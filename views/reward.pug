@@ -78,13 +78,13 @@ block content
               th.text-center #{settings.locale.heavy_reward}
               th.text-center #{settings.locale.heavy_estnext}
           tbody
-            - var supplyValue = Number(heavy.supply).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+            - var supplyValue = Number(heavy.supply).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             - var splitSupply = supplyValue.split('.');
-            - var capValue = Number(heavy.cap).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+            - var capValue = Number(heavy.cap).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             - var splitCap = capValue.split('.');
-            - var rewardValue = Number(heavy.reward).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+            - var rewardValue = Number(heavy.reward).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             - var splitReward = rewardValue.split('.');
-            - var nextValue = Number(heavy.estnext).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+            - var nextValue = Number(heavy.estnext).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             - var splitNext = nextValue.split('.');
             tr
               td.text-center #{splitSupply[0]}.

@@ -122,12 +122,12 @@ block content
                   a.breakWord(href='/tx/' + txn.txid) #{txn.txid}
                 td.text-center #{txn.vout.length}
                 if txn.vout.length > 0
-                  - var total = Number(txn.total / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                  - var total = Number(txn.total / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split('.');
-                  td.text-center #{totalParts[0]}.
+                  td.text-end #{totalParts[0]}.
                     span.decimal #{totalParts[1]}
                 else
-                  - var total = Number(txn.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                  - var total = Number(txn.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split('.');
-                  td.text-center #{totalParts[0]}.
+                  td.text-end #{totalParts[0]}.
                     span.decimal #{totalParts[1]}

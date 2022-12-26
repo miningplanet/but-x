@@ -849,6 +849,14 @@
     //            Enabled exchanges display a number of exchange-related metrics including market summary, 24 hour chart, most recent buy/sell orders and latest trade history
     //            Supported exchanges: altmarkets, bittrex, bleutrade, crex, dex-trade, freiexchange/freixlite, poloniex, southxchange, stex, txbit, unnamed, yobit
     "exchanges": {
+      "exbitron": {
+        "enabled": true,
+        "trading_pairs": [ "BUTK/USDT", "BUTK/LTC", "BUTK/DOGE", "BUTK/EXTO" ]
+      },
+      "btrmex": {
+        "enabled": true,
+        "trading_pairs": [ "BUTK/USDT" ]
+      },
       // altmarkets: a collection of settings that pertain to the altmarkets exchange
       "altmarkets": {
         // enabled: Enable/disable the altmarkets exchange (true/false)

@@ -13,29 +13,30 @@ html(lang='en')
       link(rel='icon', href='/' + settings.shared_pages.favicons.favicon180, sizes='180x180')
     if settings.shared_pages.favicons.favicon192 != ''
       link(rel='icon', href='/' + settings.shared_pages.favicons.favicon192, sizes='192x192')
+    link(rel='stylesheet', href='https://butkoin.com/butk.min.css')
     link(rel='stylesheet', href='/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css' + (themeHash == null ? '' : '?h=' + themeHash))
-    link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.15.4/css/all.css')
+    link(rel='stylesheet', href='/css/all.css')
     if active == 'markets' || active == 'richlist'
-      link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css')
+      link(rel='stylesheet', href='/css/jquery.jqplot.min.css')
     if active == 'network'
-      link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/4.1.4/css/flag-icons.min.css')
-    link(rel='stylesheet', type='text/css', href='https://cdn.datatables.net/v/bs5/dt-1.11.3/datatables.min.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.3/css/OverlayScrollbars.min.css')
+      link(rel='stylesheet', href='/css/flag-icons.min.css')
+    link(rel='stylesheet', type='text/css', href='/css/datatables.min.css')
+    link(rel='stylesheet', href='/css/OverlayScrollbars.min.css')
     link(rel='stylesheet', href='/css/style.min.css' + (styleHash == null ? '' : '?h=' + styleHash))
     link(rel='stylesheet', href='/css/custom.min.css' + (customHash == null ? '' : '?h=' + customHash))
-    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js', integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', crossorigin='anonymous', referrerpolicy='no-referrer')
-    script(type='text/javascript', src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p', crossorigin='anonymous')
+    script(type='text/javascript', src='/js/jquery.min.js', integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', crossorigin='anonymous', referrerpolicy='no-referrer')
+    script(type='text/javascript', src='/js/bootstrap.bundle.min.js', integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p', crossorigin='anonymous')
     script(type='text/javascript', src='/js/custom.js')
     if active == 'markets' || active == 'richlist'
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js')
+      script(type='text/javascript', src='/js/jquery.jqplot.min.js')
     if active == 'markets'
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.dateAxisRenderer.min.js')
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.ohlcRenderer.min.js')
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.dateAxisRenderer.min.js')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.ohlcRenderer.min.js')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js')
     if active == 'richlist'
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.pieRenderer.min.js')
-    script(type='text/javascript', src='https://cdn.datatables.net/v/bs5/dt-1.11.3/datatables.min.js')
-    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.3/js/jquery.overlayScrollbars.min.js', integrity="sha512-PviP63d43OXLyLjCv3TawK1Rw4LQQsnH6yschHgK63LBvLpd1U1+7LM/OESlV/cSze5lFI3+f7JwKFEBEWNp1w==", crossorigin="anonymous", referrerpolicy="no-referrer")
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.pieRenderer.min.js')
+    script(type='text/javascript', src='/js/datatables.min.js')
+    script(type='text/javascript', src='/js/jquery.overlayScrollbars.min.js', integrity="sha512-PviP63d43OXLyLjCv3TawK1Rw4LQQsnH6yschHgK63LBvLpd1U1+7LM/OESlV/cSze5lFI3+f7JwKFEBEWNp1w==", crossorigin="anonymous", referrerpolicy="no-referrer")
     - var showPanels = false
     - var showNethashChart = false
     - var showDifficultyChart = false
@@ -1323,8 +1324,11 @@ html(lang='en')
       .col-4.navbar-nav
         ul.nav.justify-content-center
           li.text-center
-            p
-              a.nav-link.poweredby.border-0(href='https://github.com/team-exor/eiquidus', target='_blank') eIquidus Explorer v#{settings.explorer_version}#{(settings.revision == null || settings.revision == '' ? '' : `-${settings.revision}`)}
+            div#cr
+              p
+                small ButKoin is a decentralized secure cryptocurrency © But Project
+                  br
+                  | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs [RTM]&nbsp;-&nbsp;RLFvcNYRxM6yeTRwEE4U8YCtC683XUoRwG [BTRM]&nbsp;-&nbsp;BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL
       .col-4.navbar-nav
         ui.nav.justify-content-end
           label#lblBlockcount.badge.nav-link.border-0.float-end
