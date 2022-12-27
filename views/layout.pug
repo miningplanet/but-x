@@ -133,9 +133,9 @@ html(lang='en')
         if settings.error_page.show_difficulty_chart == true
           - showDifficultyChart = true
     if active == 'reward' || (settings.network_history.enabled == true && ((showNethashChart == true && settings.shared_pages.page_header.network_charts.nethash_chart.enabled == true && settings.shared_pages.show_hashrate == true) || (showDifficultyChart == true && settings.shared_pages.page_header.network_charts.difficulty_chart.enabled == true)))
-      script(type='text/javascript', src='https://cdn.jsdelivr.net/npm/chart.js@3.6.1/dist/chart.min.js')
+      script(type='text/javascript', src='/js/chart.min.js')
     if settings.network_history.enabled == true && ((showNethashChart == true && settings.shared_pages.page_header.network_charts.nethash_chart.enabled == true && settings.shared_pages.show_hashrate == true) || (showDifficultyChart == true && settings.shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
-      script(type='text/javascript', src='https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.2.0')
+      script(type='text/javascript', src='/js/chartjs-plugin-crosshair.js')
     - var sideBarClasses = [];
     if settings.shared_pages.page_header.bgcolor != null && settings.shared_pages.page_header.bgcolor != ''
       - sideBarClasses.push('bg-' + settings.shared_pages.page_header.bgcolor);
@@ -1059,11 +1059,11 @@ html(lang='en')
                 button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
                   span.navbar-toggler-icon
             if settings.shared_pages.page_header.home_link == 'title'
-              a.navbar-brand(href='/', style='order:-1;') #{settings.shared_pages.page_title}
+              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{settings.shared_pages.page_title}
             else if settings.shared_pages.page_header.home_link == 'coin'
-              a.navbar-brand(href='/', style='order:-1;') #{settings.coin.name}
+              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{settings.coin.name}
             else if settings.shared_pages.page_header.home_link == 'logo'
-              a(href='/', alt=settings.coin.name + ' Home', title=settings.coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
+              a(href='https://butkoin.com', alt=settings.coin.name + ' Home', title=settings.coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
                 img.logo-main(src=(settings.shared_pages.page_header.home_link_logo == null || settings.shared_pages.page_header.home_link_logo == '' ? settings.shared_pages.logo : settings.shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + settings.shared_pages.page_header.home_link_logo_height + 'px;')
             .collapse.navbar-collapse(id='navbar-collapse')
               ul.navbar-nav(style='width:100%;')

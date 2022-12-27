@@ -84,11 +84,11 @@ block content
             td.text-center #{splitDifficulty[0]}.
               span.decimal #{splitDifficulty[1]}
             if block.confirmations >= confirmations
-              td.text-center.table-success=block.confirmations
+              td.text-center=block.confirmations
             else if block.confirmations < (confirmations / 2)
-              td.text-center.table-danger=block.confirmations
+              td.text-center=block.confirmations
             else
-              td.text-center.table-warning=block.confirmations
+              td.text-center=block.confirmations
             if settings.blockchain_specific.heavycoin.enabled == true
               td.text-center=block.vote
             td.text-center #{splitBlockSize[0]}.

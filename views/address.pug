@@ -73,7 +73,6 @@ block content
           $("td:eq(1)", row).html('<a href="/tx/' + txhash + '">' + txhash + '</a>').addClass('breakWord d-none d-md-table-cell');
           var amount = 0;
           var updown = '';
-          var rowclass = 'table-info';
 
           if (out > 0 && vin > 0) {
             amount = Number(out - vin);
@@ -89,14 +88,12 @@ block content
           } else if (out > 0) {
             amount = Number(out).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             updown = '+';
-            rowclass = 'table-success';
           } else {
             amount = Number(vin).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
             updown = '-';
-            rowclass = 'table-danger';
           }
           var amountParts = amount.split('.');
-          $("td:eq(2)", row).html(updown + amountParts[0] + '.<span class="decimal">' + amountParts[1] + '</span>').addClass(rowclass + ' text-end');
+          $("td:eq(2)", row).html(updown + amountParts[0] + '.<span class="decimal">' + amountParts[1] + '</span>').addClass('text-end');
           $("td:eq(3)", row).html(balanceParts[0] + '.<span class="decimal">' + balanceParts[1] + '</span>').addClass('text-end');
           $("td:eq(4)", row).html('<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp) + '</span>').addClass('text-center');
         },

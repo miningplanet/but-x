@@ -95,7 +95,7 @@ block content
           if (useNewDashFormat)
             $("td.ipAddressCol", row).addClass("breakWord");
 
-          switch (data['status'].toUpperCase()) {
+          /* switch (data['status'].toUpperCase()) {
             case 'ENABLED':
               $("td.statusCol", row).addClass('table-success');
               break;
@@ -108,7 +108,7 @@ block content
             default:
               $("td.statusCol", row).addClass('table-info');
               break;
-          }
+          } */
         },
         fnDrawCallback: function(settings) {
           fixDataTableColumns();
