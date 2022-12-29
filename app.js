@@ -437,7 +437,8 @@ app.use('/ext/getsummary', function(req, res) {
           lib.get_hashrate(function(hashrate) {
             db.get_stats(settings.coin.name, function (stats) {
               lib.get_masternodecount(function(masternodestotal) {
-                lib.get_difficulty(function(difficulty) {
+                lib.get_difficulty(function(difficulties) {
+                  var difficulty = difficulties.difficulty;
                   difficultyHybrid = '';
 
                   if (difficulty && difficulty['proof-of-work']) {
