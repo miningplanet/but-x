@@ -695,39 +695,92 @@ if (lib.is_locked([database]) == false) {
               isObject = true;
             }
 
-            lib.syncLoop((isObject ? objectKeys : body).length, function(loop) {
-              var i = loop.iteration();
+            const rateLimitLib = require('../lib/ratelimit');
+            const rateLimit = new rateLimitLib.RateLimit(1, 2000, false);
 
-              db.save_masternode((isObject ? body[objectKeys[i]] : body[i]), function(success) {
-                if (success) {
-                  // check if the script is stopping
-                  if (stopSync) {
-                    // stop the loop
-                    loop.break(true);
+            db.get_masternodes(function(masternodes) {
+              console.log('Got Smartnode list by DB: ' + masternodes.length);
+              lib.syncLoop((isObject ? objectKeys : body).length, function(loop) {
+                var i = loop.iteration();
+                const node = isObject ? body[objectKeys[i]] : body[i];
+                var address = node.address;
+                console.log('Sync Smartnode %s.', address);
+                var name = '';
+                var code = '';
+                // IP location does not change so often...
+                for (mn of masternodes) {
+                  if (address == mn.ip_address) {
+                    if (mn.country && mn.country_code && mn.country.length > 0 && mn.country_code.length > 0) {
+                      name = mn.country;
+                      code = mn.country_code;
+                      // console.log("Found Smartnode country code for address in DB: " + mn.ip_address + " - " + code);
+                    }
                   }
-
-                  loop.next();
-                } else {
-                  console.log('Error: Cannot save masternode %s.', (isObject ? (body[objectKeys[i]].payee ? body[objectKeys[i]].payee : 'UNKNOWN') : (body[i].addr ? body[i].addr : 'UNKNOWN')));
-                  exit(1);
                 }
-              });
-            }, function() {
-              db.remove_old_masternodes(function(cb) {
-                db.update_last_updated_stats(settings.coin.name, { masternodes_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
-                  // check if the script stopped prematurely
-                  if (stopSync) {
-                    console.log('Masternode sync was stopped prematurely');
-                    exit(1);
-                  } else {
-                    console.log('Masternode sync complete');
-                    exit(0);
-                  }
+                address = address.indexOf(":") > -1 ? address.substring(0, address.indexOf(":")) : address;
+                
+                if (name.length > 0 && code.length > 0) {
+                  node.country = name;
+                  node.country_code = code;
+                  db.save_masternode(node, function(success) {
+                    if (success) {
+                      // check if the script is stopping
+                      if (stopSync) {
+                        loop.break(true);
+                      }
+                      loop.next();
+                    } else {
+                      console.log('Error: Cannot save Smartnode %s.', (isObject ? (body[objectKeys[i]].payee ? body[objectKeys[i]].payee : 'UNKNOWN') : (body[i].addr ? body[i].addr : 'UNKNOWN')));
+                      exit(1);
+                    }
+                  });
+                } else {
+                  rateLimit.schedule(function() {
+                    log.console('Request geo location for Smartnode: ' + address);
+                    lib.get_geo_location(address, function(error, geo) {
+                      // check if an error was returned    
+                      if (error) {
+                        console.log(error);
+                      } else if (geo == null || typeof geo != 'object') {
+                        console.log('Error: geolocation api did not return a valid object');
+                      } else {
+                        name = geo.country_name;
+                        code = geo.country_code;
+                      }
+                      node.country = name;
+                      node.country_code = code;
+                      db.save_masternode(node, function(success) {
+                        if (success) {
+                          // check if the script is stopping
+                          if (stopSync) {
+                            loop.break(true);
+                          }
+                          loop.next();
+                        } else {
+                          console.log('Error: Cannot save Smartnode %s.', (isObject ? (body[objectKeys[i]].payee ? body[objectKeys[i]].payee : 'UNKNOWN') : (body[i].addr ? body[i].addr : 'UNKNOWN')));
+                          exit(1);
+                        }
+                      });
+                    });
+                  });
+                }
+              }, function() {
+                db.remove_old_masternodes(function(cb) {
+                  db.update_last_updated_stats(settings.coin.name, { masternodes_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                    // check if the script stopped prematurely
+                    if (stopSync) {
+                      console.log('Smartnodes sync was stopped prematurely');
+                      exit(1);
+                    } else {
+                      console.log('Smartnodes sync complete');
+                      exit(0);
+                    }
+                  });
                 });
               });
             });
           } else {
-            console.log('No masternodes found');
+            console.log('No Smartnodes found');
             exit(2);
           }
         });

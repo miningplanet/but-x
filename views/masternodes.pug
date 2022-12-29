@@ -51,6 +51,7 @@ block content
           dataSrc: function(json) {
             for (i = 0; i < json.length; i++) {
               var addr = json[i]['addr'];
+              var country = json[i]['country'];
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + "'>" + json[i]['address'] + "</a>";
               json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
 
@@ -70,6 +71,11 @@ block content
                 else
                   json[i]['addr'] = '<div><label class="badge bg-default" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr'];
               }
+
+              if (json[i]['country_code'].length > 1) {
+                console.log("Add flag: " + json[i]['country_code'].toLowerCase());
+                json[i]['country'] = json[i]['country'] + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>';
+              }
             }
  
             useNewDashFormat = json.length > 0 && json[0].ip_address != null && json[0].ip_address != '';
@@ -87,28 +93,14 @@ block content
           { name: 'lastpaid', data: 'lastpaid', className: "lastPaidCol" },
           { name: 'last_paid_block', data: 'last_paid_block', className: "lastPaidBlockCol" },
           { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
-          { name: 'status', data: 'status', className: "statusCol" }
+          { name: 'status', data: 'status', className: "statusCol" },
+          { name: 'country', data: 'country', className: "text-end" }
         ],
         rowCallback: function(row, data, index) {
           $("td.addressCol", row).addClass("breakWord");
 
           if (useNewDashFormat)
             $("td.ipAddressCol", row).addClass("breakWord");
-
-          /* switch (data['status'].toUpperCase()) {
-            case 'ENABLED':
-              $("td.statusCol", row).addClass('table-success');
-              break;
-            case 'REMOVE':
-              $("td.statusCol", row).addClass('table-danger');
-              break;
-            case 'EXPIRED':
-              $("td.statusCol", row).addClass('table-warning');
-              break;
-            default:
-              $("td.statusCol", row).addClass('table-info');
-              break;
-          } */
         },
         fnDrawCallback: function(settings) {
           fixDataTableColumns();
@@ -174,7 +166,7 @@ block content
     .card.card-default.border-0.cardSpacer
       .card-header
         strong Masternode List
-      table#masternodes-table.table.table-bordered.table-striped.table-paging.table-hover
+      table#masternodes-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
         - var theadClasses = [];
         if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
           - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
@@ -190,4 +182,5 @@ block content
             th.text-center Last paid block
             th.text-center Active since
             th.text-center Status
+            th.text-center Country
         tbody.text-center

@@ -14,7 +14,9 @@ var MasternodeSchema = new Schema({
   lastpaid: { type: Number, default: 0 },
   claim_name: { type: String, default: '', index: true },
   ip_address: { type: String, default: '', index: true },
-  last_paid_block: {type: Number, default: 0}
+  last_paid_block: {type: Number, default: 0},
+  country: { type: String, default: "" },
+  country_code: { type: String, default: "" }
 }, {id: false});
 
 module.exports = mongoose.model('Masternode', MasternodeSchema);
