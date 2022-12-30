@@ -753,6 +753,7 @@ settings.api_page.public_apis.rpc.getmasternodelist = { "enabled": false };
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('coin', settings.coin);
+app.set('currencies', settings.currencies);
 app.set('network_history', settings.network_history);
 app.set('shared_pages', settings.shared_pages);
 app.set('index_page', settings.index_page);

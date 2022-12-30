@@ -199,6 +199,9 @@ block content
                     }
                   }
                 ],
+                grid: {
+                  backgroundColor: 'transparent'
+                },
                 highlighter: {
                   show: true,
                   showMarker: false,
@@ -346,21 +349,21 @@ block content
                       span.small.fw-normal  (#{marketdata.exchange})
                 tbody
                   each buy in marketdata.data.buys
-                    - var price = Number(buy.price).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                    - var price = Number(buy.price).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     - var splitPrice = price.split(".");
                     - var quantity = Number(buy.quantity).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
                     - var splitQuantity = quantity.split(".");
                     if buy.total != null
-                      - var total = Number(buy.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var total = Number(buy.total).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     else
-                      - var total = Number(parseFloat(buy.price).toFixed(8) * parseFloat(buy.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var total = Number(parseFloat(buy.price).toFixed(8) * parseFloat(buy.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     - var splitTotal = total.split(".");
                     tr
-                      td.text-center.text-success.fw-bold #{splitPrice[0]}.
+                      td.text-end.text-success.fw-bold #{splitPrice[0]}.
                         span.decimal #{splitPrice[1]}
-                      td.text-center #{splitQuantity[0]}.
+                      td.text-end #{splitQuantity[0]}.
                         span.decimal #{splitQuantity[1]}
-                      td.text-center #{splitTotal[0]}.
+                      td.text-end #{splitTotal[0]}.
                         span.decimal #{splitTotal[1]}
           .col-md-6.col-xs-12.cardSpacer
             .card.card-default.border-0.wrapper-border-0(class=theadClasses)
@@ -371,29 +374,29 @@ block content
               table#sell-orders.table.table-striped.table-bordered.table-hover.order-table.bottom-border-0
                 thead
                   tr(class=theadClasses)
-                    th.text-center #{settings.locale.mkt_price}
+                    th.text-end #{settings.locale.mkt_price}
                       span.small.fw-normal  (#{marketdata.exchange})
-                    th.text-center #{settings.locale.mkt_amount}
+                    th.text-end #{settings.locale.mkt_amount}
                       span.small.fw-normal  (#{marketdata.coin})
-                    th.text-center #{settings.locale.mkt_total}
+                    th.text-end #{settings.locale.mkt_total}
                       span.small.fw-normal  (#{marketdata.exchange})
                 tbody
                   each sell in marketdata.data.sells
-                    - var price = Number(sell.price).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                    - var price = Number(sell.price).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     - var splitPrice = price.split(".");
                     - var quantity = Number(sell.quantity).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
                     - var splitQuantity = quantity.split(".");
                     if sell.total != null
-                      - var total = Number(sell.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var total = Number(sell.total).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     else
-                      - var total = Number(parseFloat(sell.price).toFixed(8) * parseFloat(sell.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var total = Number(parseFloat(sell.price).toFixed(8) * parseFloat(sell.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                     - var splitTotal = total.split(".");
                     tr
-                      td.text-center.text-danger.fw-bold #{splitPrice[0]}.
+                      td.text-end.text-danger.fw-bold #{splitPrice[0]}.
                         span.decimal #{splitPrice[1]}                  
-                      td.text-center #{splitQuantity[0]}.
+                      td.text-end #{splitQuantity[0]}.
                         span.decimal #{splitQuantity[1]}
-                      td.text-center #{splitTotal[0]}.
+                      td.text-end #{splitTotal[0]}.
                         span.decimal #{splitTotal[1]}
         .row
           .col-md-12
@@ -415,32 +418,32 @@ block content
                 tbody
                   each order in marketdata.data.history
                     if order.ordertype != null
-                      - var price = Number(order.price).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var price = Number(order.price).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       - var splitPrice = price.split(".");
-                      - var quantity = Number(order.quantity).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var quantity = Number(order.quantity).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       - var splitQuantity = quantity.split(".");
                       if order.total != null
-                        - var total = Number(order.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                        - var total = Number(order.total).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       else
-                        - var total = Number(parseFloat(order.price).toFixed(8) * parseFloat(order.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                        - var total = Number(parseFloat(order.price).toFixed(8) * parseFloat(order.quantity).toFixed(8)).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       - var splitTotal = total.split(".");
                       if order.ordertype.toUpperCase() == 'BUY'
                         tr
-                          td.text-center.text-success.fw-bold #{splitPrice[0]}.
+                          td.text-end.text-success.fw-bold #{splitPrice[0]}.
                             span.decimal #{splitPrice[1]}   
-                          td.text-center #{splitQuantity[0]}.
+                          td.text-end #{splitQuantity[0]}.
                             span.decimal #{splitQuantity[1]}
-                          td.text-center #{splitTotal[0]}.
+                          td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
                             span.timestampCol=order.timestamp
                       else
                         tr
-                          td.text-center.text-danger.fw-bold #{splitPrice[0]}.
+                          td.text-end.text-danger.fw-bold #{splitPrice[0]}.
                             span.decimal #{splitPrice[1]}
-                          td.text-center #{splitQuantity[0]}.
+                          td.text-end #{splitQuantity[0]}.
                             span.decimal #{splitQuantity[1]}
-                          td.text-center #{splitTotal[0]}.
+                          td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
                             span.timestampCol=order.timestamp
