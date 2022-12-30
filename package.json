@@ -39,7 +39,7 @@
     "intl": "^1.2.5",
     "jsonminify": "^0.4.2",
     "mongodb": "^4.7.0",
-    "mongoose": "^6.3.6",
+    "mongoose": "^6.8.2",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.31",
     "pug": "~3.0.2",
