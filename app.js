@@ -568,8 +568,15 @@ app.use('/ext/getnetworkpeers', function(req, res) {
         delete peers[i]['_doc']['__v'];
       }
 
+      var newPeers = [];
+      for (i = 0; i < peers.length; i++) {
+        if (peers[i].version != 'ButKoin Core Green:1.2.17.3') {
+          newPeers.push(peers[i]);
+        }
+      }
+
       // sort ip6 addresses to the bottom
-      peers.sort(function(a, b) {
+      newPeers.sort(function(a, b) {
         var address1 = a.address.indexOf(':') > -1;
         var address2 = b.address.indexOf(':') > -1;
 
@@ -582,7 +589,7 @@ app.use('/ext/getnetworkpeers', function(req, res) {
       });
 
       // return peer data
-      res.json(peers);
+      res.json(newPeers);
     });
   } else
     res.end('This method is disabled');
