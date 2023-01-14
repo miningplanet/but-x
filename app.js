@@ -268,12 +268,65 @@ app.use('/ext/getdistribution', function(req, res) {
 app.use('/ext/getcurrentprice', function(req, res) {
   // check if the getcurrentprice api is enabled
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getcurrentprice.enabled == true) {
-    db.get_stats(settings.coin.name, function (stats) {
-      eval('var p_ext = { "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, }');
-      res.send(p_ext);
-    });
-  } else
+    const defaultExchangeCurrencyPrefix = settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase();
+    if (settings.cache.enabled == true) {
+      var r = priceCache.get(1);
+      if (r == undefined) {
+        // getPrices(true, res)
+        // res.send(getPrices(true, res));
+        db.get_stats(settings.coin.name, function (stats) {
+          r = {};
+          r['last_price_' + defaultExchangeCurrencyPrefix] = stats.last_price;
+          r['last_price_usd'] = stats.last_usd_price;
+          lib.get_exchange_rates(function(error, data) {
+            if (error) {
+              console.log(error);
+            } else if (data == null || typeof data != 'object') {
+              console.log('Error: exchange rates API did not return a valid object');
+            } else {
+              // Cache all exchange rates and add by config
+              priceCache.set(2,data);
+              for (var item in settings.currencies) {
+                console.debug(item, data[item]);
+                if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
+                  r['last_price_' + item.toLowerCase()] = Number.parseFloat(r['last_price_usd']) * Number.parseFloat(data.rates[item]);
+                }
+              };
+              priceCache.set (1, r);
+              console.debug("Cache prices: " + JSON.stringify(r));
+              res.send(r);
+            }
+          });
+        });
+      } else {
+        console.debug("Get prices by cache: " + JSON.stringify(r));
+        res.send(r);
+      }
+    } else {
+      db.get_stats(settings.coin.name, function (stats) {
+        r = {};
+        r['last_price_' + defaultExchangeCurrencyPrefix] = stats.last_price;
+        r['last_price_usd'] = stats.last_usd_price;
+        lib.get_exchange_rates(function(error, data) {
+          if (error) {
+            console.log(error);
+          } else if (data == null || typeof data != 'object') {
+            console.log('Error: exchange rates api did not return a valid object');
+          } else {
+            for (var item in settings.currencies) {
+              if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
+                r['last_price_' + item.toLowerCase()] = Number.parseFloat(r['last_price_usd']) * Number.parseFloat(data.rates[item]);
+              }
+            };
+            console.debug("Get prices by cache: " + JSON.stringify(r));
+            res.send(r);
+          }
+        });
+      });
+    }
+  } else {
     res.end('This method is disabled');
+  }
 });
 
 app.use('/ext/getbasicstats', function(req, res) {

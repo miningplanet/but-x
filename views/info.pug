@@ -222,7 +222,18 @@ block content
                 p
                   div.fw-bold getcurrentprice
                   div
-                    em Returns last known exchange price
+                    em Returns last known exchange prices in
+                      ul
+                        li Bitcoin (BTC)
+                        li Theter (USDT)
+                        li US Dollar (USD)
+                        li Euro (EUR)
+                        li Chinese Yuan (CNY)
+                        li Indian Rupees (INR)
+                        li Japanese Yen (JPY)
+                        li British Pound Sterling (GBP)
+                        li Russian Rubel (RUB)
+                        li Brazilian Real (BRL)
                   a(href='/ext/getcurrentprice') #{address}/ext/getcurrentprice
             if settings.api_page.public_apis.ext.getnetworkpeers.enabled == true
               li
