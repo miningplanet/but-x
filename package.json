@@ -30,6 +30,7 @@
     "update-explorer": "node ./scripts/update_explorer.js"
   },
   "dependencies": {
+    "@isaacs/ttlcache": "^1.2.1",
     "async": "^3.2.4",
     "bad-words": "^3.0.4",
     "body-parser": "^1.20.0",

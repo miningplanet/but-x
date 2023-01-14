@@ -10,10 +10,12 @@ var express = require('express'),
     lib = require('./lib/explorer'),
     db = require('./lib/database'),
     package_metadata = require('./package.json'),
-    locale = require('./lib/locale');
+    locale = require('./lib/locale'),
+    TTLCache = require('@isaacs/ttlcache');
 var app = express();
 var apiAccessList = [];
 const { exec } = require('child_process');
+const priceCache = new TTLCache({ max: 2, ttl: settings.cache.price * 1000, updateAgeOnGet: false, noUpdateTTL: false });
 
 // pass wallet rpc connection info to nodeapi
 nodeapi.setWalletDetails(settings.wallet);
@@ -754,6 +756,7 @@ app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('coin', settings.coin);
 app.set('currencies', settings.currencies);
+app.set('cache', settings.cache);
 app.set('network_history', settings.network_history);
 app.set('shared_pages', settings.shared_pages);
 app.set('index_page', settings.index_page);

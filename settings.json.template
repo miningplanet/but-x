@@ -78,6 +78,12 @@
     "symbol": "EXOR"
   },
 
+  // TTL cache (time in seconds)
+  "cache" = {
+    "enabled": true,
+    "price": 30
+  },
+
   // network_history: a collection of settings that controls saving of extra historical network data during a block sync
   "network_history": {
     // enabled: Enable/disable the saving of additional network history data (true/false)
