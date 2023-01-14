@@ -340,6 +340,23 @@
           //          Set this to any valid html color
           //          Ex: "#ffffff" or "rgba(255, 255, 255, 1)" or "white"
           "bgcolor": "#ffffff",
+          "pow_line_color": "rgba(173,255,47)",
+          "pow_fill_color": "rgba(173,255,47, 0.2)",
+          "pos_line_color": "rgba(173,255,47)",
+          "pos_fill_color": "rgba(173,255,47, 0.2)",
+          "ghostrider_line_color": "rgba(153,255,47)",
+          "ghostrider_fill_color": "rgba(153,255,47, 0.2)",
+          "yespower_line_color": "rgba(213,255,87)",
+          "yespower_fill_color": "rgba(213,255,87, 0.2)",
+          "lyra2_line_color": "rgba(245,182,66)",
+          "lyra2_fill_color": "rgba(245,182,66, 0.2)",
+          "sha256d_line_color": "rgba(66,245,245)",
+          "sha256d_fill_color": "rgba(66,245,245, 0.2)",
+          "scrypt_line_color": "rgba(66,123,245)",
+          "scrypt_fill_color": "rgba(66,123,245, 0.2)",
+          "butkscrypt_line_color": "rgba(54,52,186)",
+          "butkscrypt_fill_color": "rgba(54,52,186, 0.2)",
+          
           // pow_line_color: Change the line color of the network difficulty chart for POW coins
           //                 Set this to any valid html color
           //                 Ex: "#ffffff" or "rgba(255, 255, 255, 1)" or "white"
