@@ -94,6 +94,13 @@ block content
                   div.fw-bold getnetworkhashps
                   div
                     em #{settings.locale.api_getnetworkhashps}
+                      ul
+                        li Ghostrider (CPU)
+                        li Yespower (CPU)
+                        li Lyra2z330 (GPU)
+                        li Sha256d (ASIC)
+                        li Scrypt (ASIC)
+                        li Butkscrypt (ASIC)
                   a(href='/api/getnetworkhashps') #{address}/api/getnetworkhashps
             if settings.api_page.public_apis.rpc.getvotelist.enabled == true && settings.api_cmds['getvotelist'] != null && settings.api_cmds['getvotelist'] != ''
               li

@@ -415,10 +415,45 @@ html(lang='en')
                       labels: result.map(function(a) {return a.blockindex;}),
                       datasets: [
                         {
-                          label: 'Hashrate',
-                          data: result.map(function(a) {return a.nethash;}),
-                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.fill_color}'],
-                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.line_color}'],
+                          label: 'Ghostrider',
+                          data: result.map(function(a) {return a.nethash_ghostrider;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.ghostrider_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.ghostrider_line_color}'],
+                          fill: 'start'
+                        },
+                        {
+                          label: 'Yespower',
+                          data: result.map(function(a) {return a.nethash_yespower;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.yespower_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.yespower_line_color}'],
+                          fill: 'start'
+                        },
+                        {
+                          label: 'Lyra2',
+                          data: result.map(function(a) {return a.nethash_lyra2;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.lyra2_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.lyra2_line_color}'],
+                          fill: 'start'
+                        },
+                        {
+                          label: 'Sha256d',
+                          data: result.map(function(a) {return a.nethash_sha256d;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.sha256d_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.sha256d_line_color}'],
+                          fill: 'start'
+                        },
+                        {
+                          label: 'Scrypt',
+                          data: result.map(function(a) {return a.nethash_scrypt;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.scrypt_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.scrypt_line_color}'],
+                          fill: 'start'
+                        },
+                        {
+                          label: 'Butkscrypt',
+                          data: result.map(function(a) {return a.nethash_butkscrypt;}),
+                          backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.butkscrypt_fill_color}'],
+                          borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.butkscrypt_line_color}'],
                           fill: 'start'
                         }
                       ]

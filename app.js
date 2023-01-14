@@ -489,7 +489,7 @@ app.use('/ext/getsummary', function(req, res) {
             blockcount: (blockcount ? blockcount : '-')
           });
         } else {
-          lib.get_hashrate(function(hashrate) {
+          lib.get_hashrate(function(hashps) {
             db.get_stats(settings.coin.name, function (stats) {
               lib.get_masternodecount(function(masternodestotal) {
                 lib.get_difficulty(function(difficulties) {
@@ -506,8 +506,8 @@ app.use('/ext/getsummary', function(req, res) {
                       difficulty = difficulty['proof-of-stake'];
                   }
 
-                  if (hashrate == 'There was an error. Check your console.')
-                    hashrate = 0;
+                  if (hashps == 'There was an error. Check your console.')
+                    hashps = 0;
 
                   // check if the masternode count api is enabled
                   if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
@@ -527,7 +527,13 @@ app.use('/ext/getsummary', function(req, res) {
                       difficulty: (difficulty ? difficulty : '-'),
                       difficultyHybrid: difficultyHybrid,
                       supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                      hashrate: hashrate,
+                      hashrate: hashps.nethash_butkscrypt,
+                      hashrate_ghostrider: hashps.nethash_ghostrider,
+                      hashrate_yespower: hashps.nethash_yespower,
+                      hashrate_lyra2: hashps.nethash_lyra2,
+                      hashrate_sha256d: hashps.nethash_sha256d,
+                      hashrate_scrypt: hashps.nethash_scrypt,
+                      hashrate_butk: hashps.nethash_butkscrypt,
                       lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
                       connections: (connections ? connections : '-'),
                       masternodeCountOnline: (masternodestotal ? mn_enabled : '-'),
@@ -540,7 +546,13 @@ app.use('/ext/getsummary', function(req, res) {
                       difficulty: (difficulty ? difficulty : '-'),
                       difficultyHybrid: difficultyHybrid,
                       supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                      hashrate: hashrate,
+                      hashrate: hashps.nethash_butkscrypt,
+                      hashrate_ghostrider: hashps.nethash_ghostrider,
+                      hashrate_yespower: hashps.nethash_yespower,
+                      hashrate_lyra2: hashps.nethash_lyra2,
+                      hashrate_sha256d: hashps.nethash_sha256d,
+                      hashrate_scrypt: hashps.nethash_scrypt,
+                      hashrate_butk: hashps.nethash_butkscrypt,
                       lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
                       connections: (connections ? connections : '-'),
                       blockcount: (blockcount ? blockcount : '-')
