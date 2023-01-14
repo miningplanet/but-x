@@ -192,7 +192,7 @@ block content
                     renderer: $.jqplot.OHLCRenderer,
                     rendererOptions: {
                       candleStick: true,
-                      upBodyColor: '#2aa3a3',
+                      upBodyColor: 'rgba(213,255,87)',
                       downBodyColor: '#e2595b',
                       fillUpBody: true,
                       fillDownBody: true
@@ -200,7 +200,13 @@ block content
                   }
                 ],
                 grid: {
-                  backgroundColor: 'transparent'
+                  backgroundColor: 'transparent',
+                  gridLineColor: 'rgba(100,100,100,0.5)',
+                  shadow: true,
+                  shadowAngle: 45,
+                  shadowOffset: 1.5,
+                  shadowWidth: 3,
+                  shadowDepth: 3
                 },
                 highlighter: {
                   show: true,

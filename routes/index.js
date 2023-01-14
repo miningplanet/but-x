@@ -329,7 +329,7 @@ function route_get_index(res, error) {
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
           themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_prefix: settings.coin.name + ' Block Explorer'
+          page_title_prefix: settings.coin.name + ' Explorer'
         }
       );
     });
@@ -345,7 +345,7 @@ function route_get_index(res, error) {
         customHash: get_file_timestamp('./public/css/custom.scss'),
         styleHash: get_file_timestamp('./public/css/style.scss'),
         themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-        page_title_prefix: settings.coin.name + ' Block Explorer'
+        page_title_prefix: settings.coin.name + ' Explorer'
       }
     );
   }
@@ -430,9 +430,9 @@ router.get('/info', function(req, res) {
     // load the api page
     res.render(
       'info',
-      {
+      { // req.headers.host
         active: 'info',
-        address: req.headers.host,
+        address: 'https://explorer.butkoin.com',
         showSync: db.check_show_sync_message(),
         customHash: get_file_timestamp('./public/css/custom.scss'),
         styleHash: get_file_timestamp('./public/css/style.scss'),
@@ -683,7 +683,7 @@ router.get('/masternodes', function(req, res) {
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
             themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-            page_title_prefix: settings.coin.name + ' Masternodes'
+            page_title_prefix: settings.coin.name + ' Smartnodes'
           }
         );
       });
@@ -698,7 +698,7 @@ router.get('/masternodes', function(req, res) {
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
           themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_prefix: settings.coin.name + ' Masternodes'
+          page_title_prefix: settings.coin.name + ' Smartnodes'
         }
       );
     }

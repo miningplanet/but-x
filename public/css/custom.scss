@@ -1,7 +1,11 @@
 /* Add custom css rules here */
 :root { --bs-body-bg: #080808 }
-BODY { font-family: 'Courier New',monospace !important }
-DIV#body-container { margin: 80px auto !important }
+BODY { align-items: baseline; font-family: 'Courier New',monospace !important }
+IMG.logo-main { margin-right: 14px !important }
+.navbar-light .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28173, 255, 47, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; }
+DIV#main-child-container DIV.col-lg-12 { margin-top: 30px !important; }
+DIV#body-container { margin: 50px auto !important }
+DIV#page-header-container { margin-top: 15px !important }
 DIV.col-md-12 { padding-left: 10px !important; padding-right: 10px !important; }
 DIV.align-items-start { margin-bottom: 20px !important; } 
 DIV.border-0 { min-height: 40px !important; border: solid 1px greenyellow !important }
@@ -12,3 +16,5 @@ DIV#pnlThree { margin-bottom: 25px !important }
 /*DIV#pnlThree IMG { filter: hue-rotate(35deg) }*/
 TBODY TR TD A, DIV.card-body A { color: greenyellow !important }
 DIV#footer-container DIV.navbar-nav LABEL.nav-link { color: greenyellow !important }
+A.page-link { background-color: transparent !important }
+.text-success { color: rgba(213,255,87) !important }

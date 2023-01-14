@@ -89,7 +89,7 @@ block content
         a#showClaimInstructions.badge.bg-primary(href='#claimInstructions', style='font-size:100%;margin-bottom:15px;', data-bs-toggle='collapse' role='button' aria-expanded='false' aria-controls='claimInstructions')
           i.fas.fa-angle-up(style='margin-right:5px;')
           span Show claim instructions
-        div#claimInstructions.alert.alert-primary.collapse
+        div#claimInstructions.collapse
           div
             span Use the
             span.fw-bold  Sign Message
@@ -124,6 +124,7 @@ block content
           div
             span.fw-bold NOTE:
             span  You can update your claimed address at any time, as often as you wish. To remove a previously claimed display name, simply sign a blank message to return the address back to its original value.
+          br
         form#claimForm
           .form-group
             fieldset.entryField

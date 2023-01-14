@@ -1129,7 +1129,7 @@ html(lang='en')
           div.container
             .navbar-header
               span#navbar-toggler-span(alt='Toggle Menu', title='Toggle Menu', data-bs-toggle='tooltip', data-bs-placement='left')
-                button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
+                button.navbar-light.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
                   span.navbar-toggler-icon
             if settings.shared_pages.page_header.home_link == 'title'
               a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{settings.shared_pages.page_title}
@@ -1153,7 +1153,7 @@ html(lang='en')
                   li#masternodes.nav-item
                     a.nav-link(href='/masternodes')
                       span.fa.fa-share-alt
-                      span.margin-left-5 Masternodes
+                      span.margin-left-5 Smartnodes
                 if settings.movement_page.enabled == true
                   li#movement.nav-item
                     a.nav-link(href='/movement')
@@ -1262,10 +1262,10 @@ html(lang='en')
                     span.nav-icon.fa.fa-star
                     span.margin-left-5 #{settings.locale.menu_reward}
               if settings.masternodes_page.enabled == true
-                li#masternodes.nav-item(alt="Masternodes", title="Masternodes", data-bs-toggle='tooltip', data-bs-placement='right')
+                li#masternodes.nav-item(alt="Smartnodes", title="Smartnodes", data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/masternodes')
                     span.nav-icon.fa.fa-share-alt
-                    span.margin-left-5 Masternodes
+                    span.margin-left-5 Smartnodes
               if settings.movement_page.enabled == true
                 li#movement.nav-item(alt=settings.locale.menu_movement, title=settings.locale.menu_movement, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/movement')
@@ -1401,7 +1401,7 @@ html(lang='en')
               p
                 small ButKoin is a decentralized secure cryptocurrency © But Project
                   br
-                  | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs [RTM]&nbsp;-&nbsp;RLFvcNYRxM6yeTRwEE4U8YCtC683XUoRwG [BTRM]&nbsp;-&nbsp;BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL
+                  | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs
       .col-4.navbar-nav
         ui.nav.justify-content-end
           label#lblBlockcount.badge.nav-link.border-0.float-end

@@ -86,7 +86,7 @@ Table of Contents
 - Sass support
 - Pages/features:
   - **Home/Explorer:** Displays latest blockchain transactions
-  - **Masternodes:** Displays the current listing of all masternodes known to be active on the network. *\*only applicable to masternode coins*
+  - **Smartnodes:** Displays the current listing of all masternodes known to be active on the network. *\*only applicable to masternode coins*
   - **Movement:** Displays latest blockchain transactions that are greater than a certain configurable amount
   - **Network:** Displays a list of peers that have connected to the coind wallet in the past 24 hours, along with useful addnode data that can be used to connect your own wallets to the network easier
   - **Top 100:** Displays the top 100 richest wallet addresses, the top 100 wallet addresses that have the highest total number of coins received based on adding up all received transactions, as well as a table and pie chart breakdown of wealth distribution. Additional support for omitting burned coins from top 100 lists
@@ -163,7 +163,7 @@ Table of Contents
 - Customizable panels at the top of every page to display the following information:
   - **Network:** Displays the current network hash rate *\*only applicable to POW coins*
   - **Difficulty:** Displays the current proof-of-work and/or proof-of-stake difficulty
-  - **Masternodes:** Displays a count of online and unreachable masternodes *\*only applicable to masternode coins*
+  - **Smartnodes:** Displays a count of online and unreachable smartnodes *\*only applicable to smartnode coins*
   - **Coin Supply:** Displays the current circulating coin supply value
   - **Price:** Displays the current market price (value measured using default market pair)
   - **Market Cap:** Displays the current market cap value in (value measured using default market pair)

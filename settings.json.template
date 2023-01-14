@@ -1260,7 +1260,7 @@
         },
         // getmasternodelist: a collection of settings that pertain to the /ext/getmasternodelist api endpoint
         //                    Returns the complete list of masternodes on the network (only applicable to masternode coins)
-        //                    NOTE: This api is used internally via ajax call to populate the Masternodes table on the masternodes page. Disabling the api from here will not stop the Masternodes table from displaying data
+        //                    NOTE: This api is used internally via ajax call to populate the smartnodes table on the masternodes page. Disabling the api from here will not stop the smartnodes table from displaying data
         "getmasternodelist": {
           // enabled: Enable/disable the /ext/getmasternodelist api endpoint (true/false)
           //          If set to false, the /ext/getmasternodelist api will be completely disabled for public use (no definition on the api page and a disabled error msg if you try to call the endpoint directly) but the api will still be available internally to the explorer
