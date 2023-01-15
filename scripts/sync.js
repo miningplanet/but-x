@@ -703,8 +703,14 @@ if (lib.is_locked([database]) == false) {
               lib.syncLoop((isObject ? objectKeys : body).length, function(loop) {
                 var i = loop.iteration();
                 const node = isObject ? body[objectKeys[i]] : body[i];
+                // Copy for BUTK.
+                node.txhash = node.proTxHash;
+                node.lastpaid = node.lastpaidtime;
+                node.last_paid_block = node.lastpaidblock;
+                node.txhash = node.proTxHash;
+                // Copy for BUTK end.
                 var address = node.address;
-                console.log('Sync Smartnode %s.', address);
+                console.log('Sync Smartnode %s', address);
                 var name = '';
                 var code = '';
                 // IP location does not change so often...
@@ -736,7 +742,7 @@ if (lib.is_locked([database]) == false) {
                   });
                 } else {
                   rateLimit.schedule(function() {
-                    log.console('Request geo location for Smartnode: ' + address);
+                    console.log('Request geo location for Smartnode: ' + address);
                     lib.get_geo_location(address, function(error, geo) {
                       // check if an error was returned    
                       if (error) {
@@ -765,7 +771,7 @@ if (lib.is_locked([database]) == false) {
                   });
                 }
               }, function() {
-                db.remove_old_masternodes(function(cb) {
+                // db.remove_old_masternodes(function(cb) {
                   db.update_last_updated_stats(settings.coin.name, { masternodes_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
                     // check if the script stopped prematurely
                     if (stopSync) {
@@ -776,7 +782,7 @@ if (lib.is_locked([database]) == false) {
                       exit(0);
                     }
                   });
-                });
+                // });
               });
             });
           } else {
