@@ -145,10 +145,51 @@ html(lang='en')
       - sideBarClasses.push('bg-primary');
       - sideBarClasses.push('navbar-dark');
     script.
+      var nethashChart;
+      var difficultyChart;
       var sideMarketVisible = false;
       var topMenuExpanded = false;
       var sideBarClasses = '!{sideBarClasses}'.replace(/,/g, " ");
       /* Special thanks to the stackoverflow community for the getParameterByName function: https://stackoverflow.com/a/901144/3038650 */
+      function undefinedOrFalse(i) {
+        return typeof i === 'undefined' || i == null || i == false;
+      }
+      function hashonlycpu() {
+        const newState = undefinedOrFalse( nethashChart.data.datasets[0].hidden) || undefinedOrFalse( nethashChart.data.datasets[1].hidden);
+        nethashChart.data.datasets[0].hidden = newState;
+        nethashChart.data.datasets[1].hidden = newState;
+        nethashChart.update();
+      }
+      function hashonlygpu() {
+        const newState = undefinedOrFalse( nethashChart.data.datasets[2].hidden);
+        nethashChart.data.datasets[2].hidden = newState;
+        nethashChart.update();
+      }
+      function hashonlyasic() {
+        const newState = undefinedOrFalse( nethashChart.data.datasets[3].hidden) || undefinedOrFalse( nethashChart.data.datasets[4].hidden) || undefinedOrFalse( nethashChart.data.datasets[5].hidden);
+        nethashChart.data.datasets[3].hidden = newState;
+        nethashChart.data.datasets[4].hidden = newState;
+        nethashChart.data.datasets[5].hidden = newState;
+        nethashChart.update();
+      }
+      function diffonlycpu() {
+        const newState = undefinedOrFalse( difficultyChart.data.datasets[0].hidden) || undefinedOrFalse( difficultyChart.data.datasets[1].hidden);
+        difficultyChart.data.datasets[0].hidden = newState;
+        difficultyChart.data.datasets[1].hidden = newState;
+        difficultyChart.update();
+      }
+      function diffonlygpu() {
+        const newState = undefinedOrFalse( difficultyChart.data.datasets[2].hidden);
+        difficultyChart.data.datasets[2].hidden = newState;
+        difficultyChart.update();
+      }
+      function diffonlyasic() {
+        const newState = undefinedOrFalse( difficultyChart.data.datasets[3].hidden) || undefinedOrFalse( difficultyChart.data.datasets[4].hidden) || undefinedOrFalse( difficultyChart.data.datasets[5].hidden);
+        difficultyChart.data.datasets[3].hidden = newState;
+        difficultyChart.data.datasets[4].hidden = newState;
+        difficultyChart.data.datasets[5].hidden = newState;
+        difficultyChart.update();
+      }
       function getParameterByName(name, url = window.location.href) {
         name = name.replace(/[\[\]]/g, '\\$&');
         var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
@@ -423,7 +464,7 @@ html(lang='en')
                         },
                         {
                           label: 'Yespower',
-                          data: result.map(function(a) {return a.nethash_yespower;}),
+                          data: result.map(function(a) {return a.nethash_yespower / 1000;}),
                           backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.yespower_fill_color}'],
                           borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.yespower_line_color}'],
                           fill: 'start'
@@ -437,7 +478,7 @@ html(lang='en')
                         },
                         {
                           label: 'Sha256d',
-                          data: result.map(function(a) {return a.nethash_sha256d;}),
+                          data: result.map(function(a) {return a.nethash_sha256d / 1000;}),
                           backgroundColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.sha256d_fill_color}'],
                           borderColor: ['#{settings.shared_pages.page_header.network_charts.nethash_chart.sha256d_line_color}'],
                           fill: 'start'
@@ -472,20 +513,27 @@ html(lang='en')
                         yAxis: {
                           title: {
                             display: true,
-                            text: 'Network ' + getNetHashUnits(),
+                            text: 'KH/s or MH/s',
                             font: {
                               weight: 'bold'
                             }
-                          }
+                          },
+                          type: 'linear'
                         }
                       },
                       plugins: {
                         legend: {
+                          onClick: (e) => e.stopPropagation(),
                           display: true,
-                          position: 'bottom'
+                          position: 'bottom',
+                          labels: {
+                            boxHeight: 12,
+                            boxWidth: 12
+                          }
                         },
                         title: {
-                          display: false
+                          display: false,
+                          padding: 0
                         },
                         tooltip: {
                           mode: 'index',
@@ -508,7 +556,25 @@ html(lang='en')
                                   max = decimalCount;
                               }
 
-                              return Number((context.raw || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':max,'useGrouping':true}) + ' ' + getNetHashUnits();
+                              if (context.dataset.label == 'Ghostrider') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' KH/s';
+                              } else if (context.dataset.label == 'Yespower') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' MH/s';
+                              } else if (context.dataset.label == 'Lyra2') {
+                                const n = Number((context.raw *1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' KH/s'
+                              } if (context.dataset.label == 'Sha256d') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' MH/s'
+                              } else if (context.dataset.label == 'Scrypt') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' KH/s'
+                              } else if (context.dataset.label == 'Butkscrypt') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' KH/s'
+                              }
                             }
                           }
                         },
@@ -573,27 +639,24 @@ html(lang='en')
                   });
                   diffDataSets.push({
                     label: 'Sha256d',
-                    data: result.map(function(a) {return a.difficulty_sha256d;}),
+                    data: result.map(function(a) {return a.difficulty_sha256d}),
                     backgroundColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.sha256d_fill_color}'],
                     borderColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.sha256d_line_color}'],
-                    fill: 'start',
-                    hidden: true,
+                    fill: 'start'
                   });
                   diffDataSets.push({
                     label: 'Scrypt',
                     data: result.map(function(a) {return a.difficulty_scrypt;}),
                     backgroundColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.scrypt_fill_color}'],
                     borderColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.scrypt_line_color}'],
-                    fill: 'start',
-                    hidden: true,
+                    fill: 'start'
                   });
                   diffDataSets.push({
                     label: 'Butkscrypt',
-                    data: result.map(function(a) {return a.difficulty_butkscrypt;}),
+                    data: result.map(function(a) {return a.difficulty_butkscrypt}),
                     backgroundColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_fill_color}'],
                     borderColor: ['#{settings.shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_line_color}'],
-                    fill: 'start',
-                    hidden: true,
+                    fill: 'start'
                   });
                 }
 
@@ -632,13 +695,19 @@ html(lang='en')
                             font: {
                               weight: 'bold'
                             }
-                          }
+                          },
+                          type: 'logarithmic'
                         }
                       },
                       plugins: {
                         legend: {
+                          onClick: (e) => e.stopPropagation(),
                           display: true,
-                          position: 'bottom'
+                          position: 'bottom',
+                          labels: {
+                            boxHeight: 12,
+                            boxWidth: 12
+                          }
                         },
                         title: {
                           display: false
@@ -1373,15 +1442,23 @@ html(lang='en')
                     .card.card-default.border-0
                       .card-header
                         strong Network Hashrate
-                      .card-body
+                      .card-body(style='padding:0.2rem;')
                         canvas#nethashChart(style='max-height:300px;background-color:'+settings.shared_pages.page_header.network_charts.nethash_chart.bgcolor+';')
+                      .card-footer(id='hashChartFooter')
+                        button(onclick='hashonlycpu()') CPU
+                        button(onclick='hashonlygpu()') GPU
+                        button(onclick='hashonlyasic()') ASIC
                 if showDifficultyChart == true && settings.shared_pages.page_header.network_charts.difficulty_chart.enabled == true
                   div#difficultyChartParent(class=chartColumnClass, style='display:none;margin:10px 0;')
                     .card.card-default.border-0
                       .card-header
                         strong Proof of work (PoW) Difficulty
-                      .card-body
+                      .card-body(style='padding:0.2rem;')
                         canvas#difficultyChart(style='max-height:300px;background-color:'+settings.shared_pages.page_header.network_charts.difficulty_chart.bgcolor+';')
+                      .card-footer(id="difficultyChartFooter")
+                        button(onclick='diffonlycpu()') CPU
+                        button(onclick='diffonlygpu()') GPU
+                        button(onclick='diffonlyasic()') ASIC
           block content
     div#footer-container(class=footerClasses, role='navigation')
       .col-4.navbar-nav
