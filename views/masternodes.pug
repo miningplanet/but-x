@@ -56,7 +56,7 @@ block content
               json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
 
               if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
-                json[i]['lastpaid'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']) + '</span>';
+                json[i]['lastpaid'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']).replace(' UTC', '') + '</span>';
               else
                 json[i]['lastpaid'] = '<em>N/A</em>';
               if (json[i]['activetime'])
@@ -178,8 +178,8 @@ block content
             th.text-center Wallet address
             th.text-center Protocol
             th.text-center Last seen
+            th.text-center Last paid (UTC)
             th.text-center Last paid
-            th.text-center Last paid block
             th.text-center Active since
             th.text-center Status
             th.text-center Country
