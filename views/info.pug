@@ -263,6 +263,16 @@ block content
                   div
                     em="Returns basic statistics about the coin including: block count, circulating supply, USD price, " + settings.markets_page.default_exchange.trading_pair.split('/')[1].toUpperCase() + " price" + (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '' ? ', ' + '# of masternodes' : '')
                   a(href='/ext/getbasicstats') #{address}/ext/getbasicstats
+            if settings.api_page.public_apis.ext.getmarkets.enabled == true
+              li
+                p
+                  div.fw-bold getmarkets [mode] Use 'summary' or 'full'.
+                  div
+                    em="Returns the list of markets with summary and optional buys, sells, and chart data if mode is 'full'." 
+                  div
+                    a(href='/ext/getmarkets/summary') #{address}/ext/getmarkets/summary
+                  div
+                    a(href='/ext/getmarkets/full') #{address}/ext/getmarkets/full
             if settings.api_page.public_apis.ext.getsummary.enabled == true
               li
                 p

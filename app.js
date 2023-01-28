@@ -361,6 +361,40 @@ app.use('/ext/getbasicstats', function(req, res) {
     res.end('This method is disabled');
 });
 
+app.use('/ext/getmarkets/:mode', function(req, res) {
+  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmarkets.enabled == true) {
+    if (req.params.mode == 'summary') {
+      db.get_markets_summary(function(data) {
+      var markets = data;
+      if (typeof markets === 'string') {
+        console.warn(markets);
+        res.end(markets);
+      }
+      var r = {}
+      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+      r.markets = markets;
+      res.send(r);
+      });
+    } else if (req.params.mode == 'full') {
+      db.get_markets(function(data) {
+      var markets = data;
+      if (typeof markets === 'string') {
+        console.warn(markets);
+        res.end(markets);
+      }
+      var r = {}
+      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+      r.markets = markets;
+      res.send(r);
+      });
+    } else {
+      res.end('Invalid mode: use summary or full.');
+    }
+  } else {
+    res.end('This method is disabled');
+  }
+});
+
 app.use('/ext/getlasttxs/:min', function(req, res) {
   // check if the getlasttxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getlasttxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
