@@ -14,6 +14,7 @@ var express = require('express'),
     TTLCache = require('@isaacs/ttlcache');
 var app = express();
 var apiAccessList = [];
+const date = require('date-and-time')
 const { exec } = require('child_process');
 const priceCache = new TTLCache({ max: 2, ttl: settings.cache.price * 1000, updateAgeOnGet: false, noUpdateTTL: false });
 
@@ -266,18 +267,17 @@ app.use('/ext/getdistribution', function(req, res) {
 });
 
 app.use('/ext/getcurrentprice', function(req, res) {
-  // check if the getcurrentprice api is enabled
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getcurrentprice.enabled == true) {
     const defaultExchangeCurrencyPrefix = settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase();
     if (settings.cache.enabled == true) {
       var r = priceCache.get(1);
       if (r == undefined) {
-        // getPrices(true, res)
-        // res.send(getPrices(true, res));
         db.get_stats(settings.coin.name, function (stats) {
-          r = {};
-          r['last_price_' + defaultExchangeCurrencyPrefix] = stats.last_price;
-          r['last_price_usd'] = stats.last_usd_price;
+          r = {}
+          r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+          r.rates = [];
+          ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
+          ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
           lib.get_exchange_rates(function(error, data) {
             if (error) {
               console.log(error);
@@ -287,9 +287,8 @@ app.use('/ext/getcurrentprice', function(req, res) {
               // Cache all exchange rates and add by config
               priceCache.set(2,data);
               for (var item in settings.currencies) {
-                console.debug(item, data[item]);
                 if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
-                  r['last_price_' + item.toLowerCase()] = Number.parseFloat(r['last_price_usd']) * Number.parseFloat(data.rates[item]);
+                  ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
                 }
               };
               priceCache.set (1, r);
@@ -304,9 +303,11 @@ app.use('/ext/getcurrentprice', function(req, res) {
       }
     } else {
       db.get_stats(settings.coin.name, function (stats) {
-        r = {};
-        r['last_price_' + defaultExchangeCurrencyPrefix] = stats.last_price;
-        r['last_price_usd'] = stats.last_usd_price;
+        r = {}
+        r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+        r.rates = [];
+        ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
+        ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
         lib.get_exchange_rates(function(error, data) {
           if (error) {
             console.log(error);
@@ -315,7 +316,7 @@ app.use('/ext/getcurrentprice', function(req, res) {
           } else {
             for (var item in settings.currencies) {
               if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
-                r['last_price_' + item.toLowerCase()] = Number.parseFloat(r['last_price_usd']) * Number.parseFloat(data.rates[item]);
+                ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
               }
             };
             console.debug("Get prices by cache: " + JSON.stringify(r));
@@ -328,6 +329,15 @@ app.use('/ext/getcurrentprice', function(req, res) {
     res.end('This method is disabled');
   }
 });
+
+function ratesPush(rates, currencies, item, price) {
+  rates.push({
+    "code": currencies[item].code,
+    "symbol": currencies[item].symbol,
+    "rate": price,
+    "name": currencies[item].name,
+  });
+}
 
 app.use('/ext/getbasicstats', function(req, res) {
   // check if the getbasicstats api is enabled

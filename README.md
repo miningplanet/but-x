@@ -122,7 +122,7 @@ Table of Contents
       - **gettx:** Returns information for given tx hash
       - **getbalance:** Returns current balance of given address
       - **getlasttxs:** Returns transactions greater than a specific number of coins, starting from a particular offset
-      - **getcurrentprice:** Returns last known exchange price
+      - **getcurrentprice:** Returns last known exchange prices
       - **getbasicstats:** Returns basic statistics about the coin including: block count, circulating supply, USD price, default market price and # of masternodes *\*# of masternodes is only applicable to masternode coins*
       - **getsummary:** Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, default market price, network connection count, block count, count of online masternodes and count of offline masternodes *\*masternode counts are only applicable to masternode coins*
       - **getnetworkpeers:** Returns the list of network peers that have connected to the explorer node in the last 24 hours
