@@ -1,30 +1,5 @@
 @use 'theme-selector' as theme-selector;
-@use './themes/cerulean/variables' as cerulean;
-@use './themes/cosmo/variables' as cosmo;
-@use './themes/cyborg/variables' as cyborg;
 @use './themes/darkly/variables' as darkly;
-@use './themes/exor/variables' as exor;
-@use './themes/flatly/variables' as flatly;
-@use './themes/journal/variables' as journal;
-@use './themes/litera/variables' as litera;
-@use './themes/lumen/variables' as lumen;
-@use './themes/lux/variables' as lux;
-@use './themes/materia/variables' as materia;
-@use './themes/minty/variables' as minty;
-@use './themes/morph/variables' as morph;
-@use './themes/pulse/variables' as pulse;
-@use './themes/quartz/variables' as quartz;
-@use './themes/sandstone/variables' as sandstone;
-@use './themes/simplex/variables' as simplex;
-@use './themes/sketchy/variables' as sketchy;
-@use './themes/slate/variables' as slate;
-@use './themes/solar/variables' as solar;
-@use './themes/spacelab/variables' as spacelab;
-@use './themes/superhero/variables' as superhero;
-@use './themes/united/variables' as united;
-@use './themes/vapor/variables' as vapor;
-@use './themes/yeti/variables' as yeti;
-@use './themes/zephyr/variables' as zephyr;
 
 $theme-name: to-lower-case(theme-selector.$theme-name);
 
