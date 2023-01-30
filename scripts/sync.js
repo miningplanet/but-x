@@ -34,6 +34,9 @@ function usage() {
   console.log('update           Updates index from last sync to current block');
   console.log('check            Checks index for (and adds) any missing transactions/addresses');
   console.log('                 Optional parameter: block number to start checking from');
+  console.log('enrichtx         Only for TX data synced prior to commit b14ae8d5636fd75e8e464323d9ba50ef0914a8c2:');
+  console.log('                 Enriches TXs with further fields like version, type, locktime and more.');
+  console.log('                 Optional parameters: block number start and end inclusive');
   console.log('reindex          Clears index then resyncs from genesis to current block');
   console.log('reindex-rich     Clears and recreates the richlist data');
   console.log('reindex-txcount  Rescan and flatten the tx count value for faster access');
@@ -294,6 +297,20 @@ if (process.argv[2] == null || process.argv[2] == 'index' || process.argv[2] == 
       }
 
       break;
+    case 'enrichtx':
+      console.log("Enrich TX...");
+      mode = 'enrichtx';
+
+      // check if the block start value was passed in and is an integer
+      if (!isNaN(process.argv[4]) && Number.isInteger(parseFloat(process.argv[4]))) {
+        // Check if the block start value is less than 1
+        if (parseInt(process.argv[4]) < 1)
+          block_start = 1;
+        else
+          block_start = parseInt(process.argv[4]);
+      }
+
+      break;
     case 'reindex':
       // check if readlinesync module is installed
       if (!db.fs.existsSync('./node_modules/readline-sync')) {
@@ -460,6 +477,122 @@ if (lib.is_locked([database]) == false) {
                         exit(0);
                       });
                     }
+                  });
+                } else if (mode == 'enrichtx') {
+                  console.log('Enrich TX... Please wait..');
+
+                  var end = stats.count;
+                  // check if the block end value was passed in and is an integer
+                  if (!isNaN(process.argv[5]) && Number.isInteger(parseFloat(process.argv[5]))) {
+                    // Check if the block start value is less than 1
+                    var newEnd = parseInt(process.argv[5]);
+                    if (newEnd >= block_start && newEnd <= end)
+                      end = newEnd;
+                  }
+
+                  console.log('Scan blocks from height ' + block_start + ' to ' + end + '...');
+
+                  var blocks_to_scan = [];
+                  var task_limit_blocks = settings.sync.block_parallel_tasks;
+                  var task_limit_txs = 1;
+
+                  if (typeof block_start === 'undefined' || block_start < 0) 
+                    block_start = 0;
+
+                  if (task_limit_blocks < 1)
+                    task_limit_blocks = 1;
+
+                  for (i = block_start; i <= end; i++)
+                    blocks_to_scan.push(i);
+
+                  check_only = true;
+
+                  async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
+                    lib.get_blockhash(block_height, function(blockhash) {
+                      process.stdout.write('Check block ' + block_height + ' ');
+                      if (blockhash) {
+                        console.log('and hash ' + blockhash);
+                        lib.get_block(blockhash, function(block) {
+                          if (block) {
+                            var task_limit_txs = 1;
+                            async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
+                              Tx.findOne({txid: txid}, function(err, tx) {
+                                process.stdout.write('Check TX with ID ' + txid);
+                                if (tx) {
+                                  process.stdout.write(" and type " + tx.tx_type + ".");
+                                  if (tx.tx_type == null) {
+                                    process.stdout.write(" will be updated ");
+                                    lib.get_rawtransaction(txid, function(rtx) {
+                                      if (rtx && rtx.txid) {
+                                        process.stdout.write(" with TX from daemon and type: " + rtx.type + "\n");
+                                        Tx.updateOne({txid: txid}, {
+                                          version: rtx.version,
+                                          tx_type: rtx.type,
+                                          size: rtx.size,
+                                          locktime: rtx.locktime,
+                                          instantlock: rtx.instantlock,
+                                          chainlock: rtx.chainlock
+                                        }, function() {
+                                          setTimeout( function() {
+                                            tx = next_tx;
+                                            // next_tx();
+                                          }, settings.sync.update_timeout);
+                                          console.log("TX " + txid + " updated.");
+                                        });
+                                      }
+                                    });
+                                  } else {
+                                    console.log(" No updated required.");
+                                  }
+                                  setTimeout( function() {
+                                    tx = null;
+                                    // check if the script is stopping
+                                    if (stopSync) {
+                                      // stop the loop
+                                      next_tx({});
+                                    } else
+                                      next_tx();
+                                  }, settings.sync.update_timeout);
+                                } else {
+                                  console.log("- not found! Exit.");
+                                  exit(1);
+                                }
+                              });
+                            }, function() {
+                              setTimeout( function() {
+                                blockhash = null;
+                                block = null;
+                
+                                // check if the script is stopping
+                                if (stopSync) {
+                                  // stop the loop
+                                  next_block({});
+                                } else
+                                  next_block();
+                              }, settings.sync.update_timeout);
+                            });
+                          } else {
+                            // console.log("- not found! Exit.");
+                            console.log('Block not found: %s', blockhash);
+                
+                            setTimeout( function() {
+                              // check if the script is stopping
+                              if (stopSync) {
+                                // stop the loop
+                                next_block({});
+                              } else
+                                next_block();
+                            }, settings.sync.update_timeout);
+                          }
+                        });
+                      } else {
+                        console.log("- not found! Exit.");
+                        exit(1);
+                      }
+                    });
+                  }, function() {
+                    console.log( "Finished.");
+                    exit(0);
                   });
                 } else if (mode == 'update') {
                   // Get the last synced block index value
