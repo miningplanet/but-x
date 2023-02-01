@@ -40,14 +40,14 @@
     "express": ">=4.18.1",
     "intl": "^1.2.5",
     "jsonminify": "^0.4.2",
-    "mongodb": "^4.7.0",
+    "mongodb": "^5.0.0",
     "mongoose": "^6.9.0",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.32",
     "pug": "~3.0.2",
     "qr-image": "^3.2.0",
     "readline-sync": "^1.4.10",
-    "sass": "^1.52.3",
+    "sass": "^1.58.0",
     "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
