@@ -98,7 +98,8 @@
   // TTL cache (time in seconds)
   "cache" = {
     "enabled": true,
-    "price": 30
+    "price": 60,
+    "ticker": 60
   },
 
   // network_history: a collection of settings that controls saving of extra historical network data during a block sync
@@ -1269,6 +1270,9 @@
         "getbasicstats": {
           // enabled: Enable/disable the /ext/getbasicstats api endpoint (true/false)
           //          If set to false, the /ext/getbasicstats api will be completely disabled for public use (no definition on the api page and a disabled error msg if you try to call the endpoint directly)
+          "enabled": true
+        },
+        "getticker": {
           "enabled": true
         },
         "getmarkets": {

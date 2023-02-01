@@ -17,6 +17,11 @@ var apiAccessList = [];
 const date = require('date-and-time')
 const { exec } = require('child_process');
 const priceCache = new TTLCache({ max: 2, ttl: settings.cache.price * 1000, updateAgeOnGet: false, noUpdateTTL: false });
+const tickerCache = new TTLCache({ max: 1, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false });
+
+var request = require('postman-request');
+var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
+var base_url = base_server + ''; // api/
 
 // pass wallet rpc connection info to nodeapi
 nodeapi.setWalletDetails(settings.wallet);
@@ -357,6 +362,97 @@ app.use('/ext/getbasicstats', function(req, res) {
         res.send(p_ext);
       }
     });
+  } else
+    res.end('This method is disabled');
+});
+
+app.use('/ext/getticker/:mode', function(req, res) {
+  // check if the getbasicstats api is enabled
+  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getticker.enabled == true) {
+    if (settings.cache.enabled == true) {
+      var r = tickerCache.get(1);
+      if (r == undefined) {
+        db.get_stats(settings.coin.name, function (stats) {
+          db.count_masternodes(function(mn) {
+            // console.log("Stats: " + JSON.stringify(stats))
+            // console.log("MN: " + JSON.stringify(mn))
+            db.get_markets_summary(function(marketdata) {
+              var markets = marketdata;
+              if (typeof markets === 'string') {
+                console.warn(markets);
+                markets = [];
+              }
+              request({uri: base_url + 'ext/getcurrentprice', json: true}, function (error, response, ratesdata) {
+                var rates = ratesdata;
+                if (typeof rates === 'string') {
+                  console.warn(rates);
+                  rates = [];
+                }
+                request({uri: base_url + 'ext/getdistribution', json: true}, function (error, response, ddata) {
+                  var distribution = ddata;
+                  if (typeof distribution === 'string') {
+                    console.warn(distribution);
+                    distribution = {};
+                  }
+                  request({uri: base_url + 'api/getdifficulty', json: true}, function (error, response, diffdata) {
+                    var algos = diffdata;
+                    if (typeof algos === 'string') {
+                      console.warn(algos);
+                      algos = {};
+                    } else {
+                      algos = algos.pow_difficulties;
+                    }
+
+                    request({uri: base_url + 'api/getnetworkhashps', json: true}, function (error, response, hashdata) {
+                      var hashps = hashdata;
+                      if (typeof hashps === 'string') {
+                        console.warn(hashps);
+                        hashps = {};
+                      }
+
+                      if (algos[0] && hashps.ghostrider) algos[0].hashps = hashps.ghostrider
+                      if (algos[1] && hashps.yespower) algos[1].hashps = hashps.yespower
+                      if (algos[2] && hashps.lyra2) algos[2].hashps = hashps.lyra2
+                      if (algos[3] && hashps.sha256d) algos[3].hashps = hashps.sha256d
+                      if (algos[4] && hashps.scrypt) algos[4].hashps = hashps.scrypt
+                      if (algos[5] && hashps.butkscrypt) algos[5].hashps = hashps.butkscrypt
+
+                      var r = {}
+                      // r.rank = 1234
+                      r.coin = settings.coin.name
+                      r.code = settings.coin.symbol
+                      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+                      r.tip = stats.count
+                      r.supply = stats.supply
+                      r.supply_max = 21000000000
+                      r.price = stats.last_price
+                      r.price_usd = stats.last_usd_price
+                      r.txes = stats.txes
+                      r.markets = markets
+                      r.rates = rates;
+                      r.node_collateral = 15000000
+                      r.node_count = mn.count;
+                      r.node_active = mn.active;
+                      r.distribution = distribution
+                      r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
+                      r.algos = algos
+                      tickerCache.set (1, r);
+                      console.debug("Cache ticker: " + JSON.stringify(r));
+                      res.send(r);
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      } else {
+        console.debug("Get ticker by cache: " + JSON.stringify(r));
+        res.send(r);
+      }
+    } else {
+      res.end('This method is available only with caching enabled');
+    }
   } else
     res.end('This method is disabled');
 });
