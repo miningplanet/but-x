@@ -160,7 +160,7 @@ NOTE: As of v1.100.0-bae4d50, it is no longer necessary to manually restart the 
 -getnetworkhashps rpc call now returns a '-' if shared_pages.show_hashrate is not set to true
 -Searching for unsycned blocks/txs no longer saves the data locally but instead still shows the data on screen. This helps prevent syncing data out-of-order (This eliminates the need for db_index.pid which has been removed)
 -Coin supply is now always taken from the stats collection database instead of from the wallet via rpc command in all cases except when syncing
--Added new social_links setting to allow adding as many custom links as desired including the ability to display as image or fontawesome icon
+-Added new social_links setting to allow adding as many custom links as desired including the ability to display as image
 -Removed old hardcoded settings for twitter, facebook, google+, bitcointalk, github, slack, discord, telegram, reddit, youtube and custom website link
 -Removed unnecessary includes for address_history.pug, net_addnodes.pug, net_list.pug, rl_balance.pug, rl_received.pug and restored code in place of include
 -Renamed /ext/connections to /ext/getnetworkpeers and added it to list of public apis on the /info page

@@ -424,7 +424,7 @@
       "footer_height_mobile": "70px",
       // social_links: a collection of settings that pertain to the social links on the page footer
       //               Add as many custom social links to be displayed in the page footer as desired
-      //               For each entry you must fill in the image_path or fontawesome_class to determine the image or icon to show for the url link. It is not necessary to fill in both as only the 1st filled-in value will be used
+      //               For each entry you must fill in the image_path or style to determine the image or icon style to show for the url link. It is not necessary to fill in both as only the 1st filled-in value will be used
       "social_links": [
         {
           // enabled: Enable/disable this particular social link (true/false)
@@ -434,8 +434,8 @@
           "tooltip_text": "Github",
           // url: The exact url that the social link should navigate to
           "url": "https://github.com/team-exor",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "fab fa-github",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "github",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": ""
@@ -448,8 +448,8 @@
           "tooltip_text": "Twitter",
           // url: The exact url that the social link should navigate to
           "url": "https://twitter.com/ExorOfficial",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "fab fa-twitter",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "twitter",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": ""
@@ -462,8 +462,8 @@
           "tooltip_text": "Discord",
           // url: The exact url that the social link should navigate to
           "url": "https://discord.gg/dSuGm3y",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "fab fa-discord",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "discord",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": ""
@@ -476,8 +476,8 @@
           "tooltip_text": "Telegram",
           // url: The exact url that the social link should navigate to
           "url": "https://t.me/Exorofficial",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "fab fa-telegram",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "telegram",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": ""
@@ -490,8 +490,8 @@
           "tooltip_text": "Website",
           // url: The exact url that the social link should navigate to
           "url": "https://exor.io",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": "/img/external.png"
@@ -504,8 +504,8 @@
           "tooltip_text": "Coingecko",
           // url: The exact url that the social link should navigate to
           "url": "https://www.coingecko.com/en/coins/exor",
-          // fontawesome_class: A string of css classes, separated by spaces that can be used to display a fontawesome icon for this social link. See https://fontawesome.com/ for more info
-          "fontawesome_class": "",
+          // icon: A string of css classes, separated by spaces that can be used to display an icon icon for this social link.
+          "icon": "",
           // image_path: The path to an image file that will be displayed for this social link
           //             NOTE: The path root is /public
           "image_path": "/img/coingecko.png"

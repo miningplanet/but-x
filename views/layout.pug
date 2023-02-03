@@ -15,7 +15,6 @@ html(lang='en')
       link(rel='icon', href='/' + settings.shared_pages.favicons.favicon192, sizes='192x192')
     link(rel='stylesheet', href='https://butkoin.com/butk.min.css')
     link(rel='stylesheet', href='/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css' + (themeHash == null ? '' : '?h=' + themeHash))
-    link(rel='stylesheet', href='/css/all.css')
     if active == 'markets' || active == 'richlist'
       link(rel='stylesheet', href='/css/jquery.jqplot.min.css')
     if active == 'network' || active == 'masternodes'
@@ -807,18 +806,18 @@ html(lang='en')
           return '<div class="card-header"><strong>#{settings.locale.difficulty}</strong></div><div class="card-body"><div id="difficultyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="difficultypanel" class="header-panel" style="display:none;"><span class="fas fa-sliders-h"></span>'+difficultyType+'</div></div>';
         }
         function getMasternodesPanel() {
-          return '<div class="card-header"><strong>#{settings.locale.masternodecount}</strong></div><div class="card-body"><div id="masternodePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="masternodepanel" class="header-panel" style="display:none;"><span id="spnMasternodeCountOnline" class="fa fa-check-circle" data-bs-toggle="tooltip" data-bs-placement="top"></span><label id="masternodeCountOnline" data-bs-toggle="tooltip" data-bs-placement="top"></label><label>&nbsp;/&nbsp;</label><label id="masternodeCountOffline" data-bs-toggle="tooltip" data-bs-placement="top"></label><span id="spnMasternodeCountOffline" class="fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="top"></span></div></div>';
+          return '<div class="card-header"><strong>#{settings.locale.masternodecount}</strong></div><div class="card-body"><div id="masternodePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="masternodepanel" class="header-panel" style="display:none;"><span id="spnMasternodeCountOnline" class="img snactive" data-bs-toggle="tooltip" data-bs-placement="top"></span><label id="masternodeCountOnline" data-bs-toggle="tooltip" data-bs-placement="top"></label><label>&nbsp;/&nbsp;</label><label id="masternodeCountOffline" data-bs-toggle="tooltip" data-bs-placement="top"></label><span id="spnMasternodeCountOffline" class="img sninactive" data-bs-toggle="tooltip" data-bs-placement="top"></span></div></div>';
         }
         function getCoinSupplyPanel() {
           var supplyType='<label id="supply"></label>';
-          return '<div class="card-header"><strong>#{settings.locale.ex_supply} <span class="small fw-normal">(#{settings.coin.symbol})</span></strong></div><div class="card-body"><div id="supplyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="supplypanel" class="header-panel" style="display:none;"><span class="fa fa-chart-pie"></span>'+supplyType+'</div></div>';
+          return '<div class="card-header"><strong>#{settings.locale.ex_supply} <span class="small fw-normal">(#{settings.coin.symbol})</span></strong></div><div class="card-body"><div id="supplyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="supplypanel" class="header-panel" style="display:none;"><span class="img supply"></span>'+supplyType+'</div></div>';
         }
         function getPricePanel() {
           var priceType='<label id="lastPrice">-</label>';
-          return '<div class="card-header"><strong>Price <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="pricePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="pricepanel" class="header-panel" style="display:none;"><span class="fa fa-rocket"></span>'+priceType+'</div></div>';
+          return '<div class="card-header"><strong>Price <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="pricePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="pricepanel" class="header-panel" style="display:none;"><span class="img price"></span>'+priceType+'</div></div>';
         }
         function getMarketCapPanel() {
-          return '<div class="card-header"><strong>Market Cap <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="marketCapPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="marketCapPanel" class="header-panel" style="display:none;"><span class="fas fa-chart-line"></span><label id="marketCap"></label></div></div>';
+          return '<div class="card-header"><strong>Market Cap <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="marketCapPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="marketCapPanel" class="header-panel" style="display:none;"><span class="img marketcap"></span><label id="marketCap"></label></div></div>';
         }
         function getLogoPanel() {
           return '<img src="#{settings.shared_pages.logo}" style="margin-top:-15px;height:128px;" alt="#{settings.coin.name} Logo" title="#{settings.coin.name} Logo" />';
@@ -1210,7 +1209,7 @@ html(lang='en')
               ul.navbar-nav(style='width:100%;')
                 li#home.nav-item
                   a.nav-link(href='/')
-                    span.fas.fa-cubes
+                    span.explorer
                     span.margin-left-5 #{settings.locale.menu_explorer}
                 if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
                   li#reward.nav-item
@@ -1220,22 +1219,22 @@ html(lang='en')
                 if settings.masternodes_page.enabled == true
                   li#masternodes.nav-item
                     a.nav-link(href='/masternodes')
-                      span.fa.fa-share-alt
+                      span.smartnodes
                       span.margin-left-5 Smartnodes
                 if settings.movement_page.enabled == true
                   li#movement.nav-item
                     a.nav-link(href='/movement')
-                      span.far.fa-money-bill-alt
+                      span.movement
                       span.margin-left-5 #{settings.locale.menu_movement}
                 if settings.network_page.enabled == true
                   li#network.nav-item
                     a.nav-link(href='/network')
-                      span.fas.fa-network-wired
+                      span.network
                       span.margin-left-5 #{settings.locale.menu_network}
                 if settings.richlist_page.enabled == true
                   li#richlist.nav-item
                     a.nav-link(href='/richlist')
-                      span.fab.fa-btc
+                      span.richlist
                       span.margin-left-5 #{settings.locale.menu_richlist}
                 if settings.markets_page.enabled == true
                   if settings.markets_page.show_market_dropdown_menu == true && settings.market_count > 1
@@ -1265,22 +1264,22 @@ html(lang='en')
                   else
                     li#markets.nav-item
                       a.nav-link(href='/markets/' + settings.markets_page.default_exchange.exchange_name + '/' + settings.markets_page.default_exchange.trading_pair)
-                        span.fas.fa-chart-line
+                        span.markets
                         span.margin-left-5 #{settings.locale.menu_markets}
                 if settings.api_page.enabled == true
                   li#info.nav-item
                     a.nav-link(href='/info')
-                      span.fa.fa-info-circle
+                      span.api
                       span.margin-left-5 #{settings.locale.menu_api}
                 if settings.claim_address_page.show_header_menu == true && settings.claim_address_page.enabled == true
                   li#claim-address.nav-item
                     a.nav-link(href='/claim')
-                      span.far.fa-address-card
+                      span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
             if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
-                  span.fas.fa-search
+                  span.search
         if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
@@ -1466,8 +1465,8 @@ html(lang='en')
             if social.enabled
               li.float-start
                 a.nav-link.social-link.border-0(href=social.url, target='_blank', alt=settings.coin.name + ' ' + social.tooltip_text, title=settings.coin.name + ' ' + social.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
-                  if social.fontawesome_class != null && social.fontawesome_class != ''
-                    span(class='vertical-align-middle ' + social.fontawesome_class)
+                  if social.icon != null && social.icon != ''
+                    span(class='vertical-align-middle ' + social.icon)
                   else
                     img(class='vertical-align-middle', src=social.image_path)
       .col-4.navbar-nav
