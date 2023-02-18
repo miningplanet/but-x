@@ -481,6 +481,8 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol', function(req, res) {
 
         var market_name = (isAlt ? (market_data.market_name_alt == null ? '' : market_data.market_name_alt) : (market_data.market_name == null ? '' : market_data.market_name));
         var market_logo = (isAlt ? (market_data.market_logo_alt == null ? '' : market_data.market_logo_alt) : (market_data.market_logo == null ? '' : market_data.market_logo));
+        var ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url;
+        var referal = market_data.referal == null ? '' : market_data.referal;
 
         // check if markets page should show last updated date
         if (settings.markets_page.page_header.show_last_updated == true) {
@@ -493,6 +495,8 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol', function(req, res) {
                 marketdata: {
                   market_name: market_name,
                   market_logo: market_logo,
+                  ext_market_url: ext_market_url,
+                  referal: referal,
                   coin: coin_symbol,
                   exchange: pair_symbol,
                   data: data,
@@ -517,6 +521,8 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol', function(req, res) {
               marketdata: {
                 market_name: market_name,
                 market_logo: market_logo,
+                ext_market_url: ext_market_url,
+                referal: referal,
                 coin: coin_symbol,
                 exchange: pair_symbol,
                 data: data,
