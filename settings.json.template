@@ -1188,6 +1188,9 @@
       },
       // ext: a collection of settings that pertain to the extended apis that are retrieved from local mongo database collection
       "ext": {
+        "getblockchaininfo": {
+          "enabled": true
+        },
         // getmoneysupply: a collection of settings that pertain to the /ext/getmoneysupply api endpoint
         //                 Returns current money supply
         //                 NOTE: This api is not used internally and is therefore only publicly available

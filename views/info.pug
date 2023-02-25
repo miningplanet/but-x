@@ -36,6 +36,13 @@ block content
           p
             em Return data from coind
           ul
+            if settings.api_page.public_apis.rpc.getblockchaininfo.enabled == true && settings.api_cmds['getblockchaininfo'] != null && settings.api_cmds['getblockchaininfo'] != ''
+              li
+                p
+                  div.fw-bold getblockchaininfo
+                  div
+                    em #{settings.locale.api_getblockchaininfo}
+                  a(href='/api/getblockchaininfo') #{address}/api/getblockchaininfo
             if settings.api_page.public_apis.rpc.getdifficulty.enabled == true && settings.api_cmds['getdifficulty'] != null && settings.api_cmds['getdifficulty'] != ''
               li
                 p
