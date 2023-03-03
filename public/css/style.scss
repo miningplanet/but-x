@@ -702,7 +702,7 @@ $theme-name: to-lower-case(theme-selector.$theme-name);
 }
 
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-size: 14px; font-family: 'Courier New',monospace !important; font-weight: 400; line-height: 1.5
 }
 
 p {
@@ -925,13 +925,6 @@ div.dataTables_scrollBody > table {
 .table > tbody > tr {
   > td {
     @include table-border-color;
-
-    &.addr-summary {
-      line-height: 7.7;
-      font-size: 1.3em;
-      font-weight: 800;
-      text-align: center;
-    }
 
     &:first-child {
       border-left: 0;

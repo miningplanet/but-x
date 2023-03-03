@@ -30,10 +30,10 @@ block content
       var useNewDashFormat = false;
       var labels = !{JSON.stringify(settings.labels)};
       var ctable = $('#masternodes-table').dataTable({
-        autoWidth: true,
+        autoWidth: false,
         searching: true,
         ordering: true,
-        order: [[ 5, 'desc' ]],
+        order: [[ 7, 'desc' ]],
         responsive: true,
         lengthChange: true,
         processing: true,
@@ -51,9 +51,10 @@ block content
           dataSrc: function(json) {
             for (i = 0; i < json.length; i++) {
               var addr = json[i]['addr'];
-              var country = json[i]['country'];
+              var status = json[i]['status'];
+              var country = "<span>" + json[i]['country'] + "</span>";
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + "'>" + json[i]['address'] + "</a>";
-              json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
+              json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']).replace(' UTC', '') + '</span>';
 
               if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
                 json[i]['lastpaid'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']).replace(' UTC', '') + '</span>';
@@ -63,7 +64,8 @@ block content
                 json[i]['activetime'] = secondsToHms(json[i]['activetime']);
               else
                 json[i]['activetime'] = '<em>N/A</em>';
-              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
+
+              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
 
               if (labels[addr] != null && labels[addr].enabled == true) {
                 if (labels[addr].type)
@@ -72,9 +74,14 @@ block content
                   json[i]['addr'] = '<div><label class="badge bg-default" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr'];
               }
 
+              var entity="&#9888;"
+              if (status && status == "ENABLED") {
+                entity="&#10004;"
+              }
+              json[i]['status'] = '<span class="entitybig"><b>' + entity + '</b></span>';
+
               if (json[i]['country_code'].length > 1) {
-                console.log("Add flag: " + json[i]['country_code'].toLowerCase());
-                json[i]['country'] = json[i]['country'] + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>';
+                json[i]['country'] = country + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>';
               }
             }
  
@@ -94,17 +101,14 @@ block content
           { name: 'last_paid_block', data: 'last_paid_block', className: "lastPaidBlockCol" },
           { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
           { name: 'status', data: 'status', className: "statusCol" },
-          { name: 'country', data: 'country', className: "text-end" }
+          { name: 'country', data: 'country', className: "countryCol" }
         ],
         rowCallback: function(row, data, index) {
           $("td.addressCol", row).addClass("breakWord");
-
           if (useNewDashFormat)
             $("td.ipAddressCol", row).addClass("breakWord");
         },
         fnDrawCallback: function(settings) {
-          fixDataTableColumns();
-          fixFooterHeightAndPosition();
           enableTooltips();
         },
         fnInitComplete: function(settings, json) {
@@ -114,6 +118,7 @@ block content
             ctable.api().column('network:name').visible(!useNewDashFormat, false);
             ctable.api().column('version:name').visible(!useNewDashFormat, false);
             ctable.api().column('lastseen:name').visible(!useNewDashFormat, false);
+            /* ctable.api().column('lastpaid:name').visible(false, false); */
             ctable.api().column('activetime:name').visible(!useNewDashFormat, false);
             ctable.api().column('ip_address:name').visible(useNewDashFormat, false);
             ctable.api().column('last_paid_block:name').visible(useNewDashFormat);
@@ -174,13 +179,13 @@ block content
           tr(class=theadClasses)
             th.text-center Pay rank
             th.text-center Protocol
-            th.text-center IP address
-            th.text-center Wallet address
+            th.text-center IP:port
+            th.text-center Payout
             th.text-center Protocol
-            th.text-center Last seen
-            th.text-center Last paid (UTC)
-            th.text-center Last paid
+            th.text-center Last seen (UTC)
+            th.text-center Last $ (UTC)
+            th.text-center Last $
             th.text-center Active since
-            th.text-center Status
-            th.text-center Country
+            th.text-center !
+            th.text-center 
         tbody.text-center

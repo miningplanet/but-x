@@ -35,7 +35,6 @@ block content
           responsive: true,
           scrollX: true,
           fnDrawCallback: function(settings) {
-            fixDataTableColumns();
           }
         });
         $('.order-table').dataTable({
@@ -49,7 +48,6 @@ block content
           responsive: true,
           scrollX: true,
           fnDrawCallback: function(settings) {
-            fixDataTableColumns();
           }
         });
         $('#history-table').dataTable({
@@ -64,13 +62,13 @@ block content
             }
           },
           fnDrawCallback: function(settings) {
-            if ($('#history-table > tbody > tr > td > span.timestampCol').length > 0) {
-              $('#history-table > tbody > tr > td > span.timestampCol').each(function() {
+            if ($('#history-table > tbody > tr > td > small > span.timestampCol').length > 0) {
+              $('#history-table > tbody > tr > td > small > span.timestampCol').each(function() {
                 if ($.isNumeric($(this).text())) {
                   if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true)
                     $(this).attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(parseInt($(this).text()), true));
 
-                  $(this).html(format_unixtime(parseInt($(this).text())));
+                  $(this).html(format_unixtime(parseInt($(this).text())).replace(' UTC', ''));
                 }
               });
 
@@ -78,7 +76,6 @@ block content
                 enableTooltips();
             }
 
-            fixDataTableColumns();
           }
         });
       });
@@ -240,70 +237,8 @@ block content
                 if marketdata.data.chartdata == 'null' || marketdata.data.chartdata == '' || marketdata.data.chartdata == '[]'
                   span.fas.fa-chart-line.float-end.view-chart-disabled.market-toggle(style='cursor: pointer;color: var(--bs-body-color);', data-bs-toggle='tooltip', data-bs-placement='bottom', title=settings.locale.mkt_no_chart)
               table#market-summary.table.table-bordered.bottom-border-0.summary-table.single-row-table(style='border-top:0;margin-top:0 !important;')
-                thead
-                  tr(class=theadClasses)
-                    if marketdata.data.summary.high != null
-                      th.text-center #{settings.locale.mkt_high}
-                    if marketdata.data.summary.low != null
-                      th.text-center #{settings.locale.mkt_low}
-                    if marketdata.data.summary.volume != null
-                      th.text-center #{settings.locale.mkt_volume}
-                        span.small.fw-normal  (#{marketdata.coin})
-                    if marketdata.data.summary.volume_btc != null
-                      th.text-center #{settings.locale.mkt_volume}
-                        span.small.fw-normal  (#{marketdata.exchange})
-                    if marketdata.data.summary.bid != null
-                      th.text-center #{settings.locale.mkt_top_bid}
-                    if marketdata.data.summary.ask != null
-                      th.text-center #{settings.locale.mkt_top_ask}
-                    if marketdata.data.summary.last != null
-                      th.text-center #{settings.locale.mkt_last}
-                    if marketdata.data.summary.prev != null
-                      th.text-center #{settings.locale.mkt_yesterday}
-                    if marketdata.data.summary.change != null || (marketdata.data.summary.last != null && marketdata.data.summary.prev != null)
-                      th.text-center #{settings.locale.mkt_change}
                 tbody
                   tr
-                    if marketdata.data.summary.high != null
-                      - var highValue = Number(marketdata.data.summary.high).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitHigh = highValue.split(".");
-                      td.text-center #{splitHigh[0]}.
-                        span.decimal #{splitHigh[1]}
-                    if marketdata.data.summary.low != null
-                      - var lowValue = Number(marketdata.data.summary.low).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitLow = lowValue.split(".");
-                      td.text-center #{splitLow[0]}.
-                        span.decimal #{splitLow[1]}
-                    if marketdata.data.summary.volume != null
-                      - var volumeValue = Number(marketdata.data.summary.volume).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitVolume = volumeValue.split(".");
-                      td.text-center #{splitVolume[0]}.
-                        span.decimal #{splitVolume[1]}
-                    if marketdata.data.summary.volume_btc != null
-                      - var volumeBTCValue = Number(marketdata.data.summary.volume_btc).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitVolumeBTC = volumeBTCValue.split(".");
-                      td.text-center #{splitVolumeBTC[0]}.
-                        span.decimal #{splitVolumeBTC[1]}
-                    if marketdata.data.summary.bid != null
-                      - var bidValue = Number(marketdata.data.summary.bid).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitBid = bidValue.split(".");
-                      td.text-center #{splitBid[0]}.
-                        span.decimal #{splitBid[1]}
-                    if marketdata.data.summary.ask != null
-                      - var askValue = Number(marketdata.data.summary.ask).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitAsk = askValue.split(".");
-                      td.text-center #{splitAsk[0]}.
-                        span.decimal #{splitAsk[1]}
-                    if marketdata.data.summary.last != null
-                      - var lastValue = Number(marketdata.data.summary.last).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitLast = lastValue.split(".");
-                      td.text-center #{splitLast[0]}.
-                        span.decimal #{splitLast[1]}
-                    if marketdata.data.summary.prev != null
-                      - var prevValue = Number(marketdata.data.summary.prev).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
-                      - var splitPrev = prevValue.split(".");
-                      td.text-center #{splitPrev[0]}.
-                        span.decimal #{splitPrev[1]}
                     if marketdata.data.summary.change != null || (marketdata.data.summary.last != null && marketdata.data.summary.prev != null)
                       if marketdata.data.summary.change != null
                         if marketdata.data.summary.change == '' || marketdata.data.summary.change == '-'
@@ -315,18 +250,77 @@ block content
                       else
                         - var price_change = Number(0).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                       - var splitChange = price_change.split(".");
+                      td #{settings.locale.mkt_change}
                       if price_change > 0
-                        td.text-center.text-success.fw-bold +#{splitChange[0]}.
+                        td.text-success.fw-bold +#{splitChange[0]}.
                           span.decimal #{splitChange[1]}
                           span  %
                       else if price_change < 0
-                        td.text-center.text-danger.fw-bold #{splitChange[0]}.
+                        td.text-danger.fw-bold #{splitChange[0]}.
                           span.decimal #{splitChange[1]}
                           span  %
                       else
-                        td.text-center.fw-bold #{splitChange[0]}.
+                        td.fw-bold #{splitChange[0]}.
                           span.decimal #{splitChange[1]}
                           span  %
+                  tr
+                    if marketdata.data.summary.last != null
+                      - var lastValue = Number(marketdata.data.summary.last).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitLast = lastValue.split(".");
+                      td #{settings.locale.mkt_last}
+                      td #{splitLast[0]}.
+                        span.decimal #{splitLast[1]}
+                  tr
+                    if marketdata.data.summary.high != null
+                      - var highValue = Number(marketdata.data.summary.high).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitHigh = highValue.split(".");
+                      td #{settings.locale.mkt_high}
+                      td #{splitHigh[0]}.
+                        span.decimal #{splitHigh[1]}
+                  tr
+                    if marketdata.data.summary.low != null
+                      - var lowValue = Number(marketdata.data.summary.low).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitLow = lowValue.split(".");
+                      td #{settings.locale.mkt_low}
+                      td #{splitLow[0]}.
+                        span.decimal #{splitLow[1]}
+                  tr
+                    if marketdata.data.summary.volume != null
+                      - var volumeValue = Number(marketdata.data.summary.volume).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitVolume = volumeValue.split(".");
+                      td #{settings.locale.mkt_volume}
+                        span.small.fw-normal  (#{marketdata.coin})
+                      td #{splitVolume[0]}.
+                        span.decimal #{splitVolume[1]}
+                  tr
+                    if marketdata.data.summary.volume_btc != null
+                      - var volumeBTCValue = Number(marketdata.data.summary.volume_btc).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitVolumeBTC = volumeBTCValue.split(".");
+                      td #{settings.locale.mkt_volume}
+                        span.small.fw-normal  (#{marketdata.exchange})
+                      td #{splitVolumeBTC[0]}.
+                        span.decimal #{splitVolumeBTC[1]}
+                  tr
+                    if marketdata.data.summary.bid != null
+                      - var bidValue = Number(marketdata.data.summary.bid).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitBid = bidValue.split(".");
+                      td #{settings.locale.mkt_top_bid}
+                      td #{splitBid[0]}.
+                        span.decimal #{splitBid[1]}
+                  tr
+                    if marketdata.data.summary.ask != null
+                      - var askValue = Number(marketdata.data.summary.ask).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitAsk = askValue.split(".");
+                      td #{settings.locale.mkt_top_ask}
+                      td #{splitAsk[0]}.
+                        span.decimal #{splitAsk[1]}
+                  tr
+                    if marketdata.data.summary.prev != null
+                      - var prevValue = Number(marketdata.data.summary.prev).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                      - var splitPrev = prevValue.split(".");
+                      td #{settings.locale.mkt_yesterday}
+                      td #{splitPrev[0]}.
+                        span.decimal #{splitPrev[1]}
         if marketdata.data.chartdata != 'null' && marketdata.data.chartdata != '' && marketdata.data.chartdata != '[]'
           #marketChart.row
             .col-md-12.cardSpacer
@@ -426,8 +420,9 @@ block content
                     if order.ordertype != null
                       - var price = Number(order.price).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       - var splitPrice = price.split(".");
-                      - var quantity = Number(order.quantity).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
+                      - var quantity = Number(order.quantity).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                       - var splitQuantity = quantity.split(".");
+                      // - var timestamp = order.timestamp ? order.timestamp.toString().replace(' UTC','') : 'N/A'
                       if order.total != null
                         - var total = Number(order.total).toLocaleString('en',{'minimumFractionDigits':settings.currencies[marketdata.exchange].minfd,'maximumFractionDigits':settings.currencies[marketdata.exchange].maxfd,'useGrouping':true});
                       else
@@ -442,7 +437,8 @@ block content
                           td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
-                            span.timestampCol=order.timestamp
+                            small
+                              span.timestampCol=order.timestamp
                       else
                         tr
                           td.text-end.text-danger.fw-bold #{splitPrice[0]}.
@@ -452,7 +448,8 @@ block content
                           td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
-                            span.timestampCol=order.timestamp
+                            small
+                              span.timestampCol=order.timestamp
     else
       .alert.alert-danger.alert-dismissible.fade.show(role='alert')
         button.btn-close(type='button', data-bs-dismiss='alert')

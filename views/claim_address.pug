@@ -20,16 +20,13 @@ block content
           if ($('#claimAlert').length == 0)
             $('<div id="claimAlert"></div>').insertBefore('#claimForm');
           $('#claimAlert').html(generateAlertHTML(claimClass, true, (claimClass == 'success' ? (removedClaim ? 'Address claim removed successfully' : 'Address claimed successfully') : (claimClass == 'danger' ? 'Failed to claim address' : 'Required field missing')), (claimClass == 'success' ? '<strong>' + $('input#address').val() + '</strong> will now be referred to as <strong>' + (removedClaim ? $('input#address').val() : displayAsText($('#message').val())) + '</strong> throughout the website' : warnMsg) + '.'));
-          fixFooterHeightAndPosition();
         }
         $('#claimInstructions').on('show.bs.collapse', function () {
           $('#showClaimInstructions').html('<i class="fas fa-angle-down" style="margin-right:5px;"></i><span>Hide claim instructions</span>');
         }).on('hide.bs.collapse', function () {
           $('#showClaimInstructions').html('<i class="fas fa-angle-up" style="margin-right:5px;"></i><span>Show claim instructions</span>');
         }).on('shown.bs.collapse', function () {
-          fixFooterHeightAndPosition();
         }).on('hidden.bs.collapse', function () {
-          fixFooterHeightAndPosition();
         });
         $('#claimForm').on('submit', function (e) {
           e.preventDefault();
@@ -141,4 +138,4 @@ block content
             fieldset.entryField
               label.form-label.mt-3(for='signature') Signature
               input#signature.form-control.mb-3(type='text', placeholder='Signature', maxlength='100')
-          button.btn.btn-success(type='submit') Claim
+          button.btn(type='submit') Claim

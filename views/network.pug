@@ -52,23 +52,22 @@ block content
 
         if (setting_con_port_filter == '-1') {
           columns = [
-            { data: 'address', width: '25%' },
-            { data: 'protocol', width: '15%' },
-            { data: 'version', width:'35%' },
-            { data: 'country', width: '25%'}
+            { data: 'address' },
+            { data: 'protocol' },
+            { data: 'version' },
+            { data: 'country' }
           ];
         } else {
           columns = [
-            { data: 'address', width: '20%' },
-            { data: 'port', width: '12%' },
-            { data: 'protocol', width: '15%' },
-            { data: 'version', width:'33%' },
-            { data: 'country', width: '20%', class: 'text-end' }
+            { data: 'address'},
+            { data: 'protocol'},
+            { data: 'version'},
+            { data: 'country', class: 'text-end' }
           ];
         }
 
         $('#connections-table').dataTable({
-          autoWidth: true,
+          autoWidth: false,
           searching: false,
           ordering: true,
           order: [],
@@ -86,27 +85,26 @@ block content
           },
           data: connectionRows,
           rowCallback: function (row, data, index) {
-            var colIndex = 1;
+            // var colIndex = 1;
             var flagBlock = '';
 
             if (data['country_code'].length > 1) {
               flagBlock = '<div class="margin-left-5 flag-icon flag-icon-'+data['country_code'].toLowerCase()+'"></div>';
             }
 
-            $("td:eq(0)", row).html(data['address']).addClass('breakWord');
+            $("td:eq(0)", row).html(data['address'] + ':' + data['port']).addClass('breakWord');
 
-            if (setting_con_port_filter != '-1') {
+            /*if (setting_con_port_filter != '-1') {
               $("td:eq(1)", row).html(data['port']);
               colIndex = 2;
-            }
+            }*/
 
-            $(`td:eq(${colIndex})`, row).html(data['protocol']);
-            $(`td:eq(${colIndex + 1})`, row).html(data['version']);
-            $(`td:eq(${colIndex + 2})`, row).html(data['country'] + flagBlock);
+            $(`td:eq(1)`, row).html(data['protocol']);
+            $(`td:eq(2)`, row).html(data['version']).addClass('full');
+            $(`td:eq(3)`, row).html("<span>" + data['country'] + "</span>" + flagBlock).addClass('countryCol');
           },
           fnDrawCallback: function(settings) {
-            fixDataTableColumns();
-            fixFooterHeightAndPosition();
+
           },
           columns: columns
         });
@@ -141,7 +139,7 @@ block content
           addNodeRows.push({'nodes': 'addnode=' + (addNodePeers[i]['address'] != null && addNodePeers[i]['address'].indexOf(':') > -1 ? '[' + addNodePeers[i]['address'] + ']' : addNodePeers[i]['address']) + (addNodePeers[i]['port'] == null ? '' : ':' + addNodePeers[i]['port'])});
 
         $('#addnodes-table').dataTable({
-          autoWidth: true,
+          autoWidth: false,
           searching: false,
           ordering: false,
           responsive: true,
@@ -149,7 +147,7 @@ block content
           processing: true,
           iDisplayLength: setting_txPerPage,
           lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(settings.network_page.addnodes_table.page_length_options)}),
-          scrollX: true,
+          scrollX: false,
           language: {
             paginate: {
               previous: '<',
@@ -161,8 +159,7 @@ block content
             $("td:eq(0)", row).css('white-space', 'nowrap').html(`<button class="btn btn-sm btn-copy" type="button"><i class="far fa-copy"></i></button>&nbsp;<span>${data.nodes}</span>`);
           },
           fnDrawCallback: function(settings) {
-            fixDataTableColumns();
-            fixFooterHeightAndPosition();
+
           },
           columns: [
             {data: 'nodes', width: '100%'}
@@ -201,7 +198,7 @@ block content
           oneTryRows.push({'nodes': 'addnode ' + (peers[i]['address'] != null && peers[i]['address'].indexOf(':') > -1 ? '[' + peers[i]['address'] + ']' : peers[i]['address']) + (peers[i]['port'] == null ? '' : ':' + peers[i]['port']) + ' onetry'});
 
         $('#onetry-table').dataTable({
-          autoWidth: true,
+          autoWidth: false,
           searching: false,
           ordering: false,
           responsive: true,
@@ -209,7 +206,7 @@ block content
           processing: true,
           iDisplayLength: setting_txPerPage,
           lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(settings.network_page.onetry_table.page_length_options)}),
-          scrollX: true,
+          scrollX: false,
           language: {
             paginate: {
               previous: '<',
@@ -221,8 +218,6 @@ block content
             $("td:eq(0)", row).css('white-space', 'nowrap').html(`<button class="btn btn-sm btn-copy" type="button"><i class="far fa-copy"></i></button>&nbsp;<span>${data.nodes}</span>`);
           },
           fnDrawCallback: function(settings) {
-            fixDataTableColumns();
-            fixFooterHeightAndPosition();
           },
           columns: [
             {data: 'nodes', width: '100%'}
@@ -234,8 +229,6 @@ block content
       });
 
       $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        fixDataTableColumns();
-        fixFooterHeightAndPosition();
       });
 
       if ('#{settings.network_page.page_header.show_last_updated}' == 'true') {
@@ -315,12 +308,12 @@ block content
           table#connections-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
             thead
               tr(class=theadClasses)
-                th.text-center #{settings.locale.net_address}
-                if settings.network_page.connections_table.port_filter != '-1'
+                th.text-center IP:port
+                // if settings.network_page.connections_table.port_filter != '-1'
                   th.text-center='Port'
-                th.text-center #{settings.locale.net_protocol}
-                th.text-center #{settings.locale.net_subversion}
-                th.text-center #{settings.locale.net_country}
+                th.text-center Protocol
+                th.text-center.full #{settings.locale.net_version}
+                th.text-center
             tbody.text-center
       #addnodes.container.tab-pane(style='margin-top:0;border-top:0;')
         .card.card-default.border-0
@@ -330,7 +323,7 @@ block content
               em Typically you can access the config file through QT-wallet menu, Tools > Open Wallet Configuration File
           table#addnodes-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
             thead
-              tr(class=theadClasses)
+              tr
                 th AddNode Config Lines
             tbody
           .card-body.border-top-0
@@ -338,6 +331,6 @@ block content
               em coindaemon-cli
           table#onetry-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
             thead
-              tr(class=theadClasses)
+              tr
                 th OneTry Node Lines
             tbody

@@ -14,12 +14,10 @@ block content
         searching: false,
         ordering: false,
         responsive: true,
-        scrollX: true,
-        fnDrawCallback: function(settings) {
-          fixDataTableColumns();
-        }
+        scrollX: false,
+        fnDrawCallback: function(settings) {}
       });
-
+      /* block.time_formatted = format_unixtime(#{block.time}) */
       $('span#timestampCol').html(format_unixtime(#{block.time}));
 
       if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
@@ -63,62 +61,65 @@ block content
             a.d-none.d-md-block(href='/api/getblock?hash=' + block.hash, style='margin-left:auto;', data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_block_data)
               span.fa.fa-info-circle(style='color: var(--bs-body-color);')
       table#block-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
-        thead
-          tr(class=theadClasses)
-            th.text-center #{settings.locale.height}
-            th.text-center #{settings.locale.difficulty}
-            th.text-center #{settings.locale.confirmations}
-            if settings.blockchain_specific.heavycoin.enabled == true
-              th.text-center Vote
-            th.text-center #{settings.locale.size} (kB)
-            th.text-center #{settings.locale.bits}
-            th.text-center #{settings.locale.nonce}
-            th.text-center #{settings.locale.timestamp}
         tbody
           - var difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
           - var splitDifficulty = difficulty.split('.');
           - var block_size = Number(block.size/1024).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
           - var splitBlockSize = block_size.split('.');
           tr
-            td.text-center=block.height
-            td.text-center #{splitDifficulty[0]}.
+            td #{settings.locale.height}
+            td=block.height
+          tr
+            td #{settings.locale.difficulty}
+            td #{splitDifficulty[0]}.
               span.decimal #{splitDifficulty[1]}
+          tr
+            td #{settings.locale.confirmations}
             if block.confirmations >= confirmations
-              td.text-center=block.confirmations
+              td=block.confirmations
             else if block.confirmations < (confirmations / 2)
-              td.text-center=block.confirmations
+              td=block.confirmations
             else
-              td.text-center=block.confirmations
-            if settings.blockchain_specific.heavycoin.enabled == true
-              td.text-center=block.vote
-            td.text-center #{splitBlockSize[0]}.
+              td=block.confirmations
+          if settings.blockchain_specific.heavycoin.enabled == true
+            tr
+              td Vote
+              td=block.vote
+          tr
+            td #{settings.locale.size} (kB)
+            td #{splitBlockSize[0]}.
               span.decimal #{splitBlockSize[1]}
-            td.text-center=block.bits
-            td.text-center=block.nonce
-            td.text-center
-              span#timestampCol
+          tr
+            td #{settings.locale.bits}
+            td=block.bits
+          tr
+            td #{settings.locale.nonce}
+            td=block.nonce
+          tr
+            td #{settings.locale.timestamp}
+            td
+              span#timestampCol=block.time
     if block.hash == settings.block_page.genesis_block
       .alert.alert-info(role='alert', style='text-align:center;')
         strong #{settings.locale.block_genesis}
     else
-      .card.card-default.border-0
+      div#block-txs-wrapper.card.card-default.border-0
         .card-header
-          strong #{settings.locale.ex_latest_transactions}
-        table.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+          strong Transactions
+        table#block-txs.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
           thead
             tr(class=theadClasses)
-              th.text-center.d-table-cell.d-md-none
-              th.d-none.d-md-table-cell #{settings.locale.tx_hash}
-              th.text-center #{settings.locale.tx_recipients}
-              th.text-center #{settings.locale.mkt_amount}
-                span.small.fw-normal  (#{settings.coin.symbol})
+              // th.text-center.d-table-cell.d-md-none
+              th.d-md-table-cell #{settings.locale.tx_hash}
+              th.text-center Txout
+              th.text-center #{settings.coin.symbol}
           tbody
             each txn in txs
               tr
-                td.text-center.d-table-cell.d-md-none
+                // td.text-center.d-table-cell.d-md-none
                   a(href='/tx/' + txn.txid)
-                    span.fa.fa-eye(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_tx)
-                td.d-none.d-md-table-cell
+                    span.entity(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_tx) &#8627
+                td.text-begin.txCol.d-md-table-cell
                   a.breakWord(href='/tx/' + txn.txid) #{txn.txid}
                 td.text-center #{txn.vout.length}
                 if txn.vout.length > 0

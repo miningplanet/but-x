@@ -101,7 +101,7 @@ block content
           .cardSpacer.clearfix
   .row(style='margin-left:0;margin-right:0;')
     if settings.richlist_page.show_current_balance == true || settings.richlist_page.show_received_coins == true
-      div(class=(settings.richlist_page.wealth_distribution.show_distribution_table == true || settings.richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12 col-lg-8' : 'col-12'))
+      div(style='padding: 0', class=(settings.richlist_page.wealth_distribution.show_distribution_table == true || settings.richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12 col-lg-8' : 'col-12'))
         .container
           ul.nav.nav-tabs(role='tablist')
             if settings.richlist_page.show_current_balance == true
@@ -114,7 +114,7 @@ block content
           if settings.richlist_page.show_current_balance == true
             #balance(class='container tab-pane' + (settings.richlist_page.show_current_balance == true ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
-                table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
+                table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(id="rich" style='margin-bottom:0;', cellspacing='0')
                   thead
                     tr(class=theadClasses)
                       th.text-center
@@ -134,7 +134,7 @@ block content
                       tr
                         td.text-center
                           =count
-                        td
+                        td.addressCol
                           if settings.claim_address_page.enabled == false || address.name == null || address.name == ''
                             a.breakWord(href='/address/' + address.a_id) #{address.a_id}
                           else
@@ -147,14 +147,13 @@ block content
           if settings.richlist_page.show_received_coins == true
             #received(class='container tab-pane' + (!settings.richlist_page.show_current_balance ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
-                table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
+                table#rreceive.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
                     tr(class=theadClasses)
                       th.text-center
                         span.position
                       th #{settings.locale.tx_address}
                       th.text-center #{settings.locale.rl_received}
-                        span.small.fw-normal  (#{settings.coin.symbol})
                   tbody
                     - var count = 0;
                     each address in received
@@ -164,7 +163,7 @@ block content
                       tr
                         td.text-center
                           =count
-                        td
+                        td.addressCol
                           if settings.claim_address_page.enabled == false || address.name == null || address.name == ''
                             a.breakWord(href='/address/' + address.a_id) #{address.a_id}
                           else

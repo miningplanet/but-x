@@ -469,6 +469,20 @@
           "image_path": ""
         },
         {
+          "enabled": true,
+          "tooltip_text": "Facebook",
+          "url": "https://www.facebook.com/",
+          "icon": "facebook",
+          "image_path": ""
+        },
+        {
+          "enabled": true,
+          "tooltip_text": "Instagram",
+          "url": "https://www.instagram.com",
+          "icon": "instagram",
+          "image_path": ""
+        },
+        {
           // enabled: Enable/disable this particular social link (true/false)
           //          If set to false, the link will be completely inaccessible
           "enabled": true,

@@ -574,7 +574,7 @@ router.get('/richlist', function(req, res) {
                 customHash: get_file_timestamp('./public/css/custom.scss'),
                 styleHash: get_file_timestamp('./public/css/style.scss'),
                 themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-                page_title_prefix: 'Top ' + settings.coin.name + ' Coin Holders'
+                page_title_prefix: 'Top ' + settings.coin.name + ' Holders'
               }
             );
           });

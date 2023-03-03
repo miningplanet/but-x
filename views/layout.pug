@@ -200,41 +200,8 @@ html(lang='en')
       function fixFooterHeightAndPosition() {
         var screenWidth = $(window).outerWidth();
 
-        if (screenWidth <= 575) {
-          // Mobile
-          $('#footer-container').css('height', '!{settings.shared_pages.page_footer.footer_height_mobile}');
-        } else if (screenWidth >= 576 && screenWidth <= 991) {
-          // Tablet
-          $('#footer-container').css('height', '!{settings.shared_pages.page_footer.footer_height_tablet}');
-        } else {
-          // Desktop
-          $('#footer-container').css('height', '!{settings.shared_pages.page_footer.footer_height_desktop}');
-        }
 
-        if (!#{settings.shared_pages.page_footer.sticky_footer}) {
-          // Wait a tick before fixing footer position to give time for elements to be rendered
-          setTimeout(function() {
-            // Ensure footer is shown at the bottom of the viewport
-            var offset = (window.innerHeight - $('#footer-container').position().top - $('#footer-container').outerHeight());
-            $('#footer-container').css('margin-top', (offset > 0 ? offset - 1 : '10') + 'px');
 
-            if ('#{settings.shared_pages.page_header.menu}' == 'side')
-              fixSidebarHeight();
-          }, 1);
-        } else {
-          // Add spacing to the bottom of the body for the sticky footer
-          $('body').css('margin-bottom', ($('#footer-container').outerHeight() + 10) + 'px');
-
-          if ('#{settings.shared_pages.page_header.menu}' == 'side')
-            fixSidebarHeight();
-        }
-
-        fixSocialLinkFontSize();
-      }
-      function fixSocialLinkFontSize() {
-        var fontSize = $('#footer-container').height() * (getSocialLinkHeight() / 100);
-        $('#footer-container .social-link').css('font-size', fontSize);
-        $('#footer-container .social-link > img').css('width', fontSize + 'px').css('height', fontSize + 'px');
       }
       function fixSidebarHeight() {
         if ('#{settings.shared_pages.page_footer.sticky_footer}' != 'true')
@@ -266,15 +233,6 @@ html(lang='en')
           // Enable tooltips only if browser supports them
           $('[data-bs-toggle="tooltip"]').tooltip();
         }
-      }
-      function fixDataTableColumns() {
-        // Wait 2 ticks before adjusting table columns to give time for elements to be rendered (1 tick doesn't seem to be enough for some tables)
-        var ColumnAdjustSetIntervalID = setInterval(function() {
-          // Stop setInterval from running again
-          clearInterval(ColumnAdjustSetIntervalID);
-          // Ensure columns are properly aligned
-          $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
-        }, 2, 'adjustTableColumns');
       }
       function rotateElement(elementSelector) {
         var element = $(elementSelector);
@@ -423,7 +381,7 @@ html(lang='en')
               showTopPanelData('pricepanel', 'pricePanelLoading');
             }
 
-            $("#lblConnections").text(json.connections + ' connections');
+            /* $("#lblConnections").text(json.connections + ' connections'); */
             $("#lblBlockcount").text(json.blockcount + ' blocks');
           }});
         }
@@ -783,9 +741,6 @@ html(lang='en')
           });
         }
         $(window).resize(function () {
-          fixDataTableColumns();
-          fixFooterHeightAndPosition();
-
           if ('#{settings.shared_pages.page_header.menu}' == 'side') {
             fixSidebar();
             positionSidebarSearch();
@@ -798,26 +753,48 @@ html(lang='en')
         });
         function getNetworkPanel() {
           var hashRateType='<label id="hashrate"></label>';
-          return '<div class="card-header"><strong>#{settings.locale.network} <span class="small fw-normal">'+getNetHashUnits()+'</span></strong></div><div class="card-body"><div id="hashratePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="hashratepanel" class="header-panel" style="display:none;"><span class="fa fa-cogs"></span>'+hashRateType+'</div></div>';
+          return '<div class="card-header"><b>#{settings.locale.network} <span class="small fw-normal">'+getNetHashUnits()+'</span></b></div><div class="card-body"><div id="hashratePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="hashratepanel" class="header-panel" style="display:none;"><span class="fa fa-cogs"></span>'+hashRateType+'</div></div>';
         }
         function getDifficultyPanel() {
           var difficultyType='<label id="difficulty"></label>';
           if ('#{settings.shared_pages.difficulty}' == 'Hybrid') difficultyType+='<br /><span class="fas fa-sliders-h"></span><label id="difficultyHybrid"></label>';
-          return '<div class="card-header"><strong>#{settings.locale.difficulty}</strong></div><div class="card-body"><div id="difficultyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="difficultypanel" class="header-panel" style="display:none;"><span class="fas fa-sliders-h"></span>'+difficultyType+'</div></div>';
+          return '<div class="card-header"><b>#{settings.locale.difficulty}</b></div><div class="card-body"><div id="difficultyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="difficultypanel" class="header-panel" style="display:none;"><span class="fas fa-sliders-h"></span>'+difficultyType+'</div></div>';
         }
         function getMasternodesPanel() {
-          return '<div class="card-header"><strong>#{settings.locale.masternodecount}</strong></div><div class="card-body"><div id="masternodePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="masternodepanel" class="header-panel" style="display:none;"><span id="spnMasternodeCountOnline" class="img snactive" data-bs-toggle="tooltip" data-bs-placement="top"></span><label id="masternodeCountOnline" data-bs-toggle="tooltip" data-bs-placement="top"></label><label>&nbsp;/&nbsp;</label><label id="masternodeCountOffline" data-bs-toggle="tooltip" data-bs-placement="top"></label><span id="spnMasternodeCountOffline" class="img sninactive" data-bs-toggle="tooltip" data-bs-placement="top"></span></div></div>';
+          var s = '<div class="card-header"><b>#{settings.locale.masternodecount}</b></div><div class="card-body">';
+          s += '<div id="masternodePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="masternodepanel" class="header-panel" style="display:none;">'
+          s += '<label id="spnMasternodeCountOnline" data-bs-toggle="tooltip" data-bs-placement="top"><strong>&#10004;&nbsp;</strong></label>'
+          s += '<label id="masternodeCountOnline" data-bs-toggle="tooltip" data-bs-placement="top"></label>'
+          s += '<label>&nbsp;/&nbsp;</label>'
+          s += '<label id="masternodeCountOffline" data-bs-toggle="tooltip" data-bs-placement="top"></label>'
+          s += '<label id="spnMasternodeCountOffline" data-bs-toggle="tooltip" data-bs-placement="top"><strong>&nbsp;&#9888;</strong></label>'
+          s += '</div></div>'
+          return s;
         }
         function getCoinSupplyPanel() {
-          var supplyType='<label id="supply"></label>';
-          return '<div class="card-header"><strong>#{settings.locale.ex_supply} <span class="small fw-normal">(#{settings.coin.symbol})</span></strong></div><div class="card-body"><div id="supplyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="supplypanel" class="header-panel" style="display:none;"><span class="img supply"></span>'+supplyType+'</div></div>';
+          var s='<div class="card-header"><b>#{settings.locale.ex_supply} <span class="small fw-normal">(#{settings.coin.symbol})</span></b></div>'
+          s += '<div class="card-body"><div id="supplyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
+          s += '<div id="supplypanel" class="header-panel" style="display:none;">';
+          s += '<label><strong>&#9921;&nbsp;</strong></label><label id="supply"></label>'
+          s += '</div></div>'
+          return s;
         }
         function getPricePanel() {
           var priceType='<label id="lastPrice">-</label>';
-          return '<div class="card-header"><strong>Price <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="pricePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="pricepanel" class="header-panel" style="display:none;"><span class="img price"></span>'+priceType+'</div></div>';
+          var s='<div class="card-header"><b>Price <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></b></div>';
+          s += '<div class="card-body"><div id="pricePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
+          s += '<div id="pricepanel" class="header-panel" style="display:none;">';
+          s += '<label><strong>&#9889;&nbsp;</strong></label><label id="lastPrice">-</label>';
+          s += '</div></div>';
+          return s;
         }
         function getMarketCapPanel() {
-          return '<div class="card-header"><strong>Market Cap <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></strong></div><div class="card-body"><div id="marketCapPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div><div id="marketCapPanel" class="header-panel" style="display:none;"><span class="img marketcap"></span><label id="marketCap"></label></div></div>';
+          var s='<div class="card-header"><b>Market Cap <span class="small fw-normal">(#{settings.markets_page.default_exchange.trading_pair.split('/')[1]})</span></b></div>';
+          s += '<div class="card-body"><div id="marketCapPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
+          s += '<div id="marketCapPanel" class="header-panel" style="display:none;">';
+          s += '<label><strong>&#8778;&nbsp;</strong></label><label id="marketCap"></label>';
+          s += '</div></div>';
+          return s;
         }
         function getLogoPanel() {
           return '<img src="#{settings.shared_pages.logo}" style="margin-top:-15px;height:128px;" alt="#{settings.coin.name} Logo" title="#{settings.coin.name} Logo" />';
@@ -878,7 +855,6 @@ html(lang='en')
 
           $('.alert-dismissible').on('closed.bs.alert', function (e) {
             e.preventDefault();
-            fixFooterHeightAndPosition();
           });
         });
         $(document).on('click', 'button#search-header-button', function (e) {
@@ -886,10 +862,8 @@ html(lang='en')
             $('#search-header-span').tooltip('hide');
         });
         $('#search-navbar-collapse').on('shown.bs.collapse', function (e) {
-          fixFooterHeightAndPosition();
         });
         $('#search-navbar-collapse').on('hidden.bs.collapse', function (e) {
-          fixFooterHeightAndPosition();
         });
         if (#{showPanels} == true) {
           hideShowPanel('#{settings.panel1}', 'pnlOne');
@@ -1139,7 +1113,6 @@ html(lang='en')
           update_network_charts();
         }
         update_stats();
-        fixFooterHeightAndPosition();
         enableTooltips();
       });
     - var bodyClasses = [];
@@ -1170,7 +1143,9 @@ html(lang='en')
     if settings.shared_pages.page_header.sticky_header == true
       - headerClasses.push('fixed-top');
     if settings.shared_pages.page_footer.sticky_footer == true
+      //- if (outerWidth() > 991) {
       - footerClasses.push('fixed-bottom');
+      //- }
     if settings.shared_pages.page_header.bgcolor != null && settings.shared_pages.page_header.bgcolor != ''
       - headerClasses.push('bg-' + settings.shared_pages.page_header.bgcolor);
       - dropdownClasses.push('bg-' + settings.shared_pages.page_header.bgcolor);
@@ -1211,31 +1186,6 @@ html(lang='en')
                   a.nav-link(href='/')
                     span.explorer
                     span.margin-left-5 #{settings.locale.menu_explorer}
-                if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
-                  li#reward.nav-item
-                    a.nav-link(href='/reward')
-                      span.fa.fa-star
-                      span.margin-left-5 #{settings.locale.menu_reward}
-                if settings.masternodes_page.enabled == true
-                  li#masternodes.nav-item
-                    a.nav-link(href='/masternodes')
-                      span.smartnodes
-                      span.margin-left-5 Smartnodes
-                if settings.movement_page.enabled == true
-                  li#movement.nav-item
-                    a.nav-link(href='/movement')
-                      span.movement
-                      span.margin-left-5 #{settings.locale.menu_movement}
-                if settings.network_page.enabled == true
-                  li#network.nav-item
-                    a.nav-link(href='/network')
-                      span.network
-                      span.margin-left-5 #{settings.locale.menu_network}
-                if settings.richlist_page.enabled == true
-                  li#richlist.nav-item
-                    a.nav-link(href='/richlist')
-                      span.richlist
-                      span.margin-left-5 #{settings.locale.menu_richlist}
                 if settings.markets_page.enabled == true
                   if settings.markets_page.show_market_dropdown_menu == true && settings.market_count > 1
                     li#markets.dropdown.nav-item
@@ -1266,6 +1216,31 @@ html(lang='en')
                       a.nav-link(href='/markets/' + settings.markets_page.default_exchange.exchange_name + '/' + settings.markets_page.default_exchange.trading_pair)
                         span.markets
                         span.margin-left-5 #{settings.locale.menu_markets}
+                if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
+                  li#reward.nav-item
+                    a.nav-link(href='/reward')
+                      span.fa.fa-star
+                      span.margin-left-5 #{settings.locale.menu_reward}
+                if settings.masternodes_page.enabled == true
+                  li#masternodes.nav-item
+                    a.nav-link(href='/masternodes')
+                      span.smartnodes
+                      span.margin-left-5 Smartnodes
+                if settings.movement_page.enabled == true
+                  li#movement.nav-item
+                    a.nav-link(href='/movement')
+                      span.movement
+                      span.margin-left-5 #{settings.locale.menu_movement}
+                if settings.network_page.enabled == true
+                  li#network.nav-item
+                    a.nav-link(href='/network')
+                      span.network
+                      span.margin-left-5 #{settings.locale.menu_network}
+                if settings.richlist_page.enabled == true
+                  li#richlist.nav-item
+                    a.nav-link(href='/richlist')
+                      span.richlist
+                      span.margin-left-5 #{settings.locale.menu_richlist}
                 if settings.api_page.enabled == true
                   li#info.nav-item
                     a.nav-link(href='/info')
@@ -1402,7 +1377,7 @@ html(lang='en')
           if showPanels == true || (settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header')
             .col-lg-12
               if showPanels == true
-                .row.text-center.d-flex.justify-content-center
+                div#cockpit.row.text-center.d-flex.justify-content-center
                   div(class="col-lg-2 col-lg-offset-" + settings.paneloffset)
                     - if (settings.panel1 != '') {
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlOne')
@@ -1458,26 +1433,21 @@ html(lang='en')
                         button(onclick='diffonlygpu()') GPU
                         button(onclick='diffonlyasic()') ASIC
           block content
-    div#footer-container(class=footerClasses, role='navigation')
-      .col-4.navbar-nav
-        ul.nav.justify-content-left
-          each social in settings.shared_pages.page_footer.social_links
-            if social.enabled
-              li.float-start
-                a.nav-link.social-link.border-0(href=social.url, target='_blank', alt=settings.coin.name + ' ' + social.tooltip_text, title=settings.coin.name + ' ' + social.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
-                  if social.icon != null && social.icon != ''
-                    span(class='vertical-align-middle ' + social.icon)
-                  else
-                    img(class='vertical-align-middle', src=social.image_path)
-      .col-4.navbar-nav
-        ul.nav.justify-content-center
-          li.text-center
-            div#cr
-              p
-                small ButKoin is a decentralized secure cryptocurrency © But Project
-                  br
-                  | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs
-      .col-4.navbar-nav
+    footer
+      div#social
+        each social in settings.shared_pages.page_footer.social_links
+          if social.enabled
+            a.social-link.border-0(href=social.url, target='_blank', alt=settings.coin.name + ' ' + social.tooltip_text, title=settings.coin.name + ' ' + social.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
+              if social.icon != null && social.icon != ''
+                span(class='vertical-align-middle ' + social.icon)
+              else
+                img(class='vertical-align-middle', src=social.image_path)
+      div#copy
+        p
+          small ButKoin is a decentralized secure cryptocurrency © But Project
+            br
+            | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs
+// .col-4.navbar-nav
         ui.nav.justify-content-end
           label#lblBlockcount.badge.nav-link.border-0.float-end
-          label#lblConnections.badge.nav-link.border-0.float-end
+          // label#lblConnections.badge.nav-link.border-0.float-end
