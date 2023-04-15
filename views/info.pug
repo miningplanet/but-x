@@ -31,6 +31,7 @@ block content
           hr
         - var hide_rpc_api_section = !(settings.api_page.public_apis.rpc.getdifficulty.enabled == true && settings.api_cmds['getdifficulty'] != null && settings.api_cmds['getdifficulty'] != '') && !(settings.api_page.public_apis.rpc.getconnectioncount.enabled == true && settings.api_cmds['getconnectioncount'] != null && settings.api_cmds['getconnectioncount'] != '') && !(settings.api_page.public_apis.rpc.getblockcount.enabled == true && settings.api_cmds['getblockcount'] != null && settings.api_cmds['getblockcount'] != '') && !(settings.api_page.public_apis.rpc.getblockhash.enabled == true && settings.api_cmds['getblockhash'] != null && settings.api_cmds['getblockhash'] != '') && !(settings.api_page.public_apis.rpc.getblock.enabled == true && settings.api_cmds['getblock'] != null && settings.api_cmds['getblock'] != '') && !(settings.api_page.public_apis.rpc.getrawtransaction.enabled == true && settings.api_cmds['getrawtransaction'] != null && settings.api_cmds['getrawtransaction'] != '') && !(settings.api_page.public_apis.rpc.getnetworkhashps.enabled == true && settings.shared_pages.show_hashrate == true && settings.api_cmds['getnetworkhashps'] != null && settings.api_cmds['getnetworkhashps'] != '') && !(settings.api_page.public_apis.rpc.getvotelist.enabled == true && settings.api_cmds['getvotelist'] != null && settings.api_cmds['getvotelist'] != '') && !(settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') && (!settings.blockchain_specific.heavycoin.enabled || (!(settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getmaxvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getphase.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != null && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getreward.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != null && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getsupply.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != null && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardestimate.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardwhenstr.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != '')));
         - var hide_ext_api_section = !settings.api_page.public_apis.ext.getmoneysupply.enabled && !settings.api_page.public_apis.ext.getdistribution.enabled && !settings.api_page.public_apis.ext.getaddress.enabled && !settings.api_page.public_apis.ext.getaddresstxs.enabled && !settings.api_page.public_apis.ext.gettx.enabled && !settings.api_page.public_apis.ext.getbalance.enabled && !settings.api_page.public_apis.ext.getlasttxs.enabled && !settings.api_page.public_apis.ext.getcurrentprice.enabled && !settings.api_page.public_apis.ext.getnetworkpeers.enabled && !settings.api_page.public_apis.ext.getbasicstats.enabled && !settings.api_page.public_apis.ext.getsummary.enabled && !(settings.api_page.public_apis.ext.getmasternodelist.enabled && settings.api_cmds['getmasternodelist'] != null && settings.api_cmds['getmasternodelist'] != '') && !settings.api_page.public_apis.ext.getmasternoderewards.enabled && !settings.api_page.public_apis.ext.getmasternoderewardstotal.enabled;
+        - var hide_electrum_api_section = false;
         if !hide_rpc_api_section
           h3 #{settings.locale.api_calls}
           p
@@ -336,3 +337,132 @@ block content
             p
               div.fw-bold qrcode (/qr/hash)
               a(href='/qr/' + settings.api_page.sample_data.address) #{address}/qr/#{settings.api_page.sample_data.address}
+          hr
+        if !hide_electrum_api_section
+          h3 ElectrumX API (JSON-RPC 2.0)
+          p ElectrumX servers for ButKoin light wallets (former Bitcoin Lightning) are available at 
+            ul 
+              li 88.99.186.230
+              li 95.216.204.251
+              li 116.203.130.246
+              li 135.181.36.174
+          p ports
+            ul
+              li 50001 TCP
+              li 50002 TLS
+              li 50003 Websocket
+              li 50004 TLS Websocket
+          p &nbsp;
+          ul
+            li
+              p
+                div.fw-bold version
+                div
+                  em Returns the server version (all clients must request this resource first, but only once per session).
+                  p 
+                    b {"id": "clientID", "method": "server.version", "params": []}
+                  code -> {"jsonrpc":"2.0","result":["ElectrumX 1.16.0","1.4"],"id":"clientID"}
+            li
+              p
+                div.fw-bold ping
+                div
+                  em Pings the server.
+                  p 
+                    b {"id": "clientID", "method": "server.ping", "params": []}
+                  code -> {"jsonrpc":"2.0","result":null,"id":"clientID"}
+            li
+              p
+                div.fw-bold banner
+                div
+                  em Returns the server banner.
+                  p 
+                    b {"id": "clientID", "method": "server.banner", "params": []}
+                  code -> {"jsonrpc":"2.0","result":"You are connected to an ElectrumX 1.16.0 server.","id":"clientID"}
+            li
+              p
+                div.fw-bold donation address
+                div
+                  em Returns the servers donation address.
+                  p 
+                    b {"id": "clientID", "method": "server.donation_address", "params": []}
+                  code -> {"jsonrpc":"2.0","result":" XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs","id":"clientID"}
+            li
+              p
+                div.fw-bold features
+                div
+                  em Returns the servers service list.
+                  p 
+                    b {"id": "clientID", "method": "server.features", "params": []}
+                  code -> {"jsonrpc":"2.0","result":{"hosts":{"88.99.186.230":{"tcp_port":50001,"ssl_port":50002,"ws_port":50003,"wss_port":50004}},"pruning":null,"server_version":"ElectrumX 1.16.0","protocol_min":"1.4","protocol_max":"1.4.2","genesis_hash":"001787e5f9c3cd249f84f0142071f6098d9e3b7ec8591ff73543ddc4900c1dc2","hash_function":"sha256","services":["tcp://88.99.186.230:50001","ssl://88.99.186.230:50002","ws://88.99.186.230:50003","wss://88.99.186.230:50004"]},"id":"clientID"}
+            li
+              p
+                div.fw-bold estimate transaction fee
+                div
+                  em Returns the estimated transaction fee for the given number of confirmations.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.estimatefee", "params": ["5"]}
+                  code -> {"jsonrpc":"2.0","result":1.047e-05,"id":"clientID"}
+            li
+              p
+                div.fw-bold relay fee
+                div
+                  em Returns the minimum fee a low-priority transaction has to pay.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.relayfee", "params": []}
+                  code -> {"jsonrpc":"2.0","result":1e-05,"id":"clientID"}
+            li
+              p
+                div.fw-bold subscribe peer discovery
+                div
+                  em Returns the list of But ElectrumX network peers and subscribes to changes of this list.
+                  p 
+                    b {"id": "clientID", "method": "server.peers.subscribe", "params": []}
+                  code -> {"jsonrpc":"2.0","result":[["135.181.36.174","135.181.36.174",["v1.4.2","s50002","t50001"]],["116.203.130.246","116.203.130.246",["v1.4.2","s50002","t50001"]],["88.99.186.230","88.99.186.230",["v1.4.2","s50002","t50001"]]],"id":"clientID"}
+            li
+              p
+                div.fw-bold get block header
+                div
+                  em Returns the list of block header for the given height.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.block.header", "params": ["10"]}
+                  code -> {"jsonrpc":"2.0","result":"00080020...92010000","id":"clientID"}
+            li
+              p
+                div.fw-bold get block headers
+                div
+                  em Returns a given number of block headers from the height given as one string. Max number is 2016.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.block.headers", "params": ["437123", "100"]}
+                  code -> {"jsonrpc":"2.0","result":{"hex":"00280020...c1ea84fa","count":11,"max":2016},"id":"clientID"}
+            li
+              p
+                div.fw-bold address balance
+                div
+                  em Returns the balance for the given script hash in BUTK .
+                  p 
+                    b {"id": "clientID", "method": "blockchain.scripthash.get_balance", "params": ["b8b56d50373d2c9b57d623e5379dd7a10708a563372a18b6d7ddedf4f2400855"]}
+                  code -> {"jsonrpc":"2.0","result":{"confirmed":11321996296013,"unconfirmed":0},"id":"clientID"}
+            li
+              p
+                div.fw-bold list unspent
+                div
+                  em Returns unspent transaction outputs for the given script hash in BUTK.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.scripthash.listunspent", "params": ["b8b56d50373d2c9b57d623e5379dd7a10708a563372a18b6d7ddedf4f2400855"]}
+                  code -> {"jsonrpc":"2.0","result":[{"tx_hash":"d554ac7a95b0f363fa6fd691acec43afb2ccd7cb4c7d4383d97ca62e26413af5","tx_pos":1,"height":80666,"value":8796296296300},{"tx_hash":"2599c9ac54b86cf9d5e9fd0dac21d9ebd39ab73510f3b3a10a894c35f1b3f0e8","tx_pos":1,"height":83930,"value":2435800000000},{"tx_hash":"d73530da14f5075f9976d9a17f1722bb2a42bd0d9893995b4e6f76001837ecb2","tx_pos":0,"height":331057,"value":87899999713},{"tx_hash":"87bc2c0ceae472f8865055713f64ff49fcd93fd739d52ced85f9df2b2cb8ba50","tx_pos":0,"height":414048,"value":2000000000}],"id":"clientID"}
+            li
+              p
+                div.fw-bold mempool transactions
+                div
+                  em Returns the transactions in the mempool for the given script hash.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.scripthash.get_mempool", "params": ["8b01df4e368ea28f8dc0423bcf7a4923e3a12d307c875e47a0cfbf90b5c39161"]}
+                  code -> {"jsonrpc":"2.0","result":[],"id":"clientID"}
+            li
+              p
+                div.fw-bold subscribe to script hash
+                div
+                  em Subcribes to the given script hash and the changes of the address balance and transactions.
+                  p 
+                    b {"id": "clientID", "method": "blockchain.scripthash.subscribe", "params": ["8b01df4e368ea28f8dc0423bcf7a4923e3a12d307c875e47a0cfbf90b5c39161"]}
+                  code -> {"jsonrpc":"2.0","result":null,"id":"clientID"}
