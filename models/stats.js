@@ -18,4 +18,4 @@ var StatsSchema = new Schema({
   markets_last_updated: { type: Number, default: 0 }
 });
 
-module.exports = mongoose.model('coinstats', StatsSchema);
+module.exports = StatsSchema;

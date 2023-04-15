@@ -22,7 +22,7 @@ function exit(mongoose, exitCode) {
 
         // finish exit cleanup
         finishExit(db, exitCode);
-      });
+      }, net);
     } else {
       // disconnect mongo connection
       mongoose.disconnect();
@@ -78,7 +78,9 @@ function drop_collection(mongoose, colName, cb) {
 }
 
 function delete_database(mongoose, settings, cb) {
-  const dbString = `mongodb://${encodeURIComponent(settings.dbsettings.user)}:${encodeURIComponent(settings.dbsettings.password)}@${settings.dbsettings.address}:${settings.dbsettings.port}/${settings.dbsettings.database}`;
+  const dbs = settings.getDbs()
+  const dbString = dbs[0]
+  // TODO: DB delete backup
 
   console.log('Connecting to database..');
 
@@ -133,7 +135,9 @@ function restore_backup(mongoose, settings, backupPath, extractedPath, gZip) {
   console.log('Restoring backup.. Please wait..');
 
   // restore mongo database from backup
-  const restoreProcess = exec(`mongorestore --host="${settings.dbsettings.address}" --port="${settings.dbsettings.port}" --username="${settings.dbsettings.user}" --password="${settings.dbsettings.password}" --authenticationDatabase="${settings.dbsettings.database}" ${(gZip ? `--gzip --archive="${backupPath}"` : `"${extractedPath}"`)}`);
+  // TODO: DB restore backup
+  const dbs = settings.dbs[0]
+  const restoreProcess = exec(`mongorestore --host="${dbs.address}" --port="${dbs.port}" --username="${dbs.user}" --password="${dbs.password}" --authenticationDatabase="${dbs.database}" ${(gZip ? `--gzip --archive="${backupPath}"` : `"${extractedPath}"`)}`);
 
   restoreProcess.stdout.on('data', (data) => {
     console.log(data);
@@ -254,7 +258,7 @@ if (process.argv[2] != null && process.argv[2] != '') {
                     var extractedPath = path.join(defaultBackupPath, path.basename(backupPath).replace(oldArchiveSuffix, ''));
 
                     // check if this is a valid backup archive now that the files have been extracted
-                    if (fs.existsSync(`${path.join(extractedPath, settings.dbsettings.database)}`)) {
+                    if (fs.existsSync(`${path.join(extractedPath, dbs.database)}`)) {
                       const mongoose = require('mongoose');
 
                       // delete all collections from existing database

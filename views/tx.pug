@@ -13,30 +13,28 @@ block content
         $('span#timestampCol').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(#{tx.timestamp}, true));
         enableTooltips();
       }
-      if (#{settings.shared_pages.page_header.page_title_image.enable_animation} == true && #{settings.transaction_page.page_header.show_img} == true)
-        startRotateElement('img#header-img');
     });
   .col-xs-12.col-md-12
     if settings.transaction_page.page_header.show_img == true || settings.transaction_page.page_header.show_title == true || settings.transaction_page.page_header.show_description == true
       #page-header-container(style='align-items:' + (settings.transaction_page.page_header.show_img == true && settings.transaction_page.page_header.show_title == true && settings.transaction_page.page_header.show_description == true ? 'flex-start' : 'center'))
         if settings.transaction_page.page_header.show_img == true
           #header-img-container
-            img#header-img(src=(settings.shared_pages.page_header.page_title_image == null || settings.shared_pages.page_header.page_title_image.image_path == null || settings.shared_pages.page_header.page_title_image.image_path == '' ? '/img/page-title-img.png' : settings.shared_pages.page_header.page_title_image.image_path))
+            img#header-img(src=page_title_logo)
         #page-title-container
           if settings.transaction_page.page_header.show_title == true
-            h3#page-title #{settings.locale.tx_title.replace('{1}', settings.coin.name)}
+            h3#page-title #{settings.locale.tx_title.replace('{1}', coin.name)}
           if settings.transaction_page.page_header.show_description == true
             if settings.transaction_page.page_header.show_title != true
               #page-title-container
-                .sub-page-header.text-muted=settings.locale.tx_description.replace('{1}', settings.coin.name).replace('{2}', tx.blockindex)
+                .sub-page-header.text-muted=settings.locale.tx_description.replace('{1}', coin.name).replace('{2}', tx.blockindex)
             else
-              .sub-page-header.text-muted=settings.locale.tx_description.replace('{1}', settings.coin.name).replace('{2}', tx.blockindex)
+              .sub-page-header.text-muted=settings.locale.tx_description.replace('{1}', coin.name).replace('{2}', tx.blockindex)
       .cardSpacer.clearfix
     .card.card-default.border-0.cardSpacer
       .card-header
         strong=settings.locale.tx_hash + ': ' + tx.txid
         if settings.api_page.public_apis.rpc.getrawtransaction.enabled == true
-          a.d-none.d-md-inline(href=`/api/getrawtransaction?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
+          a.d-none.d-md-inline(href=`/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
       table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
         tbody
@@ -44,7 +42,7 @@ block content
           tr
             td.d-md-table-cell #{settings.locale.tx_block_hash}
             td.d-md-table-cell
-              a.breakWord(href='/block/' + tx.blockhash) #{tx.blockhash}
+              a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockhash}
           tr
             if settings.transaction_page.show_op_return == true
               td='OP_RETURN'
@@ -77,7 +75,7 @@ block content
                   th #{settings.locale.tx_address}
                   if (tx.vin.length > 0)
                     if tx.vin[0].addresses != 'coinbase'
-                      th.text-center #{settings.coin.symbol}
+                      th.text-center #{coin.symbol}
               tbody
                 if tx.vin.length > 0
                   each address in tx.vin
@@ -90,7 +88,7 @@ block content
                       tr
                         td.addressCol
                           if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
-                            a.breakWord(href='/address/' + address.addresses)
+                            a.breakWord(href='/address/' + address.addresses + '/' + net)
                               if address.claim_name == null || address.claim_name == ''
                                 =address.addresses
                               else
@@ -98,13 +96,13 @@ block content
                             include ./includes/rl_labels.pug
                           else if address.addresses == 'hidden_address'
                             if settings.address_page.enable_hidden_address_view == true
-                              a.breakWord(href='/address/hidden_address')
+                              a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_sender
                             else
                               =settings.locale.hidden_sender
                           else
                             if settings.address_page.enable_unknown_address_view == true
-                              a.breakWord(href='/address/unknown_address')
+                              a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_sender
                             else
                               =settings.locale.unknown_sender
@@ -121,7 +119,7 @@ block content
               thead
                 tr(class=theadClasses)
                   th #{settings.locale.tx_address}
-                  th.text-center #{settings.coin.symbol}
+                  th.text-center #{coin.symbol}
               tbody
                 each address in tx.vout
                   if tx.vout.length > 0
@@ -130,7 +128,7 @@ block content
                     tr
                       if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
                         td.addressCol
-                          a.breakWord(href='/address/' + address.addresses)
+                          a.breakWord(href='/address/' + address.addresses + '/' + net)
                             if address.claim_name == null || address.claim_name == ''
                               =address.addresses
                             else
@@ -142,13 +140,13 @@ block content
                         td.addressCol
                           if address.addresses == 'hidden_address'
                             if settings.address_page.enable_hidden_address_view == true
-                              a.breakWord(href='/address/hidden_address')
+                              a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_recipient
                             else
                               =settings.locale.hidden_recipient
                           else
                             if settings.address_page.enable_unknown_address_view == true
-                              a.breakWord(href='/address/unknown_address')
+                              a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_recipient
                             else
                               =settings.locale.unknown_recipient
@@ -158,13 +156,13 @@ block content
                         td(colspan='2')
                           if address.addresses == 'hidden_address'
                             if settings.address_page.enable_hidden_address_view == true
-                              a.breakWord(href='/address/hidden_address')
+                              a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_recipient
                             else
                               =settings.locale.hidden_recipient
                           else
                             if settings.address_page.enable_unknown_address_view == true
-                              a.breakWord(href='/address/unknown_address')
+                              a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_recipient
                             else
                               =settings.locale.unknown_recipient
@@ -173,7 +171,7 @@ block content
                     - var ramountParts = ramount.split('.');
                     tr
                       td.addressCol
-                        a.breakWord(href='/address/' + address.addresses)
+                        a.breakWord(href='/address/' + address.addresses+ '/' + net)
                           if address.claim_name == null || address.claim_name == ''
                             =address.addresses
                           else

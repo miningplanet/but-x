@@ -20,4 +20,4 @@ var NetworkHistorySchema = new Schema({
   difficulty_butkscrypt: { type: Number, default: 0 }
 }, {id: false});
 
-module.exports = mongoose.model('NetworkHistory', NetworkHistorySchema);
+module.exports = NetworkHistorySchema;

@@ -21,7 +21,7 @@ block content
     $(document).ready(function() {
       $.ajax({
         method: 'GET',
-        url: '/ext/getnetworkpeers/internal',
+        url: '/ext/getnetworkpeers/#{net}',
         dataType: 'json'
       }).done(function(peers) {
         var setting_txPerPage = parseInt("#{settings.network_page.connections_table.items_per_page}");
@@ -244,8 +244,6 @@ block content
         } else
           $('span#lastUpdatedDate').html(' N/A');
       }
-      if (#{settings.shared_pages.page_header.page_title_image.enable_animation} == true && #{settings.network_page.page_header.show_img} == true)
-        startRotateElement('img#header-img');
 
       $('#addnodes').on('click', 'button.btn-copy', function (event) {
         var btn = $(this);
@@ -276,10 +274,10 @@ block content
         #page-header-container(style='align-items:' + (settings.network_page.page_header.show_img == true && settings.network_page.page_header.show_title == true && settings.network_page.page_header.show_last_updated == true && settings.network_page.page_header.show_description == true ? 'flex-start' : 'center'))
           if settings.network_page.page_header.show_img == true
             #header-img-container
-              img#header-img(src=(settings.shared_pages.page_header.page_title_image == null || settings.shared_pages.page_header.page_title_image.image_path == null || settings.shared_pages.page_header.page_title_image.image_path == '' ? '/img/page-title-img.png' : settings.shared_pages.page_header.page_title_image.image_path))
+              img#header-img(src=page_title_logo)
           #page-title-container
             if settings.network_page.page_header.show_title == true
-              h3#page-title #{settings.locale.net_title.replace('{1}', settings.coin.name)}
+              h3#page-title #{settings.locale.net_title.replace('{1}', coin.name)}
             if settings.network_page.page_header.show_last_updated == true
               if settings.network_page.page_header.show_title != true && settings.network_page.page_header.show_description != true
                 #page-title-container
@@ -293,9 +291,9 @@ block content
             if settings.network_page.page_header.show_description == true
               if settings.network_page.page_header.show_title != true && settings.network_page.page_header.show_last_updated != true
                 #page-title-container
-                  .sub-page-header.text-muted=settings.locale.net_description.replace('{1}', settings.coin.name)
+                  .sub-page-header.text-muted=settings.locale.net_description.replace('{1}', coin.name)
               else
-                .sub-page-header.text-muted=settings.locale.net_description.replace('{1}', settings.coin.name)
+                .sub-page-header.text-muted=settings.locale.net_description.replace('{1}', coin.name)
         .cardSpacer.clearfix
       ul.nav.nav-tabs(role='tablist')
         li.nav-item(role='presentation')

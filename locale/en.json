@@ -118,7 +118,7 @@
   "net_country": "Country",
 
   // api view
-  "api_title": "{1} Public API",
+  "api_title": "{1} Public API {2}",
   "api_description": "A listing of public API endpoints for retrieving {1} coin data from the network without the need for a local wallet",
   "api_documentation": "API Documentation",
   "api_calls": "API Calls",

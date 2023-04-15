@@ -1,33 +1,46 @@
 #!/usr/bin/env node
 var debug = require('debug')('explorer');
 var settings = require('../lib/settings');
+const detect = require('detect-port');
 var db = require('../lib/database');
 var app = require('../app');
 
 app.set('port', process.env.PORT || settings.webserver.port);
 
-var dbString = 'mongodb://' + encodeURIComponent(settings.dbsettings.user);
-dbString = dbString + ':' + encodeURIComponent(settings.dbsettings.password);
-dbString = dbString + '@' + settings.dbsettings.address;
-dbString = dbString + ':' + settings.dbsettings.port;
-dbString = dbString + '/' + settings.dbsettings.database;
+const dbstrings = settings.getDbs()
 
-db.connect(dbString, function() {
-  // initialize the database
+db.connection_factory('mainnet', dbstrings[0], function(conn) {
   db.initialize_data_startup(function() {
-    var server = app.listen(app.get('port'), '::', function() {
-      debug('Express server listening on port ' + server.address().port);
-    });
-
-    process.on('SIGINT', () => {
-      server.close(() => {
-        var mongoose = require('mongoose');
-
-        mongoose.connection.close(false, () => {
-          // close the main process now that all http and database connections have closed
-          process.exit(0);
+    var port = app.get('port')
+    detect(port).then(function(result) {
+      console.log('Detected port %s.', result)
+      if (port !== result -1) {
+        console.log('Starting...')
+        var server = app.listen(app.get('port'), '::', function() {
+          debug('Express server listening on port ' + server.address().port);
         });
-      });
-    });
-  });
+        process.on('SIGINT', () => {
+          console.log('Stopping...')
+          server.close(() => {
+            var mongoose = require('mongoose');
+            mongoose.connection.close(false, () => {
+              // close the main process now that all http and database connections have closed
+              console.log('Exit...')
+              process.exit(0);
+            });
+          });
+        });
+      }
+    })
+  }, 'mainnet');
 });
+
+db.connection_factory('testnet', dbstrings[1], function(conn) {
+  db.initialize_data_startup(function() {
+    // NOOP
+  }, 'testnet');
+});
+
+module.exports = {
+  db: db
+}

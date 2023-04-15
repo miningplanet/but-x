@@ -47,13 +47,13 @@ block content
           }
         },
         ajax: {
-          url: '/ext/getmasternodelist',
+          url: '/ext/getmasternodelist/#{net}',
           dataSrc: function(json) {
             for (i = 0; i < json.length; i++) {
               var addr = json[i]['addr'];
               var status = json[i]['status'];
               var country = "<span>" + json[i]['country'] + "</span>";
-              json[i]['address'] = "<a href='/address/" + json[i]['address'] + "'>" + json[i]['address'] + "</a>";
+              json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
               json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']).replace(' UTC', '') + '</span>';
 
               if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
@@ -65,7 +65,7 @@ block content
               else
                 json[i]['activetime'] = '<em>N/A</em>';
 
-              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
+              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
 
               if (labels[addr] != null && labels[addr].enabled == true) {
                 if (labels[addr].type)
@@ -139,18 +139,16 @@ block content
         } else
           $('span#lastUpdatedDate').html(' N/A');
       }
-      if (#{settings.shared_pages.page_header.page_title_image.enable_animation} == true && #{settings.masternodes_page.page_header.show_img} == true)
-        startRotateElement('img#header-img');
     });
   .col-md-12.cardSpacer
     if settings.masternodes_page.page_header.show_img == true || settings.masternodes_page.page_header.show_title == true || settings.masternodes_page.page_header.show_last_updated == true || settings.masternodes_page.page_header.show_description == true
       #page-header-container(style='align-items:' + (settings.masternodes_page.page_header.show_img == true && settings.masternodes_page.page_header.show_title == true && settings.masternodes_page.page_header.show_last_updated == true && settings.masternodes_page.page_header.show_description == true ? 'flex-start' : 'center'))
         if settings.masternodes_page.page_header.show_img == true
           #header-img-container
-            img#header-img(src=(settings.shared_pages.page_header.page_title_image == null || settings.shared_pages.page_header.page_title_image.image_path == null || settings.shared_pages.page_header.page_title_image.image_path == '' ? '/img/page-title-img.png' : settings.shared_pages.page_header.page_title_image.image_path))
+            img#header-img(src=page_title_logo)
         #page-title-container
           if settings.masternodes_page.page_header.show_title == true
-            h3#page-title #{settings.locale.mn_title.replace('{1}', settings.coin.name)}
+            h3#page-title #{settings.locale.mn_title.replace('{1}', coin.name)}
           if settings.masternodes_page.page_header.show_last_updated == true
             if settings.masternodes_page.page_header.show_title != true && settings.masternodes_page.page_header.show_description != true
               #page-title-container
@@ -164,9 +162,9 @@ block content
           if settings.masternodes_page.page_header.show_description == true
             if settings.masternodes_page.page_header.show_title != true && settings.masternodes_page.page_header.show_last_updated != true
               #page-title-container
-                .sub-page-header.text-muted=settings.locale.mn_description.replace('{1}', settings.coin.name)
+                .sub-page-header.text-muted=settings.locale.mn_description.replace('{1}', coin.name)
             else
-              .sub-page-header.text-muted=settings.locale.mn_description.replace('{1}', settings.coin.name)
+              .sub-page-header.text-muted=settings.locale.mn_description.replace('{1}', coin.name)
       .cardSpacer.clearfix
     .card.card-default.border-0.cardSpacer
       .card-header

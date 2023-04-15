@@ -14,4 +14,4 @@ var HeavySchema = new Schema({
   votes: { type: Array, default: [] }
 });
 
-module.exports = mongoose.model('Heavy', HeavySchema);
+module.exports = HeavySchema

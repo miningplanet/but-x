@@ -19,4 +19,4 @@ var MasternodeSchema = new Schema({
   country_code: { type: String, default: "" }
 }, {id: false});
 
-module.exports = mongoose.model('Masternode', MasternodeSchema);
+module.exports = MasternodeSchema;

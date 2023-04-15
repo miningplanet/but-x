@@ -16,15 +16,25 @@ var app = express();
 var apiAccessList = [];
 const date = require('date-and-time')
 const { exec } = require('child_process');
-const priceCache = new TTLCache({ max: 2, ttl: settings.cache.price * 1000, updateAgeOnGet: false, noUpdateTTL: false });
-const tickerCache = new TTLCache({ max: 1, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false });
+const summaryCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const networkChartCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const statsCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.stats * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const supplyCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.supply * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const difficultyCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.difficulty * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const pricesCache = new TTLCache({ max: settings.wallets.length * 2, ttl: settings.cache.prices * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const tickerCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const balancesCache = new TTLCache({ max: 100, ttl: settings.cache.balances * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const distributionCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const peersCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const masternodesCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
 var request = require('postman-request');
 var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
 var base_url = base_server + ''; // api/
 
-// pass wallet rpc connection info to nodeapi
-nodeapi.setWalletDetails(settings.wallet);
+// pass wallet rpc connections info to nodeapi
+nodeapi.setWalletDetails(settings.wallets);
+
 // dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value
 Object.keys(settings.api_cmds).forEach(function(key, index, map) {
   if (key != 'use_rpc' && settings.api_cmds[key] != null && settings.api_cmds[key] != '')
@@ -82,10 +92,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
 app.use('/api', nodeapi.app);
+// app.use('/:net?', routes);
 app.use('/', routes);
 
 // post method to claim an address using verifymessage functionality
-app.post('/claim', function(req, res) {
+app.post('/claim/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   // check if the bad-words filter is enabled
   if (settings.claim_address_page.enable_bad_word_filter == true) {
     // initialize the bad-words filter
@@ -102,7 +115,7 @@ app.post('/claim', function(req, res) {
   // check if the message was filtered
   if (message == req.body.message) {
     // call the verifymessage api
-    lib.verify_message(req.body.address, req.body.signature, req.body.message, function(body) {
+    lib.verify_message(net, req.body.address, req.body.signature, req.body.message, function(body) {
       if (body == false)
         res.json({'status': 'failed', 'error': true, 'message': 'Invalid signature'});
       else if (body == true) {
@@ -114,7 +127,7 @@ app.post('/claim', function(req, res) {
             res.json({'status': 'failed', 'error': true, 'message': 'Wallet address ' + req.body.address + ' is not valid or does not have any transactions'});
           else
             res.json({'status': 'failed', 'error': true, 'message': 'Wallet address or signature is invalid'});
-        });
+        }, net);
       } else
         res.json({'status': 'failed', 'error': true, 'message': 'Wallet address or signature is invalid'});
     });
@@ -125,20 +138,30 @@ app.post('/claim', function(req, res) {
 });
 
 // extended apis
-app.use('/ext/getmoneysupply', function(req, res) {
-  // check if the getmoneysupply api is enabled
+app.use('/ext/getmoneysupply/:net?', function(req, res) {
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmoneysupply.enabled == true) {
-    // lookup stats
-    db.get_stats(settings.coin.name, function (stats) {
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)
+    const r = supplyCache.get(net);
+    if (r == undefined) {
+      db.get_stats(coin.name, function (stats) {
+        supplyCache.set(net, stats.supply);
+        console.debug("Cached supply '%s' %s", net, r);
+        res.setHeader('content-type', 'text/plain');
+        res.end((stats && stats.supply ? stats.supply.toString() : '0'));
+      }, net);
+    } else {
+      console.debug("Get supply by cache '%s' %s", net, r);
       res.setHeader('content-type', 'text/plain');
-      res.end((stats && stats.supply ? stats.supply.toString() : '0'));
-    });
+      res.end((r ? r.toString() : '0'));
+    }
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getaddress/:hash', function(req, res) {
-  // check if the getaddress api is enabled
+app.use('/ext/getaddress/:hash/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getaddress.enabled == true) {
     db.get_address(req.params.hash, false, function(address) {
       db.get_address_txs_ajax(req.params.hash, 0, settings.api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(txs, count) {
@@ -176,32 +199,35 @@ app.use('/ext/getaddress/:hash', function(req, res) {
             sent: (address.sent / 100000000),
             received: (address.received / 100000000),
             balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
-            last_txs: last_txs
+            last_txs: last_txs,
+            coin: coin,
+            net: net
           };
 
           res.send(a_ext);
         } else
-          res.send({ error: 'address not found.', hash: req.params.hash});
-      });
-    });
+          res.send({ error: 'address not found.', hash: req.params.hash, coin: coin, net: net});
+      }, net);
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/gettx/:txid', function(req, res) {
-  // check if the gettx api is enabled
+app.use('/ext/gettx/:txid/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.gettx.enabled == true) {
     var txid = req.params.txid;
 
     db.get_tx(txid, function(tx) {
       if (tx) {
         lib.get_blockcount(function(blockcount) {
-          res.send({ active: 'tx', tx: tx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0)});
-        });
+          res.send({ active: 'tx', tx: tx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
+        }, net);
       } else {
         lib.get_rawtransaction(txid, function(rtx) {
           if (rtx && rtx.txid) {
-            lib.prepare_vin(rtx, function(vin, tx_type_vin) {
+            lib.prepare_vin(net, rtx, function(vin, tx_type_vin) {
               lib.prepare_vout(rtx.vout, rtx.txid, vin, ((typeof rtx.vjoinsplit === 'undefined' || rtx.vjoinsplit == null) ? [] : rtx.vjoinsplit), function(rvout, rvin, tx_type_vout) {
                 lib.calculate_total(rvout, function(total) {
                   if (!rtx.confirmations > 0) {
@@ -215,7 +241,7 @@ app.use('/ext/gettx/:txid', function(req, res) {
                       blockindex: -1
                     };
 
-                    res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount:-1});
+                    res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount:-1, coin: coin, net: net});
                   } else {
                     var utx = {
                       txid: rtx.txid,
@@ -228,58 +254,80 @@ app.use('/ext/gettx/:txid', function(req, res) {
                     };
 
                     lib.get_blockcount(function(blockcount) {
-                      res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0)});
-                    });
+                      res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
+                    }, net);
                   }
                 });
               });
             });
           } else
-            res.send({ error: 'tx not found.', hash: txid});
-        });
+            res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net});
+        }, net);
       }
-    });
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getbalance/:hash', function(req, res) {
-  // check if the getbalance api is enabled
+app.use('/ext/getbalance/:hash/:net?', function(req, res) {
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getbalance.enabled == true) {
-    db.get_address(req.params.hash, false, function(address) {
-      if (address) {
-        res.setHeader('content-type', 'text/plain');
-        res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''));
-      } else
-        res.send({ error: 'address not found.', hash: req.params.hash });
-    });
+    const hash = req.params.hash
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)
+    const r = balancesCache.get(net + '_' + hash);
+    if (r == undefined) {
+      db.get_address(hash, false, function(address) {
+        if (address) {
+          console.debug("Cached balance '%s' '%s' %s", net, hash, address.balance);
+          balancesCache.set(net + '_' + hash, address.balance)
+          res.setHeader('content-type', 'text/plain');
+          res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''));
+        } else
+          res.send({ error: 'address not found.', hash: hash, coin: coin, net: net });
+      }, net);
+    } else {
+      console.debug("Get balance by cache '%s' '%s' %s", net, hash, r);
+      res.setHeader('content-type', 'text/plain');
+      res.end((r / 100000000).toString().replace(/(^-+)/mg, ''));
+    }
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getdistribution', function(req, res) {
-  // check if the getdistribution api is enabled
+app.use('/ext/getdistribution/:net?', function(req, res) {
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getdistribution.enabled == true) {
-    db.get_richlist(settings.coin.name, function(richlist) {
-      db.get_stats(settings.coin.name, function(stats) {
-        db.get_distribution(richlist, stats, function(dist) {
-          res.send(dist);
-        });
-      });
-    });
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)
+    const r = distributionCache.get(net);
+    if (r == undefined) {
+      db.get_richlist(coin.name, function(richlist) {
+        db.get_stats(coin.name, function(stats) {
+          db.get_distribution(richlist, stats, function(dist) {
+            console.debug("Cached distribution '%s' %s", net, dist.supply);
+            distributionCache.set(net, dist);
+            res.send(dist);
+          }, net);
+        }, net);
+      }, net);
+    } else {
+      console.debug("Get distribution by cache '%s' %s", net, r.supply);
+      res.send(r);
+    }
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getcurrentprice', function(req, res) {
+app.use('/ext/getcurrentprice/:net?', function(req, res) {
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getcurrentprice.enabled == true) {
     const defaultExchangeCurrencyPrefix = settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase();
     if (settings.cache.enabled == true) {
-      var r = priceCache.get(1);
+      const net = settings.getNet(req.params['net'])
+      const coin = settings.getCoin(net)
+      var r = pricesCache.get(net);
       if (r == undefined) {
-        db.get_stats(settings.coin.name, function (stats) {
+        db.get_stats(coin.name, function (stats) {
           r = {}
-          r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+          r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
           r.rates = [];
           ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
           ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
@@ -290,26 +338,26 @@ app.use('/ext/getcurrentprice', function(req, res) {
               console.log('Error: exchange rates API did not return a valid object');
             } else {
               // Cache all exchange rates and add by config
-              priceCache.set(2,data);
+              pricesCache.set(net + '_data', data);
               for (var item in settings.currencies) {
                 if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
                   ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
                 }
               };
-              priceCache.set (1, r);
-              console.debug("Cache prices: " + JSON.stringify(r));
+              pricesCache.set (net, r);
+              console.debug("Cached prices '%s' %s", net, r.last_updated);
               res.send(r);
             }
           });
-        });
+        }, net);
       } else {
-        console.debug("Get prices by cache: " + JSON.stringify(r));
+        console.debug("Get prices by cache '%s' %s", net, r.last_updated);
         res.send(r);
       }
     } else {
-      db.get_stats(settings.coin.name, function (stats) {
+      db.get_stats(coin.name, function (stats) {
         r = {}
-        r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+        r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
         r.rates = [];
         ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
         ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
@@ -324,11 +372,11 @@ app.use('/ext/getcurrentprice', function(req, res) {
                 ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
               }
             };
-            console.debug("Get prices by cache: " + JSON.stringify(r));
+            console.debug("Get prices by cache '%s' %s", net, r.last_updated);
             res.send(r);
           }
         });
-      });
+      }, net);
     }
   } else {
     res.end('This method is disabled');
@@ -344,57 +392,66 @@ function ratesPush(rates, currencies, item, price) {
   });
 }
 
-app.use('/ext/getbasicstats', function(req, res) {
-  // check if the getbasicstats api is enabled
+app.use('/ext/getbasicstats/:net?', function(req, res) {
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getbasicstats.enabled == true) {
-    // lookup stats
-    db.get_stats(settings.coin.name, function (stats) {
-      // check if the masternode count api is enabled
-      if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
-        // masternode count api is available
-        lib.get_masternodecount(function(masternodestotal) {
-          eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)
+    const r = statsCache.get(net);
+    if (r == undefined) {
+      db.get_stats(coin.name, function (stats) {
+        // check if the masternode count api is enabled
+        if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
+          // masternode count api is available
+          lib.get_masternodecount(net, function(masternodestotal) {
+            eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
+            statsCache.set (net, p_ext);
+            console.debug("Cached stats '%s' %s", net, p_ext.block_count);
+            res.send(p_ext);
+          });
+        } else {
+          // masternode count api is not available
+          eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
+          statsCache.set (net, p_ext);
+          console.debug("Cached stats '%s' %s", net, p_ext.block_count);
           res.send(p_ext);
-        });
-      } else {
-        // masternode count api is not available
-        eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
-        res.send(p_ext);
-      }
-    });
+        }
+      }, net);
+    } else {
+      console.debug("Get stats by cache '%s' %s", net, r.block_count);
+      res.send(r);
+    }
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getticker/:mode', function(req, res) {
-  // check if the getbasicstats api is enabled
+app.use('/ext/getticker/:mode/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getticker.enabled == true) {
     if (settings.cache.enabled == true) {
-      var r = tickerCache.get(1);
+      var r = tickerCache.get(net);
       if (r == undefined) {
-        db.get_stats(settings.coin.name, function (stats) {
+        db.get_stats(coin.name, function (stats) {
           db.count_masternodes(function(mn) {
-            // console.log("Stats: " + JSON.stringify(stats))
-            // console.log("MN: " + JSON.stringify(mn))
             db.get_markets_summary(function(marketdata) {
               var markets = marketdata;
               if (typeof markets === 'string') {
                 console.warn(markets);
                 markets = [];
               }
-              request({uri: base_url + 'ext/getcurrentprice', json: true}, function (error, response, ratesdata) {
+              request({uri: base_url + 'ext/getcurrentprice/' + net, json: true}, function (error, response, ratesdata) {
                 var rates = ratesdata;
                 if (typeof rates === 'string') {
                   console.warn(rates);
                   rates = [];
                 }
-                request({uri: base_url + 'ext/getdistribution', json: true}, function (error, response, ddata) {
+                request({uri: base_url + 'ext/getdistribution/' + net, json: true}, function (error, response, ddata) {
                   var distribution = ddata;
                   if (typeof distribution === 'string') {
                     console.warn(distribution);
                     distribution = {};
                   }
-                  request({uri: base_url + 'api/getdifficulty', json: true}, function (error, response, diffdata) {
+                  request({uri: base_url + 'api/getdifficulty/' + net, json: true}, function (error, response, diffdata) {
                     var algos = diffdata;
                     if (typeof algos === 'string') {
                       console.warn(algos);
@@ -403,7 +460,7 @@ app.use('/ext/getticker/:mode', function(req, res) {
                       algos = algos.pow_difficulties;
                     }
 
-                    request({uri: base_url + 'api/getnetworkhashps', json: true}, function (error, response, hashdata) {
+                    request({uri: base_url + 'api/getnetworkhashps/' + net, json: true}, function (error, response, hashdata) {
                       var hashps = hashdata;
                       if (typeof hashps === 'string') {
                         console.warn(hashps);
@@ -419,9 +476,9 @@ app.use('/ext/getticker/:mode', function(req, res) {
 
                       var r = {}
                       // r.rank = 1234
-                      r.coin = settings.coin.name
-                      r.code = settings.coin.symbol
-                      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+                      r.coin = coin.name
+                      r.code = coin.symbol
+                      r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
                       r.tip = stats.count
                       r.supply = stats.supply
                       r.supply_max = 21000000000
@@ -436,18 +493,19 @@ app.use('/ext/getticker/:mode', function(req, res) {
                       r.distribution = distribution
                       r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
                       r.algos = algos
-                      tickerCache.set (1, r);
-                      console.debug("Cache ticker: " + JSON.stringify(r));
+                      tickerCache.set (net, r);
+                      console.debug("Cache ticker '%s' '%s' %s", r.coin, net, r.last_updated);
                       res.send(r);
                     });
                   });
                 });
               });
-            });
-          });
-        });
+            }, net);
+          }, net);
+        }, net);
       } else {
-        console.debug("Get ticker by cache: " + JSON.stringify(r));
+        console.debug("Get ticker by ćache '%s' '%s' %s", r.coin, net, r.last_updated);
+
         res.send(r);
       }
     } else {
@@ -457,7 +515,9 @@ app.use('/ext/getticker/:mode', function(req, res) {
     res.end('This method is disabled');
 });
 
-app.use('/ext/getmarkets/:mode', function(req, res) {
+app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmarkets.enabled == true) {
     if (req.params.mode == 'summary') {
       db.get_markets_summary(function(data) {
@@ -467,10 +527,10 @@ app.use('/ext/getmarkets/:mode', function(req, res) {
         res.end(markets);
       }
       var r = {}
-      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+      r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
       r.markets = markets;
       res.send(r);
-      });
+      }, net);
     } else if (req.params.mode == 'full') {
       db.get_markets(function(data) {
       var markets = data;
@@ -479,10 +539,10 @@ app.use('/ext/getmarkets/:mode', function(req, res) {
         res.end(markets);
       }
       var r = {}
-      r.last_updated=date.format(new Date(),'YYYY-MM-DDTHH:mm:ssZ')
+      r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
       r.markets = markets;
       res.send(r);
-      });
+      }, net);
     } else {
       res.end('Invalid mode: use summary or full.');
     }
@@ -491,7 +551,9 @@ app.use('/ext/getmarkets/:mode', function(req, res) {
   }
 });
 
-app.use('/ext/getlasttxs/:min', function(req, res) {
+app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   // check if the getlasttxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getlasttxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     var min = req.params.min, start, length, internal = false;
@@ -539,12 +601,14 @@ app.use('/ext/getlasttxs/:min', function(req, res) {
         // display data in more readable format for public api
         res.json(data);
       }
-    });
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getaddresstxs/:address/:start/:length', function(req, res) {
+app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   // check if the getaddresstxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getaddresstxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     var internal = false;
@@ -611,163 +675,198 @@ app.use('/ext/getaddresstxs/:address/:start/:length', function(req, res) {
         // display data in more readable format for public api
         res.json(data);
       }
-    });
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getsummary', function(req, res) {
+app.use('/ext/getsummary/:net?', function(req, res) {
   // check if the getsummary api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getsummary.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
-    lib.get_connectioncount(function(connections) {
-      lib.get_blockcount(function(blockcount) {
-        // check if this is a footer-only method that should only return the connection count and block count
-        if (req.headers['footer-only'] != null && req.headers['footer-only'] == 'true') {
-          // only return the connection count and block count
-          res.send({
-            connections: (connections ? connections : '-'),
-            blockcount: (blockcount ? blockcount : '-')
-          });
-        } else {
-          lib.get_hashrate(function(hashps) {
-            db.get_stats(settings.coin.name, function (stats) {
-              lib.get_masternodecount(function(masternodestotal) {
-                lib.get_difficulty(function(difficulties) {
-                  var difficulty = difficulties.difficulty;
-                  difficultyHybrid = '';
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)
+    const r = summaryCache.get(net);
+    if (r == undefined) {
+      lib.get_connectioncount(net, function(connections) {
+        lib.get_blockcount(function(blockcount) {
+          // check if this is a footer-only method that should only return the connection count and block count
+          if (req.headers['footer-only'] != null && req.headers['footer-only'] == 'true') {
+            // only return the connection count and block count
+            const v = {
+              connections: (connections ? connections : '-'),
+              blockcount: (blockcount ? blockcount : '-')
+            }
+            summaryCache.set (net, v);
+            console.debug("Cached summary '%s' %s", net, v);
+            res.send(v);
+          } else {
+            lib.get_hashrate(function(hashps) {
+              db.get_stats(coin.name, function (stats) {
+                lib.get_masternodecount(net, function(masternodestotal) {
+                  lib.get_difficulty(net, function(difficulties) {
+                    var difficulty = difficulties.difficulty;
+                    difficultyHybrid = '';
 
-                  if (difficulty && difficulty['proof-of-work']) {
-                    if (settings.shared_pages.difficulty == 'Hybrid') {
-                      difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
-                      difficulty = 'POW: ' + difficulty['proof-of-work'];
-                    } else if (settings.shared_pages.difficulty == 'POW')
-                      difficulty = difficulty['proof-of-work'];
-                    else
-                      difficulty = difficulty['proof-of-stake'];
-                  }
-
-                  if (hashps == 'There was an error. Check your console.')
-                    hashps = 0;
-
-                  // check if the masternode count api is enabled
-                  if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
-                    // masternode count api is available
-                    var mn_total = 0;
-                    var mn_enabled = 0;
-
-                    if (masternodestotal) {
-                      if (masternodestotal.total)
-                        mn_total = masternodestotal.total;
-
-                      if (masternodestotal.enabled)
-                        mn_enabled = masternodestotal.enabled;
+                    if (difficulty && difficulty['proof-of-work']) {
+                      if (settings.shared_pages.difficulty == 'Hybrid') {
+                        difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
+                        difficulty = 'POW: ' + difficulty['proof-of-work'];
+                      } else if (settings.shared_pages.difficulty == 'POW')
+                        difficulty = difficulty['proof-of-work'];
+                      else
+                        difficulty = difficulty['proof-of-stake'];
                     }
 
-                    res.send({
-                      difficulty: (difficulty ? difficulty : '-'),
-                      difficultyHybrid: difficultyHybrid,
-                      supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                      hashrate: hashps.nethash_butkscrypt,
-                      hashrate_ghostrider: hashps.nethash_ghostrider,
-                      hashrate_yespower: hashps.nethash_yespower,
-                      hashrate_lyra2: hashps.nethash_lyra2,
-                      hashrate_sha256d: hashps.nethash_sha256d,
-                      hashrate_scrypt: hashps.nethash_scrypt,
-                      hashrate_butk: hashps.nethash_butkscrypt,
-                      lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
-                      connections: (connections ? connections : '-'),
-                      masternodeCountOnline: (masternodestotal ? mn_enabled : '-'),
-                      masternodeCountOffline: (masternodestotal ? Math.floor(mn_total - mn_enabled) : '-'),
-                      blockcount: (blockcount ? blockcount : '-')
-                    });
-                  } else {
-                    // masternode count api is not available
-                    res.send({
-                      difficulty: (difficulty ? difficulty : '-'),
-                      difficultyHybrid: difficultyHybrid,
-                      supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                      hashrate: hashps.nethash_butkscrypt,
-                      hashrate_ghostrider: hashps.nethash_ghostrider,
-                      hashrate_yespower: hashps.nethash_yespower,
-                      hashrate_lyra2: hashps.nethash_lyra2,
-                      hashrate_sha256d: hashps.nethash_sha256d,
-                      hashrate_scrypt: hashps.nethash_scrypt,
-                      hashrate_butk: hashps.nethash_butkscrypt,
-                      lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
-                      connections: (connections ? connections : '-'),
-                      blockcount: (blockcount ? blockcount : '-')
-                    });
-                  }
+                    if (hashps == 'There was an error. Check your console.')
+                      hashps = 0;
+
+                    // check if the masternode count api is enabled
+                    if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
+                      // masternode count api is available
+                      var mn_total = 0;
+                      var mn_enabled = 0;
+
+                      if (masternodestotal) {
+                        if (masternodestotal.total)
+                          mn_total = masternodestotal.total;
+
+                        if (masternodestotal.enabled)
+                          mn_enabled = masternodestotal.enabled;
+                      }
+
+                      const v = {
+                        difficulty: (difficulty ? difficulty : '-'),
+                        difficultyHybrid: difficultyHybrid,
+                        supply: (stats == null || stats.supply == null ? 0 : stats.supply),
+                        hashrate: hashps.nethash_butkscrypt,
+                        hashrate_ghostrider: hashps.nethash_ghostrider,
+                        hashrate_yespower: hashps.nethash_yespower,
+                        hashrate_lyra2: hashps.nethash_lyra2,
+                        hashrate_sha256d: hashps.nethash_sha256d,
+                        hashrate_scrypt: hashps.nethash_scrypt,
+                        hashrate_butk: hashps.nethash_butkscrypt,
+                        lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
+                        connections: (connections ? connections : '-'),
+                        masternodeCountOnline: (masternodestotal ? mn_enabled : '-'),
+                        masternodeCountOffline: (masternodestotal ? Math.floor(mn_total - mn_enabled) : '-'),
+                        blockcount: (blockcount ? blockcount : '-')
+                      }
+                      summaryCache.set (net, v);
+                      console.debug("Cached summary '%s' %s", net, v);
+                      res.send(v);
+                    } else {
+                      // masternode count api is not available
+                      const v = {
+                        difficulty: (difficulty ? difficulty : '-'),
+                        difficultyHybrid: difficultyHybrid,
+                        supply: (stats == null || stats.supply == null ? 0 : stats.supply),
+                        hashrate: hashps.nethash_butkscrypt,
+                        hashrate_ghostrider: hashps.nethash_ghostrider,
+                        hashrate_yespower: hashps.nethash_yespower,
+                        hashrate_lyra2: hashps.nethash_lyra2,
+                        hashrate_sha256d: hashps.nethash_sha256d,
+                        hashrate_scrypt: hashps.nethash_scrypt,
+                        hashrate_butk: hashps.nethash_butkscrypt,
+                        lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
+                        connections: (connections ? connections : '-'),
+                        blockcount: (blockcount ? blockcount : '-')
+                      }
+                      summaryCache.set (net, v);
+                      console.debug("Cached summary '%s' %s", net, v);
+                      res.send(v);
+                    }
+                  });
                 });
-              });
-            });
-          });
-        }
+              }, net);
+            }, net);
+          }
+        }, net);
       });
-    });
+    } else {
+      console.debug("Get summary by cache '%s' %s", net, r.blockcount)
+      res.send(r)
+    }
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getnetworkpeers', function(req, res) {
+app.use('/ext/getnetworkpeers/:net?', function(req, res) {
   // check if the getnetworkpeers api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getnetworkpeers.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
-    // get list of peers
-    db.get_peers(function(peers) {
-      // loop through peers list and remove the mongo _id and __v keys
-      for (i = 0; i < peers.length; i++) {
-        delete peers[i]['_doc']['_id'];
-        delete peers[i]['_doc']['__v'];
-      }
-
-      var newPeers = [];
-      for (i = 0; i < peers.length; i++) {
-        if (peers[i].version != 'ButKoin Core Green:1.2.17.3') {
-          newPeers.push(peers[i]);
+    const net = settings.getNet(req.params['net'])
+    const coin = settings.getCoin(net)  
+    const r = peersCache.get(net);
+    if (r == undefined) {
+      db.get_peers(function(peers) {
+        // loop through peers list and remove the mongo _id and __v keys
+        for (i = 0; i < peers.length; i++) {
+          delete peers[i]['_doc']['_id'];
+          delete peers[i]['_doc']['__v'];
         }
-      }
 
-      // sort ip6 addresses to the bottom
-      newPeers.sort(function(a, b) {
-        var address1 = a.address.indexOf(':') > -1;
-        var address2 = b.address.indexOf(':') > -1;
+        var newPeers = [];
+        for (i = 0; i < peers.length; i++) {
+          if (peers[i].version != 'ButKoin Core Green:1.2.17.3') {
+            newPeers.push(peers[i]);
+          }
+        }
 
-        if (address1 < address2)
-          return -1;
-        else if (address1 > address2)
-          return 1;
-        else
-          return 0;
-      });
+        // sort ip6 addresses to the bottom
+        newPeers.sort(function(a, b) {
+          var address1 = a.address.indexOf(':') > -1;
+          var address2 = b.address.indexOf(':') > -1;
 
-      // return peer data
-      res.json(newPeers);
-    });
+          if (address1 < address2)
+            return -1;
+          else if (address1 > address2)
+            return 1;
+          else
+            return 0;
+        });
+
+        // return peer data
+        peersCache.set (net, newPeers);
+        console.debug("Cached peers '%s'", net);
+        res.json(newPeers);
+      }, net);
+    } else {
+      console.debug("Get peers by cache '%s'", net);
+      res.send(r);
+    }
   } else
     res.end('This method is disabled');
 });
 
 // get the list of masternodes from local collection
-app.use('/ext/getmasternodelist', function(req, res) {
+app.use('/ext/getmasternodelist/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   // check if the getmasternodelist api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternodelist.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
-    // get the masternode list from local collection
-    db.get_masternodes(function(masternodes) {
-      // loop through masternode list and remove the mongo _id and __v keys
-      for (i = 0; i < masternodes.length; i++) {
-        delete masternodes[i]['_doc']['_id'];
-        delete masternodes[i]['_doc']['__v'];
-      }
-
-      // return masternode list
-      res.send(masternodes);
-    });
+    const r = masternodesCache.get(net);
+    if (r == undefined) {
+      db.get_masternodes(function(masternodes) {
+        // loop through masternode list and remove the mongo _id and __v keys
+        for (i = 0; i < masternodes.length; i++) {
+          delete masternodes[i]['_doc']['_id'];
+          delete masternodes[i]['_doc']['__v'];
+        }
+        masternodesCache.set(net, masternodes);
+        console.debug("Cached masternodes '%s'", net);
+        res.send(masternodes);
+      }, net);
+    } else {
+      console.debug("Get masternodes by cache '%s'", net);
+      res.send(r)
+    }
   } else
     res.end('This method is disabled');
 });
 
 // returns a list of masternode reward txs for a single masternode address from a specific block height
-app.use('/ext/getmasternoderewards/:hash/:since', function(req, res) {
+app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   // check if the getmasternoderewards api is enabled
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternoderewards.enabled == true) {
     db.get_masternode_rewards(req.params.hash, req.params.since, function(rewards) {
@@ -787,14 +886,15 @@ app.use('/ext/getmasternoderewards/:hash/:since', function(req, res) {
         res.json(rewards);
       } else
         res.send({error: "failed to retrieve masternode rewards", hash: req.params.hash, since: req.params.since});
-    });
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
 // returns the total masternode rewards received for a single masternode address from a specific block height
-app.use('/ext/getmasternoderewardstotal/:hash/:since', function(req, res) {
-  // check if the getmasternoderewardstotal api is enabled
+app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
   if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternoderewardstotal.enabled == true) {
     db.get_masternode_rewards_totals(req.params.hash, req.params.since, function(total_rewards) {
       if (total_rewards != null) {
@@ -802,18 +902,29 @@ app.use('/ext/getmasternoderewardstotal/:hash/:since', function(req, res) {
         res.json(total_rewards);
       } else
         res.send({error: "failed to retrieve masternode rewards", hash: req.params.hash, since: req.params.since});
-    });
+    }, net);
   } else
     res.end('This method is disabled');
 });
 
-app.use('/ext/getnetworkchartdata', function(req, res) {
-  db.get_network_chart_data(function(data) {
-    if (data)
-      res.send(data);
-    else
-      res.send();
-  });
+app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
+  const r = networkChartCache.get(net);
+  if (r == undefined) {
+    db.get_network_chart_data(function(data) {
+      if (data) {
+        networkChartCache.set(net, data);
+        console.debug("Cached network chart '%s'", net);
+        res.send(data);
+      } else {
+        res.send();
+      }
+    }, net);
+  } else {
+    console.debug("Get network chart by cache '%s'", net);
+    res.send(r);
+  }
 });
 
 app.use('/system/restartexplorer', function(req, res, next) {
@@ -966,7 +1077,11 @@ settings.api_page.public_apis.rpc.getmasternodelist = { "enabled": false };
 // locals
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
-app.set('coin', settings.coin);
+// TODO: Make multi coin II.
+// Uses at least coin.name in layout.pug, error.pug
+app.set('coin', settings.coins[0].id);
+app.set('coins', settings.coins);
+app.set('default_wallet', settings.wallets[0].id);
 app.set('currencies', settings.currencies);
 app.set('cache', settings.cache);
 app.set('network_history', settings.network_history);
@@ -1028,10 +1143,15 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
+    // TODO: Make multi coin II
+    var net = settings.getNet('mainnet')
+    const coin = settings.getCoin(net)
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
-      error: err
+      error: err,
+      coin: coin,
+      net: net
     });
   });
 }
@@ -1039,10 +1159,15 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  // TODO: Make multi coin II
+  var net = settings.getNet('mainnet')
+  const coin = settings.getCoin(net)
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
-    error: {}
+    error: {},
+    coin: coin,
+    net: net
   });
 });
 

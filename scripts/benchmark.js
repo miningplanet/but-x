@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
     Address = require('../models/address'),
     settings = require('../lib/settings'),
     lib = require('../lib/explorer'),
-    Stats = require('../models/stats'),
+    // Stats = require('../models/stats'),
     async = require('async');
 
 var COUNT = 5000; // number of blocks to index
@@ -14,22 +14,19 @@ function exit(exitCode) {
   process.exit(exitCode);
 }
 
-var dbString = 'mongodb://' + encodeURIComponent(settings.dbsettings.user);
-dbString = dbString + ':' + encodeURIComponent(settings.dbsettings.password);
-dbString = dbString + '@' + settings.dbsettings.address;
-dbString = dbString + ':' + settings.dbsettings.port;
-dbString = dbString + "/IQUIDUS-BENCHMARK";
+// TODO: DB benchmark
+const dbs = settings.getDbs()
 
 mongoose.set('strictQuery', true);
 
-mongoose.connect(dbString, function(err) {
+mongoose.connect(dbs[0], function(err) {
   if (err) {
     console.log('Error: Unable to connect to database: %s', dbString);
     exit(999);
   }
 
   Tx.deleteMany({}, function(err) {
-    Address.deleteMany({}, function(err2) {
+    db.AddressDb[net].deleteMany({}, function(err2) {
       var s_timer = new Date().getTime();
 
       // updates tx, address & richlist db's
@@ -51,7 +48,7 @@ mongoose.connect(dbString, function(err) {
 
         async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
           if (!check_only && block_height % settings.sync.save_stats_after_sync_blocks === 0) {
-            Stats.updateOne({coin: coin}, {
+            db.StatsDb[net].updateOne({coin: coin}, {
               last: block_height - 1,
               txes: txes
             }, function() {});
@@ -71,7 +68,7 @@ mongoose.connect(dbString, function(err) {
                           next_tx();
                         }, timeout);
                       } else {
-                        db.save_tx(txid, block_height, function(err, tx_has_vout) {
+                        db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
                           if (err)
                             console.log(err);
                           else
@@ -101,15 +98,15 @@ mongoose.connect(dbString, function(err) {
                     next_block();
                   }, timeout);
                 }
-              });
+              }, net);
             } else {
               setTimeout( function() {
                 next_block();
               }, timeout);
             }
-          });
+          }, net);
         }, function() {
-          Stats.updateOne({coin: coin}, {
+          db.StatsDb[net].updateOne({coin: coin}, {
             last: end,
             txes: txes
           }, function() {
@@ -122,7 +119,7 @@ mongoose.connect(dbString, function(err) {
         var e_timer = new Date().getTime();
 
         Tx.countDocuments({}, function(txerr, txcount) {
-          Address.countDocuments({}, function(aerr, acount) {
+          dbAddressDb[net].countDocuments({}, function(aerr, acount) {
             var stats = {
               tx_count: txcount,
               address_count: acount,

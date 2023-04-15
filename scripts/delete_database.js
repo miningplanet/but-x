@@ -22,7 +22,7 @@ function exit(mongoose, exitCode) {
 
         // finish exit cleanup
         finishExit(db, exitCode);
-      });
+      }, net);
     } else {
       // disconnect mongo connection
       mongoose.disconnect();
@@ -88,7 +88,9 @@ rl.question('Are you sure you want to do this? [y/n]: ', function (deleteAnswer)
 
           const settings = require('../lib/settings');
           const mongoose = require('mongoose');
-          const dbString = `mongodb://${encodeURIComponent(settings.dbsettings.user)}:${encodeURIComponent(settings.dbsettings.password)}@${settings.dbsettings.address}:${settings.dbsettings.port}/${settings.dbsettings.database}`;
+          const dbs = settings.getDbs()
+          const dbString = dbs[0]
+          // TODO: DB delete
 
           console.log('Connecting to database..');
 

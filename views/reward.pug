@@ -28,8 +28,6 @@ block content
         } else
           $('span#lastUpdatedDate').html(' N/A');
       }
-      if (#{settings.shared_pages.page_header.page_title_image.enable_animation} == true && #{settings.blockchain_specific.heavycoin.reward_page.page_header.show_img} == true)
-        startRotateElement('img#header-img');
     });
   .row(style='margin-left:0;margin-right:0;')
     .col-xs-12.col-md-12
@@ -37,10 +35,10 @@ block content
         #page-header-container(style='align-items:' + (settings.blockchain_specific.heavycoin.reward_page.page_header.show_img == true && settings.blockchain_specific.heavycoin.reward_page.page_header.show_title == true && settings.blockchain_specific.heavycoin.reward_page.page_header.show_last_updated == true && settings.blockchain_specific.heavycoin.reward_page.page_header.show_description == true ? 'flex-start' : 'center'))
           if settings.blockchain_specific.heavycoin.reward_page.page_header.show_img == true
             #header-img-container
-              img#header-img(src=(settings.shared_pages.page_header.page_title_image == null || settings.shared_pages.page_header.page_title_image.image_path == null || settings.shared_pages.page_header.page_title_image.image_path == '' ? '/img/page-title-img.png' : settings.shared_pages.page_header.page_title_image.image_path))
+              img#header-img(src=page_title_logo)
           #page-title-container
             if settings.blockchain_specific.heavycoin.reward_page.page_header.show_title == true
-              h3#page-title #{settings.locale.heavy_title.replace('{1}', settings.coin.name)}
+              h3#page-title #{settings.locale.heavy_title.replace('{1}', coin.name)}
             if settings.blockchain_specific.heavycoin.reward_page.page_header.show_last_updated == true
               if settings.blockchain_specific.heavycoin.reward_page.page_header.show_title != true && settings.blockchain_specific.heavycoin.reward_page.page_header.show_description != true
                 #page-title-container
@@ -54,14 +52,14 @@ block content
             if settings.blockchain_specific.heavycoin.reward_page.page_header.show_description == true
               if settings.blockchain_specific.heavycoin.reward_page.page_header.show_title != true && settings.blockchain_specific.heavycoin.reward_page.page_header.show_last_updated != true
                 #page-title-container
-                  .sub-page-header.text-muted=settings.locale.heavy_description.replace('{1}', settings.coin.name)
+                  .sub-page-header.text-muted=settings.locale.heavy_description.replace('{1}', coin.name)
               else
-                .sub-page-header.text-muted=settings.locale.heavy_description.replace('{1}', settings.coin.name)
+                .sub-page-header.text-muted=settings.locale.heavy_description.replace('{1}', coin.name)
         .cardSpacer.clearfix
       .card.card-default.border-0.card-address-reward
         .card-header(style='position:relative;')
           strong #{settings.locale.heavy_reward_voting_info}
-            span.small.fw-normal  (#{settings.coin.symbol})
+            span.small.fw-normal  (#{coin.symbol})
         table#reward-summary.table.table-bordered.table-striped.summary-table.single-row-table(style='border-top:0;border-bottom:0;margin-top:0 !important;')
           - var theadClasses = [];
           if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
@@ -69,9 +67,9 @@ block content
           thead
             tr(class=theadClasses)
               th.text-center #{settings.locale.ex_supply}
-                span.small.fw-normal  (#{settings.coin.symbol})
+                span.small.fw-normal  (#{coin.symbol})
               th.text-center #{settings.locale.heavy_cap}
-                span.small.fw-normal  (#{settings.coin.symbol})
+                span.small.fw-normal  (#{coin.symbol})
               th.text-center #{settings.locale.heavy_phase}
               th.text-center #{settings.locale.heavy_maxvote}
               th.text-center #{settings.locale.heavy_reward}

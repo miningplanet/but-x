@@ -11,4 +11,4 @@ var PeersSchema = new Schema({
   country_code: { type: String, default: "" }
 });
 
-module.exports = mongoose.model('Peers', PeersSchema);
+module.exports = PeersSchema;

@@ -7,31 +7,52 @@
   // locale: Change language definitions. Only English is supported for now
   "locale": "locale/en.json",
 
-  // dbsettings: a collection of settings that allow the explorer to connect to MongoDB
-  "dbsettings": {
-    // user: The MongoDB username
-    "user": "eiquidus",
-    // password: The MongoDB password
-    "password": "Nd^p2d77ceBX!L",
-    // database: The MongoDB database name (default: explorerdb)
-    "database": "explorerdb",
-    // address: The MongoDB hostname. This should always be 'localhost' if connecting to a local instance, otherwise specify the ip address of a remote instance
-    "address": "localhost",
-    // port: The port # that MongoDB is configured to listen for requests on (default: 27017)
-    "port": 27017
-  },
+  // list of coins.
+  "coins": [
+    {
+    "id": "BUTK",
+    "name": "ButKoin",
+    "symbol": "BUTK"
+    }
+  ],
 
-  // wallet: a collection of settings that allow the explorer to connect to the coin wallet
-  "wallet": {
-    // host: The hostname or ip address of the wallet to connect to (default: localhost)
-    "host": "localhost",
-    // port: The port # that the wallet is configured to listen for RPC requests on (default: 51573 for Exor wallet)
-    "port": 51573,
-    // username: The wallet RPC username
-    "username": "exorrpc",
-    // password: The wallet RPC password
-    "password": "sSTLyCkrD94Y8&9mr^m6W^Mk367Vr!!K"
-  },
+  // list of DBs, first is default
+  "dbs": [
+    {
+      "id": "mainnet",
+      "user": "iquidus",
+      "password": "3xp!0reR",
+      "database": "explorerdb",
+      "address": "localhost",
+      "port": 27017
+    },
+    {
+      "id": "testnet",
+      "user": "iquidus-testnet",
+      "password": "3xpTest3!",
+      "database": "explorerdb-testnet",
+      "address": "localhost",
+      "port": 27017
+    }
+  ],
+
+  // list of wallets with same order as dbs
+  "wallets": [
+    {
+      "id": "mainnet",
+      "host": "localhost",
+      "port": 15998,
+      "username": "rrr59AKrh3hdfgfgf",
+      "password": "ttfhgfhghgjhjwew"
+    },
+    {
+      "id": "testnet",
+      "host": "localhost",
+      "port": 34340,
+      "username": "admin1",
+      "password": "123"
+    }
+  ],
 
   // webserver: a collection of settings that pertain to the node.js express web framework (read more: https://www.npmjs.com/package/express)
   "webserver": {
@@ -98,8 +119,17 @@
   // TTL cache (time in seconds)
   "cache" = {
     "enabled": true,
-    "price": 60,
-    "ticker": 60
+    "summary": 60,
+    "network_chart": 60,
+    "stats": 60,
+    "supply": 60,
+    "difficulty": 60,
+    "prices": 60,
+    "ticker": 60,
+    "balances": 60,
+    "distribution": 60,
+    "peers": 120,
+    "masternodes": 120
   },
 
   // network_history: a collection of settings that controls saving of extra historical network data during a block sync
@@ -291,15 +321,6 @@
         // position: Determine where the search box should appear on the website
         //           valid options: inside-header, below-header
         "position": "inside-header"
-      },
-      // page_title_image: A collection of settings that pertain to the page title image for each page
-      "page_title_image": {
-        // image_path: The path to an image file that is displayed in the header section of all pages next to the page title (NOTE: This image can be enabled/disabled on a per-page basis)
-        //             NOTE: The path root is /public
-        //             The optimum logo size is 48x48 as the image will be forced to this size when displayed
-        "image_path": "/img/page-title-img.png",
-        // enable_animation: Enable/disable the flip/spin animation on the page title image (true/false)
-        "enable_animation": true
       },
       // network_charts: A collection of settings that pertain to the network hashrate and difficulty line charts displayed on page header of all pages
       //                 NOTE: You can independently show/hide individual charts by changing the show_nethash_chart and show_difficulty_chart values in the settings for each page
@@ -551,7 +572,6 @@
     "show_difficulty_chart": true,
     // page_header: a collection of settings that pertain to the index page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.ex_title" (true/false)
       "show_title": true,
@@ -584,7 +604,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the block page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.block_title" (true/false)
       "show_title": true,
@@ -607,7 +626,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the transaction/tx page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.tx_title" (true/false)
       "show_title": true,
@@ -633,7 +651,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the address page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.a_title" (true/false)
       "show_title": true,
@@ -671,7 +688,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the error page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.error_title" (true/false)
       "show_title": true,
@@ -695,7 +711,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the masternodes page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.mn_title" (true/false)
       "show_title": true,
@@ -727,7 +742,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the movement page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.move_title" (true/false)
       "show_title": true,
@@ -769,7 +783,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the network page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.net_title" (true/false)
       "show_title": true,
@@ -841,7 +854,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the richlist/top100 page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.rl_title" (true/false)
       "show_title": true,
@@ -896,7 +908,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the markets page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.mkt_title" (true/false)
       "show_title": true,
@@ -1095,7 +1106,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the api page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.api_title" (true/false)
       "show_title": true,
@@ -1108,9 +1118,9 @@
     "sample_data": {
       // blockindex: This value can be any valid block height number from your coins blockchain
       //             NOTE: This value is only used to build example api links on the api page from the /api/getblockhash api for example
-      "blockindex": 64152,
+      "blockindex": 500,
       // blockhash: This value can be any valid block hash from your coins blockchain
-      //            For many bitcoin clones you can use the following cmd to get the block hash for a given block height: coin-cli getblockhash 64152
+      //            For many bitcoin clones you can use the following cmd to get the block hash for a given block height: coin-cli getblockhash 500
       //            NOTE: This value is only used to build example api links on the api page from the /api/getblock api for example
       "blockhash": "775d67da29dd6553268061f86368d06654944dd5d5c61db4c97e4c7960c11a74",
       // txhash: This value can be any valid transaction hash from your coins blockchain
@@ -1345,7 +1355,6 @@
     "show_difficulty_chart": false,
     // page_header: a collection of settings that pertain to the claim address page header
     "page_header": {
-      // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
       "show_img": true,
       // show_title: Determine whether to show the page title as defined in "locale.claim_title" (true/false)
       "show_title": true,
@@ -1507,7 +1516,6 @@
         "show_difficulty_chart": false,
         // page_header: a collection of settings that pertain to the reward page header
         "page_header": {
-          // show_img: Determine whether to show the page title image defined in the "shared_pages.page_header.page_title_image" setting (true/false)
           "show_img": true,
           // show_title: Determine whether to show the page title as defined in "locale.reward_title" (true/false)
           "show_title": true,

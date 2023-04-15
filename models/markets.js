@@ -14,4 +14,4 @@ var MarketsSchema = new Schema({
   history: { type: Array, default: [] },
 });
 
-module.exports = mongoose.model('Markets', MarketsSchema);
+module.exports = MarketsSchema;

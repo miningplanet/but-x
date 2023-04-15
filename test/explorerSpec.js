@@ -75,14 +75,14 @@ describe('explorer', function() {
     });
 
     it('should ignore nonstandard outputs', function(done) {
-      lib.prepare_vout(data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
         expect(prepared.length).toEqual(2);
         done();
       });
     });
 
     it('should maintain order', function(done) {
-      lib.prepare_vout(data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
         expect(prepared[1].amount).toEqual(17499989908960);
         expect(prepared[1].addresses).toEqual('ENpRvyLpLFEyrMZthAGABhxZi3N4Byk3Ab');
         done();
@@ -103,7 +103,7 @@ describe('explorer', function() {
     });
 
     it('should calculate correct total', function(done) {
-      lib.prepare_vout(data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
         lib.calculate_total(prepared, function(total) {
           expect(total).toEqual(19499989908960);
           done();
@@ -125,14 +125,14 @@ describe('explorer', function() {
     });
 
     it('should return array of correct length', function(done) {
-      lib.prepare_vin(data.txB(), function(prepared) {
+      lib.prepare_vin(net, data.txB(), function(prepared) {
         expect(prepared.length).toEqual(1);
         done();
       });
     });
 
     it('should get correct input addresses', function(done) {
-      lib.prepare_vin(data.txB(), function(prepared) {
+      lib.prepare_vin(net, data.txB(), function(prepared) {
         expect(prepared[0].amount).toEqual(27499989920000);
         expect(prepared[0].addresses).toEqual('coinbase');
         done();

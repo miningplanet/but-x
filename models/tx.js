@@ -20,4 +20,4 @@ var TxSchema = new Schema({
 
 TxSchema.index({total: 1, total: -1, blockindex: 1, blockindex: -1});
 
-module.exports = mongoose.model('Tx', TxSchema);
+module.exports = TxSchema;

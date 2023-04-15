@@ -17,8 +17,6 @@ block content
         } else
           $('span#lastUpdatedDate').html(' N/A');
       }
-      if (#{settings.shared_pages.page_header.page_title_image.enable_animation} == true && #{settings.markets_page.page_header.show_img} == true)
-        startRotateElement('img#header-img');
     });
   - var theadClasses = [];
   if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
@@ -84,7 +82,7 @@ block content
       #page-header-container(style='align-items:' + (settings.markets_page.page_header.show_img == true && settings.markets_page.page_header.show_title == true && ((settings.markets_page.page_header.show_last_updated == true && settings.markets_page.page_header.show_description == true) || ((settings.markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') && settings.markets_page.page_header.show_description == true) || ((settings.markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') && settings.markets_page.page_header.show_last_updated == true)) ? 'flex-start' : 'center'))
         if settings.markets_page.page_header.show_img == true
           #header-img-container
-            img#header-img(src=(settings.shared_pages.page_header.page_title_image == null || settings.shared_pages.page_header.page_title_image.image_path == null || settings.shared_pages.page_header.page_title_image.image_path == '' ? '/img/page-title-img.png' : settings.shared_pages.page_header.page_title_image.image_path))
+            img#header-img(src=page_title_logo)
         #page-title-container
           if settings.markets_page.page_header.show_title == true
             h3#page-title !{settings.locale.mkt_title.replace('{1}', marketdata.market_name + ' <span class="small fw-normal">(' + marketdata.coin + '/' + marketdata.exchange + ')</span>')}
@@ -130,7 +128,7 @@ block content
                     each pair in mkt.trading_pairs
                       if market == mkt.id && marketdata.coin.toLowerCase() + '/' + marketdata.exchange.toLowerCase() == pair.pair.toLowerCase()
                         li.nav-item
-                          a.nav-link.active(href='/markets/' + mkt.id + '/' + pair.pair)
+                          a.nav-link.active(href='/markets/' + mkt.id + '/' + pair.pair + '/' + net)
                             if pair.isAlt == true
                               if mkt.alt_logo != null && mkt.alt_logo != ''
                                 img.align-top.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
@@ -147,7 +145,7 @@ block content
                                 span.small.fw-normal  (#{pair.pair})
                       else
                         li.nav-item
-                          a.nav-link(href='/markets/' + mkt.id + '/' + pair.pair)
+                          a.nav-link(href='/markets/' + mkt.id + '/' + pair.pair + '/' + net)
                             if pair.isAlt == true
                               if mkt.alt_logo != null && mkt.alt_logo != ''
                                 img.align-top.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')

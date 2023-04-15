@@ -4,7 +4,7 @@ html(lang='en')
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
     meta(http-equiv='Content-Language', content='en')
-    title=(page_title_prefix == null || page_title_prefix == '' ? settings.locale.error_title.replace('{1}', settings.coin.name) : page_title_prefix) + ' - ' + settings.shared_pages.page_title
+    title=(page_title_prefix == null || page_title_prefix == '' ? settings.locale.error_title.replace('{1}', coin.name) : page_title_prefix) + ' - ' + settings.shared_pages.page_title
     if settings.shared_pages.favicons.favicon32 != ''
       link(rel='icon', href='/' + settings.shared_pages.favicons.favicon32, sizes='32x32')
     if settings.shared_pages.favicons.favicon128 != ''
@@ -319,7 +319,7 @@ html(lang='en')
           if (#{showPanels} == false)
             summary_headers['footer-only'] = 'true';
 
-          $.ajax({url: '/ext/getsummary', headers: summary_headers, success: function(json) {
+          $.ajax({url: '/ext/getsummary/#{net}', headers: summary_headers, success: function(json) {
             if (#{showPanels} == true) {
               if (json.masternodeCountOnline == null)
                 json.masternodeCountOnline = '-';
@@ -772,7 +772,7 @@ html(lang='en')
           return s;
         }
         function getCoinSupplyPanel() {
-          var s='<div class="card-header"><b>#{settings.locale.ex_supply} <span class="small fw-normal">(#{settings.coin.symbol})</span></b></div>'
+          var s='<div class="card-header"><b>#{settings.locale.ex_supply} <span class="small fw-normal">(#{coin.symbol})</span></b></div>'
           s += '<div class="card-body"><div id="supplyPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
           s += '<div id="supplypanel" class="header-panel" style="display:none;">';
           s += '<label><strong>&#9921;&nbsp;</strong></label><label id="supply"></label>'
@@ -797,7 +797,7 @@ html(lang='en')
           return s;
         }
         function getLogoPanel() {
-          return '<img src="#{settings.shared_pages.logo}" style="margin-top:-15px;height:128px;" alt="#{settings.coin.name} Logo" title="#{settings.coin.name} Logo" />';
+          return '<img src="#{settings.shared_pages.logo}" style="margin-top:-15px;height:128px;" alt="#{coin.name} Logo" title="#{coin.name} Logo" />';
         }
         function getActivePanel(panelName) {
           var sReturn='';
@@ -1176,14 +1176,14 @@ html(lang='en')
             if settings.shared_pages.page_header.home_link == 'title'
               a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{settings.shared_pages.page_title}
             else if settings.shared_pages.page_header.home_link == 'coin'
-              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{settings.coin.name}
+              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{coin.name}
             else if settings.shared_pages.page_header.home_link == 'logo'
-              a(href='https://butkoin.com', alt=settings.coin.name + ' Home', title=settings.coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
+              a(href='https://butkoin.com', alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
                 img.logo-main(src=(settings.shared_pages.page_header.home_link_logo == null || settings.shared_pages.page_header.home_link_logo == '' ? settings.shared_pages.logo : settings.shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + settings.shared_pages.page_header.home_link_logo_height + 'px;')
             .collapse.navbar-collapse(id='navbar-collapse')
               ul.navbar-nav(style='width:100%;')
                 li#home.nav-item
-                  a.nav-link(href='/')
+                  a.nav-link(href='/' + net)
                     span.explorer
                     span.margin-left-5 #{settings.locale.menu_explorer}
                 if settings.markets_page.enabled == true
@@ -1213,42 +1213,42 @@ html(lang='en')
                                     span.small.fw-normal  (#{pair.pair})
                   else
                     li#markets.nav-item
-                      a.nav-link(href='/markets/' + settings.markets_page.default_exchange.exchange_name + '/' + settings.markets_page.default_exchange.trading_pair)
+                      a.nav-link(href='/markets/' + settings.markets_page.default_exchange.exchange_name + '/' + settings.markets_page.default_exchange.trading_pair + '/' + net)
                         span.markets
                         span.margin-left-5 #{settings.locale.menu_markets}
                 if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
                   li#reward.nav-item
-                    a.nav-link(href='/reward')
+                    a.nav-link(href='/reward/' + net)
                       span.fa.fa-star
                       span.margin-left-5 #{settings.locale.menu_reward}
                 if settings.masternodes_page.enabled == true
                   li#masternodes.nav-item
-                    a.nav-link(href='/masternodes')
+                    a.nav-link(href='/masternodes/' + net)
                       span.smartnodes
                       span.margin-left-5 Smartnodes
                 if settings.movement_page.enabled == true
                   li#movement.nav-item
-                    a.nav-link(href='/movement')
+                    a.nav-link(href='/movement/' + net)
                       span.movement
                       span.margin-left-5 #{settings.locale.menu_movement}
                 if settings.network_page.enabled == true
                   li#network.nav-item
-                    a.nav-link(href='/network')
+                    a.nav-link(href='/network/' + net)
                       span.network
                       span.margin-left-5 #{settings.locale.menu_network}
                 if settings.richlist_page.enabled == true
                   li#richlist.nav-item
-                    a.nav-link(href='/richlist')
+                    a.nav-link(href='/richlist/' + net)
                       span.richlist
                       span.margin-left-5 #{settings.locale.menu_richlist}
                 if settings.api_page.enabled == true
                   li#info.nav-item
-                    a.nav-link(href='/info')
+                    a.nav-link(href='/info/' + net)
                       span.api
                       span.margin-left-5 #{settings.locale.menu_api}
                 if settings.claim_address_page.show_header_menu == true && settings.claim_address_page.enabled == true
                   li#claim-address.nav-item
-                    a.nav-link(href='/claim')
+                    a.nav-link(href='/claim/' + net)
                       span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
             if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
@@ -1258,7 +1258,7 @@ html(lang='en')
         if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
-              form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search')
+              form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
                 div.input-group.input-group-md.search-for(style='width:100%;')
                   input.form-control(type='text', name='search', placeholder=settings.locale.ex_search_message)
                   button.btn.btn-success.btn-sm(type='submit') #{settings.locale.ex_search_button}
@@ -1269,9 +1269,9 @@ html(lang='en')
             if settings.shared_pages.page_header.home_link == 'title'
               a.navbar-brand.nav-link(href='/', style='order:-1;') #{settings.shared_pages.page_title}
             else if settings.shared_pages.page_header.home_link == 'coin'
-              a.navbar-brand.nav-link(href='/', style='order:-1;') #{settings.coin.name}
+              a.navbar-brand.nav-link(href='/', style='order:-1;') #{coin.name}
             else if settings.shared_pages.page_header.home_link == 'logo'
-              a(href='/', alt=settings.coin.name + ' Home', title=settings.coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
+              a(href='/', alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
                 img.logo-main(src=(settings.shared_pages.page_header.home_link_logo == null || settings.shared_pages.page_header.home_link_logo == '' ? settings.shared_pages.logo : settings.shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + settings.shared_pages.page_header.home_link_logo_height + 'px;')
             div#side-header-toggle.side-header-toggle
               span.fas.fa-bars(alt='Expand Menu', title='Expand Menu', data-bs-toggle='tooltip', data-bs-placement='right')
@@ -1282,7 +1282,7 @@ html(lang='en')
         if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse.flexGrow1
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
-              form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search')
+              form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
                 div.input-group.input-group-md.search-for(style='width:100%;')
                   input.form-control(type='text', name='search', placeholder=settings.locale.ex_search_message)
                   button.btn.btn-success.btn-sm(type='submit') #{settings.locale.ex_search_button}
@@ -1400,7 +1400,7 @@ html(lang='en')
                   - }
               if settings.shared_pages.page_header.search.enabled == true && settings.shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header'
                 div#search-row.row.text-center
-                  form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search')
+                  form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
                     #index-search.form-group.d-flex.justify-content-center
                       input.form-control(type='text', name='search', placeholder=settings.locale.ex_search_message, style='min-width:80%;margin-right:5px;')
                       button.btn.btn-success(type='submit') #{settings.locale.ex_search_button}
@@ -1437,7 +1437,7 @@ html(lang='en')
       div#social
         each social in settings.shared_pages.page_footer.social_links
           if social.enabled
-            a.social-link.border-0(href=social.url, target='_blank', alt=settings.coin.name + ' ' + social.tooltip_text, title=settings.coin.name + ' ' + social.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
+            a.social-link.border-0(href=social.url, target='_blank', alt=coin.name + ' ' + social.tooltip_text, title=coin.name + ' ' + social.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
               if social.icon != null && social.icon != ''
                 span(class='vertical-align-middle ' + social.icon)
               else

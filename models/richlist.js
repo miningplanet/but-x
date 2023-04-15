@@ -8,4 +8,4 @@ var RichlistSchema = new Schema({
   burned: { type: Array, default: [] }
 });
 
-module.exports = mongoose.model('Richlist', RichlistSchema);
+module.exports = RichlistSchema;

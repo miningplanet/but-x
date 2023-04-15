@@ -69,8 +69,10 @@ if (!fs.existsSync(path.join(backupPath, `${backupFilename}${archiveSuffix}`))) 
       const randomDirectoryName = Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5);
 
       // execute backup
-      const backupProcess = exec(`mongodump --host="${settings.dbsettings.address}" --port="${settings.dbsettings.port}" --username="${settings.dbsettings.user}" --password="${settings.dbsettings.password}" --db="${settings.dbsettings.database}" --archive="${path.join(backupPath, backupFilename + archiveSuffix)}" --gzip`);
-
+      // TODO: DB backup
+      const dbs = settings.dbs[0]
+      const backupProcess = exec(`mongodump --host="${dbs.address}" --port="${dbs.port}" --username="${dbs.user}" --password="${dbs.password}" --db="${dbs.database}" --archive="${path.join(backupPath, backupFilename + archiveSuffix)}" --gzip`);
+      
       backupProcess.stdout.on('data', (data) => {
         console.log(data);
       });
