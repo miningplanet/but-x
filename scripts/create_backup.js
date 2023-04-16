@@ -1,8 +1,19 @@
+/**
+ * Backups the database for the given net into the given file.
+ *
+ * Usage:
+ * 
+ * node scripts/create_backup.js /var/backup/but-eiquidus.db.bak [net]
+ * 
+ * [net] = chain, default 'mainnet' or settings.dbs[0].
+ */
 const fs = require('fs');
 const path = require('path');
-const lib = require('../lib/explorer');
+const settings = require('../lib/settings')
+const lib = require('../lib/explorer')
 const archiveSuffix = '.bak';
 const backupLockName = 'backup';
+
 var backupPath = path.join(path.dirname(__dirname), 'backups');
 var backupFilename;
 var lockCreated = false;
@@ -29,6 +40,16 @@ if (process.argv[2] != null && process.argv[2] != '') {
 
   // no backup filename passed in. use todays date as the backup filename
   backupFilename = `${systemDate.getFullYear()}-${monthName[systemDate.getMonth()]}-${systemDate.getDate()}`;
+}
+
+var net = settings.dbs[0].id
+if (process.argv[3] != null && process.argv[3] != '') {
+  net = settings.getNetOrNull(process.argv[3])
+  console.log("Use chain %s", net)
+}
+if (net == null) {
+  console.error("Chain '%s' not found. Exit.", process.argv[3])
+  exit(999)
 }
 
 // check if backup filename has the archive suffix already
@@ -65,12 +86,13 @@ if (!fs.existsSync(path.join(backupPath, `${backupFilename}${archiveSuffix}`))) 
       console.log("Script launched with pid: " + process.pid);
 
       const { exec } = require('child_process');
-      const settings = require('../lib/settings');
       const randomDirectoryName = Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5);
 
       // execute backup
-      // TODO: DB backup
-      const dbs = settings.dbs[0]
+      const dbs = settings.getDbOrNull(net)
+      if (dbs == null) {
+        console.error("DB for chain '%s' not found. Exit.", net)
+      }
       const backupProcess = exec(`mongodump --host="${dbs.address}" --port="${dbs.port}" --username="${dbs.user}" --password="${dbs.password}" --db="${dbs.database}" --archive="${path.join(backupPath, backupFilename + archiveSuffix)}" --gzip`);
       
       backupProcess.stdout.on('data', (data) => {
