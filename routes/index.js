@@ -126,7 +126,7 @@ function route_get_tx(res, txid, coin, net) {
     db.get_tx(txid, function(tx) {
       if (tx) {
         lib.get_blockcount(function(blockcount) {
-          if (settings.claim_address_page.enabled == true) {
+          if (settings.get(net, 'claim_address_page').enabled == true) {
             db.populate_claim_address_names(tx, function(tx) {
               res.render(
                 'tx',
@@ -182,7 +182,7 @@ function route_get_tx(res, txid, coin, net) {
                       blockindex: -1
                     };
 
-                    if (settings.claim_address_page.enabled == true) {
+                    if (settings.get(net, 'claim_address_page').enabled == true) {
                       db.populate_claim_address_names(utx, function(utx) {
                         res.render(
                           'tx',
@@ -238,7 +238,7 @@ function route_get_tx(res, txid, coin, net) {
                           };
 
                           lib.get_blockcount(function(blockcount) {
-                            if (settings.claim_address_page.enabled == true) {
+                            if (settings.get(net, 'claim_address_page').enabled == true) {
                               db.populate_claim_address_names(utx, function(utx) {
                                 res.render(
                                   'tx',
@@ -295,7 +295,7 @@ function route_get_tx(res, txid, coin, net) {
                       };
 
                       lib.get_blockcount(function(blockcount) {
-                        if (settings.claim_address_page.enabled == true) {
+                        if (settings.get(net, 'claim_address_page').enabled == true) {
                           db.populate_claim_address_names(utx, function(utx) {
                             res.render(
                               'tx',
@@ -421,7 +421,7 @@ function route_get_address(res, hash, coin, net='mainnet') {
 
 function route_get_claim_form(res, hash, coin, net='mainnet') {
   net = settings.getNet(net)
-  if (settings.claim_address_page.enabled == true) {
+  if (settings.get(net, 'claim_address_page').enabled == true) {
     // check if a hash was passed in
     if (hash == null || hash == '') {
       // no hash so just load the claim page without an address

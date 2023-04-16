@@ -65,7 +65,7 @@ block content
               else
                 json[i]['activetime'] = '<em>N/A</em>';
 
-              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
+              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.get(net, 'claim_address_page').enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
 
               if (labels[addr] != null && labels[addr].enabled == true) {
                 if (labels[addr].type)

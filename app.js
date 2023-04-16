@@ -100,7 +100,7 @@ app.post('/claim/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   // check if the bad-words filter is enabled
-  if (settings.claim_address_page.enable_bad_word_filter == true) {
+  if (settings.get(net, 'claim_address_page').enable_bad_word_filter == true) {
     // initialize the bad-words filter
     var bad_word_lib = require('bad-words');
     var bad_word_filter = new bad_word_lib();
@@ -1079,6 +1079,7 @@ app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 // TODO: Make multi coin II.
 // Uses at least coin.name in layout.pug, error.pug
+app.set('get', settings.get);
 app.set('coin', settings.coins[0].id);
 app.set('coins', settings.coins);
 app.set('default_wallet', settings.wallets[0].id);
