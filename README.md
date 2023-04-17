@@ -1,4 +1,4 @@
-# eIquidus
+# but-eiquidus
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/team-exor/eiquidus?color=ffbd11&label=version)
 ![GitHub Release Date](https://img.shields.io/github/release-date/team-exor/eiquidus)
@@ -10,14 +10,9 @@ Written in node.js and mongodb, eIquidus is the most stable, secure, customizabl
 
 ![Homepage](public/img/screenshots/homepage-1-101-0.png)
 
-### Premium Support
+### Support
 
-All code in this project is open source and available free-of-charge under the BSD-3-Clause license. If you require assistance setting up an explorer for your coin, or are interested in hiring a developer to incorporate custom changes for your explorer, you may contact the developer using the links below:
-
-<div align="center">
-<a href="https://discord.gg/dSuGm3y"><img src="https://img.shields.io/badge/Discord-Joe%20%5BTeam%20Exor%5D%235573-blue?style=for-the-badge&logo=Discord" /></a>&nbsp;
-<a href="https://t.me/joeuhren"><img src="https://img.shields.io/badge/Telegram-joeuhren-blue?style=for-the-badge&logo=Telegram" /></a>
-</div>
+In general but-eiquidus is open source and comes without support. You might contact us at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2) 
 
 Table of Contents
 ------------------
@@ -65,23 +60,27 @@ Table of Contents
 - [Donations / Support Us](#donations--support-us)
 - [Special Thanks](#special-thanks)
 - [License](#license)
+- [Disclaimer](#disclaimer)
+
+### Prerequisites
+
+#### System requirements
+
+The system requirements heavily depend on the deployment.
+
+- 512 MB or more of RAM
+- 10 GB disk space
+
+#### Software
+
+- Linux, MacOS or MS Windows
+- Node.js - min. v17.9.1, current dev and prod version is v19.9.0
+- MongoDB - v5.1.0 or newer recommended
 
 ### Features
 
 - Built using the following scripts and technologies:
-  - Node.js (v16.13.1 or newer recommended)
-  - MongoDB (v5.0.4 or newer recommended)
-  - JQuery v3.6.0
-  - Bootstrap v5.1.3
-  - DataTables v1.11.3
-  - FontAwesome v5.15.4
-  - Luxon v2.1.1
-  - jqPlot v1.0.9
-  - Chart.js v3.6.1
-    - chartjs-plugin-crosshair v1.2.0 ([https://github.com/abelheinsbroek/chartjs-plugin-crosshair](https://github.com/abelheinsbroek/chartjs-plugin-crosshair))
-  - OverlayScrollbars v1.13.3
-  - flag-icon-css v4.1.4 ([https://github.com/lipis/flag-icon-css](https://github.com/lipis/flag-icon-css))
-- Platform independent (tested to run on Windows, MacOS and Linux) **NOTE:** Most of the instructions in this guide were written for use with Linux and may need to be modified when using another OS
+- Platform independent **NOTE:** Most of the instructions in this guide were written for use with Linux and may need to be modified when using another OS
 - Mobile-friendly
 - Sass support
 - Pages/features:
@@ -135,33 +134,7 @@ Table of Contents
   - **Block Info:** Displays block summary and list of transactions for a specific block height
   - **Transaction Info:** Displays transaction summary, optional OP_RETURN value, list of input addresses and output addresses for a specific transaction
   - **Address Info:** Displays wallet address summary (balance, total sent, total received, QR code) and a list of latest transactions for a specific wallet address
-- Choose from 26 built-in themes with tweakable settings such as light and dark options to customize the look and feel of the explorer:
-  - **Exor** *\*default theme made especially for eIquidus*
-  - **Cerulean** ([Preview](https://bootswatch.com/cerulean/))
-  - **Cosmo** ([Preview](https://bootswatch.com/cosmo/))
-  - **Cyborg** ([Preview](https://bootswatch.com/cyborg/))
-  - **Darkly** ([Preview](https://bootswatch.com/darkly/))
-  - **Flatly** ([Preview](https://bootswatch.com/flatly/))
-  - **Journal** ([Preview](https://bootswatch.com/journal/))
-  - **Litera** ([Preview](https://bootswatch.com/litera/))
-  - **Lumen** ([Preview](https://bootswatch.com/lumen/))
-  - **Lux** ([Preview](https://bootswatch.com/lux/))
-  - **Materia** ([Preview](https://bootswatch.com/materia/))
-  - **Minty** ([Preview](https://bootswatch.com/minty/))
-  - **Morph** ([Preview](https://bootswatch.com/morph/))
-  - **Pulse** ([Preview](https://bootswatch.com/pulse/))
-  - **Quartz** ([Preview](https://bootswatch.com/quartz/))
-  - **Sandstone** ([Preview](https://bootswatch.com/sandstone/))
-  - **Simplex** ([Preview](https://bootswatch.com/simplex/))
-  - **Sketchy** ([Preview](https://bootswatch.com/sketchy/))
-  - **Slate** ([Preview](https://bootswatch.com/slate/))
-  - **Solar** ([Preview](https://bootswatch.com/solar/))
-  - **Spacelab** ([Preview](https://bootswatch.com/spacelab/))
-  - **Superhero** ([Preview](https://bootswatch.com/superhero/))
-  - **United** ([Preview](https://bootswatch.com/united/))
-  - **Vapor** ([Preview](https://bootswatch.com/vapor/))
-  - **Yeti** ([Preview](https://bootswatch.com/yeti/))
-  - **Zephyr** ([Preview](https://bootswatch.com/zephyr/))
+- but-eiquidus comes with a dark layout.
 - Customizable panels at the top of every page to display the following information:
   - **Network:** Displays the current network hash rate *\*only applicable to POW coins*
   - **Difficulty:** Displays the current proof-of-work and/or proof-of-stake difficulty
@@ -221,9 +194,22 @@ Table of Contents
       - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed
   - Zcash/zk-SNARKs private tx support
 
+### Popular libraries included
+
+- JQuery v3.6.0
+- Bootstrap v5.1.3
+- DataTables v1.11.3
+- FontAwesome v5.15.4
+- Luxon v2.1.1
+- jqPlot v1.0.9
+- Chart.js v3.6.1
+  - chartjs-plugin-crosshair v1.2.0 ([https://github.com/abelheinsbroek/chartjs-plugin-crosshair](https://github.com/abelheinsbroek/chartjs-plugin-crosshair))
+- OverlayScrollbars v1.13.3
+
 ### See it in Action
 
--  https://explorer.exor.io/
+-  https://explorer.butkoin.com/
+-  https://explorer.butkoin.com/testnet
 
 ### Installation
 
@@ -244,8 +230,8 @@ The following prerequisites must be installed before using the explorer:
 
 - [Node.js](https://nodejs.org/en/) (v14.15.4 or newer recommended)
 - [MongoDB](https://www.mongodb.com/) (v4.4.3 or newer recommended)
-- [Git](https://git-scm.com/downloads) (v2.36.0 or newer recommended)
-- A fully synchronized *coind* wallet daemon that supports the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). **NOTE:** In most cases, the blockchain must be synced with the `txindex` feature enabled to have access to all transactions. See the [Wallet Settings](#wallet-settings) section for more details.
+- [Git](https://git-scm.com/downloads) (v2.36.0 or newer recommended) if you do not download but-eiquidus in another way
+- A fully indexed and synchronized *coind* wallet daemon that supports the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). **NOTE:** In most cases, the blockchain must be synchronized with the `addressindex`, `txindex`, `timestampindex`, `spentindex` and `futureindex` option enabled to have access to all features. See the [Wallet Settings](#wallet-settings) section for more details.
 
 ##### Database Setup
 
@@ -263,7 +249,7 @@ Select database:
 use explorerdb
 ```
 
-Create a new user with read/write access:
+Create a new user with read/write access. Collections and indexes are created or updated during startup or by the sync.js script update mode.
 
 ```
 db.createUser( { user: "eiquidus", pwd: "Nd^p2d77ceBX!L", roles: [ "readWrite" ] } )
@@ -863,7 +849,7 @@ Delete the mongo database with the following command:
 
 `npm run delete-database`
 
-### Known Issues
+### Trouble shooting
 
 **exceeding stack size**
 
@@ -915,6 +901,7 @@ We also encourage submitting quality pull requests from software developers look
 
 ### License
 
+Copyright (c) 2023, butkoin.com by miningplanet (mining@planet.ms)<br />
 Copyright (c) 2019-2022, The Exor Community<br />
 Copyright (c) 2017, The Chaincoin Community<br />
 Copyright (c) 2015, Iquidus Technology<br />
@@ -927,7 +914,9 @@ Redistribution and use in source and binary forms, with or without modification,
 
 * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
-* Neither the name of Iquidus Technology nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+* Neither the name of Iquidus Technology nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission (TODO: rename to but-grid after multicoin stage II is released).
+
+### Disclaimer
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
