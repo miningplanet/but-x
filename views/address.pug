@@ -4,9 +4,9 @@ block content
   include ./includes/common.pug
   script.
     var hashAddress = "#{address.a_id}";
-    var setting_maxTxCount = parseInt("#{settings.api_page.public_apis.ext.getaddresstxs.max_items_per_query}");
-    var setting_txPerPage = parseInt("#{settings.address_page.history_table.items_per_page}");
-    var lengthMenuOptsAdd = !{JSON.stringify(settings.address_page.history_table.page_length_options)};
+    var setting_maxTxCount = parseInt("#{api_page.public_apis.ext.getaddresstxs.max_items_per_query}");
+    var setting_txPerPage = parseInt("#{address_page.history_table.items_per_page}");
+    var lengthMenuOptsAdd = !{JSON.stringify(address_page.history_table.page_length_options)};
     var lengthMenuOpts = [];
     var addedLength = false;
     for (i = 0; i < lengthMenuOptsAdd.length; i++) {
@@ -96,7 +96,7 @@ block content
           var amountParts = amount.split('.');
           $("td:eq(2)", row).html(updown + amountParts[0] + '.<span class="decimal">' + amountParts[1] + '</span>').addClass('text-end');
           $("td:eq(3)", row).html(balanceParts[0] + '.<span class="decimal">' + balanceParts[1] + '</span>').addClass('text-end');
-          $("td:eq(4)", row).html('<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp).replace(' UTC', '') + '</span>').addClass('text-center');
+          $("td:eq(4)", row).html('<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp).replace(' UTC', '') + '</span>').addClass('text-center');
         },
         fnDrawCallback: function(settings) {
           enableTooltips();
@@ -119,19 +119,19 @@ block content
   - var received = Number(address.received / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
   - var receivedParts = received.split('.');
   - var theadClasses = [];
-  if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-xs-12.col-md-12
-    if settings.address_page.page_header.show_img == true || settings.address_page.page_header.show_title == true || settings.address_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.address_page.page_header.show_img == true && settings.address_page.page_header.show_title == true && settings.address_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.address_page.page_header.show_img == true
+    if address_page.page_header.show_img == true || address_page.page_header.show_title == true || address_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (address_page.page_header.show_img == true && address_page.page_header.show_title == true && address_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if address_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.address_page.page_header.show_title == true
+          if address_page.page_header.show_title == true
             h3#page-title #{settings.locale.a_title.replace('{1}', coin.name)}
-          if settings.address_page.page_header.show_description == true
-            if settings.address_page.page_header.show_title != true
+          if address_page.page_header.show_description == true
+            if address_page.page_header.show_title != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.a_description.replace('{1}', coin.name).replace('{2}', (address.a_id == 'hidden_address' ? settings.locale.hidden_address : (address.a_id == 'unknown_address' ? settings.locale.unknown_address : address.a_id)))
             else
@@ -139,7 +139,7 @@ block content
       .cardSpacer.clearfix
     .card.card-default.border-0.card-address-summary.cardSpacer
       .card-header(style='position:relative;')
-        if settings.get(net, 'claim_address_page').enabled == false || address.name == null || address.name == ''
+        if claim_address_page.enabled == false || address.name == null || address.name == ''
           if address.a_id == 'hidden_address'
             strong #{settings.locale.hidden_address}
           else if address.a_id == 'unknown_address'
@@ -150,7 +150,7 @@ block content
           strong #{address.name}
         | &#8203;
         include ./includes/rl_labels.pug
-        if (!settings.labels[address.a_id] || !settings.labels[address.a_id].enabled) && settings.get(net, 'claim_address_page').enabled == true
+        if (!settings.labels[address.a_id] || !settings.labels[address.a_id].enabled) && claim_address_page.enabled == true
           a#claim-address.fw-bold(href='/claim/' + address.a_id, style='font-size:smaller;padding-bottom:0;')
             if address.name == null || address.name == ''
               =" Is this yours? Claim it now for free!"
@@ -166,13 +166,13 @@ block content
               span.small.fw-normal  (#{coin.symbol})
             td.addr-summary #{balanceParts[0]}.
               span.decimal #{balanceParts[1]}
-          if settings.address_page.show_sent_received == true
+          if address_page.show_sent_received == true
             tr
               td #{settings.locale.total_sent}
                 span.small.fw-normal  (#{coin.symbol})
               td.addr-summary #{sentParts[0]}.
                 span.decimal #{sentParts[1]}
-          if settings.address_page.show_sent_received == true
+          if address_page.show_sent_received == true
             tr
               td #{settings.locale.total_received}
                 span.small.fw-normal  (#{coin.symbol})

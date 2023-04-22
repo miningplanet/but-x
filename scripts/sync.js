@@ -456,7 +456,8 @@ if (db.lib.is_locked([database]) == false) {
                                         // check for and update heavycoin data if applicable
                                         update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
                                           // check for and update network history data if applicable
-                                          update_network_history(nstats.last, settings.network_history.enabled, function(network_hist) {
+                                          const network_history = settings.get(net, 'network_history')
+                                          update_network_history(nstats.last, network_history.enabled, function(network_hist) {
                                             // always check for and remove the sync msg if exists
                                             db.remove_sync_message();
 
@@ -631,7 +632,8 @@ if (db.lib.is_locked([database]) == false) {
                               // check for and update heavycoin data if applicable
                               update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
                                 // check for and update network history data if applicable
-                                update_network_history(nstats.last, settings.network_history.enabled, function(network_hist) {
+                                const network_history = settings.get(net, 'network_history')
+                                update_network_history(nstats.last, network_history.enabled, function(network_hist) {
                                   // always check for and remove the sync msg if exists
                                   db.remove_sync_message();
 
@@ -945,24 +947,25 @@ if (db.lib.is_locked([database]) == false) {
       });
     } else {
       // check if market feature is enabled
-      if (settings.markets_page.enabled == true) {
+      const markets_page = settings.get(net, 'markets_page')
+      if (markets_page.enabled == true) {
         var complete = 0;
         var total_pairs = 0;
-        var exchanges = Object.keys(settings.markets_page.exchanges);
+        var exchanges = Object.keys(markets_page.exchanges);
 
         // loop through all exchanges to determine how many trading pairs must be updated
         exchanges.forEach(function(key, index, map) {
           // check if market is enabled via settings
-          if (settings.markets_page.exchanges[key].enabled == true) {
+          if (markets_page.exchanges[key].enabled == true) {
             // check if market is installed/supported
             if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
               // add trading pairs to total
-              total_pairs += settings.markets_page.exchanges[key].trading_pairs.length;
+              total_pairs += markets_page.exchanges[key].trading_pairs.length;
 
               // loop through all trading pairs for this market
-              for (var i = 0; i < settings.markets_page.exchanges[key].trading_pairs.length; i++) {
+              for (var i = 0; i < markets_page.exchanges[key].trading_pairs.length; i++) {
                 // ensure trading pair setting is always uppercase
-                settings.markets_page.exchanges[key].trading_pairs[i] = settings.markets_page.exchanges[key].trading_pairs[i].toUpperCase();
+                markets_page.exchanges[key].trading_pairs[i] = markets_page.exchanges[key].trading_pairs[i].toUpperCase();
               }
             }
           }
@@ -976,11 +979,11 @@ if (db.lib.is_locked([database]) == false) {
           // loop through and test all exchanges defined in the settings.json file
           exchanges.forEach(function(key, index, map) {
             // check if market is enabled via settings
-            if (settings.markets_page.exchanges[key].enabled == true) {
+            if (markets_page.exchanges[key].enabled == true) {
               // check if market is installed/supported
               if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
                 // loop through all trading pairs
-                settings.markets_page.exchanges[key].trading_pairs.forEach(function(pair_key, pair_index, pair_map) {
+                markets_page.exchanges[key].trading_pairs.forEach(function(pair_key, pair_index, pair_map) {
                   // split the pair data
                   var split_pair = pair_key.split('/');
                   // check if this is a valid trading pair

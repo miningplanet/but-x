@@ -3,8 +3,8 @@ extends layout
 block content
   include ./includes/common.pug
   script.
-    var setting_txPerPage = parseInt("#{settings.masternodes_page.masternode_table.items_per_page}");
-    var lengthMenuOpts = !{JSON.stringify(settings.masternodes_page.masternode_table.page_length_options)};
+    var setting_txPerPage = parseInt("#{masternodes_page.masternode_table.items_per_page}");
+    var lengthMenuOpts = !{JSON.stringify(masternodes_page.masternode_table.page_length_options)};
     var addedLength = false;
     for (i = 0; i < lengthMenuOpts.length; i++) {
       if (!addedLength) {
@@ -54,10 +54,10 @@ block content
               var status = json[i]['status'];
               var country = "<span>" + json[i]['country'] + "</span>";
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
-              json[i]['lastseen'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']).replace(' UTC', '') + '</span>';
+              json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']).replace(' UTC', '') + '</span>';
 
               if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
-                json[i]['lastpaid'] = '<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']).replace(' UTC', '') + '</span>';
+                json[i]['lastpaid'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']).replace(' UTC', '') + '</span>';
               else
                 json[i]['lastpaid'] = '<em>N/A</em>';
               if (json[i]['activetime'])
@@ -65,7 +65,7 @@ block content
               else
                 json[i]['activetime'] = '<em>N/A</em>';
 
-              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{settings.get(net, 'claim_address_page').enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
+              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
 
               if (labels[addr] != null && labels[addr].enabled == true) {
                 if (labels[addr].type)
@@ -126,13 +126,13 @@ block content
         }
       });
 
-      if ('#{settings.masternodes_page.page_header.show_last_updated}' == 'true') {
+      if ('#{masternodes_page.page_header.show_last_updated}' == 'true') {
         var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)};
 
         if (lastUpdatedDate != 0) {
           $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate));
 
-          if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
             $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
             enableTooltips();
           }
@@ -141,26 +141,26 @@ block content
       }
     });
   .col-md-12.cardSpacer
-    if settings.masternodes_page.page_header.show_img == true || settings.masternodes_page.page_header.show_title == true || settings.masternodes_page.page_header.show_last_updated == true || settings.masternodes_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.masternodes_page.page_header.show_img == true && settings.masternodes_page.page_header.show_title == true && settings.masternodes_page.page_header.show_last_updated == true && settings.masternodes_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.masternodes_page.page_header.show_img == true
+    if masternodes_page.page_header.show_img == true || masternodes_page.page_header.show_title == true || masternodes_page.page_header.show_last_updated == true || masternodes_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (masternodes_page.page_header.show_img == true && masternodes_page.page_header.show_title == true && masternodes_page.page_header.show_last_updated == true && masternodes_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if masternodes_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.masternodes_page.page_header.show_title == true
+          if masternodes_page.page_header.show_title == true
             h3#page-title #{settings.locale.mn_title.replace('{1}', coin.name)}
-          if settings.masternodes_page.page_header.show_last_updated == true
-            if settings.masternodes_page.page_header.show_title != true && settings.masternodes_page.page_header.show_description != true
+          if masternodes_page.page_header.show_last_updated == true
+            if masternodes_page.page_header.show_title != true && masternodes_page.page_header.show_description != true
               #page-title-container
                 .sub-page-header
                   span.fw-bold=settings.locale.last_updated + ':'
                   span.text-muted#lastUpdatedDate
             else
-              .sub-page-header(style='margin-bottom:' + (settings.masternodes_page.page_header.show_description == true ? '5' : '0') + 'px')
+              .sub-page-header(style='margin-bottom:' + (masternodes_page.page_header.show_description == true ? '5' : '0') + 'px')
                 span.fw-bold=settings.locale.last_updated + ':'
                 span.text-muted#lastUpdatedDate
-          if settings.masternodes_page.page_header.show_description == true
-            if settings.masternodes_page.page_header.show_title != true && settings.masternodes_page.page_header.show_last_updated != true
+          if masternodes_page.page_header.show_description == true
+            if masternodes_page.page_header.show_title != true && masternodes_page.page_header.show_last_updated != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.mn_description.replace('{1}', coin.name)
             else
@@ -171,8 +171,8 @@ block content
         strong Masternode List
       table#masternodes-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
         - var theadClasses = [];
-        if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-          - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+        if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+          - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
         thead
           tr(class=theadClasses)
             th.text-center Pay rank

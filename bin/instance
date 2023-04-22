@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-var debug = require('debug')('explorer');
-var settings = require('../lib/settings');
+const debug = require('debug')('debug');
+const settings = require('../lib/settings');
 const detect = require('detect-port');
-var db = require('../lib/database');
-var app = require('../app');
+const db = require('../lib/database');
+const app = require('../app');
 
 app.set('port', process.env.PORT || settings.webserver.port);
 

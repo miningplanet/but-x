@@ -6,16 +6,16 @@ block content
       // NOOP
     });
   .col-md-12.cardSpacer
-    if settings.api_page.page_header.show_img == true || settings.api_page.page_header.show_title == true || settings.api_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.api_page.page_header.show_img == true && settings.api_page.page_header.show_title == true && settings.api_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.api_page.page_header.show_img == true
+    if api_page.page_header.show_img == true || api_page.page_header.show_title == true || api_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (api_page.page_header.show_img == true && api_page.page_header.show_title == true && api_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if api_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.api_page.page_header.show_title == true
+          if api_page.page_header.show_title == true
             h3#page-title #{settings.locale.api_title.replace('{1}', coin.name).replace('{2}', net)}
-          if settings.api_page.page_header.show_description == true
-            if settings.api_page.page_header.show_title != true
+          if api_page.page_header.show_description == true
+            if api_page.page_header.show_title != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.api_description.replace('{1}', coin.name)
             else
@@ -25,18 +25,17 @@ block content
       .card-header
         strong #{settings.locale.api_documentation}
       .card-body
-        if settings.api_page.show_logo == true
-          img(src=settings.shared_pages.logo, style='margin:0;height:128px;')
+        if api_page.show_logo == true
+          img(src=shared_pages.logo, style='margin:0;height:128px;')
           hr
-        - var hide_rpc_api_section = !(settings.api_page.public_apis.rpc.getdifficulty.enabled == true && settings.api_cmds['getdifficulty'] != null && settings.api_cmds['getdifficulty'] != '') && !(settings.api_page.public_apis.rpc.getconnectioncount.enabled == true && settings.api_cmds['getconnectioncount'] != null && settings.api_cmds['getconnectioncount'] != '') && !(settings.api_page.public_apis.rpc.getblockcount.enabled == true && settings.api_cmds['getblockcount'] != null && settings.api_cmds['getblockcount'] != '') && !(settings.api_page.public_apis.rpc.getblockhash.enabled == true && settings.api_cmds['getblockhash'] != null && settings.api_cmds['getblockhash'] != '') && !(settings.api_page.public_apis.rpc.getblock.enabled == true && settings.api_cmds['getblock'] != null && settings.api_cmds['getblock'] != '') && !(settings.api_page.public_apis.rpc.getrawtransaction.enabled == true && settings.api_cmds['getrawtransaction'] != null && settings.api_cmds['getrawtransaction'] != '') && !(settings.api_page.public_apis.rpc.getnetworkhashps.enabled == true && settings.shared_pages.show_hashrate == true && settings.api_cmds['getnetworkhashps'] != null && settings.api_cmds['getnetworkhashps'] != '') && !(settings.api_page.public_apis.rpc.getvotelist.enabled == true && settings.api_cmds['getvotelist'] != null && settings.api_cmds['getvotelist'] != '') && !(settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') && (!settings.blockchain_specific.heavycoin.enabled || (!(settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getmaxvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getphase.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != null && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getreward.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != null && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getsupply.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != null && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardestimate.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardwhenstr.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != '')));
-        - var hide_ext_api_section = !settings.api_page.public_apis.ext.getmoneysupply.enabled && !settings.api_page.public_apis.ext.getdistribution.enabled && !settings.api_page.public_apis.ext.getaddress.enabled && !settings.api_page.public_apis.ext.getaddresstxs.enabled && !settings.api_page.public_apis.ext.gettx.enabled && !settings.api_page.public_apis.ext.getbalance.enabled && !settings.api_page.public_apis.ext.getlasttxs.enabled && !settings.api_page.public_apis.ext.getcurrentprice.enabled && !settings.api_page.public_apis.ext.getnetworkpeers.enabled && !settings.api_page.public_apis.ext.getbasicstats.enabled && !settings.api_page.public_apis.ext.getsummary.enabled && !(settings.api_page.public_apis.ext.getmasternodelist.enabled && settings.api_cmds['getmasternodelist'] != null && settings.api_cmds['getmasternodelist'] != '') && !settings.api_page.public_apis.ext.getmasternoderewards.enabled && !settings.api_page.public_apis.ext.getmasternoderewardstotal.enabled;
-        - var hide_electrum_api_section = false;
+        - var hide_rpc_api_section = !(api_page.public_apis.rpc.getdifficulty.enabled == true && api_cmds['getdifficulty'] != null && api_cmds['getdifficulty'] != '') && !(api_page.public_apis.rpc.getconnectioncount.enabled == true && api_cmds['getconnectioncount'] != null && api_cmds['getconnectioncount'] != '') && !(api_page.public_apis.rpc.getblockcount.enabled == true && api_cmds['getblockcount'] != null && api_cmds['getblockcount'] != '') && !(api_page.public_apis.rpc.getblockhash.enabled == true && api_cmds['getblockhash'] != null && api_cmds['getblockhash'] != '') && !(api_page.public_apis.rpc.getblock.enabled == true && api_cmds['getblock'] != null && api_cmds['getblock'] != '') && !(api_page.public_apis.rpc.getrawtransaction.enabled == true && api_cmds['getrawtransaction'] != null && api_cmds['getrawtransaction'] != '') && !(api_page.public_apis.rpc.getnetworkhashps.enabled == true && shared_pages.show_hashrate == true && api_cmds['getnetworkhashps'] != null && api_cmds['getnetworkhashps'] != '') && !(api_page.public_apis.rpc.getvotelist.enabled == true && api_cmds['getvotelist'] != null && api_cmds['getvotelist'] != '') && !(api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') && (!settings.blockchain_specific.heavycoin.enabled || (!(settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getmaxvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getphase.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != null && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getreward.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != null && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getsupply.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != null && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardestimate.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardwhenstr.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != '')));
+        - var hide_ext_api_section = !api_page.public_apis.ext.getmoneysupply.enabled && !api_page.public_apis.ext.getdistribution.enabled && !api_page.public_apis.ext.getaddress.enabled && !api_page.public_apis.ext.getaddresstxs.enabled && !api_page.public_apis.ext.gettx.enabled && !api_page.public_apis.ext.getbalance.enabled && !api_page.public_apis.ext.getlasttxs.enabled && !api_page.public_apis.ext.getcurrentprice.enabled && !api_page.public_apis.ext.getnetworkpeers.enabled && !api_page.public_apis.ext.getbasicstats.enabled && !api_page.public_apis.ext.getsummary.enabled && !(api_page.public_apis.ext.getmasternodelist.enabled && api_cmds['getmasternodelist'] != null && api_cmds['getmasternodelist'] != '') && !api_page.public_apis.ext.getmasternoderewards.enabled && !api_page.public_apis.ext.getmasternoderewardstotal.enabled;
         if !hide_rpc_api_section
           h3 #{settings.locale.api_calls}
           p
             em Return data from coind
           ul
-            if settings.api_page.public_apis.rpc.getblockchaininfo.enabled == true && settings.api_cmds['getblockchaininfo'] != null && settings.api_cmds['getblockchaininfo'] != ''
+            if api_page.public_apis.rpc.getblockchaininfo.enabled == true && api_cmds['getblockchaininfo'] != null && api_cmds['getblockchaininfo'] != ''
               li
                 p
                   div.fw-bold getblockchaininfo
@@ -46,7 +45,7 @@ block content
                     a(href='/api/getblockchaininfo/' + net) #{address}/api/getblockchaininfo/#{net}
                   else
                     a(href='/api/getblockchaininfo') #{address}/api/getblockchaininfo
-            if settings.api_page.public_apis.rpc.getdifficulty.enabled == true && settings.api_cmds['getdifficulty'] != null && settings.api_cmds['getdifficulty'] != ''
+            if api_page.public_apis.rpc.getdifficulty.enabled == true && api_cmds['getdifficulty'] != null && api_cmds['getdifficulty'] != ''
               li
                 p
                   div.fw-bold getdifficulty
@@ -63,7 +62,7 @@ block content
                     a(href='/api/getdifficulty/' + net) #{address}/api/getdifficulty/#{net}
                   else
                     a(href='/api/getdifficulty') #{address}/api/getdifficulty
-            if settings.api_page.public_apis.rpc.getconnectioncount.enabled == true && settings.api_cmds['getconnectioncount'] != null && settings.api_cmds['getconnectioncount'] != ''
+            if api_page.public_apis.rpc.getconnectioncount.enabled == true && api_cmds['getconnectioncount'] != null && api_cmds['getconnectioncount'] != ''
               li
                 p
                   div.fw-bold getconnectioncount
@@ -73,7 +72,7 @@ block content
                     a(href='/api/getconnectioncount/' + net) #{address}/api/getconnectioncount/#{net}
                   else
                     a(href='/api/getconnectioncount') #{address}/api/getconnectioncount
-            if settings.api_page.public_apis.rpc.getblockcount.enabled == true && settings.api_cmds['getblockcount'] != null && settings.api_cmds['getblockcount'] != ''
+            if api_page.public_apis.rpc.getblockcount.enabled == true && api_cmds['getblockcount'] != null && api_cmds['getblockcount'] != ''
               li
                 p
                   div.fw-bold getblockcount
@@ -83,27 +82,27 @@ block content
                     a(href='/api/getblockcount/' + net) #{address}/api/getblockcount/#{net}
                   else
                     a(href='/api/getblockcount') #{address}/api/getblockcount
-            if settings.api_page.public_apis.rpc.getblockhash.enabled == true && settings.api_cmds['getblockhash'] != null && settings.api_cmds['getblockhash'] != ''
+            if api_page.public_apis.rpc.getblockhash.enabled == true && api_cmds['getblockhash'] != null && api_cmds['getblockhash'] != ''
               li
                 p
                   div.fw-bold getblockhash [index]
                   div
                     em #{settings.locale.api_getblockhash}
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/api/getblockhash/' + net + '?index=' + settings.api_page.sample_data.blockindex) #{address}/api/getblockhash/#{net}?index=#{settings.api_page.sample_data.blockindex}
+                    a(href='/api/getblockhash/' + net + '?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash/#{net}?index=#{api_page.sample_data.blockindex}
                   else
-                    a(href='/api/getblockhash?index=' + settings.api_page.sample_data.blockindex) #{address}/api/getblockhash?index=#{settings.api_page.sample_data.blockindex}
-            if settings.api_page.public_apis.rpc.getblock.enabled == true && settings.api_cmds['getblock'] != null && settings.api_cmds['getblock'] != ''
+                    a(href='/api/getblockhash?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash?index=#{api_page.sample_data.blockindex}
+            if api_page.public_apis.rpc.getblock.enabled == true && api_cmds['getblock'] != null && api_cmds['getblock'] != ''
               li
                 p
                   div.fw-bold getblock [hash]
                   div
                     em #{settings.locale.api_getblock}
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/api/getblock/' + net + '?hash=' + settings.api_page.sample_data.blockhash) #{address}/api/getblock/#{net}?hash=#{settings.api_page.sample_data.blockhash}
+                    a(href='/api/getblock/' + net + '?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock/#{net}?hash=#{api_page.sample_data.blockhash}
                   else
-                    a(href='/api/getblock?hash=' + settings.api_page.sample_data.blockhash) #{address}/api/getblock?hash=#{settings.api_page.sample_data.blockhash}
-            if settings.api_page.public_apis.rpc.getrawtransaction.enabled == true && settings.api_cmds['getrawtransaction'] != null && settings.api_cmds['getrawtransaction'] != ''
+                    a(href='/api/getblock?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock?hash=#{api_page.sample_data.blockhash}
+            if api_page.public_apis.rpc.getrawtransaction.enabled == true && api_cmds['getrawtransaction'] != null && api_cmds['getrawtransaction'] != ''
               li
                 p
                   div.fw-bold getrawtransaction [txid] [decrypt]
@@ -111,15 +110,15 @@ block content
                     em #{settings.locale.api_getrawtransaction}
                   div
                     if net != null && net != "" && net != settings.default_wallet
-                      a(href='/api/getrawtransaction/' + net + '?txid=' + settings.api_page.sample_data.txhash + '&decrypt=0') #{address}/api/getrawtransaction/#{net}?txid=#{settings.api_page.sample_data.txhash}&decrypt=0
+                      a(href='/api/getrawtransaction/' + net + '?txid=' + api_page.sample_data.txhash + '&decrypt=0') #{address}/api/getrawtransaction/#{net}?txid=#{api_page.sample_data.txhash}&decrypt=0
                     else
-                      a(href='/api/getrawtransaction?txid=' + settings.api_page.sample_data.txhash + '&decrypt=0') #{address}/api/getrawtransaction?txid=#{settings.api_page.sample_data.txhash}&decrypt=0
+                      a(href='/api/getrawtransaction?txid=' + api_page.sample_data.txhash + '&decrypt=0') #{address}/api/getrawtransaction?txid=#{api_page.sample_data.txhash}&decrypt=0
                   div
                     if net != null && net != "" && net != settings.default_wallet
-                      a(href='/api/getrawtransaction/' + net + '?txid=' + settings.api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction/#{net}?txid=#{settings.api_page.sample_data.txhash}&decrypt=1
+                      a(href='/api/getrawtransaction/' + net + '?txid=' + api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction/#{net}?txid=#{api_page.sample_data.txhash}&decrypt=1
                     else
-                      a(href='/api/getrawtransaction?txid=' + settings.api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction?txid=#{settings.api_page.sample_data.txhash}&decrypt=1
-            if settings.api_page.public_apis.rpc.getnetworkhashps.enabled == true && settings.shared_pages.show_hashrate == true && settings.api_cmds['getnetworkhashps'] != null && settings.api_cmds['getnetworkhashps'] != ''
+                      a(href='/api/getrawtransaction?txid=' + api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction?txid=#{api_page.sample_data.txhash}&decrypt=1
+            if api_page.public_apis.rpc.getnetworkhashps.enabled == true && shared_pages.show_hashrate == true && api_cmds['getnetworkhashps'] != null && api_cmds['getnetworkhashps'] != ''
               li
                 p
                   div.fw-bold getnetworkhashps
@@ -136,14 +135,14 @@ block content
                     a(href='/api/getnetworkhashps/' + net) #{address}/api/getnetworkhashps/#{net}
                   else
                     a(href='/api/getnetworkhashps') #{address}/api/getnetworkhashps
-            if settings.api_page.public_apis.rpc.getvotelist.enabled == true && settings.api_cmds['getvotelist'] != null && settings.api_cmds['getvotelist'] != ''
+            if api_page.public_apis.rpc.getvotelist.enabled == true && api_cmds['getvotelist'] != null && api_cmds['getvotelist'] != ''
               li
                 p
                   div.fw-bold getvotelist
                   div
                     em #{settings.locale.api_getvotelist}
                   a(href='/api/getvotelist') #{address}/api/getvotelist
-            if settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != ''
+            if api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != ''
               li
                 p
                   div.fw-bold getmasternodecount
@@ -216,7 +215,7 @@ block content
           p
             em Return data from local indexes
           ul
-            if settings.api_page.public_apis.ext.getmoneysupply.enabled == true
+            if api_page.public_apis.ext.getmoneysupply.enabled == true
               li
                 p
                   div.fw-bold getmoneysupply
@@ -226,7 +225,7 @@ block content
                     a(href='/ext/getmoneysupply/' + net) #{address}/ext/getmoneysupply/#{net}
                   else
                     a(href='/ext/getmoneysupply') #{address}/ext/getmoneysupply
-            if settings.api_page.public_apis.ext.getdistribution.enabled == true
+            if api_page.public_apis.ext.getdistribution.enabled == true
               li
                 p
                   div.fw-bold getdistribution
@@ -236,60 +235,60 @@ block content
                     a(href='/ext/getdistribution/' + net) #{address}/ext/getdistribution/#{net}
                   else
                     a(href='/ext/getdistribution') #{address}/ext/getdistribution
-            if settings.api_page.public_apis.ext.getaddress.enabled == true
+            if api_page.public_apis.ext.getaddress.enabled == true
               li
                 p
                   div.fw-bold getaddress (/ext/getaddress/hash)
                   div
                     em Returns information for given address
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getaddress/' + settings.api_page.sample_data.address + '/' + net) #{address}/ext/getaddress/#{settings.api_page.sample_data.address}/#{net}
+                    a(href='/ext/getaddress/' + api_page.sample_data.address + '/' + net) #{address}/ext/getaddress/#{api_page.sample_data.address}/#{net}
                   else
-                    a(href='/ext/getaddress/' + settings.api_page.sample_data.address) #{address}/ext/getaddress/#{settings.api_page.sample_data.address}
-            if settings.api_page.public_apis.ext.getaddresstxs.enabled == true
+                    a(href='/ext/getaddress/' + api_page.sample_data.address) #{address}/ext/getaddress/#{api_page.sample_data.address}
+            if api_page.public_apis.ext.getaddresstxs.enabled == true
               li
                 p
                   div.fw-bold getaddresstxs (/ext/getaddresstxs/hash/start/length)
                   div
                     em Returns last [length] transactions for address [hash], starting from offset [start]
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getaddresstxs/' + settings.api_page.sample_data.address + '/0/50/' + net) #{address}/ext/getaddresstxs/#{settings.api_page.sample_data.address}/0/50/#{net}
+                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/0/50/' + net) #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/0/50/#{net}
                   else
-                    a(href='/ext/getaddresstxs/' + settings.api_page.sample_data.address + '/0/50') #{address}/ext/getaddresstxs/#{settings.api_page.sample_data.address}/0/50
-            if settings.api_page.public_apis.ext.gettx.enabled == true
+                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/0/50') #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/0/50
+            if api_page.public_apis.ext.gettx.enabled == true
               li
                 p
                   div.fw-bold gettx (/ext/gettx/hash)
                   div
                     em Returns information for given tx hash
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/gettx/' + settings.api_page.sample_data.txhash + '/' + net) #{address}/ext/gettx/#{settings.api_page.sample_data.txhash}/#{net}
+                    a(href='/ext/gettx/' + api_page.sample_data.txhash + '/' + net) #{address}/ext/gettx/#{api_page.sample_data.txhash}/#{net}
                   else
-                    a(href='/ext/gettx/' + settings.api_page.sample_data.txhash) #{address}/ext/gettx/#{settings.api_page.sample_data.txhash}
-            if settings.api_page.public_apis.ext.getbalance.enabled == true
+                    a(href='/ext/gettx/' + api_page.sample_data.txhash) #{address}/ext/gettx/#{api_page.sample_data.txhash}
+            if api_page.public_apis.ext.getbalance.enabled == true
               li
                 p
                   div.fw-bold getbalance (/ext/getbalance/hash)
                   div
                     em Returns current balance of given address
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getbalance/' + settings.api_page.sample_data.address + '/' + net) #{address}/ext/getbalance/#{settings.api_page.sample_data.address}/#{net}
+                    a(href='/ext/getbalance/' + api_page.sample_data.address + '/' + net) #{address}/ext/getbalance/#{api_page.sample_data.address}/#{net}
                   else
-                    a(href='/ext/getbalance/' + settings.api_page.sample_data.address) #{address}/ext/getbalance/#{settings.api_page.sample_data.address}
-            if settings.api_page.public_apis.ext.getlasttxs.enabled == true
+                    a(href='/ext/getbalance/' + api_page.sample_data.address) #{address}/ext/getbalance/#{api_page.sample_data.address}
+            if api_page.public_apis.ext.getlasttxs.enabled == true
               li
                 p
                   div.fw-bold getlasttxs (/ext/getlasttxs/min/start/length)
                   div
                     em Returns last [length] transactions greater than [min] coins, starting from offset [start]
                   div
-                    em Note: [length] is limited to returning #{settings.api_page.public_apis.ext.getlasttxs.max_items_per_query} records per query
+                    em Note: [length] is limited to returning #{api_page.public_apis.ext.getlasttxs.max_items_per_query} records per query
                   div
                     if net != null && net != "" && net != settings.default_wallet
                       a(href='/ext/getlasttxs/100/0/100/' + net) #{address}/ext/getlasttxs/100/0/100/#{net}
                     else
                       a(href='/ext/getlasttxs/100/0/100') #{address}/ext/getlasttxs/100/0/100
-            if settings.api_page.public_apis.ext.getcurrentprice.enabled == true
+            if api_page.public_apis.ext.getcurrentprice.enabled == true
               li
                 p
                   div.fw-bold getcurrentprice
@@ -310,7 +309,7 @@ block content
                     a(href='/ext/getcurrentprice/' + net) #{address}/ext/getcurrentprice/#{net}
                   else
                     a(href='/ext/getcurrentprice') #{address}/ext/getcurrentprice
-            if settings.api_page.public_apis.ext.getnetworkpeers.enabled == true
+            if api_page.public_apis.ext.getnetworkpeers.enabled == true
               li
                 p
                   div.fw-bold getnetworkpeers
@@ -320,17 +319,17 @@ block content
                     a(href='/ext/getnetworkpeers/' + net) #{address}/ext/getnetworkpeers/#{net}
                   else
                     a(href='/ext/getnetworkpeers') #{address}/ext/getnetworkpeers
-            if settings.api_page.public_apis.ext.getbasicstats.enabled == true
+            if api_page.public_apis.ext.getbasicstats.enabled == true
               li
                 p
                   div.fw-bold getbasicstats
                   div
-                    em="Returns basic statistics about the coin including: block count, circulating supply, USD price, " + settings.markets_page.default_exchange.trading_pair.split('/')[1].toUpperCase() + " price" + (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '' ? ', ' + '# of masternodes' : '')
+                    em="Returns basic statistics about the coin including: block count, circulating supply, USD price, " + settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toUpperCase() + " price" + (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '' ? ', ' + '# of masternodes' : '')
                   if net != null && net != "" && net != settings.default_wallet
                     a(href='/ext/getbasicstats/' + net) #{address}/ext/getbasicstats/#{net}
                   else
                     a(href='/ext/getbasicstats') #{address}/ext/getbasicstats
-            if settings.api_page.public_apis.ext.getticker.enabled == true
+            if api_page.public_apis.ext.getticker.enabled == true
               li
                 p
                   div.fw-bold getticker [mode] Use 'all'.
@@ -340,7 +339,7 @@ block content
                     a(href='/ext/getticker/all/' + net) #{address}/ext/getticker/all/#{net}
                   else
                     a(href='/ext/getticker/all') #{address}/ext/getticker/all
-            if settings.api_page.public_apis.ext.getmarkets.enabled == true
+            if api_page.public_apis.ext.getmarkets.enabled == true
               li
                 p
                   div.fw-bold getmarkets [mode] Use 'summary' or 'full'.
@@ -356,17 +355,17 @@ block content
                       a(href='/ext/getmarkets/full/' + net) #{address}/ext/getmarkets/full/#{net}
                     else
                       a(href='/ext/getmarkets/full') #{address}/ext/getmarkets/full
-            if settings.api_page.public_apis.ext.getsummary.enabled == true
+            if api_page.public_apis.ext.getsummary.enabled == true
               li
                 p
                   div.fw-bold getsummary
                   div
-                    em="Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, " + settings.markets_page.default_exchange.trading_pair.split('/')[1].toUpperCase() + " price, network connection count, block count" + (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '' ? ', ' + 'count of online masternodes' + ', ' + 'count of offline masternodes' : '')
+                    em="Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, " + settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toUpperCase() + " price, network connection count, block count" + (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '' ? ', ' + 'count of online masternodes' + ', ' + 'count of offline masternodes' : '')
                   if net != null && net != "" && net != settings.default_wallet
                     a(href='/ext/getsummary/' + net) #{address}/ext/getsummary/#{net}
                   else
                     a(href='/ext/getsummary') #{address}/ext/getsummary
-            if settings.api_page.public_apis.ext.getmasternodelist.enabled == true && settings.api_cmds['getmasternodelist'] != null && settings.api_cmds['getmasternodelist'] != ''
+            if api_page.public_apis.ext.getmasternodelist.enabled == true && api_cmds['getmasternodelist'] != null && api_cmds['getmasternodelist'] != ''
               li
                 p
                   div.fw-bold getmasternodelist
@@ -376,26 +375,26 @@ block content
                     a(href='/ext/getmasternodelist/' + net) #{address}/ext/getmasternodelist/#{net}
                   else
                     a(href='/ext/getmasternodelist') #{address}/ext/getmasternodelist
-            if settings.api_page.public_apis.ext.getmasternoderewards.enabled == true
+            if api_page.public_apis.ext.getmasternoderewards.enabled == true
               li
                 p
                   div.fw-bold getmasternoderewards (/ext/getmasternoderewards/hash/since)
                   div
                     em Returns a list of masternode reward transactions for address [hash] that arrived after block height [since]
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getmasternoderewards/' + settings.api_page.sample_data.address + '/' + settings.api_page.sample_data.blockindex + '/' + net) #{address}/ext/getmasternoderewards/#{settings.api_page.sample_data.address}/#{settings.api_page.sample_data.blockindex}/#{net}
+                    a(href='/ext/getmasternoderewards/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex + '/' + net) #{address}/ext/getmasternoderewards/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}/#{net}
                   else
-                    a(href='/ext/getmasternoderewards/' + settings.api_page.sample_data.address + '/' + settings.api_page.sample_data.blockindex) #{address}/ext/getmasternoderewards/#{settings.api_page.sample_data.address}/#{settings.api_page.sample_data.blockindex}
-            if settings.api_page.public_apis.ext.getmasternoderewardstotal.enabled == true
+                    a(href='/ext/getmasternoderewards/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex) #{address}/ext/getmasternoderewards/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}
+            if api_page.public_apis.ext.getmasternoderewardstotal.enabled == true
               li
                 p
                   div.fw-bold getmasternoderewardstotal (/ext/getmasternoderewardstotal/hash/since)
                   div
                     em Returns the total number of coins earned in masternode rewards for address [hash] that arrived after block height [since]
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getmasternoderewardstotal/' + settings.api_page.sample_data.address + '/' + settings.api_page.sample_data.blockindex + '/' + net) #{address}/ext/getmasternoderewardstotal/#{settings.api_page.sample_data.address}/#{settings.api_page.sample_data.blockindex}/#{net}
+                    a(href='/ext/getmasternoderewardstotal/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex + '/' + net) #{address}/ext/getmasternoderewardstotal/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}/#{net}
                   else
-                    a(href='/ext/getmasternoderewardstotal/' + settings.api_page.sample_data.address + '/' + settings.api_page.sample_data.blockindex) #{address}/ext/getmasternoderewardstotal/#{settings.api_page.sample_data.address}/#{settings.api_page.sample_data.blockindex}
+                    a(href='/ext/getmasternoderewardstotal/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex) #{address}/ext/getmasternoderewardstotal/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}
           hr
         h3 Linking (GET)
         p
@@ -404,21 +403,21 @@ block content
           li
             p
               div.fw-bold transaction (/tx/txid)
-              a(href='/tx/' + settings.api_page.sample_data.txhash) #{address}/tx/#{settings.api_page.sample_data.txhash}
+              a(href='/tx/' + api_page.sample_data.txhash) #{address}/tx/#{api_page.sample_data.txhash}
           li
             p
               div.fw-bold block (/block/hash)
-              a(href='/block/' + settings.api_page.sample_data.blockhash) #{address}/block/#{settings.api_page.sample_data.blockhash}
+              a(href='/block/' + api_page.sample_data.blockhash) #{address}/block/#{api_page.sample_data.blockhash}
           li
             p
               div.fw-bold address (/address/hash)
-              a(href='/address/' + settings.api_page.sample_data.address) #{address}/address/#{settings.api_page.sample_data.address}
+              a(href='/address/' + api_page.sample_data.address) #{address}/address/#{api_page.sample_data.address}
           li
             p
               div.fw-bold qrcode (/qr/hash)
-              a(href='/qr/' + settings.api_page.sample_data.address) #{address}/qr/#{settings.api_page.sample_data.address}
+              a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
           hr
-        if !hide_electrum_api_section
+        if api_page.show_electrum_api_section
           h3 ElectrumX API (JSON-RPC 2.0)
           p ElectrumX servers for ButKoin light wallets (former Bitcoin Lightning) are available at 
             ul 

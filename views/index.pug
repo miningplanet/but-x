@@ -3,9 +3,9 @@ extends layout
 block content
   include ./includes/common.pug
   script.
-    var setting_maxTxCount = parseInt("#{settings.api_page.public_apis.ext.getlasttxs.max_items_per_query}");
-    var setting_txPerPage = parseInt("#{settings.index_page.transaction_table.items_per_page}");
-    var lengthMenuOptsAdd = !{JSON.stringify(settings.index_page.transaction_table.page_length_options)};
+    var setting_maxTxCount = parseInt("#{api_page.public_apis.ext.getlasttxs.max_items_per_query}");
+    var setting_txPerPage = parseInt("#{index_page.transaction_table.items_per_page}");
+    var lengthMenuOptsAdd = !{JSON.stringify(index_page.transaction_table.page_length_options)};
     var lengthMenuOpts = [];
     var addedLength = false;
     for (i = 0; i < lengthMenuOptsAdd.length; i++) {
@@ -75,25 +75,25 @@ block content
           $("td:eq(2)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass("txCol text-center breakWord d-none d-md-table-cell");
           $("td:eq(3)", row).html(outputs).addClass("text-center d-none d-sm-table-cell");
           $("td:eq(4)", row).html(amount).addClass("text-end");
-          $("td:eq(5)", row).html('<span' + (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp).replace(' UTC', '') + '</span>').addClass('text-center');
+          $("td:eq(5)", row).html('<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp).replace(' UTC', '') + '</span>').addClass('text-center');
         },
         fnDrawCallback: function(settings) {
           enableTooltips();
         }
       });
-      var setting_reload_table_seconds = parseInt("#{settings.index_page.transaction_table.reload_table_seconds}");
+      var setting_reload_table_seconds = parseInt("#{index_page.transaction_table.reload_table_seconds}");
       if (setting_reload_table_seconds > 0) {
         setInterval( function () {
           rtable.api().ajax.reload(null, false);
         }, (setting_reload_table_seconds * 1000) );
       }
 
-      if ('#{settings.index_page.page_header.show_last_updated}' == 'true') {
+      if ('#{index_page.page_header.show_last_updated}' == 'true') {
         var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)};
         if (lastUpdatedDate != 0) {
           $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate).replace(' UTC', ''));
 
-          if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
             $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
             enableTooltips();
           }
@@ -110,26 +110,26 @@ block content
           strong #{settings.locale.ex_error}
         div #{error}
   .col-md-12.cardSpacer
-    if settings.index_page.page_header.show_img == true || settings.index_page.page_header.show_title == true || settings.index_page.page_header.show_last_updated == true || settings.index_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.index_page.page_header.show_img == true && settings.index_page.page_header.show_title == true && settings.index_page.page_header.show_last_updated == true && settings.index_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.index_page.page_header.show_img == true
+    if index_page.page_header.show_img == true || index_page.page_header.show_title == true || index_page.page_header.show_last_updated == true || index_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (index_page.page_header.show_img == true && index_page.page_header.show_title == true && index_page.page_header.show_last_updated == true && index_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if index_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.index_page.page_header.show_title == true
+          if index_page.page_header.show_title == true
             h3#page-title #{settings.locale.ex_title.replace('{1}', coin.name)}
-          if settings.index_page.page_header.show_last_updated == true
-            if settings.index_page.page_header.show_title != true && settings.index_page.page_header.show_description != true
+          if index_page.page_header.show_last_updated == true
+            if index_page.page_header.show_title != true && index_page.page_header.show_description != true
               #page-title-container
                 .sub-page-header
                   span.fw-bold=settings.locale.last_updated + ':'
                   span.text-muted#lastUpdatedDate
             else
-              .sub-page-header(style='margin-bottom:' + (settings.index_page.page_header.show_description == true ? '5' : '0') + 'px')
+              .sub-page-header(style='margin-bottom:' + (index_page.page_header.show_description == true ? '5' : '0') + 'px')
                 span.fw-bold=settings.locale.last_updated + ':'
                 span.text-muted#lastUpdatedDate
-          if settings.index_page.page_header.show_description == true
-            if settings.index_page.page_header.show_title != true && settings.index_page.page_header.show_last_updated != true
+          if index_page.page_header.show_description == true
+            if index_page.page_header.show_title != true && index_page.page_header.show_last_updated != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.ex_description.replace('{1}', coin.name)
             else
@@ -140,8 +140,8 @@ block content
         strong #{settings.locale.ex_latest_transactions}
       table#recent-table.table.table-bordered.table-striped.table-paging.table-hover
         - var theadClasses = [];
-        if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-          - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+        if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+          - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
         thead
           tr(class=theadClasses)
             th.d-table-cell.d-md-none

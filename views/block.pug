@@ -4,8 +4,8 @@ block content
   include ./includes/common.pug
   - var block_difficulty = parseFloat(block.difficulty).toFixed(4);
   - var theadClasses = [];
-  if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   script.
     $(document).ready(function() {
       $('#block-summary').dataTable({
@@ -20,22 +20,22 @@ block content
       /* block.time_formatted = format_unixtime(#{block.time}) */
       $('span#timestampCol').html(format_unixtime(#{block.time}));
 
-      if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+      if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
         $('span#timestampCol').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(#{block.time}, true));
         enableTooltips();
       }
     });
   .col-xs-12.col-md-12
-    if settings.block_page.page_header.show_img == true || settings.block_page.page_header.show_title == true || settings.block_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.block_page.page_header.show_img == true && settings.block_page.page_header.show_title == true && settings.block_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.block_page.page_header.show_img == true
+    if block_page.page_header.show_img == true || block_page.page_header.show_title == true || block_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (block_page.page_header.show_img == true && block_page.page_header.show_title == true && block_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if block_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.block_page.page_header.show_title == true
+          if block_page.page_header.show_title == true
             h3#page-title #{settings.locale.block_title.replace('{1}', coin.name)}
-          if settings.block_page.page_header.show_description == true
-            if settings.block_page.page_header.show_title != true
+          if block_page.page_header.show_description == true
+            if block_page.page_header.show_title != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', block.height)
             else
@@ -55,7 +55,7 @@ block content
           if block.nextblockhash != null
             a(href='/block/' + block.nextblockhash)
               span.fa.fa-chevron-right.block-next(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_next, style='color: var(--bs-body-color);')
-          if settings.api_page.public_apis.rpc.getblock.enabled == true
+          if api_page.public_apis.rpc.getblock.enabled == true
             a.d-none.d-md-block(href='/api/getblock?hash=' + block.hash, style='margin-left:auto;', data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_block_data)
               span.fa.fa-info-circle(style='color: var(--bs-body-color);')
       table#block-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
@@ -97,7 +97,7 @@ block content
             td #{settings.locale.timestamp}
             td
               span#timestampCol=block.time
-    if block.hash == settings.block_page.genesis_block
+    if block.hash == block_page.genesis_block
       .alert.alert-info(role='alert', style='text-align:center;')
         strong #{settings.locale.block_genesis}
     else

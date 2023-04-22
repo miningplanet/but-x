@@ -1,3 +1,4 @@
+const debug = require('debug')('debug');
 var express = require('express'),
     path = require('path'),
     nodeapi = require('./lib/nodeapi'),
@@ -28,6 +29,12 @@ const distributionCache = new TTLCache({ max: settings.wallets.length, ttl: sett
 const peersCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const masternodesCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
+// TODO: Fix chain.
+const net = 'mainnet'
+const shared_pages = settings.get(net, 'shared_pages')
+const markets_page = settings.get(net, 'markets_page')
+const api_cmds = settings.get(net, 'api_cmds')
+
 var request = require('postman-request');
 var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
 var base_url = base_server + ''; // api/
@@ -36,8 +43,8 @@ var base_url = base_server + ''; // api/
 nodeapi.setWalletDetails(settings.wallets);
 
 // dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value
-Object.keys(settings.api_cmds).forEach(function(key, index, map) {
-  if (key != 'use_rpc' && settings.api_cmds[key] != null && settings.api_cmds[key] != '')
+Object.keys(api_cmds).forEach(function(key, index, map) {
+  if (key != 'use_rpc' && api_cmds[key] != null && api_cmds[key] != '')
     apiAccessList.push(key);
 });
 // dynamically find and add additional blockchain_specific api cmds
@@ -69,16 +76,16 @@ app.set('view engine', 'pug');
 var default_favicon = '';
 
 // loop through the favicons
-Object.keys(settings.shared_pages.favicons).forEach(function(key, index, map) {
+Object.keys(shared_pages.favicons).forEach(function(key, index, map) {
   // remove the public directory from the path if exists
-  if (settings.shared_pages.favicons[key] != null && settings.shared_pages.favicons[key].indexOf('public/') > -1)
-    settings.shared_pages.favicons[key] = settings.shared_pages.favicons[key].replace(/public\//g, '');
+  if (shared_pages.favicons[key] != null && shared_pages.favicons[key].indexOf('public/') > -1)
+    shared_pages.favicons[key] = shared_pages.favicons[key].replace(/public\//g, '');
 
   // check if the favicon file exists
-  if (!db.fs.existsSync(path.join('./public', settings.shared_pages.favicons[key])))
-    settings.shared_pages.favicons[key] = '';
+  if (!db.fs.existsSync(path.join('./public', shared_pages.favicons[key])))
+    shared_pages.favicons[key] = '';
   else if (default_favicon == '')
-    default_favicon = settings.shared_pages.favicons[key];
+    default_favicon = shared_pages.favicons[key];
 });
 
 if (default_favicon != '')
@@ -139,19 +146,20 @@ app.post('/claim/:net?', function(req, res) {
 
 // extended apis
 app.use('/ext/getmoneysupply/:net?', function(req, res) {
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmoneysupply.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getmoneysupply.enabled == true) {
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = supplyCache.get(net);
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
         supplyCache.set(net, stats.supply);
-        console.debug("Cached supply '%s' %s", net, r);
+        debug("Cached supply '%s' %o", net, stats);
         res.setHeader('content-type', 'text/plain');
         res.end((stats && stats.supply ? stats.supply.toString() : '0'));
       }, net);
     } else {
-      console.debug("Get supply by cache '%s' %s", net, r);
+      debug("Get supply by cache '%s' %o ...", net, r.supply);
       res.setHeader('content-type', 'text/plain');
       res.end((r ? r.toString() : '0'));
     }
@@ -162,9 +170,10 @@ app.use('/ext/getmoneysupply/:net?', function(req, res) {
 app.use('/ext/getaddress/:hash/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getaddress.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getaddress.enabled == true) {
     db.get_address(req.params.hash, false, function(address) {
-      db.get_address_txs_ajax(req.params.hash, 0, settings.api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(txs, count) {
+      db.get_address_txs_ajax(req.params.hash, 0, api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(txs, count) {
         if (address) {
           var last_txs = [];
 
@@ -216,17 +225,19 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
 app.use('/ext/gettx/:txid/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.gettx.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.gettx.enabled == true) {
     var txid = req.params.txid;
 
     db.get_tx(txid, function(tx) {
-      if (tx) {
+      const shared_pages = settings.get(net, 'shared_pages')
+      if (tx && tx != null) {
         lib.get_blockcount(function(blockcount) {
-          res.send({ active: 'tx', tx: tx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
+          res.send({ active: 'tx', tx: tx, confirmations: shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
         }, net);
       } else {
         lib.get_rawtransaction(txid, function(rtx) {
-          if (rtx && rtx.txid) {
+          if (rtx && rtx != null && rtx.txid) {
             lib.prepare_vin(net, rtx, function(vin, tx_type_vin) {
               lib.prepare_vout(rtx.vout, rtx.txid, vin, ((typeof rtx.vjoinsplit === 'undefined' || rtx.vjoinsplit == null) ? [] : rtx.vjoinsplit), function(rvout, rvin, tx_type_vout) {
                 lib.calculate_total(rvout, function(total) {
@@ -241,7 +252,7 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
                       blockindex: -1
                     };
 
-                    res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount:-1, coin: coin, net: net});
+                    res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount:-1, coin: coin, net: net});
                   } else {
                     var utx = {
                       txid: rtx.txid,
@@ -254,7 +265,7 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
                     };
 
                     lib.get_blockcount(function(blockcount) {
-                      res.send({ active: 'tx', tx: utx, confirmations: settings.shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
+                      res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
                     }, net);
                   }
                 });
@@ -270,7 +281,8 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
 });
 
 app.use('/ext/getbalance/:hash/:net?', function(req, res) {
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getbalance.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getbalance.enabled == true) {
     const hash = req.params.hash
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
@@ -278,15 +290,15 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
     if (r == undefined) {
       db.get_address(hash, false, function(address) {
         if (address) {
-          console.debug("Cached balance '%s' '%s' %s", net, hash, address.balance);
           balancesCache.set(net + '_' + hash, address.balance)
+          debug("Cached balance '%s' '%s' %o", net, hash, address.balance);
           res.setHeader('content-type', 'text/plain');
           res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''));
         } else
           res.send({ error: 'address not found.', hash: hash, coin: coin, net: net });
       }, net);
     } else {
-      console.debug("Get balance by cache '%s' '%s' %s", net, hash, r);
+      debug("Get balance by cache '%s' '%s' %o", net, hash, r);
       res.setHeader('content-type', 'text/plain');
       res.end((r / 100000000).toString().replace(/(^-+)/mg, ''));
     }
@@ -295,7 +307,8 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
 });
 
 app.use('/ext/getdistribution/:net?', function(req, res) {
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getdistribution.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getdistribution.enabled == true) {
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = distributionCache.get(net);
@@ -303,14 +316,14 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
       db.get_richlist(coin.name, function(richlist) {
         db.get_stats(coin.name, function(stats) {
           db.get_distribution(richlist, stats, function(dist) {
-            console.debug("Cached distribution '%s' %s", net, dist.supply);
+            debug("Cached distribution '%s' %o", net, dist);
             distributionCache.set(net, dist);
             res.send(dist);
           }, net);
         }, net);
       }, net);
     } else {
-      console.debug("Get distribution by cache '%s' %s", net, r.supply);
+      debug("Get distribution by cache '%s' %o ...", net, r.supply);
       res.send(r);
     }
   } else
@@ -318,8 +331,9 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
 });
 
 app.use('/ext/getcurrentprice/:net?', function(req, res) {
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getcurrentprice.enabled == true) {
-    const defaultExchangeCurrencyPrefix = settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase();
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getcurrentprice.enabled == true) {
+    const defaultExchangeCurrencyPrefix = settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toLowerCase();
     if (settings.cache.enabled == true) {
       const net = settings.getNet(req.params['net'])
       const coin = settings.getCoin(net)
@@ -345,13 +359,13 @@ app.use('/ext/getcurrentprice/:net?', function(req, res) {
                 }
               };
               pricesCache.set (net, r);
-              console.debug("Cached prices '%s' %s", net, r.last_updated);
+              debug("Cached prices '%s' %o", net, r);
               res.send(r);
             }
           });
         }, net);
       } else {
-        console.debug("Get prices by cache '%s' %s", net, r.last_updated);
+        debug("Get prices by cache '%s' %o ...", net, r.last_updated);
         res.send(r);
       }
     } else {
@@ -372,7 +386,7 @@ app.use('/ext/getcurrentprice/:net?', function(req, res) {
                 ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
               }
             };
-            console.debug("Get prices by cache '%s' %s", net, r.last_updated);
+            debug("Get prices by cache '%s' %o ...", net, r.last_updated);
             res.send(r);
           }
         });
@@ -393,31 +407,34 @@ function ratesPush(rates, currencies, item, price) {
 }
 
 app.use('/ext/getbasicstats/:net?', function(req, res) {
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getbasicstats.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
+    const api_cmds = settings.get(net, 'api_cmds')
+    const markets_page = settings.get(net, 'markets')
     const r = statsCache.get(net);
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
         // check if the masternode count api is enabled
-        if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
+        if (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') {
           // masternode count api is available
           lib.get_masternodecount(net, function(masternodestotal) {
-            eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
+            eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
             statsCache.set (net, p_ext);
-            console.debug("Cached stats '%s' %s", net, p_ext.block_count);
+            debug("Cached coin stats '%s' %o", net, p_ext);
             res.send(p_ext);
           });
         } else {
           // masternode count api is not available
-          eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + settings.markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
+          eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
           statsCache.set (net, p_ext);
-          console.debug("Cached stats '%s' %s", net, p_ext.block_count);
+          debug("Cached coin stats '%s' %o", net, p_ext);
           res.send(p_ext);
         }
       }, net);
     } else {
-      console.debug("Get stats by cache '%s' %s", net, r.block_count);
+      debug("Get coin stats by cache '%s' %o ...", net, r.block_count);
       res.send(r);
     }
   } else
@@ -427,7 +444,8 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
 app.use('/ext/getticker/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getticker.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getticker.enabled == true) {
     if (settings.cache.enabled == true) {
       var r = tickerCache.get(net);
       if (r == undefined) {
@@ -494,7 +512,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                       r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
                       r.algos = algos
                       tickerCache.set (net, r);
-                      console.debug("Cache ticker '%s' '%s' %s", r.coin, net, r.last_updated);
+                      debug("Cached ticker '%s' '%s' %o", r.coin, net, r);
                       res.send(r);
                     });
                   });
@@ -504,7 +522,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
           }, net);
         }, net);
       } else {
-        console.debug("Get ticker by ćache '%s' '%s' %s", r.coin, net, r.last_updated);
+        debug("Get ticker by ćache '%s' '%s' % ...", r.coin, net, r.last_updated);
 
         res.send(r);
       }
@@ -518,7 +536,8 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
 app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmarkets.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getmarkets.enabled == true) {
     if (req.params.mode == 'summary') {
       db.get_markets_summary(function(data) {
       var markets = data;
@@ -554,8 +573,9 @@ app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
 app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  const api_page = settings.get(net, 'api_page')
   // check if the getlasttxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getlasttxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     var min = req.params.min, start, length, internal = false;
     // split url suffix by forward slash and remove blank entries
     var split = req.url.split('/').filter(function(v) { return v; });
@@ -583,8 +603,8 @@ app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
     }
 
     // fix parameters
-    if (typeof length === 'undefined' || isNaN(length) || length > settings.api_page.public_apis.ext.getlasttxs.max_items_per_query)
-      length = settings.api_page.public_apis.ext.getlasttxs.max_items_per_query;
+    if (typeof length === 'undefined' || isNaN(length) || length > api_page.public_apis.ext.getlasttxs.max_items_per_query)
+      length = api_page.public_apis.ext.getlasttxs.max_items_per_query;
     if (typeof start === 'undefined' || isNaN(start) || start < 0)
       start = 0;
     if (typeof min === 'undefined' || isNaN(min) || min < 0)
@@ -609,8 +629,9 @@ app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
 app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  const api_page = settings.get(net, 'api_page')
   // check if the getaddresstxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getaddresstxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getaddresstxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     var internal = false;
     // split url suffix by forward slash and remove blank entries
     var split = req.url.split('/').filter(function(v) { return v; });
@@ -618,8 +639,8 @@ app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
     if (split.length > 0 && split[0] == 'internal')
       internal = true;
     // fix parameters
-    if (typeof req.params.length === 'undefined' || isNaN(req.params.length) || req.params.length > settings.api_page.public_apis.ext.getaddresstxs.max_items_per_query)
-      req.params.length = settings.api_page.public_apis.ext.getaddresstxs.max_items_per_query;
+    if (typeof req.params.length === 'undefined' || isNaN(req.params.length) || req.params.length > api_page.public_apis.ext.getaddresstxs.max_items_per_query)
+      req.params.length = api_page.public_apis.ext.getaddresstxs.max_items_per_query;
     if (typeof req.params.start === 'undefined' || isNaN(req.params.start) || req.params.start < 0)
       req.params.start = 0;
     if (typeof req.params.min === 'undefined' || isNaN(req.params.min) || req.params.min < 0)
@@ -681,8 +702,9 @@ app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
 });
 
 app.use('/ext/getsummary/:net?', function(req, res) {
+  const api_page = settings.get(net, 'api_page')
   // check if the getsummary api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getsummary.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = summaryCache.get(net);
@@ -697,7 +719,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
               blockcount: (blockcount ? blockcount : '-')
             }
             summaryCache.set (net, v);
-            console.debug("Cached summary '%s' %s", net, v);
+            debug("Cached summary '%s' %o", net, v);
             res.send(v);
           } else {
             lib.get_hashrate(function(hashps) {
@@ -707,11 +729,12 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                     var difficulty = difficulties.difficulty;
                     difficultyHybrid = '';
 
+                    const shared_pages = settings.get(net, 'shared_pages')
                     if (difficulty && difficulty['proof-of-work']) {
-                      if (settings.shared_pages.difficulty == 'Hybrid') {
+                      if (shared_pages.difficulty == 'Hybrid') {
                         difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
                         difficulty = 'POW: ' + difficulty['proof-of-work'];
-                      } else if (settings.shared_pages.difficulty == 'POW')
+                      } else if (shared_pages.difficulty == 'POW')
                         difficulty = difficulty['proof-of-work'];
                       else
                         difficulty = difficulty['proof-of-stake'];
@@ -721,7 +744,8 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                       hashps = 0;
 
                     // check if the masternode count api is enabled
-                    if (settings.api_page.public_apis.rpc.getmasternodecount.enabled == true && settings.api_cmds['getmasternodecount'] != null && settings.api_cmds['getmasternodecount'] != '') {
+                    const api_cmds = settings.get(net, 'api_cmds')
+                    if (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') {
                       // masternode count api is available
                       var mn_total = 0;
                       var mn_enabled = 0;
@@ -752,7 +776,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                         blockcount: (blockcount ? blockcount : '-')
                       }
                       summaryCache.set (net, v);
-                      console.debug("Cached summary '%s' %s", net, v);
+                      debug("Cached summary '%s' %o", net, v);
                       res.send(v);
                     } else {
                       // masternode count api is not available
@@ -772,7 +796,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                         blockcount: (blockcount ? blockcount : '-')
                       }
                       summaryCache.set (net, v);
-                      console.debug("Cached summary '%s' %s", net, v);
+                      debug("Cached summary '%s' %o", net, v);
                       res.send(v);
                     }
                   });
@@ -783,7 +807,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
         }, net);
       });
     } else {
-      console.debug("Get summary by cache '%s' %s", net, r.blockcount)
+      debug("Get summary by cache '%s' %o ...", net, r.blockcount)
       res.send(r)
     }
   } else
@@ -791,8 +815,9 @@ app.use('/ext/getsummary/:net?', function(req, res) {
 });
 
 app.use('/ext/getnetworkpeers/:net?', function(req, res) {
+  const api_page = settings.get(net, 'api_page')
   // check if the getnetworkpeers api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getnetworkpeers.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)  
     const r = peersCache.get(net);
@@ -826,11 +851,11 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
 
         // return peer data
         peersCache.set (net, newPeers);
-        console.debug("Cached peers '%s'", net);
+        debug("Cached peers '%s' %o", net, newPeers);
         res.json(newPeers);
       }, net);
     } else {
-      console.debug("Get peers by cache '%s'", net);
+      debug("Get peers by cache '%s' ...", net);
       res.send(r);
     }
   } else
@@ -841,8 +866,9 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
 app.use('/ext/getmasternodelist/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  const api_page = settings.get(net, 'api_page')
   // check if the getmasternodelist api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternodelist.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getmasternodelist.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
     const r = masternodesCache.get(net);
     if (r == undefined) {
       db.get_masternodes(function(masternodes) {
@@ -852,11 +878,11 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
           delete masternodes[i]['_doc']['__v'];
         }
         masternodesCache.set(net, masternodes);
-        console.debug("Cached masternodes '%s'", net);
+        debug("Cached masternodes '%s' %o", net, masternodes);
         res.send(masternodes);
       }, net);
     } else {
-      console.debug("Get masternodes by cache '%s'", net);
+      debug("Get masternodes by cache '%s' ...", net);
       res.send(r)
     }
   } else
@@ -867,8 +893,9 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
 app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  const api_page = settings.get(net, 'api_page')
   // check if the getmasternoderewards api is enabled
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternoderewards.enabled == true) {
+  if (api_page.enabled == true && api_page.public_apis.ext.getmasternoderewards.enabled == true) {
     db.get_masternode_rewards(req.params.hash, req.params.since, function(rewards) {
       if (rewards != null) {
         // loop through the tx list to fix vout values and remove unnecessary data such as the always empty vin array and the mongo _id and __v keys
@@ -895,7 +922,8 @@ app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
 app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true && settings.api_page.public_apis.ext.getmasternoderewardstotal.enabled == true) {
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.ext.getmasternoderewardstotal.enabled == true) {
     db.get_masternode_rewards_totals(req.params.hash, req.params.since, function(total_rewards) {
       if (total_rewards != null) {
         // return the total of masternode rewards
@@ -915,14 +943,14 @@ app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
     db.get_network_chart_data(function(data) {
       if (data) {
         networkChartCache.set(net, data);
-        console.debug("Cached network chart '%s'", net);
+        debug("Cached network chart '%s' %o", net, data);
         res.send(data);
       } else {
         res.send();
       }
     }, net);
   } else {
-    console.debug("Get network chart by cache '%s'", net);
+    debug("Get network chart by cache '%s' ...", net);
     res.send(r);
   }
 });
@@ -945,11 +973,11 @@ var market_data = [];
 var market_count = 0;
 
 // check if markets are enabled
-if (settings.markets_page.enabled == true) {
+if (markets_page.enabled == true) {
   // dynamically populate market data
-  Object.keys(settings.markets_page.exchanges).forEach(function (key, index, map) {
+  Object.keys(markets_page.exchanges).forEach(function (key, index, map) {
     // check if market is enabled via settings
-    if (settings.markets_page.exchanges[key].enabled == true) {
+    if (markets_page.exchanges[key].enabled == true) {
       // check if market is installed/supported
       if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
         // load market file
@@ -957,9 +985,9 @@ if (settings.markets_page.enabled == true) {
         // save market_name and market_logo from market file to settings
         eval('market_data.push({id: "' + key + '", name: "' + (exMarket.market_name == null ? '' : exMarket.market_name) + '", alt_name: "' + (exMarket.market_name_alt == null ? '' : exMarket.market_name_alt) + '", logo: "' + (exMarket.market_logo == null ? '' : exMarket.market_logo) + '", alt_logo: "' + (exMarket.market_logo_alt == null ? '' : exMarket.market_logo_alt) + '", trading_pairs: []});');
         // loop through all trading pairs for this market
-        for (var i = 0; i < settings.markets_page.exchanges[key].trading_pairs.length; i++) {
+        for (var i = 0; i < markets_page.exchanges[key].trading_pairs.length; i++) {
           var isAlt = false;
-          var pair = settings.markets_page.exchanges[key].trading_pairs[i].toUpperCase(); // ensure trading pair setting is always uppercase
+          var pair = markets_page.exchanges[key].trading_pairs[i].toUpperCase(); // ensure trading pair setting is always uppercase
           var coin_symbol = pair.split('/')[0];
           var pair_symbol = pair.split('/')[1];
 
@@ -1015,12 +1043,13 @@ if (settings.markets_page.enabled == true) {
   });
 
   // Fix default exchange case
-  settings.markets_page.default_exchange.exchange_name = settings.markets_page.default_exchange.exchange_name.toLowerCase();
-  settings.markets_page.default_exchange.trading_pair = settings.markets_page.default_exchange.trading_pair.toUpperCase();
+  // TODO: Check if required.
+  markets_page.default_exchange.exchange_name = markets_page.default_exchange.exchange_name.toLowerCase();
+  markets_page.default_exchange.trading_pair = markets_page.default_exchange.trading_pair.toUpperCase();
 
-  var ex = settings.markets_page.exchanges;
-  var ex_name = settings.markets_page.default_exchange.exchange_name;
-  var ex_pair = settings.markets_page.default_exchange.trading_pair;
+  var ex = markets_page.exchanges;
+  var ex_name = markets_page.default_exchange.exchange_name;
+  var ex_pair = markets_page.default_exchange.trading_pair;
   var ex_keys = Object.keys(ex);
   var ex_error = '';
 
@@ -1052,6 +1081,7 @@ if (settings.markets_page.enabled == true) {
     }
 
     // check if a valid and enabled market was found
+    // TODO: Check if required.
     if (new_default_index == -1) {
       // no valid markets found
       console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart the explorer to resolve the problem');
@@ -1061,17 +1091,18 @@ if (settings.markets_page.enabled == true) {
       // a valid and enabled market was found to replace the default
       console.log('WARNING: ' + ex_error + '. ' + 'Default exchange will be set to' + ': ' + ex_keys[new_default_index] + ' (' + ex[ex_keys[new_default_index]].trading_pairs[0] + ')');
       // set new default exchange data
-      settings.markets_page.default_exchange.exchange_name = ex_keys[new_default_index];
-      settings.markets_page.default_exchange.trading_pair = ex[ex_keys[new_default_index]].trading_pairs[0];
+      markets_page.default_exchange.exchange_name = ex_keys[new_default_index];
+      markets_page.default_exchange.trading_pair = ex[ex_keys[new_default_index]].trading_pairs[0];
     }
   }
 }
 
 // check if home_link_logo file exists
-if (!db.fs.existsSync(path.join('./public', settings.shared_pages.page_header.home_link_logo)))
-  settings.shared_pages.page_header.home_link_logo = '';
+if (!db.fs.existsSync(path.join('./public', shared_pages.page_header.home_link_logo)))
+  shared_pages.page_header.home_link_logo = '';
 
 // always disable the rpc masternode list cmd from public apis
+// TODO: Check if required.
 settings.api_page.public_apis.rpc.getmasternodelist = { "enabled": false };
 
 // locals
@@ -1085,45 +1116,30 @@ app.set('coins', settings.coins);
 app.set('default_wallet', settings.wallets[0].id);
 app.set('currencies', settings.currencies);
 app.set('cache', settings.cache);
-app.set('network_history', settings.network_history);
-app.set('shared_pages', settings.shared_pages);
-app.set('index_page', settings.index_page);
-app.set('block_page', settings.block_page);
-app.set('transaction_page', settings.transaction_page);
-app.set('address_page', settings.address_page);
-app.set('error_page', settings.error_page);
-app.set('masternodes_page', settings.masternodes_page);
-app.set('movement_page', settings.movement_page);
-app.set('network_page', settings.network_page);
-app.set('richlist_page', settings.richlist_page);
-app.set('markets_page', settings.markets_page);
-app.set('api_page', settings.api_page);
-app.set('claim_address_page', settings.claim_address_page);
 app.set('labels', settings.labels);
-app.set('api_cmds', settings.api_cmds);
 app.set('blockchain_specific', settings.blockchain_specific);
 
 // determine panel offset based on which panels are enabled
 var paneltotal = 5;
-var panelcount = (settings.shared_pages.page_header.panels.network_panel.enabled == true && settings.shared_pages.page_header.panels.network_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.difficulty_panel.enabled == true && settings.shared_pages.page_header.panels.difficulty_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.masternodes_panel.enabled == true && settings.shared_pages.page_header.panels.masternodes_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.coin_supply_panel.enabled == true && settings.shared_pages.page_header.panels.coin_supply_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.price_panel.enabled == true && settings.shared_pages.page_header.panels.price_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.market_cap_panel.enabled == true && settings.shared_pages.page_header.panels.market_cap_panel.display_order > 0 ? 1 : 0) +
-  (settings.shared_pages.page_header.panels.logo_panel.enabled == true && settings.shared_pages.page_header.panels.logo_panel.display_order > 0 ? 1 : 0);
+var panelcount = (shared_pages.page_header.panels.network_panel.enabled == true && shared_pages.page_header.panels.network_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.difficulty_panel.enabled == true && shared_pages.page_header.panels.difficulty_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.masternodes_panel.enabled == true && shared_pages.page_header.panels.masternodes_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.coin_supply_panel.enabled == true && shared_pages.page_header.panels.coin_supply_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.price_panel.enabled == true && shared_pages.page_header.panels.price_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.market_cap_panel.enabled == true && shared_pages.page_header.panels.market_cap_panel.display_order > 0 ? 1 : 0) +
+  (shared_pages.page_header.panels.logo_panel.enabled == true && shared_pages.page_header.panels.logo_panel.display_order > 0 ? 1 : 0);
 app.set('paneloffset', paneltotal + 1 - panelcount);
 
 // determine panel order
 var panel_order = new Array();
 
-if (settings.shared_pages.page_header.panels.network_panel.enabled == true && settings.shared_pages.page_header.panels.network_panel.display_order > 0) panel_order.push({name: 'network_panel', val: settings.shared_pages.page_header.panels.network_panel.display_order});
-if (settings.shared_pages.page_header.panels.difficulty_panel.enabled == true && settings.shared_pages.page_header.panels.difficulty_panel.display_order > 0) panel_order.push({name: 'difficulty_panel', val: settings.shared_pages.page_header.panels.difficulty_panel.display_order});
-if (settings.shared_pages.page_header.panels.masternodes_panel.enabled == true && settings.shared_pages.page_header.panels.masternodes_panel.display_order > 0) panel_order.push({name: 'masternodes_panel', val: settings.shared_pages.page_header.panels.masternodes_panel.display_order});
-if (settings.shared_pages.page_header.panels.coin_supply_panel.enabled == true && settings.shared_pages.page_header.panels.coin_supply_panel.display_order > 0) panel_order.push({name: 'coin_supply_panel', val: settings.shared_pages.page_header.panels.coin_supply_panel.display_order});
-if (settings.shared_pages.page_header.panels.price_panel.enabled == true && settings.shared_pages.page_header.panels.price_panel.display_order > 0) panel_order.push({name: 'price_panel', val: settings.shared_pages.page_header.panels.price_panel.display_order});
-if (settings.shared_pages.page_header.panels.market_cap_panel.enabled == true && settings.shared_pages.page_header.panels.market_cap_panel.display_order > 0) panel_order.push({name: 'market_cap_panel', val: settings.shared_pages.page_header.panels.market_cap_panel.display_order});
-if (settings.shared_pages.page_header.panels.logo_panel.enabled == true && settings.shared_pages.page_header.panels.logo_panel.display_order > 0) panel_order.push({name: 'logo_panel', val: settings.shared_pages.page_header.panels.logo_panel.display_order});
+if (shared_pages.page_header.panels.network_panel.enabled == true && shared_pages.page_header.panels.network_panel.display_order > 0) panel_order.push({name: 'network_panel', val: shared_pages.page_header.panels.network_panel.display_order});
+if (shared_pages.page_header.panels.difficulty_panel.enabled == true && shared_pages.page_header.panels.difficulty_panel.display_order > 0) panel_order.push({name: 'difficulty_panel', val: shared_pages.page_header.panels.difficulty_panel.display_order});
+if (shared_pages.page_header.panels.masternodes_panel.enabled == true && shared_pages.page_header.panels.masternodes_panel.display_order > 0) panel_order.push({name: 'masternodes_panel', val: shared_pages.page_header.panels.masternodes_panel.display_order});
+if (shared_pages.page_header.panels.coin_supply_panel.enabled == true && shared_pages.page_header.panels.coin_supply_panel.display_order > 0) panel_order.push({name: 'coin_supply_panel', val: shared_pages.page_header.panels.coin_supply_panel.display_order});
+if (shared_pages.page_header.panels.price_panel.enabled == true && shared_pages.page_header.panels.price_panel.display_order > 0) panel_order.push({name: 'price_panel', val: shared_pages.page_header.panels.price_panel.display_order});
+if (shared_pages.page_header.panels.market_cap_panel.enabled == true && shared_pages.page_header.panels.market_cap_panel.display_order > 0) panel_order.push({name: 'market_cap_panel', val: shared_pages.page_header.panels.market_cap_panel.display_order});
+if (shared_pages.page_header.panels.logo_panel.enabled == true && shared_pages.page_header.panels.logo_panel.display_order > 0) panel_order.push({name: 'logo_panel', val: shared_pages.page_header.panels.logo_panel.display_order});
 
 panel_order.sort(function(a,b) { return a.val - b.val; });
 
@@ -1144,13 +1160,17 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    // TODO: Make multi coin II
+    // TODO: Fix chain.
     var net = settings.getNet('mainnet')
     const coin = settings.getCoin(net)
+    const shared_pages = settings.get(net, 'shared_pages')
+    const error_page = settings.get(net, 'error_page')
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
       error: err,
+      shared_pages: shared_pages,
+      error_page: error_page,
       coin: coin,
       net: net
     });
@@ -1160,13 +1180,17 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  // TODO: Make multi coin II
+  // TODO: Fix chain.
   var net = settings.getNet('mainnet')
   const coin = settings.getCoin(net)
+  const shared_pages = settings.get(net, 'shared_pages')
+  const error_page = settings.get(net, 'error_page')
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
     error: {},
+    shared_pages: shared_pages,
+    error_page: error_page,
     coin: coin,
     net: net
   });

@@ -21,7 +21,7 @@ block content
         if (lastUpdatedDate != 0) {
           $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate));
 
-          if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
             $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
             enableTooltips();
           }
@@ -62,8 +62,8 @@ block content
             span.small.fw-normal  (#{coin.symbol})
         table#reward-summary.table.table-bordered.table-striped.summary-table.single-row-table(style='border-top:0;border-bottom:0;margin-top:0 !important;')
           - var theadClasses = [];
-          if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-            - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+          if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+            - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
           thead
             tr(class=theadClasses)
               th.text-center #{settings.locale.ex_supply}

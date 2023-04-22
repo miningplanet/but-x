@@ -4,7 +4,9 @@ const settings = require('../lib/settings');
 console.log('Compiling CSS.. Please wait..');
 
 // ensure the selected theme is properly installed
-fs.writeFile('./public/css/_theme-selector.scss', `$theme-name: "${settings.shared_pages.theme}";`, function (err) {
+// TODO: Fix chain.
+const shared_pages = settings.get('mainnet', 'shared_pages')
+fs.writeFile('./public/css/_theme-selector.scss', `$theme-name: "${shared_pages.theme}";`, function (err) {
   const sass = require('sass');
 
   // generate minified css from style.scss file

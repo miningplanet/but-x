@@ -1131,6 +1131,7 @@
       //          NOTE: This value is only used to build example api links on the api page from the /ext/getaddress api for example
       "address": "ELvb8AZRgHmdsDnD1HYFwbSY4UkPhoECCW"
     },
+    "show_electrum_api_section": true,
     // public_apis: a collection of settings that pertain to the public api command system
     //              NOTE: Disabling any of these apis will remove the api definition from the api page and will return a "This method is disabled" msg if the api endpoint is called.
     //                    Some public apis are used internally by the explorer such as the /ext/getlasttxs api and even if disabled from here the internal api will still continue to function.

@@ -8,21 +8,27 @@ var express = require('express'),
 
 function route_get_block(res, blockhash, coin, net) {
   lib.get_block(blockhash, function (block) {
+    const shared_pages = settings.get(net, 'shared_pages')
+    const block_page = settings.get(net, 'block_page')
+    const api_page = settings.get(net, 'api_page')
     if (block && block != 'There was an error. Check your console.') {
-      if (blockhash == settings.block_page.genesis_block)
+      if (blockhash == block_page.genesis_block)
         res.render(
           'block', 
           {
             active: 'block',
             block: block,
-            confirmations: settings.shared_pages.confirmations,
+            confirmations: shared_pages.confirmations,
             txs: 'GENESIS',
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Genesis Block',
+            shared_pages: shared_pages,
+            block_page: block_page,
+            api_page: api_page,
             coin: coin,
             net: net
           }
@@ -35,14 +41,17 @@ function route_get_block(res, blockhash, coin, net) {
               {
                 active: 'block',
                 block: block,
-                confirmations: settings.shared_pages.confirmations,
+                confirmations: shared_pages.confirmations,
                 txs: txs,
                 showSync: db.check_show_sync_message(),
                 customHash: get_file_timestamp('./public/css/custom.scss'),
                 styleHash: get_file_timestamp('./public/css/style.scss'),
-                themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                 page_title_logo: settings.getTitleLogo(net),
                 page_title_prefix: coin.name + ' Block ' + block.height,
+                shared_pages: shared_pages,
+                block_page: block_page,
+                api_page: api_page,
                 coin: coin,
                 net: net
               }
@@ -78,14 +87,16 @@ function route_get_block(res, blockhash, coin, net) {
                 {
                   active: 'block',
                   block: block,
-                  confirmations: settings.shared_pages.confirmations,
+                  confirmations: shared_pages.confirmations,
                   txs: ntxs,
                   showSync: db.check_show_sync_message(),
                   customHash: get_file_timestamp('./public/css/custom.scss'),
                   styleHash: get_file_timestamp('./public/css/style.scss'),
-                  themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                  themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                   page_title_logo: settings.getTitleLogo(net),
                   page_title_prefix: coin.name + ' Block ' + block.height,
+                  shared_pages: shared_pages,
+                  api_page: api_page,
                   coin: coin,
                   net: net
                 }
@@ -100,7 +111,7 @@ function route_get_block(res, blockhash, coin, net) {
 
         lib.get_blockhash(height, function(hash) {
           if (hash && hash != 'There was an error. Check your console.')
-            res.redirect('/block/' + hash);
+            res.redirect('/block/' + hash + '/' + net);
           else
             route_get_index(res, 'Block not found: ' + blockhash, net);
         }, net);
@@ -120,12 +131,18 @@ function get_file_timestamp(file_name) {
 /* GET functions */
 
 function route_get_tx(res, txid, coin, net) {
-  if (txid == settings.transaction_page.genesis_tx)
-    route_get_block(res, settings.block_page.genesis_block, coin, net);
+  const transaction_page = settings.get(net, 'transaction_page')
+  if (txid == transaction_page.genesis_tx) {
+    const block_page = settings.get(net, 'block_page')
+    route_get_block(res, block_page.genesis_block, coin, net);
+  }
   else {
     db.get_tx(txid, function(tx) {
       if (tx) {
         lib.get_blockcount(function(blockcount) {
+          const shared_pages = settings.get(net, 'shared_pages')
+          const address_page = settings.get(net, 'address_page')
+          const api_page = settings.get(net, 'api_page')
           if (settings.get(net, 'claim_address_page').enabled == true) {
             db.populate_claim_address_names(tx, function(tx) {
               res.render(
@@ -133,14 +150,18 @@ function route_get_tx(res, txid, coin, net) {
                 {
                   active: 'tx',
                   tx: tx,
-                  confirmations: settings.shared_pages.confirmations,
+                  confirmations: shared_pages.confirmations,
                   blockcount: (blockcount ? blockcount : 0),
                   showSync: db.check_show_sync_message(),
                   customHash: get_file_timestamp('./public/css/custom.scss'),
                   styleHash: get_file_timestamp('./public/css/style.scss'),
-                  themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                  themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                   page_title_logo: settings.getTitleLogo(net),
                   page_title_prefix: coin.name + ' Transaction ' + tx.txid,
+                  shared_pages: shared_pages,
+                  transaction_page: transaction_page,
+                  address_page: address_page,
+                  api_page: api_page,
                   coin: coin,
                   net: net
                 }
@@ -152,14 +173,18 @@ function route_get_tx(res, txid, coin, net) {
               {
                 active: 'tx',
                 tx: tx,
-                confirmations: settings.shared_pages.confirmations,
+                confirmations: shared_pages.confirmations,
                 blockcount: (blockcount ? blockcount : 0),
                 showSync: db.check_show_sync_message(),
                 customHash: get_file_timestamp('./public/css/custom.scss'),
                 styleHash: get_file_timestamp('./public/css/style.scss'),
-                themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                 page_title_logo: settings.getTitleLogo(net),
                 page_title_prefix: coin.name + ' Transaction ' + tx.txid,
+                shared_pages: shared_pages,
+                transaction_page: transaction_page,
+                address_page: address_page,
+                api_page: api_page,
                 coin: coin,
                 net: net
               }
@@ -182,6 +207,7 @@ function route_get_tx(res, txid, coin, net) {
                       blockindex: -1
                     };
 
+                    const api_page = settings.get(net, 'api_page')
                     if (settings.get(net, 'claim_address_page').enabled == true) {
                       db.populate_claim_address_names(utx, function(utx) {
                         res.render(
@@ -189,14 +215,18 @@ function route_get_tx(res, txid, coin, net) {
                           {
                             active: 'tx',
                             tx: utx,
-                            confirmations: settings.shared_pages.confirmations,
+                            confirmations: shared_pages.confirmations,
                             blockcount: -1,
                             showSync: db.check_show_sync_message(),
                             customHash: get_file_timestamp('./public/css/custom.scss'),
                             styleHash: get_file_timestamp('./public/css/style.scss'),
-                            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                             page_title_logo: settings.getTitleLogo(net),
                             page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                            shared_pages: shared_pages,
+                            transaction_page: transaction_page,
+                            address_page: address_page,
+                            api_page: api_page,
                             coin: coin,
                             net: net
                           }
@@ -208,14 +238,18 @@ function route_get_tx(res, txid, coin, net) {
                         {
                           active: 'tx',
                           tx: utx,
-                          confirmations: settings.shared_pages.confirmations,
+                          confirmations: shared_pages.confirmations,
                           blockcount: -1,
                           showSync: db.check_show_sync_message(),
                           customHash: get_file_timestamp('./public/css/custom.scss'),
                           styleHash: get_file_timestamp('./public/css/style.scss'),
-                          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                           page_title_logo: settings.getTitleLogo(net),
                           page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                          shared_pages: shared_pages,
+                          transaction_page: transaction_page,
+                          address_page: address_page,
+                          api_page: api_page,
                           coin: coin,
                           net: net
                         }
@@ -238,6 +272,7 @@ function route_get_tx(res, txid, coin, net) {
                           };
 
                           lib.get_blockcount(function(blockcount) {
+                            const api_page = settings.get(net, 'api_page')
                             if (settings.get(net, 'claim_address_page').enabled == true) {
                               db.populate_claim_address_names(utx, function(utx) {
                                 res.render(
@@ -245,14 +280,18 @@ function route_get_tx(res, txid, coin, net) {
                                   {
                                     active: 'tx',
                                     tx: utx,
-                                    confirmations: settings.shared_pages.confirmations,
+                                    confirmations: shared_pages.confirmations,
                                     blockcount: (blockcount ? blockcount : 0),
                                     showSync: db.check_show_sync_message(),
                                     customHash: get_file_timestamp('./public/css/custom.scss'),
                                     styleHash: get_file_timestamp('./public/css/style.scss'),
-                                    themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                                    themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                                     page_title_logo: settings.getTitleLogo(net),
                                     page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                                    shared_pages: shared_pages,
+                                    transaction_page: transaction_page,
+                                    address_page: address_page,
+                                    api_page: api_page,
                                     coin: coin,
                                     net: net
                                   }
@@ -264,14 +303,18 @@ function route_get_tx(res, txid, coin, net) {
                                 {
                                   active: 'tx',
                                   tx: utx,
-                                  confirmations: settings.shared_pages.confirmations,
+                                  confirmations: shared_pages.confirmations,
                                   blockcount: (blockcount ? blockcount : 0),
                                   showSync: db.check_show_sync_message(),
                                   customHash: get_file_timestamp('./public/css/custom.scss'),
                                   styleHash: get_file_timestamp('./public/css/style.scss'),
-                                  themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                                  themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                                   page_title_logo: settings.getTitleLogo(net),
                                   page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                                  shared_pages: shared_pages,
+                                  transaction_page: transaction_page,
+                                  address_page: address_page,
+                                  api_page: api_page,
                                   coin: coin,
                                   net: net
                                 }
@@ -295,6 +338,7 @@ function route_get_tx(res, txid, coin, net) {
                       };
 
                       lib.get_blockcount(function(blockcount) {
+                        const api_page = settings.get(net, 'api_page')
                         if (settings.get(net, 'claim_address_page').enabled == true) {
                           db.populate_claim_address_names(utx, function(utx) {
                             res.render(
@@ -302,14 +346,18 @@ function route_get_tx(res, txid, coin, net) {
                               {
                                 active: 'tx',
                                 tx: utx,
-                                confirmations: settings.shared_pages.confirmations,
+                                confirmations: shared_pages.confirmations,
                                 blockcount: (blockcount ? blockcount : 0),
                                 showSync: db.check_show_sync_message(),
                                 customHash: get_file_timestamp('./public/css/custom.scss'),
                                 styleHash: get_file_timestamp('./public/css/style.scss'),
-                                themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                                 page_title_logo: settings.getTitleLogo(net),
                                 page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                                shared_pages: shared_pages,
+                                transaction_page: transaction_page,
+                                address_page: address_page,
+                                api_page: api_page,
                                 coin: coin,
                                 net: net
                               }
@@ -321,14 +369,18 @@ function route_get_tx(res, txid, coin, net) {
                             {
                               active: 'tx',
                               tx: utx,
-                              confirmations: settings.shared_pages.confirmations,
+                              confirmations: shared_pages.confirmations,
                               blockcount: (blockcount ? blockcount : 0),
                               showSync: db.check_show_sync_message(),
                               customHash: get_file_timestamp('./public/css/custom.scss'),
                               styleHash: get_file_timestamp('./public/css/style.scss'),
-                              themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                              themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                               page_title_logo: settings.getTitleLogo(net),
                               page_title_prefix: coin.name + ' Transaction ' + utx.txid,
+                              shared_pages: shared_pages,
+                              transaction_page: transaction_page,
+                              address_page: address_page,
+                              api_page: api_page,
                               coin: coin,
                               net: net
                             }
@@ -349,7 +401,10 @@ function route_get_tx(res, txid, coin, net) {
 
 function route_get_index(res, error, net='mainnet') {
   const coin = settings.getCoin(net)
-  if (settings.index_page.page_header.show_last_updated == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const index_page = settings.get(net, 'index_page')
+  const api_page = settings.get(net, 'api_page')
+  if (index_page.page_header.show_last_updated == true) {
     // lookup last updated date
     db.get_stats(coin.name, function (stats) {
       res.render(
@@ -361,9 +416,12 @@ function route_get_index(res, error, net='mainnet') {
           showSync: db.check_show_sync_message(),
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
           page_title_logo: settings.getTitleLogo(net),
           page_title_prefix: coin.name + ' Explorer',
+          shared_pages: shared_pages,
+          index_page: index_page,
+          api_page: api_page,
           coin: coin,
           net: net
         }
@@ -380,9 +438,12 @@ function route_get_index(res, error, net='mainnet') {
         showSync: db.check_show_sync_message(),
         customHash: get_file_timestamp('./public/css/custom.scss'),
         styleHash: get_file_timestamp('./public/css/style.scss'),
-        themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+        themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
         page_title_logo: settings.getTitleLogo(net),
         page_title_prefix: coin.name + ' Explorer',
+        shared_pages: shared_pages,
+        index_page: index_page,
+        api_page: api_page,
         coin: coin,
         net: net
       }
@@ -392,10 +453,14 @@ function route_get_index(res, error, net='mainnet') {
 
 function route_get_address(res, hash, coin, net='mainnet') {
   net = settings.getNet(net)
+  const shared_pages = settings.get(net, 'shared_pages')
+  const address_page = settings.get(net, 'address_page')
+  const claim_address_page = settings.get(net, 'claim_address_page')
   // check if trying to load a special address
-  if (hash != null && hash.toLowerCase() != 'coinbase' && ((hash.toLowerCase() == 'hidden_address' && settings.address_page.enable_hidden_address_view == true) || (hash.toLowerCase() == 'unknown_address' && settings.address_page.enable_unknown_address_view == true) || (hash.toLowerCase() != 'hidden_address' && hash.toLowerCase() != 'unknown_address'))) {
+  if (hash != null && hash.toLowerCase() != 'coinbase' && ((hash.toLowerCase() == 'hidden_address' && address_page.enable_hidden_address_view == true) || (hash.toLowerCase() == 'unknown_address' && address_page.enable_unknown_address_view == true) || (hash.toLowerCase() != 'hidden_address' && hash.toLowerCase() != 'unknown_address'))) {
     // lookup address in local collection
     db.get_address(hash, false, function(address) {
+      const api_page = settings.get( net, 'api_page')
       if (address)
         res.render(
           'address',
@@ -405,9 +470,13 @@ function route_get_address(res, hash, coin, net='mainnet') {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Address ' + (address['name'] == null || address['name'] == '' ? address.a_id : address['name']),
+            shared_pages: shared_pages,
+            address_page: address_page,
+            api_page: api_page,
+            claim_address_page: claim_address_page,
             coin: coin,
             net: net
           }
@@ -421,7 +490,11 @@ function route_get_address(res, hash, coin, net='mainnet') {
 
 function route_get_claim_form(res, hash, coin, net='mainnet') {
   net = settings.getNet(net)
-  if (settings.get(net, 'claim_address_page').enabled == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const address_page = settings.get(net, 'address_page')
+  const claim_address_page = settings.get(net, 'claim_address_page')
+  
+  if (claim_address_page.enabled == true) {
     // check if a hash was passed in
     if (hash == null || hash == '') {
       // no hash so just load the claim page without an address
@@ -434,9 +507,12 @@ function route_get_claim_form(res, hash, coin, net='mainnet') {
           showSync: db.check_show_sync_message(),
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
           page_title_logo: settings.getTitleLogo(net),
           page_title_prefix: coin.name + ' Claim Wallet Address',
+          shared_pages: shared_pages,
+          address_page: address_page,
+          claim_address_page: claim_address_page,
           coin: coin,
           net: net
         }
@@ -454,9 +530,12 @@ function route_get_claim_form(res, hash, coin, net='mainnet') {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Claim Wallet Address ' + hash,
+            shared_pages: shared_pages,
+            address_page: address_page,
+            claim_address_page: claim_address_page,
             coin: coin,
             net: net
           }
@@ -483,8 +562,9 @@ router.get('/testnet', function(req, res) {
 router.get('/info/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.api_page.enabled == true) {
-    // load the api page
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true) {  
+    const shared_pages = settings.get(net, 'shared_pages')
     res.render(
       'info',
       { // req.headers.host
@@ -493,11 +573,14 @@ router.get('/info/:net?', function(req, res) {
         showSync: db.check_show_sync_message(),
         customHash: get_file_timestamp('./public/css/custom.scss'),
         styleHash: get_file_timestamp('./public/css/style.scss'),
-        themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+        themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
         page_title_logo: settings.getTitleLogo(net),
         page_title_prefix: coin.name + ' Public API ' + net,
         coin: coin,
-        net: net
+        net: net,
+        shared_pages: shared_pages,
+        api_page: api_page,
+        api_cmds: settings.get(net, 'api_cmds')
       }
     );
   } else {
@@ -508,15 +591,17 @@ router.get('/info/:net?', function(req, res) {
 router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  const shared_pages = settings.get(net, 'shared_pages')
+  const markets_page = settings.get(net, 'markets_page')
 
   // ensure markets page is enabled
-  if (settings.markets_page.enabled == true) {
+  if (markets_page.enabled == true) {
     var market_id = req.params['market'];
     var coin_symbol = req.params['coin_symbol'];
     var pair_symbol = req.params['pair_symbol'];
 
     // check if the market and trading pair exists and market is enabled in settings.json
-    if (settings.markets_page.exchanges[market_id] != null && settings.markets_page.exchanges[market_id].enabled == true && settings.markets_page.exchanges[market_id].trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
+    if (markets_page.exchanges[market_id] != null && markets_page.exchanges[market_id].enabled == true && markets_page.exchanges[market_id].trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
       // lookup market data
       db.get_market(market_id, coin_symbol, pair_symbol, function(data) {
         // load market data
@@ -547,7 +632,7 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
         var referal = market_data.referal == null ? '' : market_data.referal;
 
         // check if markets page should show last updated date
-        if (settings.markets_page.page_header.show_last_updated == true) {
+        if (markets_page.page_header.show_last_updated == true) {
           // lookup last updated date
           db.get_stats(coin.name, function (stats) {
             res.render(
@@ -569,9 +654,11 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
                 showSync: db.check_show_sync_message(),
                 customHash: get_file_timestamp('./public/css/custom.scss'),
                 styleHash: get_file_timestamp('./public/css/style.scss'),
-                themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                 page_title_logo: settings.getTitleLogo(net),
                 page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
+                shared_pages: shared_pages,
+                markets_page: markets_page,
                 coin: coin,
                 net: net
               }
@@ -598,9 +685,11 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
               showSync: db.check_show_sync_message(),
               customHash: get_file_timestamp('./public/css/custom.scss'),
               styleHash: get_file_timestamp('./public/css/style.scss'),
-              themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+              themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
               page_title_logo: settings.getTitleLogo(net),
               page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
+              shared_pages: shared_pages,
+              markets_page: markets_page,
               coin: coin,
               net: net
             }
@@ -620,7 +709,10 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
 router.get('/richlist/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.richlist_page.enabled == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const richlist_page = settings.get(net, 'richlist_page')
+  const claim_address_page = settings.get(net, 'claim_address_page')
+  if (richlist_page.enabled == true) {
     db.get_stats(coin.name, function (stats) {
       db.get_richlist(coin.name, function(richlist) {
         if (richlist) {
@@ -638,13 +730,16 @@ router.get('/richlist/:net?', function(req, res) {
                 distc: distribution.t_51_75,
                 distd: distribution.t_76_100,
                 diste: distribution.t_101plus,
-                last_updated: (settings.richlist_page.page_header.show_last_updated == true ? stats.richlist_last_updated : null),
+                last_updated: (richlist_page.page_header.show_last_updated == true ? stats.richlist_last_updated : null),
                 showSync: db.check_show_sync_message(),
                 customHash: get_file_timestamp('./public/css/custom.scss'),
                 styleHash: get_file_timestamp('./public/css/style.scss'),
-                themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
                 page_title_logo: settings.getTitleLogo(net),
                 page_title_prefix: 'Top ' + coin.name + ' Holders',
+                shared_pages: shared_pages,
+                claim_address_page: claim_address_page,
+                richlist_page: richlist_page,
                 coin: coin,
                 net: net
               }
@@ -665,8 +760,11 @@ router.get('/richlist/:net?', function(req, res) {
 router.get('/movement/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.movement_page.enabled == true) {
-    if (settings.movement_page.page_header.show_last_updated == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const movement_page = settings.get(net, 'movement_page')
+  const api_page = settings.get(net, 'api_page')
+  if (movement_page.enabled == true) {
+    if (movement_page.page_header.show_last_updated == true) {
       // lookup last updated date
       db.get_stats(coin.name, function (stats) {
         res.render(
@@ -677,9 +775,12 @@ router.get('/movement/:net?', function(req, res) {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Coin Movements',
+            shared_pages: shared_pages,
+            movement_page: movement_page,
+            api_page: api_page,
             coin: coin,
             net: net
           }
@@ -695,9 +796,12 @@ router.get('/movement/:net?', function(req, res) {
           showSync: db.check_show_sync_message(),
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
           page_title_logo: settings.getTitleLogo(net),
           page_title_prefix: coin.name + ' Coin Movements',
+          shared_pages: shared_pages,
+          movement_page: movement_page,
+          api_page: api_page,
           coin: coin,
           net: net
         }
@@ -712,8 +816,10 @@ router.get('/movement/:net?', function(req, res) {
 router.get('/network/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.network_page.enabled == true) {
-    if (settings.network_page.page_header.show_last_updated == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const network_page = settings.get(net, 'network_page')
+  if (network_page.enabled == true) {
+    if (network_page.page_header.show_last_updated == true) {
       // lookup last updated date
       db.get_stats(coin.name, function (stats) {
         res.render(
@@ -724,9 +830,11 @@ router.get('/network/:net?', function(req, res) {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Network Peers',
+            shared_pages: shared_pages,
+            network_page: network_page,
             coin: coin,
             net: net
           }
@@ -742,9 +850,11 @@ router.get('/network/:net?', function(req, res) {
           showSync: db.check_show_sync_message(),
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
           page_title_logo: settings.getTitleLogo(net),
           page_title_prefix: coin.name + ' Network Peers',
+          shared_pages: shared_pages,
+          network_page: network_page,
           coin: coin,
           net: net
         }
@@ -760,8 +870,11 @@ router.get('/network/:net?', function(req, res) {
 router.get('/masternodes/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  if (settings.masternodes_page.enabled == true) {
-    if (settings.masternodes_page.page_header.show_last_updated == true) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const masternodes_page = settings.get(net, 'masternodes_page')
+  const claim_address_page = settings.get(net, 'claim_address_page')
+  if (masternodes_page.enabled == true) {
+    if (masternodes_page.page_header.show_last_updated == true) {
       // lookup last updated date
       db.get_stats(coin.name, function (stats) {
         res.render(
@@ -772,9 +885,12 @@ router.get('/masternodes/:net?', function(req, res) {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Smartnodes',
+            shared_pages: shared_pages,
+            masternodes_page: masternodes_page,
+            claim_address_page: claim_address_page,
             coin: coin,
             net: net
           }
@@ -790,9 +906,12 @@ router.get('/masternodes/:net?', function(req, res) {
           showSync: db.check_show_sync_message(),
           customHash: get_file_timestamp('./public/css/custom.scss'),
           styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
           page_title_logo: settings.getTitleLogo(net),
           page_title_prefix: coin.name + ' Smartnodes',
+          shared_pages: shared_pages,
+          masternodes_page: masternodes_page,
+          claim_address_page: claim_address_page,
           coin: coin,
           net: net
         }
@@ -824,6 +943,7 @@ router.get('/reward/:net?', function(req, res) {
             return 0;
         });
 
+        const shared_pages = settings.get(net, 'shared_pages')
         res.render(
           'reward',
           {
@@ -835,9 +955,10 @@ router.get('/reward/:net?', function(req, res) {
             showSync: db.check_show_sync_message(),
             customHash: get_file_timestamp('./public/css/custom.scss'),
             styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + settings.shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
             page_title_logo: settings.getTitleLogo(net),
             page_title_prefix: coin.name + ' Reward/Voting Details',
+            shared_pages: shared_pages,
             coin: coin,
             net: net
           }
@@ -883,12 +1004,15 @@ router.get('/address/:hash/:net?', function(req, res) {
 router.post('/search/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
-  if (settings.shared_pages.page_header.search.enabled == true) {
+  if (shared_pages.page_header.search.enabled == true) {
     var query = req.body.search.trim();
 
     if (query.length == 64) {
-      if (query == settings.transaction_page.genesis_tx)
-        res.redirect('/block/' + settings.block_page.genesis_block + '/' + net);
+      const transaction_page = settings.get(net, 'transaction_page')
+      if (query == transaction_page.genesis_tx) {
+        const block_page = settings.get(net, 'block_page')
+        res.redirect('/block/' + block_page.genesis_block + '/' + net);
+      }
       else {
         db.get_tx(query, function(tx) {
           if (tx)

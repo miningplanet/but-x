@@ -3,28 +3,28 @@ extends layout
 block content
   include ./includes/common.pug
   - var theadClasses = [];
-  if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   script.
     $(document).ready(function() {
       $('span#timestampCol').html(format_unixtime(#{tx.timestamp}).replace(' UTC', ''));
 
-      if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+      if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
         $('span#timestampCol').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(#{tx.timestamp}, true));
         enableTooltips();
       }
     });
   .col-xs-12.col-md-12
-    if settings.transaction_page.page_header.show_img == true || settings.transaction_page.page_header.show_title == true || settings.transaction_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (settings.transaction_page.page_header.show_img == true && settings.transaction_page.page_header.show_title == true && settings.transaction_page.page_header.show_description == true ? 'flex-start' : 'center'))
-        if settings.transaction_page.page_header.show_img == true
+    if transaction_page.page_header.show_img == true || transaction_page.page_header.show_title == true || transaction_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (transaction_page.page_header.show_img == true && transaction_page.page_header.show_title == true && transaction_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if transaction_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)
         #page-title-container
-          if settings.transaction_page.page_header.show_title == true
+          if transaction_page.page_header.show_title == true
             h3#page-title #{settings.locale.tx_title.replace('{1}', coin.name)}
-          if settings.transaction_page.page_header.show_description == true
-            if settings.transaction_page.page_header.show_title != true
+          if transaction_page.page_header.show_description == true
+            if transaction_page.page_header.show_title != true
               #page-title-container
                 .sub-page-header.text-muted=settings.locale.tx_description.replace('{1}', coin.name).replace('{2}', tx.blockindex)
             else
@@ -33,7 +33,7 @@ block content
     .card.card-default.border-0.cardSpacer
       .card-header
         strong=settings.locale.tx_hash + ': ' + tx.txid
-        if settings.api_page.public_apis.rpc.getrawtransaction.enabled == true
+        if api_page.public_apis.rpc.getrawtransaction.enabled == true
           a.d-none.d-md-inline(href=`/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
       table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -44,7 +44,7 @@ block content
             td.d-md-table-cell
               a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockhash}
           tr
-            if settings.transaction_page.show_op_return == true
+            if transaction_page.show_op_return == true
               td='OP_RETURN'
               td.breakWord #{tx.op_return}
           tr
@@ -95,13 +95,13 @@ block content
                                 =address.claim_name
                             include ./includes/rl_labels.pug
                           else if address.addresses == 'hidden_address'
-                            if settings.address_page.enable_hidden_address_view == true
+                            if address_page.enable_hidden_address_view == true
                               a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_sender
                             else
                               =settings.locale.hidden_sender
                           else
-                            if settings.address_page.enable_unknown_address_view == true
+                            if address_page.enable_unknown_address_view == true
                               a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_sender
                             else
@@ -139,13 +139,13 @@ block content
                       else if address.amount > 0
                         td.addressCol
                           if address.addresses == 'hidden_address'
-                            if settings.address_page.enable_hidden_address_view == true
+                            if address_page.enable_hidden_address_view == true
                               a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_recipient
                             else
                               =settings.locale.hidden_recipient
                           else
-                            if settings.address_page.enable_unknown_address_view == true
+                            if address_page.enable_unknown_address_view == true
                               a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_recipient
                             else
@@ -155,13 +155,13 @@ block content
                       else
                         td(colspan='2')
                           if address.addresses == 'hidden_address'
-                            if settings.address_page.enable_hidden_address_view == true
+                            if address_page.enable_hidden_address_view == true
                               a.breakWord(href='/address/hidden_address/' + net)
                                 =settings.locale.hidden_recipient
                             else
                               =settings.locale.hidden_recipient
                           else
-                            if settings.address_page.enable_unknown_address_view == true
+                            if address_page.enable_unknown_address_view == true
                               a.breakWord(href='/address/unknown_address/' + net)
                                 =settings.locale.unknown_recipient
                             else

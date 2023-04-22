@@ -24,9 +24,9 @@ block content
         url: '/ext/getnetworkpeers/#{net}',
         dataType: 'json'
       }).done(function(peers) {
-        var setting_txPerPage = parseInt("#{settings.network_page.connections_table.items_per_page}");
-        var setting_con_port_filter = "#{settings.network_page.connections_table.port_filter}";
-        var setting_con_hide_protocols = !{JSON.stringify(settings.network_page.connections_table.hide_protocols)};
+        var setting_txPerPage = parseInt("#{network_page.connections_table.items_per_page}");
+        var setting_con_port_filter = "#{network_page.connections_table.port_filter}";
+        var setting_con_hide_protocols = !{JSON.stringify(network_page.connections_table.hide_protocols)};
         var connectionRows = JSON.parse(JSON.stringify(peers));
 
         if (setting_con_port_filter == null || setting_con_port_filter == '')
@@ -75,7 +75,7 @@ block content
           lengthChange: true,
           processing: true,
           iDisplayLength: setting_txPerPage,
-          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(settings.network_page.connections_table.page_length_options)}),
+          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(network_page.connections_table.page_length_options)}),
           scrollX: true,
           language: {
             paginate: {
@@ -109,11 +109,11 @@ block content
           columns: columns
         });
 
-        setting_txPerPage = parseInt("#{settings.network_page.addnodes_table.items_per_page}");
+        setting_txPerPage = parseInt("#{network_page.addnodes_table.items_per_page}");
 
         var addNodeRows = [];
-        var setting_add_port_filter = "#{settings.network_page.addnodes_table.port_filter}";
-        var setting_add_hide_protocols = !{JSON.stringify(settings.network_page.addnodes_table.hide_protocols)};
+        var setting_add_port_filter = "#{network_page.addnodes_table.port_filter}";
+        var setting_add_hide_protocols = !{JSON.stringify(network_page.addnodes_table.hide_protocols)};
         var addNodePeers = JSON.parse(JSON.stringify(peers));
 
         if (setting_add_port_filter == null || setting_add_port_filter == '')
@@ -146,7 +146,7 @@ block content
           lengthChange: true,
           processing: true,
           iDisplayLength: setting_txPerPage,
-          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(settings.network_page.addnodes_table.page_length_options)}),
+          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(network_page.addnodes_table.page_length_options)}),
           scrollX: false,
           language: {
             paginate: {
@@ -169,11 +169,11 @@ block content
           ]
         });
 
-        setting_txPerPage = parseInt("#{settings.network_page.onetry_table.items_per_page}");
+        setting_txPerPage = parseInt("#{network_page.onetry_table.items_per_page}");
 
         var oneTryRows = [];
-        var setting_one_port_filter = "#{settings.network_page.onetry_table.port_filter}";
-        var setting_one_hide_protocols = !{JSON.stringify(settings.network_page.onetry_table.hide_protocols)};
+        var setting_one_port_filter = "#{network_page.onetry_table.port_filter}";
+        var setting_one_hide_protocols = !{JSON.stringify(network_page.onetry_table.hide_protocols)};
 
         if (setting_one_port_filter == null || setting_one_port_filter == '')
           setting_one_port_filter = '-1';
@@ -205,7 +205,7 @@ block content
           lengthChange: true,
           processing: true,
           iDisplayLength: setting_txPerPage,
-          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(settings.network_page.onetry_table.page_length_options)}),
+          lengthMenu: generateLengthMenu(setting_txPerPage, !{JSON.stringify(network_page.onetry_table.page_length_options)}),
           scrollX: false,
           language: {
             paginate: {
@@ -231,13 +231,13 @@ block content
       $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
       });
 
-      if ('#{settings.network_page.page_header.show_last_updated}' == 'true') {
+      if ('#{network_page.page_header.show_last_updated}' == 'true') {
         var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)};
 
         if (lastUpdatedDate != 0) {
           $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate));
 
-          if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
             $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
             enableTooltips();
           }
@@ -266,30 +266,30 @@ block content
       });
     });
   - var theadClasses = [];
-  if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
+  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-md-12.cardSpacer
     .container
-      if settings.network_page.page_header.show_img == true || settings.network_page.page_header.show_title == true || settings.network_page.page_header.show_last_updated == true || settings.network_page.page_header.show_description == true
-        #page-header-container(style='align-items:' + (settings.network_page.page_header.show_img == true && settings.network_page.page_header.show_title == true && settings.network_page.page_header.show_last_updated == true && settings.network_page.page_header.show_description == true ? 'flex-start' : 'center'))
-          if settings.network_page.page_header.show_img == true
+      if network_page.page_header.show_img == true || network_page.page_header.show_title == true || network_page.page_header.show_last_updated == true || network_page.page_header.show_description == true
+        #page-header-container(style='align-items:' + (network_page.page_header.show_img == true && network_page.page_header.show_title == true && network_page.page_header.show_last_updated == true && network_page.page_header.show_description == true ? 'flex-start' : 'center'))
+          if network_page.page_header.show_img == true
             #header-img-container
               img#header-img(src=page_title_logo)
           #page-title-container
-            if settings.network_page.page_header.show_title == true
+            if network_page.page_header.show_title == true
               h3#page-title #{settings.locale.net_title.replace('{1}', coin.name)}
-            if settings.network_page.page_header.show_last_updated == true
-              if settings.network_page.page_header.show_title != true && settings.network_page.page_header.show_description != true
+            if network_page.page_header.show_last_updated == true
+              if network_page.page_header.show_title != true && network_page.page_header.show_description != true
                 #page-title-container
                   .sub-page-header
                     span.fw-bold=settings.locale.last_updated + ':'
                     span.text-muted#lastUpdatedDate
               else
-                .sub-page-header(style='margin-bottom:' + (settings.network_page.page_header.show_description == true ? '5' : '0') + 'px')
+                .sub-page-header(style='margin-bottom:' + (network_page.page_header.show_description == true ? '5' : '0') + 'px')
                   span.fw-bold=settings.locale.last_updated + ':'
                   span.text-muted#lastUpdatedDate
-            if settings.network_page.page_header.show_description == true
-              if settings.network_page.page_header.show_title != true && settings.network_page.page_header.show_last_updated != true
+            if network_page.page_header.show_description == true
+              if network_page.page_header.show_title != true && network_page.page_header.show_last_updated != true
                 #page-title-container
                   .sub-page-header.text-muted=settings.locale.net_description.replace('{1}', coin.name)
               else
@@ -307,7 +307,7 @@ block content
             thead
               tr(class=theadClasses)
                 th.text-center IP:port
-                // if settings.network_page.connections_table.port_filter != '-1'
+                // if network_page.connections_table.port_filter != '-1'
                   th.text-center='Port'
                 th.text-center Protocol
                 th.text-center.full #{settings.locale.net_version}

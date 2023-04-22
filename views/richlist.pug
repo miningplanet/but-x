@@ -3,7 +3,7 @@ extends layout
 block content
   include ./includes/common.pug
 
-  if settings.richlist_page.wealth_distribution.show_distribution_chart == true
+  if richlist_page.wealth_distribution.show_distribution_chart == true
     script.
       $(document).ready(function() {
         var data = [
@@ -14,11 +14,11 @@ block content
           ['101+', !{diste.percent}]
         ];
         var burned = '!{burned}';
-        if ('#{settings.richlist_page.burned_coins.include_burned_coins_in_distribution}' == 'true' && burned != 'null' && burned != '' && burned != '0')
+        if ('#{richlist_page.burned_coins.include_burned_coins_in_distribution}' == 'true' && burned != 'null' && burned != '' && burned != '0')
           data.push(['Burned Coins', parseFloat(((burned / 100000000) / !{stats.supply}) * 100)]);
         var piePlot = $.jqplot('pieChart', [data],
           {
-            seriesColors: !{JSON.stringify(settings.richlist_page.wealth_distribution.colors)},
+            seriesColors: !{JSON.stringify(richlist_page.wealth_distribution.colors)},
             series: [{
               renderer: $.jqplot.PieRenderer,
               rendererOptions: {
@@ -43,13 +43,13 @@ block content
           }
         );
 
-        if ('#{settings.richlist_page.page_header.show_last_updated}' == 'true') {
+        if ('#{richlist_page.page_header.show_last_updated}' == 'true') {
           var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)};
 
           if (lastUpdatedDate != 0) {
             $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate));
 
-            if (#{settings.shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+            if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
               $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
               enableTooltips();
             }
@@ -67,50 +67,50 @@ block content
         });
       });
   - var theadClasses = [];
-  if settings.shared_pages.table_header_bgcolor != null && settings.shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + settings.shared_pages.table_header_bgcolor);
-  if settings.richlist_page.page_header.show_img == true || settings.richlist_page.page_header.show_title == true || settings.richlist_page.page_header.show_last_updated == true || settings.richlist_page.page_header.show_description == true
+  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
+    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
+  if richlist_page.page_header.show_img == true || richlist_page.page_header.show_title == true || richlist_page.page_header.show_last_updated == true || richlist_page.page_header.show_description == true
     .row(style='margin: 0 0 5px 0;')
-      div(class=(settings.richlist_page.wealth_distribution.show_distribution_table == true || settings.richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12' : 'col-12'))
+      div(class=(richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12' : 'col-12'))
         .container
-          #page-header-container(style='align-items:' + (settings.richlist_page.page_header.show_img == true && settings.richlist_page.page_header.show_title == true && settings.richlist_page.page_header.show_last_updated == true && settings.richlist_page.page_header.show_description == true ? 'flex-start' : 'center'))
-            if settings.richlist_page.page_header.show_img == true
+          #page-header-container(style='align-items:' + (richlist_page.page_header.show_img == true && richlist_page.page_header.show_title == true && richlist_page.page_header.show_last_updated == true && richlist_page.page_header.show_description == true ? 'flex-start' : 'center'))
+            if richlist_page.page_header.show_img == true
               #header-img-container
                 img#header-img(src=page_title_logo)
             #page-title-container
-              if settings.richlist_page.page_header.show_title == true
+              if richlist_page.page_header.show_title == true
                 h3#page-title #{settings.locale.rl_title.replace('{1}', coin.name)}
-              if settings.richlist_page.page_header.show_last_updated == true
-                if settings.richlist_page.page_header.show_title != true && settings.richlist_page.page_header.show_description != true
+              if richlist_page.page_header.show_last_updated == true
+                if richlist_page.page_header.show_title != true && richlist_page.page_header.show_description != true
                   #page-title-container
                     .sub-page-header
                       span.fw-bold=settings.locale.last_updated + ':'
                       span.text-muted#lastUpdatedDate
                 else
-                  .sub-page-header(style='margin-bottom:' + (settings.richlist_page.page_header.show_description == true ? '5' : '0') + 'px')
+                  .sub-page-header(style='margin-bottom:' + (richlist_page.page_header.show_description == true ? '5' : '0') + 'px')
                     span.fw-bold=settings.locale.last_updated + ':'
                     span.text-muted#lastUpdatedDate
-              if settings.richlist_page.page_header.show_description == true
-                if settings.richlist_page.page_header.show_title != true && settings.richlist_page.page_header.show_last_updated != true
+              if richlist_page.page_header.show_description == true
+                if richlist_page.page_header.show_title != true && richlist_page.page_header.show_last_updated != true
                   #page-title-container
                     .sub-page-header.text-muted=settings.locale.rl_description.replace('{1}', coin.name)
                 else
                   .sub-page-header.text-muted=settings.locale.rl_description.replace('{1}', coin.name)
           .cardSpacer.clearfix
   .row(style='margin-left:0;margin-right:0;')
-    if settings.richlist_page.show_current_balance == true || settings.richlist_page.show_received_coins == true
-      div(style='padding: 0', class=(settings.richlist_page.wealth_distribution.show_distribution_table == true || settings.richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12 col-lg-8' : 'col-12'))
+    if richlist_page.show_current_balance == true || richlist_page.show_received_coins == true
+      div(style='padding: 0', class=(richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12 col-lg-8' : 'col-12'))
         .container
           ul.nav.nav-tabs(role='tablist')
-            if settings.richlist_page.show_current_balance == true
+            if richlist_page.show_current_balance == true
               li.nav-item(role='presentation')
-                a(class='nav-link' + (settings.richlist_page.show_current_balance == true ? ' active' : ''), href='#balance', aria-controls='balance', role='tab', data-bs-toggle='tab') #{settings.locale.rl_current_balance}
-            if settings.richlist_page.show_received_coins == true
+                a(class='nav-link' + (richlist_page.show_current_balance == true ? ' active' : ''), href='#balance', aria-controls='balance', role='tab', data-bs-toggle='tab') #{settings.locale.rl_current_balance}
+            if richlist_page.show_received_coins == true
               li.nav-item(role='presentation')
-                a(class='nav-link' + (!settings.richlist_page.show_current_balance ? ' active' : ''), href='#received', aria-controls='received', role='tab', data-bs-toggle='tab') #{settings.locale.rl_received_coins}
+                a(class='nav-link' + (!richlist_page.show_current_balance ? ' active' : ''), href='#received', aria-controls='received', role='tab', data-bs-toggle='tab') #{settings.locale.rl_received_coins}
         .tab-content
-          if settings.richlist_page.show_current_balance == true
-            #balance(class='container tab-pane' + (settings.richlist_page.show_current_balance == true ? ' active' : ''), style='margin-top:0;')
+          if richlist_page.show_current_balance == true
+            #balance(class='container tab-pane' + (richlist_page.show_current_balance == true ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
                 table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(id="rich" style='margin-bottom:0;', cellspacing='0')
                   thead
@@ -142,8 +142,8 @@ block content
                           span.decimal #{itemFixedParts[1]}
                         td.text-end #{percentParts[0]}.
                           span.decimal #{percentParts[1]}
-          if settings.richlist_page.show_received_coins == true
-            #received(class='container tab-pane' + (!settings.richlist_page.show_current_balance ? ' active' : ''), style='margin-top:0;')
+          if richlist_page.show_received_coins == true
+            #received(class='container tab-pane' + (!richlist_page.show_current_balance ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
                 table#rreceive.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
@@ -162,17 +162,17 @@ block content
                         td.text-center
                           =count
                         td.addressCol
-                          if settings.get(net, 'claim_address_page').enabled == false || address.name == null || address.name == ''
+                          if claim_address_page.enabled == false || address.name == null || address.name == ''
                             a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
                           else
                             a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.name}
                           include ./includes/rl_labels.pug
                         td.text-center #{itemFixedParts[0]}.
                           span.decimal #{itemFixedParts[1]}
-    if settings.richlist_page.wealth_distribution.show_distribution_table == true || settings.richlist_page.wealth_distribution.show_distribution_chart == true
-      div(class=(settings.richlist_page.show_received_coins == true || settings.richlist_page.show_current_balance == true ? 'col-xs-12 col-lg-4' : 'col-12'))
-        if settings.richlist_page.wealth_distribution.show_distribution_table == true
-          #summary-panel.card.card-default.border-0(style='margin-top:' + (settings.richlist_page.show_current_balance == true || settings.richlist_page.show_received_coins == true ? '34' : '0') + 'px;')
+    if richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true
+      div(class=(richlist_page.show_received_coins == true || richlist_page.show_current_balance == true ? 'col-xs-12 col-lg-4' : 'col-12'))
+        if richlist_page.wealth_distribution.show_distribution_table == true
+          #summary-panel.card.card-default.border-0(style='margin-top:' + (richlist_page.show_current_balance == true || richlist_page.show_received_coins == true ? '34' : '0') + 'px;')
             .card-header
               strong #{settings.locale.rl_wealth}
             table.table.table-hover.table-bordered.summary-table.right-border-0(style='margin-bottom:0;')
@@ -185,7 +185,7 @@ block content
               tbody
                 tr
                   td.fw-bold
-                    div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[0] + ';'))
+                    div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[0] + ';'))
                     span #{settings.locale.rl_top25}
                   - var total = Number(dista.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
@@ -197,7 +197,7 @@ block content
                     span.decimal #{percentParts[1]}
                 tr
                   td.fw-bold
-                    div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[1] + ';'))
+                    div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[1] + ';'))
                     span #{settings.locale.rl_top50}
                   - var total = Number(distb.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
@@ -209,7 +209,7 @@ block content
                     span.decimal #{percentParts[1]}
                 tr
                   td.fw-bold
-                    div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[2] + ';'))
+                    div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[2] + ';'))
                     span #{settings.locale.rl_top75}
                   - var total = Number(distc.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
@@ -221,7 +221,7 @@ block content
                     span.decimal #{percentParts[1]}
                 tr
                   td.fw-bold
-                    div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[3] + ';'))
+                    div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[3] + ';'))
                     span #{settings.locale.rl_top100}
                   - var total = Number(distd.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
@@ -244,7 +244,7 @@ block content
                     span.decimal #{percentParts[1]}
                 tr
                   td.fw-bold
-                    div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[4] + ';'))
+                    div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[4] + ';'))
                     span 101+
                   - var total = Number(diste.total).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
@@ -254,10 +254,10 @@ block content
                     span.decimal.breakWord #{totalParts[1]}
                   td.text-end #{percentParts[0]}.
                     span.decimal #{percentParts[1]}
-                if settings.richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0
+                if richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0
                   tr
                     td.fw-bold
-                      div.float-start.wealth-dist-color-box(style=('background-color:' + settings.richlist_page.wealth_distribution.colors[5] + ';'))
+                      div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[5] + ';'))
                       span Burned Coins
                     - var total = Number(burned / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                     - var totalParts = total.split(".");
@@ -270,13 +270,13 @@ block content
                 tr.text-end
                   td.fw-bold
                     span #{settings.locale.total}
-                  - var total = Number(parseFloat(dista.total) + parseFloat(distb.total) + parseFloat(distc.total) + parseFloat(distd.total) + parseFloat(diste.total) + (settings.richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? burned / 100000000 : 0)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+                  - var total = Number(parseFloat(dista.total) + parseFloat(distb.total) + parseFloat(distc.total) + parseFloat(distd.total) + parseFloat(diste.total) + (richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? burned / 100000000 : 0)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
-                  - var percent = (parseFloat(dista.percent) + parseFloat(distb.percent) + parseFloat(distc.percent) + parseFloat(distd.percent) + parseFloat(diste.percent) + parseFloat((settings.richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? ((burned / 100000000) / stats.supply) * 100 : 0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':false});
+                  - var percent = (parseFloat(dista.percent) + parseFloat(distb.percent) + parseFloat(distc.percent) + parseFloat(distd.percent) + parseFloat(diste.percent) + parseFloat((richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? ((burned / 100000000) / stats.supply) * 100 : 0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':false});
                   - var percentParts = percent.split(".");
                   td.text-end.fw-bold.breakWord #{totalParts[0]}.
                     span.decimal.breakWord #{totalParts[1]}
                   td.fw-bold.text-end #{percentParts[0]}.
                     span.decimal #{percentParts[1]}
-        if settings.richlist_page.wealth_distribution.show_distribution_chart == true
+        if richlist_page.wealth_distribution.show_distribution_chart == true
           div#pieChart(style="max-width:300px;max-height:305px;margin:0 auto;")
