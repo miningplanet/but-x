@@ -400,7 +400,7 @@ html(lang='en')
         }
         function update_network_charts() {
           $.ajax({
-            url: '/ext/getnetworkchartdata',
+            url: '/ext/getnetworkchartdata' + '/#{net}',
             success: function(result) {
               if (#{settings.get(net, 'network_history').enabled} == true && #{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) {
                 const ctxNethash = document.getElementById('nethashChart').getContext('2d');
