@@ -199,9 +199,6 @@ html(lang='en')
       }
       function fixFooterHeightAndPosition() {
         var screenWidth = $(window).outerWidth();
-
-
-
       }
       function fixSidebarHeight() {
         if ('#{shared_pages.page_footer.sticky_footer}' != 'true')
@@ -866,11 +863,11 @@ html(lang='en')
         $('#search-navbar-collapse').on('hidden.bs.collapse', function (e) {
         });
         if (#{showPanels} == true) {
-          hideShowPanel('#{settings.panel1}', 'pnlOne');
-          hideShowPanel('#{settings.panel2}', 'pnlTwo');
-          hideShowPanel('#{settings.panel3}', 'pnlThree');
-          hideShowPanel('#{settings.panel4}', 'pnlFour');
-          hideShowPanel('#{settings.panel5}', 'pnlFive');
+          hideShowPanel('#{settings.panel(1, net)}', 'pnlOne');
+          hideShowPanel('#{settings.panel(2, net)}', 'pnlTwo');
+          hideShowPanel('#{settings.panel(3, net)}', 'pnlThree');
+          hideShowPanel('#{settings.panel(4, net)}', 'pnlFour');
+          hideShowPanel('#{settings.panel(5, net)}', 'pnlFive');
         }
         if ('#{shared_pages.page_header.menu}' == 'side') {
           function positionSidebarSearch() {
@@ -1378,23 +1375,23 @@ html(lang='en')
             .col-lg-12
               if showPanels == true
                 div#cockpit.row.text-center.d-flex.justify-content-center
-                  div(class="col-lg-2 col-lg-offset-" + settings.paneloffset)
-                    - if (settings.panel1 != '') {
+                  div(class="col-lg-2 col-lg-offset-" + settings.panelOffset(net))
+                    - if (settings.panel(1, net) != '') {
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlOne')
                     - }
-                  - if (settings.panel2 != '') {
+                  - if (settings.panel(2, net) != '') {
                     .col-lg-2
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlTwo')
                   - }
-                  - if (settings.panel3 != '') {
+                  - if (settings.panel(3, net) != '') {
                     .col-lg-2
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlThree')
                   - }
-                  - if (settings.panel4 != '') {
+                  - if (settings.panel(4, net) != '') {
                     .col-lg-2
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFour')
                   - }
-                  - if (settings.panel5 != '') {
+                  - if (settings.panel(5, net) != '') {
                   .col-lg-2
                     .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
                   - }

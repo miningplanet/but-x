@@ -227,18 +227,11 @@
       "home_link_logo": "/img/header-logo.png",
       // home_link_logo_height: The max-height value of the "shared_pages.page_header.home_link" logo image (value in px, only valid if "shared_pages.page_header.home_link" = 'logo')
       "home_link_logo_height": 50,
-      // panels: a collection of settings that pertain to the panels displayed on page header of all pages (NOTE: you can show/hide the entire group of panels on each page independently by changing the show_panels value in the settings for each page)
-      //         A maximum of 5 panels can be shown across the top of the page at any time, so if more than 5 are enabled, only the first 5 will be shown
+      // panels: default settings for panels displayed on page header (NOTE: you can show/hide the entire group of panels on each page independently).
+      // Shows max. 5 panels (others hidden) in the sequence they are configured here (enabled=true)
       "panels": {
-        // network_panel: a collection of settings that pertain to the network panel which displays the current network hash rate (only applicable to POW coins)
         "network_panel": {
-          // enabled: Enable/disable the network panel (true/false)
-          //          If set to false, the network panel will be completely inaccessible
           "enabled": false,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 0,
           // nethash: Determine how to acquire network hashrate. Valid options:
           //          getnetworkhashps: retrieved from getnetworkhashps rpc cmd
           //          netmhashps: retrieved from getmininginfo rpc cmd
@@ -252,65 +245,23 @@
           //                H: Display value in hashes (H/s)
           "nethash_units": "G"
         },
-        // difficulty_panel: a collection of settings that pertain to the difficulty panel which displays the current proof-of-work difficulty (only applicable to POW coins)
         "difficulty_panel": {
-          // enabled: Enable/disable the difficulty panel (true/false)
-          //          If set to false, the difficulty panel will be completely inaccessible
-          "enabled": false,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 0
+          "enabled": false
         },
-        // masternodes_panel: a collection of settings that pertain to the masternode panel which displays a count of online and unreachable masternodes (only applicable to masternode coins)
         "masternodes_panel": {
-          // enabled: Enable/disable the masternode panel (true/false)
-          //          If set to false, the masternode panel will be completely inaccessible
-          "enabled": true,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 2
+          "enabled": true
         },
-        // coin_supply_panel: a collection of settings that pertain to the coin supply panel which displays the current circulating coin supply value
         "coin_supply_panel": {
-          // enabled: Enable/disable the coin supply panel (true/false)
-          //          If set to false, the coin supply panel will be completely inaccessible
-          "enabled": true,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 1
+          "enabled": true
         },
-        // price_panel: a collection of settings that pertain to the price panel which displays the current market price measured against the default market pair
         "price_panel": {
-          // enabled: Enable/disable the price panel (true/false)
-          //          If set to false, the price panel will be completely inaccessible
-          "enabled": true,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 4
+          "enabled": true
         },
-        // market_cap_panel: a collection of settings that pertain to the market cap panel which displays the current market cap value measured against the default market pair
         "market_cap_panel": {
-          // enabled: Enable/disable the market cap panel (true/false)
-          //          If set to false, the market cap panel will be completely inaccessible
-          "enabled": true,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 5
+          "enabled": true
         },
-        // logo_panel: a collection of settings that pertain to the logo panel which displays the "shared_pages.logo" image
         "logo_panel": {
-          // enabled: Enable/disable the logo panel (true/false)
-          //          If set to false, the logo panel will be completely inaccessible
-          "enabled": true,
-          // display_order: Determine which order this panel is shown from 1-5
-          //                1 = far left panel, 5 = far right panel
-          //                The panel will be disabled with a value of 0
-          "display_order": 3
+          "enabled": true
         }
       },
       // search: A collection of settings that pertain to the search feature

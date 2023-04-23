@@ -1111,6 +1111,9 @@ app.set('locale', locale);
 // TODO: Make multi coin II.
 // Uses at least coin.name in layout.pug, error.pug
 app.set('get', settings.get);
+app.set('panelOffset', settings.panelOffset);
+app.set('panel', settings.panel);
+app.set('panels', settings.panels);
 app.set('coin', settings.coins[0].id);
 app.set('coins', settings.coins);
 app.set('default_wallet', settings.wallets[0].id);
@@ -1118,33 +1121,6 @@ app.set('currencies', settings.currencies);
 app.set('cache', settings.cache);
 app.set('labels', settings.labels);
 app.set('blockchain_specific', settings.blockchain_specific);
-
-// determine panel offset based on which panels are enabled
-var paneltotal = 5;
-var panelcount = (shared_pages.page_header.panels.network_panel.enabled == true && shared_pages.page_header.panels.network_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.difficulty_panel.enabled == true && shared_pages.page_header.panels.difficulty_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.masternodes_panel.enabled == true && shared_pages.page_header.panels.masternodes_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.coin_supply_panel.enabled == true && shared_pages.page_header.panels.coin_supply_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.price_panel.enabled == true && shared_pages.page_header.panels.price_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.market_cap_panel.enabled == true && shared_pages.page_header.panels.market_cap_panel.display_order > 0 ? 1 : 0) +
-  (shared_pages.page_header.panels.logo_panel.enabled == true && shared_pages.page_header.panels.logo_panel.display_order > 0 ? 1 : 0);
-app.set('paneloffset', paneltotal + 1 - panelcount);
-
-// determine panel order
-var panel_order = new Array();
-
-if (shared_pages.page_header.panels.network_panel.enabled == true && shared_pages.page_header.panels.network_panel.display_order > 0) panel_order.push({name: 'network_panel', val: shared_pages.page_header.panels.network_panel.display_order});
-if (shared_pages.page_header.panels.difficulty_panel.enabled == true && shared_pages.page_header.panels.difficulty_panel.display_order > 0) panel_order.push({name: 'difficulty_panel', val: shared_pages.page_header.panels.difficulty_panel.display_order});
-if (shared_pages.page_header.panels.masternodes_panel.enabled == true && shared_pages.page_header.panels.masternodes_panel.display_order > 0) panel_order.push({name: 'masternodes_panel', val: shared_pages.page_header.panels.masternodes_panel.display_order});
-if (shared_pages.page_header.panels.coin_supply_panel.enabled == true && shared_pages.page_header.panels.coin_supply_panel.display_order > 0) panel_order.push({name: 'coin_supply_panel', val: shared_pages.page_header.panels.coin_supply_panel.display_order});
-if (shared_pages.page_header.panels.price_panel.enabled == true && shared_pages.page_header.panels.price_panel.display_order > 0) panel_order.push({name: 'price_panel', val: shared_pages.page_header.panels.price_panel.display_order});
-if (shared_pages.page_header.panels.market_cap_panel.enabled == true && shared_pages.page_header.panels.market_cap_panel.display_order > 0) panel_order.push({name: 'market_cap_panel', val: shared_pages.page_header.panels.market_cap_panel.display_order});
-if (shared_pages.page_header.panels.logo_panel.enabled == true && shared_pages.page_header.panels.logo_panel.display_order > 0) panel_order.push({name: 'logo_panel', val: shared_pages.page_header.panels.logo_panel.display_order});
-
-panel_order.sort(function(a,b) { return a.val - b.val; });
-
-for (var i = 1; i < 6; i++)
-  app.set('panel'+i.toString(), ((panel_order.length >= i) ? panel_order[i-1].name : ''));
 
 app.set('market_data', market_data);
 app.set('market_count', market_count);
