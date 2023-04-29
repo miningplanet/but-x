@@ -1,4 +1,5 @@
 const debug = require('debug')('debug');
+const debugChart = require('debug')('chart');
 var express = require('express'),
     path = require('path'),
     nodeapi = require('./lib/nodeapi'),
@@ -17,17 +18,19 @@ var app = express();
 var apiAccessList = [];
 const date = require('date-and-time')
 const { exec } = require('child_process');
-const summaryCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const networkChartCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const statsCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.stats * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const supplyCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.supply * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const difficultyCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.difficulty * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const pricesCache = new TTLCache({ max: settings.wallets.length * 2, ttl: settings.cache.prices * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const tickerCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+
+// application cache
+const wlength = settings.wallets.length
+const summaryCache = new TTLCache({ max: wlength, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const networkChartCache = new TTLCache({ max: wlength, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const statsCache = new TTLCache({ max: wlength, ttl: settings.cache.stats * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const supplyCache = new TTLCache({ max: wlength, ttl: settings.cache.supply * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const pricesCache = new TTLCache({ max: wlength * 2, ttl: settings.cache.prices * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const tickerCache = new TTLCache({ max: wlength, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const balancesCache = new TTLCache({ max: 100, ttl: settings.cache.balances * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const distributionCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const peersCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const masternodesCache = new TTLCache({ max: settings.wallets.length, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const distributionCache = new TTLCache({ max: wlength, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const peersCache = new TTLCache({ max: wlength, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const masternodesCache = new TTLCache({ max: wlength, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
 // TODO: Fix chain.
 const net = 'mainnet'
@@ -154,7 +157,7 @@ app.use('/ext/getmoneysupply/:net?', function(req, res) {
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
         supplyCache.set(net, stats.supply);
-        debug("Cached supply '%s' %o", net, stats);
+        debug("Cached supply '%s' %o - mem: %o", net, stats, process.memoryUsage());
         res.setHeader('content-type', 'text/plain');
         res.end((stats && stats.supply ? stats.supply.toString() : '0'));
       }, net);
@@ -291,7 +294,7 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
       db.get_address(hash, false, function(address) {
         if (address) {
           balancesCache.set(net + '_' + hash, address.balance)
-          debug("Cached balance '%s' '%s' %o", net, hash, address.balance);
+          debug("Cached balance '%s' '%s' %o - mem: %o", net, hash, address.balance, process.memoryUsage());
           res.setHeader('content-type', 'text/plain');
           res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''));
         } else
@@ -316,7 +319,7 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
       db.get_richlist(coin.name, function(richlist) {
         db.get_stats(coin.name, function(stats) {
           db.get_distribution(richlist, stats, function(dist) {
-            debug("Cached distribution '%s' %o", net, dist);
+            debug("Cached distribution '%s' %o - mem: %o", net, dist, process.memoryUsage());
             distributionCache.set(net, dist);
             res.send(dist);
           }, net);
@@ -359,7 +362,7 @@ app.use('/ext/getcurrentprice/:net?', function(req, res) {
                 }
               };
               pricesCache.set (net, r);
-              debug("Cached prices '%s' %o", net, r);
+              debug("Cached prices '%s' %o - mem: %o", net, r, process.memoryUsage());
               res.send(r);
             }
           });
@@ -422,14 +425,14 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
           lib.get_masternodecount(net, function(masternodestotal) {
             eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
             statsCache.set (net, p_ext);
-            debug("Cached coin stats '%s' %o", net, p_ext);
+            debug("Cached coin stats '%s' %o - mem: %o", net, p_ext, process.memoryUsage());
             res.send(p_ext);
           });
         } else {
           // masternode count api is not available
           eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
           statsCache.set (net, p_ext);
-          debug("Cached coin stats '%s' %o", net, p_ext);
+          debug("Cached coin stats '%s' %o - mem: %o", net, p_ext, process.memoryUsage());
           res.send(p_ext);
         }
       }, net);
@@ -512,7 +515,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                       r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
                       r.algos = algos
                       tickerCache.set (net, r);
-                      debug("Cached ticker '%s' '%s' %o", r.coin, net, r);
+                      debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage());
                       res.send(r);
                     });
                   });
@@ -719,7 +722,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
               blockcount: (blockcount ? blockcount : '-')
             }
             summaryCache.set (net, v);
-            debug("Cached summary '%s' %o", net, v);
+            debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
             res.send(v);
           } else {
             lib.get_hashrate(function(hashps) {
@@ -776,7 +779,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                         blockcount: (blockcount ? blockcount : '-')
                       }
                       summaryCache.set (net, v);
-                      debug("Cached summary '%s' %o", net, v);
+                      debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
                       res.send(v);
                     } else {
                       // masternode count api is not available
@@ -796,7 +799,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                         blockcount: (blockcount ? blockcount : '-')
                       }
                       summaryCache.set (net, v);
-                      debug("Cached summary '%s' %o", net, v);
+                      debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
                       res.send(v);
                     }
                   });
@@ -851,7 +854,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
 
         // return peer data
         peersCache.set (net, newPeers);
-        debug("Cached peers '%s' %o", net, newPeers);
+        debug("Cached peers '%s' %o - mem: %o", net, newPeers, process.memoryUsage());
         res.json(newPeers);
       }, net);
     } else {
@@ -878,7 +881,7 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
           delete masternodes[i]['_doc']['__v'];
         }
         masternodesCache.set(net, masternodes);
-        debug("Cached masternodes '%s' %o", net, masternodes);
+        debug("Cached masternodes '%s' %o - mem: %o", net, masternodes, process.memoryUsage());
         res.send(masternodes);
       }, net);
     } else {
@@ -943,7 +946,7 @@ app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
     db.get_network_chart_data(function(data) {
       if (data) {
         networkChartCache.set(net, data);
-        debug("Cached network chart '%s' %o", net, data);
+        debugChart("Cached network chart '%s' %o - mem: %o", net, data, process.memoryUsage());
         res.send(data);
       } else {
         res.send();
