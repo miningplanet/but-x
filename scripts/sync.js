@@ -59,7 +59,7 @@ function exit(exitCode) {
   mongoose.disconnect();
 
   // only remove sync lock if it was created in this session
-  if (!lockCreated || db.lib.remove_lock(database) == true) {
+  if (!lockCreated || db.lib.remove_lock(database, net) == true) {
     // clean exit with previous exit code
     process.exit(exitCode);
   } else {
@@ -204,9 +204,9 @@ function update_network_history(height, network_history_enabled, cb, net) {
     return cb(false);
 }
 
-function check_show_sync_message(blocks_to_sync) {
+function check_show_sync_message(blocks_to_sync, net='mainnet') {
   var retVal = false;
-  var filePath = './tmp/show_sync_message.tmp';
+  const filePath = './tmp/show_sync_message-' + net + '.tmp';
   // Check if the sync msg should be shown
   if (blocks_to_sync > settings.sync.show_sync_msg_when_syncing_more_than_blocks) {
     // Check if the show sync stub file already exists
@@ -214,10 +214,8 @@ function check_show_sync_message(blocks_to_sync) {
       // File doesn't exist, so create it now
       db.fs.writeFileSync(filePath, '');
     }
-
     retVal = true;
   }
-
   return retVal;
 }
 
@@ -381,13 +379,13 @@ if (process.argv[2] == null || process.argv[2] == 'index' || process.argv[2] == 
 usage();
 
 // check if this sync option is already running/locked
-if (db.lib.is_locked([database]) == false) {
+if (db.lib.is_locked([database], net) == false) {
   // create a new sync lock before checking the rest of the locks to minimize problems with running scripts at the same time
-  db.lib.create_lock(database);
+  db.lib.create_lock(database, net);
   // ensure the lock will be deleted on exit
   lockCreated = true;
   // check the backup, restore and delete locks since those functions would be problematic when updating data
-  if (db.lib.is_locked(['backup', 'restore', 'delete']) == false) {
+  if (db.lib.is_locked(['backup', 'restore', 'delete'], net) == false) {
     // all tests passed. OK to run sync
     console.log("Script launched with pid: " + process.pid);
 
@@ -437,7 +435,7 @@ if (db.lib.is_locked([database]) == false) {
                           console.log('Block index deleted successfully');
 
                           // Check if the sync msg should be shown
-                          check_show_sync_message(stats.count);
+                          check_show_sync_message(stats.count, net);
 
                           console.log('Starting resync of blockchain data.. Please wait..');
                           update_tx_db(net, coin.name, block_start, stats.count, stats.txes, settings.sync.update_timeout, false, function() {
@@ -459,7 +457,7 @@ if (db.lib.is_locked([database]) == false) {
                                           const network_history = settings.get(net, 'network_history')
                                           update_network_history(nstats.last, network_history.enabled, function(network_hist) {
                                             // always check for and remove the sync msg if exists
-                                            db.remove_sync_message();
+                                            db.remove_sync_message(net);
 
                                             console.log('Reindex complete (block: %s)', nstats.last);
                                             exit(0);
@@ -635,7 +633,7 @@ if (db.lib.is_locked([database]) == false) {
                                 const network_history = settings.get(net, 'network_history')
                                 update_network_history(nstats.last, network_history.enabled, function(network_hist) {
                                   // always check for and remove the sync msg if exists
-                                  db.remove_sync_message();
+                                  db.remove_sync_message(net);
 
                                   console.log('Block sync complete (block: %s)', nstats.last);
                                   exit(0);
