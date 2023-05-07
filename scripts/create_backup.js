@@ -21,7 +21,7 @@ var lockCreated = false;
 // exit function used to cleanup lock before finishing script
 function exit(exitCode) {
   // only remove backup lock if it was created in this session
-  if (!lockCreated || lib.remove_lock(backupLockName) == true) {
+  if (!lockCreated || lib.remove_lock(backupLockName, net) == true) {
     // clean exit with previous exit code
     process.exit(exitCode);
   } else {
@@ -75,13 +75,13 @@ if (!fs.existsSync(backupPath)) {
 // check if backup file already exists
 if (!fs.existsSync(path.join(backupPath, `${backupFilename}${archiveSuffix}`))) {
   // check if the "create backup" process is already running
-  if (lib.is_locked([backupLockName]) == false) {
+  if (lib.is_locked([backupLockName], net) == false) {
     // create a new backup lock before checking the rest of the locks to minimize problems with running scripts at the same time
-    lib.create_lock(backupLockName);
+    lib.create_lock(backupLockName, net);
     // ensure the lock will be deleted on exit
     lockCreated = true;
     // check all other possible locks since backups should not run at the same time that data is being changed
-    if (lib.is_locked(['restore', 'delete', 'index', 'markets', 'peers', 'masternodes']) == false) {
+    if (lib.is_locked(['restore', 'delete', 'index', 'markets', 'peers', 'masternodes'], net) == false) {
       // all tests passed. OK to run backup
       console.log("Script launched with pid: " + process.pid);
 
