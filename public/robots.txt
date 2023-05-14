@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /api/
+Disallow: /address/
+Disallow: /block/
+Disallow: /tx/
+Disallow: /claim/
+Disallow: /movement/
+
+Sitemap: https://butkoin.com/sitemap.txt
+Sitemap: https://explorer.butkoin.com/sitemap.txt
+
