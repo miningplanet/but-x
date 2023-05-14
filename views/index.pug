@@ -48,10 +48,9 @@ block content
         lengthMenu: lengthMenuOpts,
         scrollX: true,
         ajax: {
-          url: '/ext/getlasttxs/0/#{net}',
+          url: '/ext/getlasttxs/#{net}/0',
           beforeSend: function(jqXHR, settings) {
-            // TODO: Check this.
-            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal/#{net}';
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal';
             return true;
           }
         },

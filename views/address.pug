@@ -52,8 +52,7 @@ block content
         ajax: {
           url: '/ext/getaddresstxs/' + hashAddress + '/#{net}',
           beforeSend: function(jqXHR, settings) {
-            // TODO: Check this.
-            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal/#{net}';
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal';
             return true;
           }
         },

@@ -47,9 +47,9 @@ block content
         lengthMenu: lengthMenuOpts,
         scrollX: true,
         ajax: {
-          url: '/ext/getlasttxs/#{movement_page.movement_table.min_amount}/#{net}',
+          url: '/ext/getlasttxs/#{net}/#{movement_page.movement_table.min_amount}',
           beforeSend: function(jqXHR, settings) {
-            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal/#{net}';
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal';
             return true;
           }
         },

@@ -248,13 +248,13 @@ block content
             if api_page.public_apis.ext.getaddresstxs.enabled == true
               li
                 p
-                  div.fw-bold getaddresstxs (/ext/getaddresstxs/hash/start/length)
+                  div.fw-bold getaddresstxs [hash] [net] [start] [length]
                   div
                     em Returns last [length] transactions for address [hash], starting from offset [start]
                   if net != null && net != "" && net != settings.default_wallet
-                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/0/50/' + net) #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/0/50/#{net}
+                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/' + net + '/0/50') #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/#{net}/0/50/
                   else
-                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/0/50') #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/0/50
+                    a(href='/ext/getaddresstxs/' + api_page.sample_data.address + '/mainnet/0/50') #{address}/ext/getaddresstxs/#{api_page.sample_data.address}/mainnet/0/50
             if api_page.public_apis.ext.gettx.enabled == true
               li
                 p
@@ -278,16 +278,16 @@ block content
             if api_page.public_apis.ext.getlasttxs.enabled == true
               li
                 p
-                  div.fw-bold getlasttxs (/ext/getlasttxs/min/start/length)
+                  div.fw-bold getlasttxs [net] [min] [length] [start]
                   div
                     em Returns last [length] transactions greater than [min] coins, starting from offset [start]
                   div
                     em Note: [length] is limited to returning #{api_page.public_apis.ext.getlasttxs.max_items_per_query} records per query
                   div
                     if net != null && net != "" && net != settings.default_wallet
-                      a(href='/ext/getlasttxs/100/0/100/' + net) #{address}/ext/getlasttxs/100/0/100/#{net}
+                      a(href='/ext/getlasttxs/'+ net + '/100/0/100') #{address}/ext/getlasttxs/#{net}/100/0/100
                     else
-                      a(href='/ext/getlasttxs/100/0/100') #{address}/ext/getlasttxs/100/0/100
+                      a(href='/ext/getlasttxs/mainnet/100/0/100') #{address}/ext/getlasttxs/mainnet/100/0/100
             if api_page.public_apis.ext.getcurrentprice.enabled == true
               li
                 p

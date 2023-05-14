@@ -573,7 +573,8 @@ app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
   }
 });
 
-app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
+app.use('/ext/getlasttxs/:net/:min', function(req, res) {
+  // TODO: Fix functionality and add cache.
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -605,8 +606,7 @@ app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
         break;
     }
 
-    // fix parameters
-    if (typeof length === 'undefined' || isNaN(length) || length > api_page.public_apis.ext.getlasttxs.max_items_per_query)
+    if (typeof length === 'undefined' || isNaN(length) || length < 1 || length > api_page.public_apis.ext.getlasttxs.max_items_per_query)
       length = api_page.public_apis.ext.getlasttxs.max_items_per_query;
     if (typeof start === 'undefined' || isNaN(start) || start < 0)
       start = 0;
@@ -629,7 +629,7 @@ app.use('/ext/getlasttxs/:min/:net?', function(req, res) {
     res.end('This method is disabled');
 });
 
-app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
+app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -641,17 +641,24 @@ app.use('/ext/getaddresstxs/:address/:start/:length/:net?', function(req, res) {
     // check if this is an internal request
     if (split.length > 0 && split[0] == 'internal')
       internal = true;
-    // fix parameters
-    if (typeof req.params.length === 'undefined' || isNaN(req.params.length) || req.params.length > api_page.public_apis.ext.getaddresstxs.max_items_per_query)
-      req.params.length = api_page.public_apis.ext.getaddresstxs.max_items_per_query;
-    if (typeof req.params.start === 'undefined' || isNaN(req.params.start) || req.params.start < 0)
-      req.params.start = 0;
-    if (typeof req.params.min === 'undefined' || isNaN(req.params.min) || req.params.min < 0)
-      req.params.min  = 0;
-    else
-      req.params.min  = (req.params.min * 100000000);
 
-    db.get_address_txs_ajax(req.params.address, req.params.start, req.params.length, function(txs, count) {
+    // fix parameters
+    const max = api_page.public_apis.ext.getaddresstxs.max_items_per_query
+    var min = min
+    var start = req.params.start
+    var length = req.params.length
+    if (typeof length === 'undefined' || isNaN(length) || length < 1 || length > max)
+      length = max
+    if (typeof start === 'undefined' || isNaN(start) || start < 0)
+      start = 0;
+    if (typeof min === 'undefined' || isNaN(min) || min < 0)
+      min = 0;
+    else
+      min  = (min * 100000000);
+
+    debug("getaddresstx for chain '%s': min=%d, start=%d, length=%d", net, min, start, length)
+
+    db.get_address_txs_ajax(req.params.address, start, length, function(txs, count) {
       var data = [];
 
       for (i = 0; i < txs.length; i++) {
