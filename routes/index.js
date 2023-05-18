@@ -757,111 +757,70 @@ router.get('/richlist/:net?', function(req, res) {
   }
 });
 
+// movements page
 router.get('/movement/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  const shared_pages = settings.get(net, 'shared_pages')
   const movement_page = settings.get(net, 'movement_page')
-  const api_page = settings.get(net, 'api_page')
   if (movement_page.enabled == true) {
+    const shared_pages = settings.get(net, 'shared_pages')
+    const api_page = settings.get(net, 'api_page')
+    const p = {
+      active: 'movement',
+      showSync: db.check_show_sync_message(net),
+      customHash: get_file_timestamp('./public/css/custom.scss'),
+      styleHash: get_file_timestamp('./public/css/style.scss'),
+      themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+      page_title_logo: settings.getTitleLogo(net),
+      page_title_prefix: coin.name + ' Coin Movements',
+      shared_pages: shared_pages,
+      movement_page: movement_page,
+      api_page: api_page,
+      coin: coin,
+      net: net
+    }
     if (movement_page.page_header.show_last_updated == true) {
-      // lookup last updated date
       db.get_stats(coin.name, function (stats) {
-        res.render(
-          'movement',
-          {
-            active: 'movement',
-            last_updated: stats.blockchain_last_updated,
-            showSync: db.check_show_sync_message(net),
-            customHash: get_file_timestamp('./public/css/custom.scss'),
-            styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-            page_title_logo: settings.getTitleLogo(net),
-            page_title_prefix: coin.name + ' Coin Movements',
-            shared_pages: shared_pages,
-            movement_page: movement_page,
-            api_page: api_page,
-            coin: coin,
-            net: net
-          }
-        );
+        p.last_updated = stats.network_last_updated
+        res.render('movement', p)
       }, net);
     } else {
-      // skip lookup of the last updated date and display the page now
-      res.render(
-        'movement',
-        {
-          active: 'movement',
-          last_updated: null,
-          showSync: db.check_show_sync_message(net),
-          customHash: get_file_timestamp('./public/css/custom.scss'),
-          styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_logo: settings.getTitleLogo(net),
-          page_title_prefix: coin.name + ' Coin Movements',
-          shared_pages: shared_pages,
-          movement_page: movement_page,
-          api_page: api_page,
-          coin: coin,
-          net: net
-        }
-      );
+      res.render('movement', p)
     }
   } else {
-    // movement page is not enabled so default to the index page
     route_get_index(res, null, net);
   }
 });
 
+// network page
 router.get('/network/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  const shared_pages = settings.get(net, 'shared_pages')
   const network_page = settings.get(net, 'network_page')
   if (network_page.enabled == true) {
+    const shared_pages = settings.get(net, 'shared_pages')
+    const p = {
+      active: 'network',
+      showSync: db.check_show_sync_message(net),
+      customHash: get_file_timestamp('./public/css/custom.scss'),
+      styleHash: get_file_timestamp('./public/css/style.scss'),
+      themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+      page_title_logo: settings.getTitleLogo(net),
+      page_title_prefix: coin.name + ' Network Peers',
+      shared_pages: shared_pages,
+      network_page: network_page,
+      coin: coin,
+      net: net
+    }
     if (network_page.page_header.show_last_updated == true) {
-      // lookup last updated date
       db.get_stats(coin.name, function (stats) {
-        res.render(
-          'network',
-          {
-            active: 'network',
-            last_updated: stats.network_last_updated,
-            showSync: db.check_show_sync_message(net),
-            customHash: get_file_timestamp('./public/css/custom.scss'),
-            styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-            page_title_logo: settings.getTitleLogo(net),
-            page_title_prefix: coin.name + ' Network Peers',
-            shared_pages: shared_pages,
-            network_page: network_page,
-            coin: coin,
-            net: net
-          }
-        );
+        p.last_updated = stats.network_last_updated
+        res.render( 'network', p)
       }, net);
     } else {
-      // skip lookup of the last updated date and display the page now
-      res.render(
-        'network',
-        {
-          active: 'network',
-          last_updated: null,
-          showSync: db.check_show_sync_message(net),
-          customHash: get_file_timestamp('./public/css/custom.scss'),
-          styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_logo: settings.getTitleLogo(net),
-          page_title_prefix: coin.name + ' Network Peers',
-          shared_pages: shared_pages,
-          network_page: network_page,
-          coin: coin,
-          net: net
-        }
-      );
+      res.render( 'network', p)
     }
   } else {
-    // network page is not enabled so default to the index page
     route_get_index(res, null, net);
   }
 });
@@ -870,55 +829,33 @@ router.get('/network/:net?', function(req, res) {
 router.get('/masternodes/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  const shared_pages = settings.get(net, 'shared_pages')
   const masternodes_page = settings.get(net, 'masternodes_page')
-  const claim_address_page = settings.get(net, 'claim_address_page')
   if (masternodes_page.enabled == true) {
+    const shared_pages = settings.get(net, 'shared_pages')
+    const claim_address_page = settings.get(net, 'claim_address_page')
+    const p = {
+      active: 'masternodes',
+      showSync: db.check_show_sync_message(net),
+      customHash: get_file_timestamp('./public/css/custom.scss'),
+      styleHash: get_file_timestamp('./public/css/style.scss'),
+      themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+      page_title_logo: settings.getTitleLogo(net),
+      page_title_prefix: coin.name + ' Smartnodes',
+      shared_pages: shared_pages,
+      masternodes_page: masternodes_page,
+      claim_address_page: claim_address_page,
+      coin: coin,
+      net: net
+    }
     if (masternodes_page.page_header.show_last_updated == true) {
-      // lookup last updated date
       db.get_stats(coin.name, function (stats) {
-        res.render(
-          'masternodes',
-          {
-            active: 'masternodes',
-            last_updated: stats.masternodes_last_updated,
-            showSync: db.check_show_sync_message(net),
-            customHash: get_file_timestamp('./public/css/custom.scss'),
-            styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-            page_title_logo: settings.getTitleLogo(net),
-            page_title_prefix: coin.name + ' Smartnodes',
-            shared_pages: shared_pages,
-            masternodes_page: masternodes_page,
-            claim_address_page: claim_address_page,
-            coin: coin,
-            net: net
-          }
-        );
+        p.last_updated = stats.network_last_updated
+        res.render('masternodes', p)
       }, net);
     } else {
-      // skip lookup of the last updated date and display the page now
-      res.render(
-        'masternodes',
-        {
-          active: 'masternodes',
-          last_updated: null,
-          showSync: db.check_show_sync_message(net),
-          customHash: get_file_timestamp('./public/css/custom.scss'),
-          styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_logo: settings.getTitleLogo(net),
-          page_title_prefix: coin.name + ' Smartnodes',
-          shared_pages: shared_pages,
-          masternodes_page: masternodes_page,
-          claim_address_page: claim_address_page,
-          coin: coin,
-          net: net
-        }
-      );
+      res.render('masternodes', p)
     }
   } else {
-    // masternode page is not enabled so default to the index page
     route_get_index(res, null, net);
   }
 });
