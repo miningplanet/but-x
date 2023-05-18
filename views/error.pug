@@ -9,7 +9,7 @@ block content
             img#header-img(src=page_title_logo)
         #page-title-container
           if error_page.page_header.show_title == true
-            h3#page-title=settings.locale.error_title.replace('{1}', settings.coin.name)
+            h3#page-title=settings.locale.error_title.replace('{1}', coin.name)
           if error_page.page_header.show_description == true
             if error_page.page_header.show_title != true
               #page-title-container

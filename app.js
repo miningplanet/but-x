@@ -1118,8 +1118,10 @@ settings.api_page.public_apis.rpc.getmasternodelist = { "enabled": false };
 // locals
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
-// TODO: Make multi coin II.
-// Uses at least coin.name in layout.pug, error.pug
+
+// TODO: Observe coin.name in layout.pug.
+// app.set('coin', settings.coins[0].id);
+
 app.set('get', settings.get);
 app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);
@@ -1146,8 +1148,9 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    // TODO: Fix chain.
-    var net = settings.getNet('mainnet')
+    // TODO: Observe fix error handler chain.
+    // const net = settings.getNet('mainnet')
+    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const shared_pages = settings.get(net, 'shared_pages')
     const error_page = settings.get(net, 'error_page')
@@ -1166,8 +1169,9 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  // TODO: Fix chain.
-  var net = settings.getNet('mainnet')
+  // TODO: Observe fix error handler chain.
+  // const net = settings.getNet('mainnet')
+  const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const shared_pages = settings.get(net, 'shared_pages')
   const error_page = settings.get(net, 'error_page')
