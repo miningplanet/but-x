@@ -1004,6 +1004,7 @@ router.get('/address/:hash/:net?', function(req, res) {
 router.post('/search/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
+  const shared_pages = settings.get(net, 'shared_pages')
   if (shared_pages.page_header.search.enabled == true) {
     var query = req.body.search.trim();
 
