@@ -1,6 +1,7 @@
-const minNodeVersionMajor = '14';
-const minNodeVersionMinor = '13';
-const minNodeVersionRevision = '1';
+const debug = require('debug')('debug');
+const minNodeVersionMajor = '17';
+const minNodeVersionMinor = '19';
+const minNodeVersionRevision = '0';
 
 // get the nodejs version
 var nodeVersion = process.version;
@@ -24,6 +25,8 @@ if (nodeVersion != null && nodeVersion != '' && nodeVersion.length < 16) {
 
   if (splitVersion.length > 2)
     nodeVersionRevision = splitVersion[2];
+
+  debug("Got node version '%s': %d.%d.%d.", nodeVersion, nodeVersionMajor, nodeVersionMinor, nodeVersionRevision)
 }
 
 // check if the installed nodejs is an older version than supported by the explorer
