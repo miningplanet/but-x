@@ -1052,11 +1052,6 @@ if (markets_page.enabled == true) {
       return 0;
   });
 
-  // Fix default exchange case
-  // TODO: Check if required.
-  markets_page.default_exchange.exchange_name = markets_page.default_exchange.exchange_name.toLowerCase();
-  markets_page.default_exchange.trading_pair = markets_page.default_exchange.trading_pair.toUpperCase();
-
   var ex = markets_page.exchanges;
   var ex_name = markets_page.default_exchange.exchange_name;
   var ex_pair = markets_page.default_exchange.trading_pair;
@@ -1090,17 +1085,12 @@ if (markets_page.enabled == true) {
       }
     }
 
-    // check if a valid and enabled market was found
-    // TODO: Check if required.
+    // Disable the markets page for this session if no active market and trading pair was found or set the new default market.
     if (new_default_index == -1) {
-      // no valid markets found
       console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart the explorer to resolve the problem');
-      // disable the markets feature for this session
       settings.markets_page.enabled = false;
     } else {
-      // a valid and enabled market was found to replace the default
       console.log('WARNING: ' + ex_error + '. ' + 'Default exchange will be set to' + ': ' + ex_keys[new_default_index] + ' (' + ex[ex_keys[new_default_index]].trading_pairs[0] + ')');
-      // set new default exchange data
       markets_page.default_exchange.exchange_name = ex_keys[new_default_index];
       markets_page.default_exchange.trading_pair = ex[ex_keys[new_default_index]].trading_pairs[0];
     }
@@ -1110,10 +1100,6 @@ if (markets_page.enabled == true) {
 // check if home_link_logo file exists
 if (!db.fs.existsSync(path.join('./public', shared_pages.page_header.home_link_logo)))
   shared_pages.page_header.home_link_logo = '';
-
-// always disable the rpc masternode list cmd from public apis
-// TODO: Check if required.
-settings.api_page.public_apis.rpc.getmasternodelist = { "enabled": false };
 
 // locals
 app.set('explorer_version', package_metadata.version);
