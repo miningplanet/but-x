@@ -6,19 +6,32 @@
 <img src="public/img/screenshots/platform-windows macos linux-lightgrey.svg" />
 ![GitHub](https://img.shields.io/github/license/team-exor/eiquidus?color=ffbd11)
 
-Written in node.js and mongodb, eIquidus is the most stable, secure, customizable and feature-rich open-source block explorer with support for virtually any altcoin that implements some form of the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Originally built for the [Exor blockchain](https://github.com/team-exor/exor), eIquidus has since grown into a fully-featured explorer with a focus on stability and security at its core. All features from the [original iquidus explorer](https://github.com/iquidus/explorer) are included here along with many new ideas from other iquidus forks, and an absolute ton of new custom changes and bug fixes that were developed specifically for eIquidus.
+Stable, secure and customizable multicoin open-source block explorer with support for virtually any altcoin that implements some form of the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html).
+
 
 ![Homepage](public/img/screenshots/homepage-1-101-0.png)
 
 ### Support
 
-In general but-eiquidus is open source and comes without support. You might contact us at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2) 
+In general but-eiquidus is open-source but comes without support! You might contact us at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2) 
+___
+
+### See it in Action
+
+-  https://explorer.butkoin.com/mainnet
+-  https://explorer.butkoin.com/testnet
+-  https://explorer.butkoin.com/bitoreum
+___
 
 Table of Contents
 ------------------
 
+- [Prerequisites](#prerequisites)
+  - [Hardware](#hardware)
+  - [Software](#software)
 - [Features](#features)
-- [See it in Action](#see-it-in-action)
+- [API functions](#api-function)
+- [Exchanges](#exchanges)
 - [Installation](#installation)
   - [Full Setup Guide](#full-setup-guide)
   - [Quick Install Instructions](#quick-install-instructions)
@@ -61,26 +74,28 @@ Table of Contents
 - [Special Thanks](#special-thanks)
 - [License](#license)
 - [Disclaimer](#disclaimer)
+___
 
 ### Prerequisites
 
-#### System requirements
+#### Hardware
 
-The system requirements heavily depend on the deployment.
+The hardware system requirements heavily depend on the data processed and the type of deployment(s). For a single chain deployment with a small blockchain or testnet with block-height up to 100.000, the following is considered as minimum requirements.
 
-- 512 MB or more of RAM
+- 2 CPU core or more
+- 2 GB or more of RAM
 - 10 GB disk space
 
 #### Software
 
 - Linux, MacOS or MS Windows
 - Node.js - min. v17.9.1, current dev and prod version is v19.9.0
-- MongoDB - v5.1.0 or newer recommended
+- MongoDB - v5.3.0 or newer recommended
+___
 
 ### Features
 
-- Built using the following scripts and technologies:
-- Platform independent **NOTE:** Most of the instructions in this guide were written for use with Linux and may need to be modified when using another OS
+- Platform independent
 - Mobile-friendly
 - Sass support
 - Pages/features:
@@ -89,47 +104,8 @@ The system requirements heavily depend on the deployment.
   - **Movement:** Displays latest blockchain transactions that are greater than a certain configurable amount
   - **Network:** Displays a list of peers that have connected to the coind wallet in the past 24 hours, along with useful addnode data that can be used to connect your own wallets to the network easier
   - **Top 100:** Displays the top 100 richest wallet addresses, the top 100 wallet addresses that have the highest total number of coins received based on adding up all received transactions, as well as a table and pie chart breakdown of wealth distribution. Additional support for omitting burned coins from top 100 lists
-  - **Markets:** Displays a number of exchange-related metrics including market summary, 24 hour chart, most recent buy/sell orders and latest trade history. The last known default exchange price is automatically converted to USD using the coingecko api from [https://www.coingecko.com/en/api](https://www.coingecko.com/en/api). The following 12 cryptocurrency exchanges are supported:
-    - [AltMarkets](https://altmarkets.io)
-    - [Bittrex](https://bittrex.com)
-    - [Bleutrade](https://bleutrade.com)
-    - [Crex24](https://crex24.com)
-    - [Dex-Trade](https://dex-trade.com)
-    - [FreiExchange](https://freiexchange.com)/[FreiXLite](https://freixlite.com) *\*no chart support due to a lack of OHLCV api data*
-    - [Poloniex](https://poloniex.com)
-    - [SouthXchange](https://southxchange.com)
-    - [Stex](https://stex.com)
-    - [Txbit](https://txbit.io) *\*no chart support due to a lack of OHLCV api data*
-    - [Unnamed](https://unnamed.exchange)
-    - [Yobit](https://yobit.io) *\*no chart support due to a lack of OHLCV api data*
-  - **API:** A listing of available public API's that can be used to retrieve information from the network without the need for a local wallet. The following public API's are supported:
-    - **RPC API calls** (Return data from coind)
-      - **getdifficulty:** Returns the current difficulty
-      - **getconnectioncount:** Returns the number of connections the block explorer has to other nodes
-      - **getblockcount:** Returns the current block index
-      - **getblockhash:** Returns the hash of the block at a specific index
-      - **getblock:** Returns information about the block with the given hash
-      - **getrawtransaction:** Returns raw transaction representation for given transaction id
-      - **getnetworkhashps:** Returns the current network hashrate
-      - **getvotelist:** Returns the current vote list
-      - **getmasternodecount:** Returns the total number of masternodes on the network *\*only applicable to masternode coins*
-    - **Extended API calls** (Return data from local indexes)
-      - **getmoneysupply:** Returns current money supply
-      - **getdistribution:** Returns wealth distribution stats
-      - **getaddress:** Returns information for given address
-      - **getaddresstxs:** Returns transactions for a wallet address starting from a particular offset
-      - **gettx:** Returns information for given tx hash
-      - **getbalance:** Returns current balance of given address
-      - **getlasttxs:** Returns transactions greater than a specific number of coins, starting from a particular offset
-      - **getcurrentprice:** Returns last known exchange prices
-      - **getbasicstats:** Returns basic statistics about the coin including: block count, circulating supply, USD price, default market price and # of masternodes *\*# of masternodes is only applicable to masternode coins*
-      - **getticker:** Returns various ticker data.
-      - **getmarkets:** Returns various market data.
-      - **getsummary:** Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, default market price, network connection count, block count, count of online masternodes and count of offline masternodes *\*masternode counts are only applicable to masternode coins*
-      - **getnetworkpeers:** Returns the list of network peers that have connected to the explorer node in the last 24 hours
-      - **getmasternodelist:** Returns the complete list of masternodes on the network *\*only applicable to masternode coins*
-      - **getmasternoderewards:** Returns a list of masternode reward transactions for a specific address that arrived after a specific block height *\*only applicable to masternode coins*
-      - **getmasternoderewardstotal:** Returns the total number of coins earned in masternode rewards for a specific address that arrived after a specific block height *\*only applicable to masternode coins*
+  - **Markets:** Displays a number of exchange-related metrics including market summary, 24 hour chart, most recent buy/sell orders and latest trade history. The last known default exchange price is automatically converted to USD using the coingecko API. See [Exchanges](#exchanges).
+  - **API:** A listing of available public API's that can be used to retrieve information from the network without the need for a local wallet. See [API functions](#api-functions).
   - **Claim Address:** Allows anyone to set custom display names for wallet addresses that they own using the **Sign Message** feature from their local wallet. Includes *bad word* filter support.
   - **Block Info:** Displays block summary and list of transactions for a specific block height
   - **Transaction Info:** Displays transaction summary, optional OP_RETURN value, list of input addresses and output addresses for a specific transaction
@@ -147,26 +123,7 @@ The system requirements heavily depend on the deployment.
   - **Hashrate chart:** Line graph listing of the estimated network hashes per second over the last number of blocks *\*Requires a full sync before network data will start being collected*
   - **Difficulty chart:** Line graph listing of the block difficulty over the last number of blocks *\*Requires a full sync before network data will start being collected*
 - Add as many custom social links to the explorer footer as desired. Useful for linking to github, twitter, coinmarketcap or any other social media or external links as necessary. 
-- Custom rpc/api command support which increases blockchain compatibility. Supported cmds:
-  - **getnetworkhashps:** Returns the estimated network hashes per second
-  - **getmininginfo:** Returns a json object containing mining-related information
-  - **getdifficulty:** Returns the proof-of-work difficulty as a multiple of the minimum difficulty
-  - **getconnectioncount:** Returns the number of connections to other nodes
-  - **getblockcount:** Returns the number of blocks in the longest blockchain
-  - **getblockhash:** Returns hash of block in best-block-chain at height provided
-  - **getblock:** Returns an object with information about the block
-  - **getrawtransaction:** Returns raw transaction data
-  - **getinfo:** Returns an object containing various state info
-  - **getblockchaininfo:** Returns an object containing various state info regarding blockchain processing
-  - **getpeerinfo:** Returns data about each connected network node as a json array of objects
-  - **gettxoutsetinfo:** Returns an object with statistics about the unspent transaction output set
-  - **getvotelist:** Returns an object with details regarding the current vote list
-  - **getmasternodecount:** Returns a json object containing the total number of masternodes on the network
-  - **getmasternodelist:** Returns a json array containing status information for all masternodes on the network
-  - **verifymessage:** Verify a signed message. Must accept the following arguments:
-    - **address:** The wallet address to use for the signature
-    - **signature:** The signature provided by the signer in base 64 encoding
-    - **message:** The message that was signed
+- Custom rpc/api command support via mapping in settings.json per chain which increases blockchain compatibility.
 - Additional support for the following custom blockchain features:
   - Bitcoin P2PK transactions
     - Bitcoin rpc/api cmds:
@@ -193,23 +150,61 @@ The system requirements heavily depend on the deployment.
       - **getnextrewardestimate:** Returns an estimate for the next block reward based on the current state of decentralized voting
       - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed
   - Zcash/zk-SNARKs private tx support
+___
 
-### Popular libraries included
+### API functions
 
-- JQuery v3.6.0
-- Bootstrap v5.1.3
-- DataTables v1.11.3
-- FontAwesome v5.15.4
-- Luxon v2.1.1
-- jqPlot v1.0.9
-- Chart.js v3.6.1
-  - chartjs-plugin-crosshair v1.2.0 ([https://github.com/abelheinsbroek/chartjs-plugin-crosshair](https://github.com/abelheinsbroek/chartjs-plugin-crosshair))
-- OverlayScrollbars v1.13.3
+but-eiquidus supports the following API functions.
 
-### See it in Action
+- **api/getblockchaininfo/{net}:** Returns statistics about the coin such as chain, header count, block count, difficulty, circulating supply or USD price.
+- **api/getdifficulty/{net}:** Returns the current difficulty.
+- **api/getconnectioncount/{net}:** Returns the number of connections the block explorer has to other nodes.
+- **api/getblockcount/{net}:** Returns the current block index.
+- **api/getblockhash/{net}?index={height}:** Returns the hash of the block at a specific index.
+- **api/getblock/{net}:** Returns information about the block with the given hash.
+- **api/getrawtransaction/{net}?txid={txid}&decrypt={0|1}:** Returns raw transaction representation for given transaction id.
+- **api/getnetworkhashps/{net}:** Returns the current network hashrate.
+- **api/getvotelist/{net}:** Returns the current vote list.
+- **api/getmasternodecount/{net}:** Returns the total number of masternodes on the network *\*only applicable to masternode coins*.
 
--  https://explorer.butkoin.com/
--  https://explorer.butkoin.com/testnet
+- **ext/getmoneysupply/{net}:** Returns current money supply.
+- **ext/getdistribution/{net}:** Returns wealth distribution stats.
+- **ext/getaddress/{address}/{net}:** Returns information for given address.
+- **ext/getaddresstxs/{address}/{net}/{start}/{length}:** Returns transactions for a wallet address starting from a particular offset.
+- **ext/gettx/{hash}/{net}:** Returns information for given tx hash.
+- **ext/getbalance/{address}/{net}:** Returns current balance of given address.
+- **ext/getlasttxs/{net}/{min}/{length}/{start}:** Returns transactions greater than a specific number of coins, starting from a particular offset.
+- **ext/getcurrentprice/{net}:** Returns last known exchange prices.
+- **ext/getbasicstats/{net}:** Returns basic statistics about the coin including: block count, circulating supply, USD price, default market price and # of masternodes *\*# of masternodes is only applicable to masternode coins*.
+- **ext/getticker/{mode}/{net}:** Returns various ticker data.
+- **ext/getmarkets/{net}:** Returns various market data.
+- **ext/getsummary/{net}:** Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, default market price, network connection count, block count, count of online masternodes and count of offline masternodes *\*masternode counts are only applicable to masternode coins*.
+- **ext/getnetworkpeers/{net}:** Returns the list of network peers that have connected to the explorer node in the last 24 hours.
+- **ext/getmasternodelist/{net}:** Returns the complete list of masternodes on the network *\*only applicable to masternode coins*.
+- **ext/getmasternoderewards/{net}:** Returns a list of masternode reward transactions for a specific address that arrived after a specific block height *\*only applicable to masternode coins*.
+- **ext/getmasternoderewardstotal/{net}:** Returns the total number of coins earned in masternode rewards for a specific address that arrived after a specific block height *\*only applicable to masternode coins*.
+___
+
+### Exchanges
+
+but-eiquidus supports the following crypto currency exchanges.
+
+- [AltMarkets](https://altmarkets.io)
+- [Bittrex](https://bittrex.com)
+- [Bleutrade](https://bleutrade.com)
+- [BitxOnex](https://www.bitxonex.comrefid=ID1906858745)
+- [Bitoreum Exchange](https://www.bitoreum.exchange?refid=ID19CBFFCE97)
+- [Crex24](https://crex24.com)
+- [Dex-Trade](https://dex-trade.com)
+- [Exbitron](https://www.exbitron.com?refid=ID5FE45E2B3D)
+- [FreiExchange](https://freiexchange.com)/[FreiXLite](https://freixlite.com) *\*no chart support due to a lack of OHLCV api data*
+- [Poloniex](https://poloniex.com)
+- [SouthXchange](https://southxchange.com)
+- [Stex](https://stex.com)
+- [Txbit](https://txbit.io) *\*no chart support due to a lack of OHLCV api data*
+- [Unnamed](https://unnamed.exchange)
+- [Yobit](https://yobit.io) *\*no chart support due to a lack of OHLCV api data*
+___
 
 ### Installation
 
@@ -228,8 +223,8 @@ While we do not yet have our own step-by-step setup instructions, there are a fe
 
 The following prerequisites must be installed before using the explorer:
 
-- [Node.js](https://nodejs.org/en/) (v14.15.4 or newer recommended)
-- [MongoDB](https://www.mongodb.com/) (v4.4.3 or newer recommended)
+- [Node.js](https://nodejs.org/en/) (v17.9.1 or newer recommended)
+- [MongoDB](https://www.mongodb.com/) (v5.3.0 or newer recommended)
 - [Git](https://git-scm.com/downloads) (v2.36.0 or newer recommended) if you do not download but-eiquidus in another way
 - A fully indexed and synchronized *coind* wallet daemon that supports the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). **NOTE:** In most cases, the blockchain must be synchronized with the `addressindex`, `txindex`, `timestampindex`, `spentindex` and `futureindex` option enabled to have access to all features. See the [Wallet Settings](#wallet-settings) section for more details.
 
@@ -243,7 +238,7 @@ mongo
 
 Select database:
 
-**NOTE:** `explorerdb` is the name of the database where you will be storing local explorer data. You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbsettings.database` setting.
+**NOTE:** `` is the name of the database where you will be storing local explorer data. You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbs[i].database` setting.
 
 ```
 use explorerdb
@@ -258,7 +253,7 @@ db.createUser( { user: "eiquidus", pwd: "Nd^p2d77ceBX!L", roles: [ "readWrite" ]
 ##### Download Source Code
 
 ```
-git clone https://github.com/team-exor/eiquidus explorer
+git clone https://github.com/miningplanet/but-eiquidus explorer
 ```
 
 ##### Install Node Modules
@@ -276,6 +271,7 @@ cp ./settings.json.template ./settings.json
 *Make required changes in settings.json*
 
 **NOTE:** You can further customize the site by adding your own javascript code to the `public/js/custom.js` file and css rules to the `public/css/custom.scss` file. Adding changes to `custom.js` and `custom.scss` is the preferred method of customizing your site, without affecting the ability to receive explorer code updates in the future.
+___
 
 ### Start/Stop the Explorer
 
@@ -438,6 +434,7 @@ or (useful for crontab):
 ```
 cd /path/to/explorer && /path/to/forever restart "explorer"
 ```
+___
 
 ### Syncing Databases with the Blockchain
 
@@ -507,6 +504,7 @@ Or, run the crontab by calling the sync script directly, which should work bette
 */5 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js peers > /dev/null 2>&1
 */5 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js masternodes > /dev/null 2>&1
 ```
+___
 
 ### Wallet Settings
 
@@ -516,18 +514,22 @@ The wallet connected to eIquidus must be running with the following flags:
 -daemon -txindex
 ```
 
-You may either call your coins daemon using this syntax:
+You may either call your coins daemon using this syntax. Not all index options are available for all chains.
 
 ```
-coind -daemon -txindex
+coind -txindex -addressindex -timestampindex -spentindex -futureindex
 ```
 
 or else you can add the settings to your coins config file (recommended):
 
 ```
-daemon=1
 txindex=1
+addressindex=1
+timestampindex=1
+spentindex=1
+futureindex=1
 ```
+___
 
 ### Run Express Webserver on Port 80
 
@@ -601,6 +603,7 @@ sudo service nginx restart
 ```
 
 7. Nginx will now forward all incoming requests to eIquidus and after restarting the explorer it should be browsable via http://example.com without the need for the http://example.com:3001 port any longer.
+___
 
 ### TLS/SSL Support
 
@@ -699,6 +702,7 @@ sudo certbot --nginx
 Certbot will ask a few simple questions and generate the necessary TLS/SSL certificate files for your domain and link them to Nginx. It will also install the necessary files to automatically renew the certificates when they are about to expire, so you shouldn't need to do anything special to keep them up to date.
 
 3. If all went well, you should now be able to start up the explorer and browse to it using a secure https connection like [https://example.com](https://example.com).
+___
 
 ### CORS Support
 
@@ -746,6 +750,7 @@ jQuery(document).ready(function($) {
   });
 });
 ```
+___
 
 ### Useful Scripts
 
@@ -848,6 +853,7 @@ Wipe the eIquidus mongo database clean to start again from scratch. :warning: **
 Delete the mongo database with the following command:
 
 `npm run delete-database`
+___
 
 ### Trouble shooting
 
@@ -879,6 +885,7 @@ Where [SIZE] is an integer higher than the default.
 **Error: bind EACCES ...**
 
 This error can appear when you try to run the explorer on a port number lower than 1024. There are a couple solutions to this problem which are explained in more detail in the [Run Express Webserver on Port 80](#run-express-webserver-on-port-80) section.
+___
 
 ### Donations / Support Us
 
@@ -914,7 +921,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
-* Neither the name of Iquidus Technology nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission (TODO: rename to but-grid after multicoin stage II is released).
+* Neither the name of Iquidus Technology nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 ### Disclaimer
 
