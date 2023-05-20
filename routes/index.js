@@ -6,6 +6,8 @@ var express = require('express'),
     lib = require('../lib/explorer'),
     qr = require('qr-image');
 
+const networks = settings.getAllNet();
+
 function route_get_block(res, blockhash, coin, net) {
   lib.get_block(blockhash, function (block) {
     const shared_pages = settings.get(net, 'shared_pages')
@@ -546,17 +548,16 @@ function route_get_claim_form(res, hash, coin, net='mainnet') {
     route_get_address(res, hash, coin, net);
 }
 
-/* GET home page. */
+/* GET home page(s). */
 
-// TODO: Fix index routes.
 router.get('/', function(req, res) {
   route_get_index(res, null, 'mainnet');
 });
-router.get('/mainnet', function(req, res) {
-  route_get_index(res, null, 'mainnet');
-});
-router.get('/testnet', function(req, res) {
-  route_get_index(res, null, 'testnet');
+
+networks.forEach( function(net, index) {
+  router.get('/' + net, function(req, res) {
+    route_get_index(res, null, net);
+  });
 });
 
 router.get('/info/:net?', function(req, res) {
