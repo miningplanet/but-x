@@ -581,7 +581,8 @@ router.get('/info/:net?', function(req, res) {
         shared_pages: shared_pages,
         api_page: api_page,
         api_cmds: settings.get(net, 'api_cmds'),
-        isButkoin: settings.isButkoin(net)
+        isButkoin: settings.isButkoin(net),
+        isMainnet: net == 'mainnet'
       }
     );
   } else {
