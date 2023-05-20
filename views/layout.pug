@@ -1048,7 +1048,7 @@ html(lang='en')
             }
           });
           /* Add a click event for the whole document when markets are enabled to emulate the autoClose feature which doesn't work when controlling bootstrap dropdowns via javascript */
-          if (#{settings.get(net, 'markets_page').enabled} == true && #{settings.get(net, 'markets_page').show_market_dropdown_menu} == true && #{settings.market_count} > 1) {
+          if (#{settings.get(net, 'markets_page').enabled} == true && #{settings.get(net, 'markets_page').show_market_dropdown_menu} == true && #{settings.market_count[net]} > 1) {
             $(document).on('click', function(e) {
               if (sideMarketVisible)
                 bootstrap.Dropdown.getOrCreateInstance($('li.side-market-menu > a.dropdown-toggle')).hide();
@@ -1184,30 +1184,31 @@ html(lang='en')
                     span.explorer
                     span.margin-left-5 #{settings.locale.menu_explorer}
                 if settings.get(net, 'markets_page').enabled == true
-                  if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count > 1
+                  if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count[net] > 1
                     li#markets.dropdown.nav-item
                       a.nav-link.dropdown-toggle(data-bs-toggle='dropdown', href='#')
                         span.fas.fa-chart-line
                         span.margin-left-5 #{settings.locale.menu_markets}
                       div.navbar(class=dropdownClasses)
-                        each mkt in settings.market_data
-                          if mkt != null && mkt.id != null
-                            each pair in mkt.trading_pairs
-                              a.dropdown-item(href='/markets/' + mkt.id + '/' + pair.pair)
-                                if pair.isAlt == true
-                                  if mkt.alt_logo != null && mkt.alt_logo != ''
-                                    img.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
+                        if settings.market_data[net]
+                          each mkt in settings.market_data[net]
+                            if mkt != null && mkt.id != null
+                              each pair in mkt.trading_pairs
+                                a.dropdown-item(href='/markets/' + mkt.id + '/' + pair.pair)
+                                  if pair.isAlt == true
+                                    if mkt.alt_logo != null && mkt.alt_logo != ''
+                                      img.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
+                                    else
+                                      i.market-logo.fas.fa-question-circle
+                                    span #{mkt.alt_name}
+                                      span.small.fw-normal  (#{pair.pair})
                                   else
-                                    i.market-logo.fas.fa-question-circle
-                                  span #{mkt.alt_name}
-                                    span.small.fw-normal  (#{pair.pair})
-                                else
-                                  if mkt.logo != null && mkt.logo != ''
-                                    img.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
-                                  else
-                                    i.market-logo.fas.fa-question-circle
-                                  span #{mkt.name}
-                                    span.small.fw-normal  (#{pair.pair})
+                                    if mkt.logo != null && mkt.logo != ''
+                                      img.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
+                                    else
+                                      i.market-logo.fas.fa-question-circle
+                                    span #{mkt.name}
+                                      span.small.fw-normal  (#{pair.pair})
                   else
                     li#markets.nav-item
                       a.nav-link(href='/markets/' + settings.get(net, 'markets_page').default_exchange.exchange_name + '/' + settings.get(net, 'markets_page').default_exchange.trading_pair + '/' + net)
@@ -1321,30 +1322,31 @@ html(lang='en')
                     span.nav-icon.fab.fa-btc
                     span.margin-left-5 #{settings.locale.menu_richlist}
               if settings.get(net, 'markets_page').enabled == true
-                if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count > 1
+                if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count[net] > 1
                   li#markets.dropend.nav-item.side-market-menu(alt=settings.locale.menu_markets, title=settings.locale.menu_markets, data-bs-toggle='tooltip', data-bs-placement='right')
                     a.nav-link.dropdown-toggle(href='#')
                       span.nav-icon.fas.fa-chart-line
                       span.margin-left-5 #{settings.locale.menu_markets}
                     div#side-market-menu.navbar(class=dropdownClasses)
-                      each mkt in settings.market_data
-                        if mkt != null && mkt.id != null
-                          each pair in mkt.trading_pairs
-                            a.dropdown-item(href='/markets/' + mkt.id + '/' + pair.pair)
-                              if pair.isAlt == true
-                                if mkt.alt_logo != null && mkt.alt_logo != ''
-                                  img.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
+                      if settings.market_data[net]
+                        each mkt in settings.market_data[net]
+                          if mkt != null && mkt.id != null
+                            each pair in mkt.trading_pairs
+                              a.dropdown-item(href='/markets/' + mkt.id + '/' + pair.pair)
+                                if pair.isAlt == true
+                                  if mkt.alt_logo != null && mkt.alt_logo != ''
+                                    img.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
+                                  else
+                                    i.market-logo.fas.fa-question-circle
+                                  span #{mkt.alt_name}
+                                    span.small.fw-normal  (#{pair.pair})
                                 else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.alt_name}
-                                  span.small.fw-normal  (#{pair.pair})
-                              else
-                                if mkt.logo != null && mkt.logo != ''
-                                  img.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
-                                else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.name}
-                                  span.small.fw-normal  (#{pair.pair})
+                                  if mkt.logo != null && mkt.logo != ''
+                                    img.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
+                                  else
+                                    i.market-logo.fas.fa-question-circle
+                                  span #{mkt.name}
+                                    span.small.fw-normal  (#{pair.pair})
                 else
                   li#markets.nav-item(alt=settings.locale.menu_markets, title=settings.locale.menu_markets, data-bs-toggle='tooltip', data-bs-placement='right')
                     a.nav-link(href='/markets/' + settings.get(net, 'markets_page').default_exchange.exchange_name + '/' + settings.get(net, 'markets_page').default_exchange.trading_pair)

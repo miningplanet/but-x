@@ -19,6 +19,8 @@ var apiAccessList = [];
 const date = require('date-and-time')
 const { exec } = require('child_process');
 
+const networks = settings.getAllNet();
+
 // application cache
 const wlength = settings.wallets.length
 const summaryCache = new TTLCache({ max: wlength, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
@@ -32,12 +34,6 @@ const distributionCache = new TTLCache({ max: wlength, ttl: settings.cache.distr
 const peersCache = new TTLCache({ max: wlength, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const masternodesCache = new TTLCache({ max: wlength, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
-// TODO: Fix chain.
-const net = 'mainnet'
-const shared_pages = settings.get(net, 'shared_pages')
-const markets_page = settings.get(net, 'markets_page')
-const api_cmds = settings.get(net, 'api_cmds')
-
 var request = require('postman-request');
 var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
 var base_url = base_server + ''; // api/
@@ -46,10 +42,14 @@ var base_url = base_server + ''; // api/
 nodeapi.setWalletDetails(settings.wallets);
 
 // dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value
-Object.keys(api_cmds).forEach(function(key, index, map) {
-  if (key != 'use_rpc' && api_cmds[key] != null && api_cmds[key] != '')
-    apiAccessList.push(key);
+networks.forEach( function(item, index) {
+  const api_cmds = settings.get(item, 'api_cmds')
+  Object.keys(api_cmds).forEach(function(key, index, map) {
+    if (key != 'use_rpc' && api_cmds[key] != null && api_cmds[key] != '')
+      apiAccessList.push(item + "@" + key);
+  });
 });
+
 // dynamically find and add additional blockchain_specific api cmds
 Object.keys(settings.blockchain_specific).forEach(function(key, index, map) {
   // check if this feature is enabled and has api cmds
@@ -63,6 +63,7 @@ Object.keys(settings.blockchain_specific).forEach(function(key, index, map) {
 });
 // whitelist the cmds in the nodeapi access list
 nodeapi.setAccess('only', apiAccessList);
+
 // determine if cors should be enabled
 if (settings.webserver.cors.enabled == true) {
   app.use(function(req, res, next) {
@@ -72,28 +73,13 @@ if (settings.webserver.cors.enabled == true) {
     next();
   });
 }
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-var default_favicon = '';
-
-// loop through the favicons
-Object.keys(shared_pages.favicons).forEach(function(key, index, map) {
-  // remove the public directory from the path if exists
-  if (shared_pages.favicons[key] != null && shared_pages.favicons[key].indexOf('public/') > -1)
-    shared_pages.favicons[key] = shared_pages.favicons[key].replace(/public\//g, '');
-
-  // check if the favicon file exists
-  if (!db.fs.existsSync(path.join('./public', shared_pages.favicons[key])))
-    shared_pages.favicons[key] = '';
-  else if (default_favicon == '')
-    default_favicon = shared_pages.favicons[key];
-});
-
-if (default_favicon != '')
-  app.use(favicon(path.join('./public', default_favicon)));
-
+// Always use Butkoin favicon.
+app.use(favicon(path.join('./public', settings.shared_pages.favicons.favicon32)));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -149,9 +135,9 @@ app.post('/claim/:net?', function(req, res) {
 
 // extended apis
 app.use('/ext/getmoneysupply/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getmoneysupply.enabled == true) {
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = supplyCache.get(net);
     if (r == undefined) {
@@ -284,10 +270,10 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
 });
 
 app.use('/ext/getbalance/:hash/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbalance.enabled == true) {
     const hash = req.params.hash
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = balancesCache.get(net + '_' + hash);
     if (r == undefined) {
@@ -310,9 +296,9 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
 });
 
 app.use('/ext/getdistribution/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getdistribution.enabled == true) {
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = distributionCache.get(net);
     if (r == undefined) {
@@ -334,11 +320,11 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
 });
 
 app.use('/ext/getcurrentprice/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getcurrentprice.enabled == true) {
     const defaultExchangeCurrencyPrefix = settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toLowerCase();
     if (settings.cache.enabled == true) {
-      const net = settings.getNet(req.params['net'])
       const coin = settings.getCoin(net)
       var r = pricesCache.get(net);
       if (r == undefined) {
@@ -410,9 +396,9 @@ function ratesPush(rates, currencies, item, price) {
 }
 
 app.use('/ext/getbasicstats/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const api_cmds = settings.get(net, 'api_cmds')
     const markets_page = settings.get(net, 'markets')
@@ -712,10 +698,10 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
 });
 
 app.use('/ext/getsummary/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   // check if the getsummary api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const r = summaryCache.get(net);
     if (r == undefined) {
@@ -825,10 +811,10 @@ app.use('/ext/getsummary/:net?', function(req, res) {
 });
 
 app.use('/ext/getnetworkpeers/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   // check if the getnetworkpeers api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
   if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
-    const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)  
     const r = peersCache.get(net);
     if (r == undefined) {
@@ -979,147 +965,154 @@ app.use('/system/restartexplorer', function(req, res, next) {
   }
 });
 
-var market_data = [];
-var market_count = 0;
+var market_data = {};
+var market_count = {};
 
-// check if markets are enabled
-if (markets_page.enabled == true) {
-  // dynamically populate market data
-  Object.keys(markets_page.exchanges).forEach(function (key, index, map) {
-    // check if market is enabled via settings
-    if (markets_page.exchanges[key].enabled == true) {
-      // check if market is installed/supported
-      if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
-        // load market file
-        var exMarket = require('./lib/markets/' + key);
-        // save market_name and market_logo from market file to settings
-        eval('market_data.push({id: "' + key + '", name: "' + (exMarket.market_name == null ? '' : exMarket.market_name) + '", alt_name: "' + (exMarket.market_name_alt == null ? '' : exMarket.market_name_alt) + '", logo: "' + (exMarket.market_logo == null ? '' : exMarket.market_logo) + '", alt_logo: "' + (exMarket.market_logo_alt == null ? '' : exMarket.market_logo_alt) + '", trading_pairs: []});');
-        // loop through all trading pairs for this market
-        for (var i = 0; i < markets_page.exchanges[key].trading_pairs.length; i++) {
-          var isAlt = false;
-          var pair = markets_page.exchanges[key].trading_pairs[i].toUpperCase(); // ensure trading pair setting is always uppercase
-          var coin_symbol = pair.split('/')[0];
-          var pair_symbol = pair.split('/')[1];
+networks.forEach( function(item, index) {
+  market_count[item] = 0
+  var tmparray = []
+  const markets_page = settings.get(item, 'markets_page')
+  // check if markets are enabled
+  if (markets_page.enabled == true) {
+    // dynamically populate market data
+    Object.keys(markets_page.exchanges).forEach(function (key, index, map) {
+      // check if market is enabled via settings
+      if (markets_page.exchanges[key].enabled == true) {
+        // check if market is installed/supported
+        if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
+          // load market file
+          var exMarket = require('./lib/markets/' + key);
+          // save market_name and market_logo from market file to settings
+          const tmp = {
+            id: key,
+            name: exMarket.market_name == null ? '' : exMarket.market_name,
+            alt_name: exMarket.market_name_alt == null ? '' : exMarket.market_name_alt,
+            logo: exMarket.market_logo == null ? '' : exMarket.market_logo,
+            alt_logo: exMarket.market_logo_alt == null ? '' : exMarket.market_logo_alt,
+            trading_pairs : []                        
+          }
+          tmparray.push(tmp)
+          // loop through all trading pairs for this market
+          for (var i = 0; i < markets_page.exchanges[key].trading_pairs.length; i++) {
+            var isAlt = false;
+            var pair = markets_page.exchanges[key].trading_pairs[i].toUpperCase(); // ensure trading pair setting is always uppercase
+            var coin_symbol = pair.split('/')[0];
+            var pair_symbol = pair.split('/')[1];
 
-          // determine if using the alt name + logo
-          if (exMarket.market_url_template != null && exMarket.market_url_template != '') {
-            switch ((exMarket.market_url_case == null || exMarket.market_url_case == '' ? 'l' : exMarket.market_url_case.toLowerCase())) {
-              case 'l':
-              case 'lower':
-                isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : false);
-                break;
-              case 'u':
-              case 'upper':
-                isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : false);
-                break;
-              default:
+            // determine if using the alt name + logo
+            if (exMarket.market_url_template != null && exMarket.market_url_template != '') {
+              switch ((exMarket.market_url_case == null || exMarket.market_url_case == '' ? 'l' : exMarket.market_url_case.toLowerCase())) {
+                case 'l':
+                case 'lower':
+                  isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : false);
+                  break;
+                case 'u':
+                case 'upper':
+                  isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : false);
+                  break;
+                default:
+              }
             }
+
+            // add trading pair to market_data
+            tmparray[tmparray.length - 1].trading_pairs.push({
+              pair: pair,
+              isAlt: isAlt
+            });
+
+            // increment the market count
+            market_count[item]++;
           }
 
-          // add trading pair to market_data
-          market_data[market_data.length - 1].trading_pairs.push({
-            pair: pair,
-            isAlt: isAlt
+          // sort trading pairs by alt status
+          tmparray[tmparray.length - 1].trading_pairs.sort(function(a, b) {
+            if (a.isAlt < b.isAlt)
+              return -1;
+            else if (a.isAlt > b.isAlt)
+              return 1;
+            else
+              return 0;
           });
-
-          // increment the market count
-          market_count++;
         }
+      }
+    });
+  
+    // sort market data by market name
+    tmparray.sort(function(a, b) {
+      var name1 = a.name.toLowerCase();
+      var name2 = b.name.toLowerCase();
 
-        // sort trading pairs by alt status
-        market_data[market_data.length - 1].trading_pairs.sort(function(a, b) {
-          if (a.isAlt < b.isAlt)
-            return -1;
-          else if (a.isAlt > b.isAlt)
-            return 1;
-          else
-            return 0;
-        });
+      if (name1 < name2)
+        return -1;
+      else if (name1 > name2)
+        return 1;
+      else
+        return 0;
+    });
+
+    var ex = markets_page.exchanges;
+    var ex_name = markets_page.default_exchange.exchange_name;
+    var ex_pair = markets_page.default_exchange.trading_pair;
+    var ex_keys = Object.keys(ex);
+    var ex_error = '';
+
+    // check to ensure default market and trading pair exist and are enabled
+    // if (ex[ex_name] == null) {
+    //   // exchange name does not exist in exchanges list
+    //   ex_error = 'Default exchange name is not valid' + ': ' + ex_name;
+    // } else if (!ex[ex_name].enabled) {
+    //   // exchange is not enabled
+    //   ex_error = 'Default exchange is disabled in settings' + ': ' + ex_name;
+    // } else if (ex[ex_name].trading_pairs.findIndex(p => p.toLowerCase() == ex_pair.toLowerCase()) == -1) {
+    //   // invalid default exchange trading pair
+    //   ex_error = 'Default exchange trading pair is not valid' + ': ' + ex_pair;
+    // }
+
+    // check if there was an error msg
+    if (ex_error != '') {
+      // there was an error, so find the next available market from settings.json
+      var new_default_index = -1;
+
+      // find the first enabled exchange with at least one trading pair
+      for (var i = 0; i < ex_keys.length; i++) {
+        if (ex[ex_keys[i]]['enabled'] === true && ex[ex_keys[i]]['trading_pairs'].length > 0) {
+          // found a match so save the index
+          new_default_index = i;
+          // stop looking for more matches
+          break;
+        }
+      }
+
+      // Disable the markets page for this session if no active market and trading pair was found or set the new default market.
+      if (new_default_index == -1) {
+        console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart the explorer to resolve the problem');
+        settings.markets_page.enabled = false;
+      } else {
+        console.log('WARNING: ' + ex_error + '. ' + 'Default exchange will be set to' + ': ' + ex_keys[new_default_index] + ' (' + ex[ex_keys[new_default_index]].trading_pairs[0] + ')');
+        markets_page.default_exchange.exchange_name = ex_keys[new_default_index];
+        markets_page.default_exchange.trading_pair = ex[ex_keys[new_default_index]].trading_pairs[0];
       }
     }
-  });
-
-  // sort market data by market name
-  market_data.sort(function(a, b) {
-    var name1 = a.name.toLowerCase();
-    var name2 = b.name.toLowerCase();
-
-    if (name1 < name2)
-      return -1;
-    else if (name1 > name2)
-      return 1;
-    else
-      return 0;
-  });
-
-  var ex = markets_page.exchanges;
-  var ex_name = markets_page.default_exchange.exchange_name;
-  var ex_pair = markets_page.default_exchange.trading_pair;
-  var ex_keys = Object.keys(ex);
-  var ex_error = '';
-
-  // check to ensure default market and trading pair exist and are enabled
-  if (ex[ex_name] == null) {
-    // exchange name does not exist in exchanges list
-    ex_error = 'Default exchange name is not valid' + ': ' + ex_name;
-  } else if (!ex[ex_name].enabled) {
-    // exchange is not enabled
-    ex_error = 'Default exchange is disabled in settings' + ': ' + ex_name;
-  } else if (ex[ex_name].trading_pairs.findIndex(p => p.toLowerCase() == ex_pair.toLowerCase()) == -1) {
-    // invalid default exchange trading pair
-    ex_error = 'Default exchange trading pair is not valid' + ': ' + ex_pair;
   }
-
-  // check if there was an error msg
-  if (ex_error != '') {
-    // there was an error, so find the next available market from settings.json
-    var new_default_index = -1;
-
-    // find the first enabled exchange with at least one trading pair
-    for (var i = 0; i < ex_keys.length; i++) {
-      if (ex[ex_keys[i]]['enabled'] === true && ex[ex_keys[i]]['trading_pairs'].length > 0) {
-        // found a match so save the index
-        new_default_index = i;
-        // stop looking for more matches
-        break;
-      }
-    }
-
-    // Disable the markets page for this session if no active market and trading pair was found or set the new default market.
-    if (new_default_index == -1) {
-      console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart the explorer to resolve the problem');
-      settings.markets_page.enabled = false;
-    } else {
-      console.log('WARNING: ' + ex_error + '. ' + 'Default exchange will be set to' + ': ' + ex_keys[new_default_index] + ' (' + ex[ex_keys[new_default_index]].trading_pairs[0] + ')');
-      markets_page.default_exchange.exchange_name = ex_keys[new_default_index];
-      markets_page.default_exchange.trading_pair = ex[ex_keys[new_default_index]].trading_pairs[0];
-    }
+  
+  if (tmparray.length > 0) {
+    market_data[item] = tmparray
   }
-}
-
-// check if home_link_logo file exists
-if (!db.fs.existsSync(path.join('./public', shared_pages.page_header.home_link_logo)))
-  shared_pages.page_header.home_link_logo = '';
+});
 
 // locals
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
-
-// TODO: Observe coin.name in layout.pug.
-// app.set('coin', settings.coins[0].id);
-
 app.set('get', settings.get);
 app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);
 app.set('panels', settings.panels);
-app.set('coin', settings.coins[0].id);
 app.set('coins', settings.coins);
 app.set('default_wallet', settings.wallets[0].id);
 app.set('currencies', settings.currencies);
 app.set('cache', settings.cache);
 app.set('labels', settings.labels);
 app.set('blockchain_specific', settings.blockchain_specific);
-
 app.set('market_data', market_data);
 app.set('market_count', market_count);
 
@@ -1134,8 +1127,6 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
-    // TODO: Observe fix error handler chain.
-    // const net = settings.getNet('mainnet')
     const net = settings.getNet(req.params['net'])
     const coin = settings.getCoin(net)
     const shared_pages = settings.get(net, 'shared_pages')
@@ -1155,8 +1146,6 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  // TODO: Observe fix error handler chain.
-  // const net = settings.getNet('mainnet')
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const shared_pages = settings.get(net, 'shared_pages')
