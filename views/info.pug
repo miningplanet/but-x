@@ -50,14 +50,19 @@ block content
                 p
                   div.fw-bold getdifficulty
                   div
-                    em #{settings.locale.api_getdifficulty}
-                      ul
-                        li Ghostrider (CPU)
-                        li Yespower (CPU)
-                        li Lyra2z330 (GPU)
-                        li Sha256d (ASIC)
-                        li Scrypt (ASIC)
-                        li Butkscrypt (ASIC)
+                    if isButkoin
+                      em #{settings.locale.api_getdifficulty}
+                        ul
+                          li Ghostrider (CPU)
+                          li Yespower (CPU)
+                          li Lyra2z330 (GPU)
+                          li Sha256d (ASIC)
+                          li Scrypt (ASIC)
+                          li Butkscrypt (ASIC)
+                    else
+                      em #{settings.locale.api_getdifficulty}
+                        ul
+                          li Ghostrider (CPU)
                   if net != null && net != "" && net != settings.default_wallet
                     a(href='/api/getdifficulty/' + net) #{address}/api/getdifficulty/#{net}
                   else
@@ -123,14 +128,19 @@ block content
                 p
                   div.fw-bold getnetworkhashps
                   div
-                    em #{settings.locale.api_getnetworkhashps}
-                      ul
-                        li Ghostrider (CPU)
-                        li Yespower (CPU)
-                        li Lyra2z330 (GPU)
-                        li Sha256d (ASIC)
-                        li Scrypt (ASIC)
-                        li Butkscrypt (ASIC)
+                    if isButkoin
+                      em #{settings.locale.api_getnetworkhashps}
+                        ul
+                          li Ghostrider (CPU)
+                          li Yespower (CPU)
+                          li Lyra2z330 (GPU)
+                          li Sha256d (ASIC)
+                          li Scrypt (ASIC)
+                          li Butkscrypt (ASIC)
+                    else
+                      em #{settings.locale.api_getnetworkhashps}
+                        ul
+                          li Ghostrider (CPU)
                   if net != null && net != "" && net != settings.default_wallet
                     a(href='/api/getnetworkhashps/' + net) #{address}/api/getnetworkhashps/#{net}
                   else
