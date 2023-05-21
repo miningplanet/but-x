@@ -440,19 +440,31 @@ block content
           li
             p
               div.fw-bold transaction (/tx/txid)
-              a(href='/tx/' + api_page.sample_data.txhash) #{address}/tx/#{api_page.sample_data.txhash}
+              if !isMainnet
+                a(href='/tx/' + api_page.sample_data.txhash + '/' + net) #{address}/tx/#{api_page.sample_data.txhash}/#{net}
+              else
+                a(href='/tx/' + api_page.sample_data.txhash) #{address}/tx/#{api_page.sample_data.txhash}
           li
             p
               div.fw-bold block (/block/hash)
-              a(href='/block/' + api_page.sample_data.blockhash) #{address}/block/#{api_page.sample_data.blockhash}
+              if !isMainnet
+                a(href='/block/' + api_page.sample_data.blockhash + '/' + net) #{address}/block/#{api_page.sample_data.blockhash}/#{net}
+              else
+                a(href='/block/' + api_page.sample_data.blockhash) #{address}/block/#{api_page.sample_data.blockhash}
           li
             p
               div.fw-bold address (/address/hash)
-              a(href='/address/' + api_page.sample_data.address) #{address}/address/#{api_page.sample_data.address}
+              if !isMainnet
+                a(href='/address/' + api_page.sample_data.address + '/' + net) #{address}/address/#{api_page.sample_data.address}/#{net}
+              else
+                a(href='/address/' + api_page.sample_data.address) #{address}/address/#{api_page.sample_data.address}
           li
             p
               div.fw-bold qrcode (/qr/hash)
-              a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
+              if !isMainnet
+                a(href='/qr/' + api_page.sample_data.address + '/' + net) #{address}/qr/#{api_page.sample_data.address}/#{net}
+              else
+                a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
           hr
         if api_page.show_electrum_api_section
           h3 ElectrumX API (JSON-RPC 2.0)
