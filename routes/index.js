@@ -566,6 +566,7 @@ router.get('/info/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true) {  
     const shared_pages = settings.get(net, 'shared_pages')
+    const markets_page = settings.get(net, 'markets_page')
     res.render(
       'info',
       { // req.headers.host
@@ -580,6 +581,7 @@ router.get('/info/:net?', function(req, res) {
         coin: coin,
         net: net,
         shared_pages: shared_pages,
+        markets_page: markets_page,
         api_page: api_page,
         api_cmds: settings.get(net, 'api_cmds'),
         isButkoin: settings.isButkoin(net),

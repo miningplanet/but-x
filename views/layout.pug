@@ -1,5 +1,20 @@
 doctype html
 html(lang='en')
+  - const markets_page = settings.get(net, 'markets_page')
+  - const index_page = settings.get(net, 'index_page')
+  - const block_page = settings.get(net, 'block_page')
+  - const transaction_page = settings.get(net, 'transaction_page')
+  - const address_page = settings.get(net, 'address_page')
+  - const masternodes_page = settings.get(net, 'masternodes_page')
+  - const movement_page = settings.get(net, 'movement_page')
+  - const network_page = settings.get(net, 'network_page')
+  - const richlist_page = settings.get(net, 'richlist_page')
+  - const api_page = settings.get(net, 'api_page')
+  - const claim_address_page = settings.get(net, 'claim_address_page')
+  - const error_page = settings.get(net, 'error_page')
+  - const network_history = settings.get(net, 'network_history')
+  
+
   head
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -41,81 +56,81 @@ html(lang='en')
     - var showDifficultyChart = false
     case active
       when 'home'
-        if settings.get(net, 'index_page').show_panels == true
+        if index_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'index_page').show_nethash_chart == true
+        if index_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'index_page').show_difficulty_chart == true
+        if index_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'block'
-        if settings.get(net, 'block_page').show_panels == true
+        if block_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'block_page').show_nethash_chart == true
+        if block_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'block_page').show_difficulty_chart == true
+        if block_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'tx'
-        if settings.get(net, 'transaction_page').show_panels == true
+        if transaction_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'transaction_page').show_nethash_chart == true
+        if transaction_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'transaction_page').show_difficulty_chart == true
+        if transaction_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'address'
-        if settings.get(net, 'address_page').show_panels == true
+        if address_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'address_page').show_nethash_chart == true
+        if address_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'address_page').show_difficulty_chart == true
+        if address_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'masternodes'
-        if settings.get(net, 'masternodes_page').show_panels == true
+        if masternodes_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'masternodes_page').show_nethash_chart == true
+        if masternodes_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'masternodes_page').show_difficulty_chart == true
+        if masternodes_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'movement'
-        if settings.get(net, 'movement_page').show_panels == true
+        if movement_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'movement_page').show_nethash_chart == true
+        if movement_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'movement_page').show_difficulty_chart == true
+        if movement_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'network'
-        if settings.get(net, 'network_page').show_panels == true
+        if network_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'network_page').show_nethash_chart == true
+        if network_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'network_page').show_difficulty_chart == true
+        if network_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'richlist'
-        if settings.get(net, 'richlist_page').show_panels == true
+        if richlist_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'richlist_page').show_nethash_chart == true
+        if richlist_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'richlist_page').show_difficulty_chart == true
+        if richlist_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'markets'
-        if settings.get(net, 'markets_page').show_panels == true
+        if markets_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'markets_page').show_nethash_chart == true
+        if markets_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'markets_page').show_difficulty_chart == true
+        if markets_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'info'
-        if settings.get(net, 'api_page').show_panels == true
+        if api_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'api_page').show_nethash_chart == true
+        if api_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'api_page').show_difficulty_chart == true
+        if api_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'claim-address'
-        if settings.get(net, 'claim_address_page').show_panels == true
+        if claim_address_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'claim_address_page').show_nethash_chart == true
+        if claim_address_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'claim_address_page').show_difficulty_chart == true
+        if claim_address_page.show_difficulty_chart == true
           - showDifficultyChart = true
       when 'reward'
         if settings.blockchain_specific.heavycoin.reward_page.show_panels == true
@@ -125,15 +140,15 @@ html(lang='en')
         if settings.blockchain_specific.heavycoin.reward_page.show_difficulty_chart == true
           - showDifficultyChart = true
       default
-        if settings.get(net, 'error_page').show_panels == true
+        if error_page.show_panels == true
           - showPanels = true
-        if settings.get(net, 'error_page').show_nethash_chart == true
+        if error_page.show_nethash_chart == true
           - showNethashChart = true
-        if settings.get(net, 'error_page').show_difficulty_chart == true
+        if error_page.show_difficulty_chart == true
           - showDifficultyChart = true
-    if active == 'reward' || (settings.get(net, 'network_history').enabled == true && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true)))
+    if active == 'reward' || (network_history.enabled == true && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true)))
       script(type='text/javascript', src='/js/chart.min.js')
-    if (settings.get(net, 'network_history').enabled == true) && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
+    if (network_history.enabled == true) && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
       script(type='text/javascript', src='/js/chartjs-plugin-crosshair.js')
     - var sideBarClasses = [];
     if shared_pages.page_header.bgcolor != null && shared_pages.page_header.bgcolor != ''
@@ -399,7 +414,7 @@ html(lang='en')
           $.ajax({
             url: '/ext/getnetworkchartdata' + '/#{net}',
             success: function(result) {
-              if (#{settings.get(net, 'network_history').enabled} == true && #{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) {
+              if (#{network_history.enabled} == true && #{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) {
                 const ctxNethash = document.getElementById('nethashChart').getContext('2d');
 
                 if (nethashChart == null) {
@@ -554,7 +569,7 @@ html(lang='en')
                 }
               }
 
-              if (#{settings.get(net, 'network_history').enabled} == true && #{showDifficultyChart} == true && #{shared_pages.page_header.network_charts.difficulty_chart.enabled} == true) {
+              if (#{network_history.enabled} == true && #{showDifficultyChart} == true && #{shared_pages.page_header.network_charts.difficulty_chart.enabled} == true) {
                 const ctxDifficulty = document.getElementById('difficultyChart').getContext('2d');
 
                 var diffDataSets = [];
@@ -778,7 +793,7 @@ html(lang='en')
         }
         function getPricePanel() {
           var priceType='<label id="lastPrice">-</label>';
-          var s='<div class="card-header"><b>Price <span class="small fw-normal">(#{settings.get(net, "markets_page").default_exchange.trading_pair.split('/')[1]})</span></b></div>';
+          var s='<div class="card-header"><b>Price <span class="small fw-normal">(#{markets_page.default_exchange.trading_pair.split('/')[1]})</span></b></div>';
           s += '<div class="card-body"><div id="pricePanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
           s += '<div id="pricepanel" class="header-panel" style="display:none;">';
           s += '<label><strong>&#9889;&nbsp;</strong></label><label id="lastPrice">-</label>';
@@ -786,7 +801,7 @@ html(lang='en')
           return s;
         }
         function getMarketCapPanel() {
-          var s='<div class="card-header"><b>Market Cap <span class="small fw-normal">(#{settings.get(net, "markets_page").default_exchange.trading_pair.split('/')[1]})</span></b></div>';
+          var s='<div class="card-header"><b>Market Cap <span class="small fw-normal">(#{markets_page.default_exchange.trading_pair.split('/')[1]})</span></b></div>';
           s += '<div class="card-body"><div id="marketCapPanelLoading" class="header-panel"><i class="fa fa-spinner fa-pulse"></i></div>';
           s += '<div id="marketCapPanel" class="header-panel" style="display:none;">';
           s += '<label><strong>&#8778;&nbsp;</strong></label><label id="marketCap"></label>';
@@ -1048,7 +1063,7 @@ html(lang='en')
             }
           });
           /* Add a click event for the whole document when markets are enabled to emulate the autoClose feature which doesn't work when controlling bootstrap dropdowns via javascript */
-          if (#{settings.get(net, 'markets_page').enabled} == true && #{settings.get(net, 'markets_page').show_market_dropdown_menu} == true && #{settings.market_count[net]} > 1) {
+          if (markets_page.enabled == true && markets_page.show_market_dropdown_menu == true && #{settings.market_count[net]} > 1) {
             $(document).on('click', function(e) {
               if (sideMarketVisible)
                 bootstrap.Dropdown.getOrCreateInstance($('li.side-market-menu > a.dropdown-toggle')).hide();
@@ -1100,7 +1115,7 @@ html(lang='en')
         setInterval(function() {
           update_stats();
         }, 60000);
-        if (#{settings.get(net, 'network_history').enabled} == true && ((#{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) || (#{showDifficultyChart} == true && #{shared_pages.page_header.network_charts.difficulty_chart.enabled} == true))) {
+        if (#{network_history.enabled} == true && ((#{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) || (#{showDifficultyChart} == true && #{shared_pages.page_header.network_charts.difficulty_chart.enabled} == true))) {
           var setting_reload_chart_seconds = #{shared_pages.page_header.network_charts.reload_chart_seconds};
           if (setting_reload_chart_seconds > 0) {
             setInterval(function() {
@@ -1183,8 +1198,8 @@ html(lang='en')
                   a.nav-link(href='/' + net)
                     span.explorer
                     span.margin-left-5 #{settings.locale.menu_explorer}
-                if settings.get(net, 'markets_page').enabled == true
-                  if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count[net] > 1
+                if markets_page.enabled == true
+                  if markets_page.show_market_dropdown_menu == true && settings.market_count[net] > 1
                     li#markets.dropdown.nav-item
                       a.nav-link.dropdown-toggle(data-bs-toggle='dropdown', href='#')
                         span.fas.fa-chart-line
@@ -1211,7 +1226,7 @@ html(lang='en')
                                       span.small.fw-normal  (#{pair.pair})
                   else
                     li#markets.nav-item
-                      a.nav-link(href='/markets/' + settings.get(net, 'markets_page').default_exchange.exchange_name + '/' + settings.get(net, 'markets_page').default_exchange.trading_pair + '/' + net)
+                      a.nav-link(href='/markets/' + markets_page.default_exchange.exchange_name + '/' + markets_page.default_exchange.trading_pair + '/' + net)
                         span.markets
                         span.margin-left-5 #{settings.locale.menu_markets}
                 if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
@@ -1219,32 +1234,32 @@ html(lang='en')
                     a.nav-link(href='/reward/' + net)
                       span.fa.fa-star
                       span.margin-left-5 #{settings.locale.menu_reward}
-                if settings.get(net, 'masternodes_page').enabled == true
+                if masternodes_page.enabled == true
                   li#masternodes.nav-item
                     a.nav-link(href='/masternodes/' + net)
                       span.smartnodes
                       span.margin-left-5 Smartnodes
-                if settings.get(net, 'movement_page').enabled == true
+                if movement_page.enabled == true
                   li#movement.nav-item
                     a.nav-link(href='/movement/' + net)
                       span.movement
                       span.margin-left-5 #{settings.locale.menu_movement}
-                if settings.get(net, 'network_page').enabled == true
+                if network_page.enabled == true
                   li#network.nav-item
                     a.nav-link(href='/network/' + net)
                       span.network
                       span.margin-left-5 #{settings.locale.menu_network}
-                if settings.get(net, 'richlist_page').enabled == true
+                if richlist_page.enabled == true
                   li#richlist.nav-item
                     a.nav-link(href='/richlist/' + net)
                       span.richlist
                       span.margin-left-5 #{settings.locale.menu_richlist}
-                if settings.get(net, 'api_page').enabled == true
+                if api_page.enabled == true
                   li#info.nav-item
                     a.nav-link(href='/info/' + net)
                       span.api
                       span.margin-left-5 #{settings.locale.menu_api}
-                if settings.get(net, 'claim_address_page').show_header_menu == true && settings.get(net, 'claim_address_page').enabled == true
+                if claim_address_page.show_header_menu == true && claim_address_page.enabled == true
                   li#claim-address.nav-item
                     a.nav-link(href='/claim/' + net)
                       span.claim
@@ -1301,28 +1316,28 @@ html(lang='en')
                   a.nav-link(href='/reward')
                     span.nav-icon.fa.fa-star
                     span.margin-left-5 #{settings.locale.menu_reward}
-              if settings.get(net, 'masternodes_page').enabled == true
+              if masternodes_page.enabled == true
                 li#masternodes.nav-item(alt="Smartnodes", title="Smartnodes", data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/masternodes')
                     span.nav-icon.fa.fa-share-alt
                     span.margin-left-5 Smartnodes
-              if settings.get(net, 'movement_page').enabled == true
+              if movement_page.enabled == true
                 li#movement.nav-item(alt=settings.locale.menu_movement, title=settings.locale.menu_movement, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/movement')
                     span.nav-icon.far.fa-money-bill-alt
                     span.margin-left-5 #{settings.locale.menu_movement}
-              if settings.get(net, 'network_page').enabled == true
+              if network_page.enabled == true
                 li#network.nav-item(alt=settings.locale.menu_network, title=settings.locale.menu_network, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/network')
                     span.nav-icon.fas.fa-network-wired
                     span.margin-left-5 #{settings.locale.menu_network}
-              if settings.get(net, 'richlist_page').enabled == true
+              if richlist_page.enabled == true
                 li#richlist.nav-item(alt=settings.locale.menu_richlist, title=settings.locale.menu_richlist, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/richlist')
                     span.nav-icon.fab.fa-btc
                     span.margin-left-5 #{settings.locale.menu_richlist}
-              if settings.get(net, 'markets_page').enabled == true
-                if settings.get(net, 'markets_page').show_market_dropdown_menu == true && settings.market_count[net] > 1
+              if markets_page.enabled == true
+                if markets_page.show_market_dropdown_menu == true && settings.market_count[net] > 1
                   li#markets.dropend.nav-item.side-market-menu(alt=settings.locale.menu_markets, title=settings.locale.menu_markets, data-bs-toggle='tooltip', data-bs-placement='right')
                     a.nav-link.dropdown-toggle(href='#')
                       span.nav-icon.fas.fa-chart-line
@@ -1349,15 +1364,15 @@ html(lang='en')
                                     span.small.fw-normal  (#{pair.pair})
                 else
                   li#markets.nav-item(alt=settings.locale.menu_markets, title=settings.locale.menu_markets, data-bs-toggle='tooltip', data-bs-placement='right')
-                    a.nav-link(href='/markets/' + settings.get(net, 'markets_page').default_exchange.exchange_name + '/' + settings.get(net, 'markets_page').default_exchange.trading_pair)
+                    a.nav-link(href='/markets/' + markets_page.default_exchange.exchange_name + '/' + markets_page.default_exchange.trading_pair)
                       span.nav-icon.fas.fa-chart-line
                       span.margin-left-5 #{settings.locale.menu_markets}
-              if settings.get(net, 'api_page').enabled == true
+              if api_page.enabled == true
                 li#info.nav-item(alt=settings.locale.menu_api, title=settings.locale.menu_api, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/info')
                     span.nav-icon.fa.fa-info-circle
                     span.margin-left-5 #{settings.locale.menu_api}
-              if settings.get(net, 'claim_address_page').show_header_menu == true && settings.get(net, 'claim_address_page').enabled == true
+              if claim_address_page.show_header_menu == true && claim_address_page.enabled == true
                 li#claim-address.nav-item(alt=settings.locale.menu_claim_address, title=settings.locale.menu_claim_address, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/claim')
                     span.nav-icon.far.fa-address-card
@@ -1403,7 +1418,7 @@ html(lang='en')
                     #index-search.form-group.d-flex.justify-content-center
                       input.form-control(type='text', name='search', placeholder=settings.locale.ex_search_message, style='min-width:80%;margin-right:5px;')
                       button.btn.btn-success(type='submit') #{settings.locale.ex_search_button}
-          if settings.get(net, 'network_history').enabled == true && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
+          if network_history.enabled == true && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
             .container
               .row.align-items-start
                 - var chartColumnClass = 'col-lg-12';

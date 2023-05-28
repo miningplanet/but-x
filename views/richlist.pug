@@ -133,7 +133,7 @@ block content
                         td.text-center
                           =count
                         td.addressCol
-                          if settings.get(net, 'claim_address_page').enabled == false || address.name == null || address.name == ''
+                          if claim_address_page.enabled == false || address.name == null || address.name == ''
                             a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
                           else
                             a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.name}
