@@ -154,6 +154,7 @@
   "mkt_volume": "Volume",
   "mkt_top_bid": "Top Bid",
   "mkt_top_ask": "Top Ask",
+  "mkt_initial": "Initial Price",
   "mkt_last": "Last Price",
   "mkt_yesterday": "Yesterday",
   "mkt_change": "Change",

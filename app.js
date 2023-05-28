@@ -1104,6 +1104,7 @@ networks.forEach( function(item, index) {
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('get', settings.get);
+app.set('formatCurrency', settings.formatCurrency);
 app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);
 app.set('panels', settings.panels);
