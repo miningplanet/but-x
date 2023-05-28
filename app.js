@@ -401,7 +401,7 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
   if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
     const coin = settings.getCoin(net)
     const api_cmds = settings.get(net, 'api_cmds')
-    const markets_page = settings.get(net, 'markets')
+    const markets_page = settings.get(net, 'markets_page')
     const r = statsCache.get(net);
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
