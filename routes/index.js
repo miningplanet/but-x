@@ -401,7 +401,7 @@ function route_get_tx(res, txid, coin, net) {
   }
 }
 
-function route_get_index(res, error, net='mainnet') {
+function route_get_index(res, error, net=settings.getDefaultNet()) {
   const coin = settings.getCoin(net)
   const shared_pages = settings.get(net, 'shared_pages')
   const index_page = settings.get(net, 'index_page')
@@ -453,7 +453,7 @@ function route_get_index(res, error, net='mainnet') {
   }
 }
 
-function route_get_address(res, hash, coin, net='mainnet') {
+function route_get_address(res, hash, coin, net=settings.getDefaultNet()) {
   net = settings.getNet(net)
   const shared_pages = settings.get(net, 'shared_pages')
   const address_page = settings.get(net, 'address_page')
@@ -490,7 +490,7 @@ function route_get_address(res, hash, coin, net='mainnet') {
     route_get_index(res, hash + ' not found', net);
 }
 
-function route_get_claim_form(res, hash, coin, net='mainnet') {
+function route_get_claim_form(res, hash, coin, net=settings.getDefaultNet()) {
   net = settings.getNet(net)
   const shared_pages = settings.get(net, 'shared_pages')
   const address_page = settings.get(net, 'address_page')

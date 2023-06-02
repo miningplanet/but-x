@@ -5,7 +5,7 @@
  * 
  * node scripts/create_backup.js /var/backup/but-eiquidus.db.bak [net]
  * 
- * [net] = chain, default 'mainnet' or settings.dbs[0].
+ * [net] = chain, default 'mainnet' or settings.getDefaultNet().
  */
 const fs = require('fs');
 const path = require('path');
@@ -42,7 +42,7 @@ if (process.argv[2] != null && process.argv[2] != '') {
   backupFilename = `${systemDate.getFullYear()}-${monthName[systemDate.getMonth()]}-${systemDate.getDate()}`;
 }
 
-var net = settings.dbs[0].id
+var net = settings.getDefaultNet()
 if (process.argv[3] != null && process.argv[3] != '') {
   net = settings.getNetOrNull(process.argv[3])
   console.log("Use chain %s", net)

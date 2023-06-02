@@ -5,7 +5,7 @@ const mongoose = require('mongoose'),
       db = require('../lib/database');
 const { StatsDb, AddressDb, AddressTxDb, TxDb, RichlistDb } = require('../lib/database');
 
-var net = 'mainnet'
+var net = settings.getDefaultNet()
 var coin = settings.getCoin(net)
 var mode = 'update';
 var database = 'index';
@@ -204,7 +204,7 @@ function update_network_history(height, network_history_enabled, cb, net) {
     return cb(false);
 }
 
-function check_show_sync_message(blocks_to_sync, net='mainnet') {
+function check_show_sync_message(blocks_to_sync, net=settings.getDefaultNet()) {
   var retVal = false;
   const filePath = './tmp/show_sync_message-' + net + '.tmp';
   // Check if the sync msg should be shown
@@ -219,13 +219,14 @@ function check_show_sync_message(blocks_to_sync, net='mainnet') {
   return retVal;
 }
 
-function get_last_usd_price(net='mainnet') {
+function get_last_usd_price(net=settings.getDefaultNet()) {
   // get the last usd price for coinstats
   db.get_last_usd_price(function(err) {
     // check for errors
     if (err == null) {
       // update markets_last_updated value
-      db.update_last_updated_stats(settings.coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+      const coin = settings.getCoin(net)
+      db.update_last_updated_stats(coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
         // check if the script stopped prematurely
         if (stopSync) {
           console.log('Market sync was stopped prematurely');
