@@ -100,7 +100,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
         db.lib.get_block(blockhash, function(block) {
           if (block) {
             async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-              TxDb[net].findOne({txid: txid}, function(err, tx) {
+              TxDb[net].findOne({txid: txid}).then((tx) => {
                 if (tx) {
                   setTimeout( function() {
                     tx = null;
@@ -134,7 +134,10 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                     }, timeout);
                   });
                 }
-              });
+              }).catch((err) => {
+                console.error("Failed to find tx database: %s", err)
+                return cb(null)
+              })
             }, function() {
               setTimeout( function() {
                 blockhash = null;
@@ -178,9 +181,9 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
       StatsDb[net].updateOne({coin: coin}, {
         last: end,
         txes: txes
-      }, function() {
+      }).then(() => {
         return cb();
-      });
+      })
     } else
       return cb();
   });
