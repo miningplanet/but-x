@@ -1,10 +1,13 @@
 https://explorer.butkoin.com/mainnet
 https://explorer.butkoin.com/testnet
 https://explorer.butkoin.com/bitoreum
+https://explorer.butkoin.com/raptoreum
 https://explorer.butkoin.com/info/mainnet
 https://explorer.butkoin.com/info/testnet
 https://explorer.butkoin.com/info/bitoreum
+https://explorer.butkoin.com/info/raptoreum
 https://explorer.butkoin.com/masternodes/mainnet
 https://explorer.butkoin.com/masternodes/bitoreum
+https://explorer.butkoin.com/masternodes/raptoreum
 https://explorer.butkoin.com/markets/btrmex/BUTK/USDT/mainnet
 
