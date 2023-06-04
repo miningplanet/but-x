@@ -90,7 +90,11 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
       StatsDb[net].updateOne({coin: coin}, {
         last: block_height - 1,
         txes: txes
-      }, function() {});
+      }).then(() => {
+        debug("Done update stats: %d", block_height)
+      }).catch((err) => {
+        console.error("Failed to update stats database: %s", err)
+      })
     } else if (check_only) {
       console.log('Checking block ' + block_height + '...');
     }
