@@ -555,10 +555,13 @@ router.get('/', function(req, res) {
 });
 
 networks.forEach( function(net, index) {
-  router.get('/' + net, function(req, res) {
-    route_get_index(res, null, net);
-  });
-});
+  const enabled = settings.getDbOrNull(net).enabled
+  if (enabled) {
+    router.get('/' + net, function(req, res) {
+      route_get_index(res, null, net);
+    })
+  }
+})
 
 router.get('/info/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])

@@ -5,11 +5,12 @@ const detect = require('detect-port');
 const db = require('../lib/database');
 const app = require('../app');
 
+const networks = settings.getAllNet()
+
 app.set('port', process.env.PORT || settings.webserver.port);
 
-const dbstrings = settings.getDbs()
-
-db.connection_factory('mainnet', dbstrings[0], function(conn) {
+// init db for default chain (must be present and cannot be disabled)
+db.connection_factory(networks[0], settings.getDbConnectionString(networks[0]), function(conn) {
   db.initialize_data_startup(function() {
     var port = app.get('port')
     detect(port).then(function(result) {
@@ -35,14 +36,22 @@ db.connection_factory('mainnet', dbstrings[0], function(conn) {
         });
       }
     })
-  }, 'mainnet');
+  }, networks[0]);
 });
 
-db.connection_factory('testnet', dbstrings[1], function(conn) {
-  db.initialize_data_startup(function() {
-    // NOOP
-  }, 'testnet');
-});
+// init dbs for other chains
+networks.forEach( function(item, index) {
+  if (index > 0) {
+    const enabled = settings.getDbOrNull(item).enabled
+    if (enabled) {
+      db.connection_factory(item, settings.getDbConnectionString(networks[index]), function(conn) {
+        db.initialize_data_startup(function() {
+          // NOOP
+        }, item)
+      })
+    }
+  }
+})
 
 module.exports = {
   db: db

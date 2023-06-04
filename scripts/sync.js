@@ -1,8 +1,8 @@
 const mongoose = require('mongoose'),
       settings = require('../lib/settings'),
       async = require('async'),
-      instance = require('../bin/instance'),
       db = require('../lib/database');
+
 const { StatsDb, AddressDb, AddressTxDb, TxDb, RichlistDb } = require('../lib/database');
 
 var net = settings.getDefaultNet()
@@ -296,7 +296,15 @@ if (process.argv[4]) {
   coin = settings.getCoin(net)
 }
 
-// exit(0)
+// init DB
+const enabled = settings.getDbOrNull(net).enabled
+if (enabled) {
+  db.connection_factory(net, settings.getDbConnectionString(net), function(conn) {
+    db.initialize_data_startup(function() {
+      // NOOP
+    }, net)
+  })
+}
 
 // check options
 if (process.argv[2] == null || process.argv[2] == 'index' || process.argv[2] == 'update') {
@@ -407,7 +415,7 @@ if (db.lib.is_locked([database], net) == false) {
           console.log('Run \'npm start\' to create database structures before running this script.');
           exit(1);
         } else {
-          instance.db.update_db(net, coin.name, function(stats) {
+          db.update_db(net, coin.name, function(stats) {
             // check if stats returned properly
             if (stats !== false) {
               // determine which index mode to run
