@@ -59,6 +59,10 @@ block content
             a.d-none.d-md-block(href='/api/getblock?hash=' + block.hash, style='margin-left:auto;', data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_block_data)
               span.fa.fa-info-circle(style='color: var(--bs-body-color);')
       table#block-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
+        thead(style='visibility: collapse !important;')
+          tr
+            th
+            th
         tbody
           - var difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
           - var splitDifficulty = difficulty.split('.');

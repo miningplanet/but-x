@@ -156,10 +156,15 @@ block content
             else
               =" Update claimed address"
       table#address-summary.table.table-bordered.table-striped.summary-table.mobile-border-right(style='border-top:0;margin-top:0 !important;')
+        thead(style='visibility: collapse !important;')
+          tr
+            th
+            th
         tbody
           tr
-            td.text-center.addr-summary(colspan=2)
+            td.text-center.addr-summary
               img.qrcode(src='/qr/' + address.a_id)
+            td
           tr
             td #{settings.locale.rl_balance}
               span.small.fw-normal  (#{coin.symbol})
