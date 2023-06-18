@@ -236,6 +236,10 @@ block content
                 if marketdata.data.chartdata == 'null' || marketdata.data.chartdata == '' || marketdata.data.chartdata == '[]'
                   span.fas.fa-chart-line.float-end.view-chart-disabled.market-toggle(style='cursor: pointer;color: var(--bs-body-color);', data-bs-toggle='tooltip', data-bs-placement='bottom', title=settings.locale.mkt_no_chart)
               table#market-summary.table.table-bordered.bottom-border-0.summary-table.single-row-table(style='border-top:0;margin-top:0 !important;')
+                thead(style='visibility: collapse !important;')
+                  tr
+                    th
+                    th
                 tbody
                   tr
                     if marketdata.data.summary.change != null || (marketdata.data.summary.last != null && marketdata.data.summary.prev != null)
@@ -262,66 +266,66 @@ block content
                         td.fw-bold #{splitChange[0]}.
                           span.decimal #{splitChange[1]}
                           span  %
-                  tr
-                    if marketdata.data.summary.initial != null
+                  if marketdata.data.summary.initial != null
+                    tr
                       - var initialValue = settings.formatCurrency(marketdata.data.summary.initial, marketdata.exchange);
                       - var splitLast = initialValue.split(".");
                       td #{settings.locale.mkt_initial}
                       td #{splitLast[0]}.
                         span.decimal #{splitLast[1]}
-                  tr
-                    if marketdata.data.summary.last != null
+                  if marketdata.data.summary.last != null
+                    tr
                       - var lastValue = settings.formatCurrency(marketdata.data.summary.last, marketdata.exchange);
                       - var splitLast = lastValue.split(".");
                       td #{settings.locale.mkt_last}
                       td #{splitLast[0]}.
                         span.decimal #{splitLast[1]}
-                  tr
-                    if marketdata.data.summary.high != null
+                  if marketdata.data.summary.high != null
+                    tr
                       - var highValue = settings.formatCurrency(marketdata.data.summary.high, marketdata.exchange);
                       - var splitHigh = highValue.split(".");
                       td #{settings.locale.mkt_high}
                       td #{splitHigh[0]}.
                         span.decimal #{splitHigh[1]}
-                  tr
-                    if marketdata.data.summary.low != null
+                  if marketdata.data.summary.low != null
+                    tr
                       - var lowValue = settings.formatCurrency(marketdata.data.summary.low, marketdata.exchange);
                       - var splitLow = lowValue.split(".");
                       td #{settings.locale.mkt_low}
                       td #{splitLow[0]}.
                         span.decimal #{splitLow[1]}
-                  tr
-                    if marketdata.data.summary.volume != null
+                  if marketdata.data.summary.volume != null
+                    tr
                       - var volumeValue = settings.formatCurrency(marketdata.data.summary.volume, marketdata.coin);
                       - var splitVolume = volumeValue.split(".");
                       td #{settings.locale.mkt_volume}
                         span.small.fw-normal  (#{marketdata.coin})
                       td #{splitVolume[0]}.
                         span.decimal #{splitVolume[1]}
-                  tr
-                    if marketdata.data.summary.volume_btc != null
+                  if marketdata.data.summary.volume_btc != null
+                    tr
                       - var volumeBTCValue = settings.formatCurrency(marketdata.data.summary.volume_btc, 'BTC');
                       - var splitVolumeBTC = volumeBTCValue.split(".");
                       td #{settings.locale.mkt_volume}
                         span.small.fw-normal  (#{marketdata.exchange})
                       td #{splitVolumeBTC[0]}.
                         span.decimal #{splitVolumeBTC[1]}
-                  tr
-                    if marketdata.data.summary.bid != null
+                  if marketdata.data.summary.bid != null
+                    tr
                       - var bidValue = settings.formatCurrency(marketdata.data.summary.bid, marketdata.exchange);
                       - var splitBid = bidValue.split(".");
                       td #{settings.locale.mkt_top_bid}
                       td #{splitBid[0]}.
                         span.decimal #{splitBid[1]}
-                  tr
-                    if marketdata.data.summary.ask != null
+                  if marketdata.data.summary.ask != null
+                    tr
                       - var askValue = settings.formatCurrency(marketdata.data.summary.ask, marketdata.exchange);
                       - var splitAsk = askValue.split(".");
                       td #{settings.locale.mkt_top_ask}
                       td #{splitAsk[0]}.
                         span.decimal #{splitAsk[1]}
-                  tr
-                    if marketdata.data.summary.prev != null
+                  if marketdata.data.summary.prev != null
+                    tr
                       - var prevValue = settings.formatCurrency(marketdata.data.summary.prev, marketdata.exchange);
                       - var splitPrev = prevValue.split(".");
                       td #{settings.locale.mkt_yesterday}
