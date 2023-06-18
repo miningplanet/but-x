@@ -559,13 +559,21 @@ app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
   }
 });
 
+function isInternalRequest(req) {
+  // TODO: Find secure solution.
+  return req.headers['x-requested-with'] != null 
+    && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' 
+    && req.headers.referer != null 
+    && req.headers.accept.indexOf('text/javascript') > -1 
+    && req.headers.accept.indexOf('application/json') > -1
+}
+
 app.use('/ext/getlasttxs/:net/:min', function(req, res) {
   // TODO: Fix functionality and add cache.
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
-  // check if the getlasttxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
     var min = req.params.min, start, length, internal = false;
     // split url suffix by forward slash and remove blank entries
     var split = req.url.split('/').filter(function(v) { return v; });
@@ -619,8 +627,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
-  // check if the getaddresstxs api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((api_page.enabled == true && api_page.public_apis.ext.getaddresstxs.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getaddresstxs.enabled == true) || isInternalRequest(req)) {
     var internal = false;
     // split url suffix by forward slash and remove blank entries
     var split = req.url.split('/').filter(function(v) { return v; });
@@ -700,28 +707,31 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
 app.use('/ext/getsummary/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
-  // check if the getsummary api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || isInternalRequest(req)) {
     const coin = settings.getCoin(net)
-    const r = summaryCache.get(net);
-    if (r == undefined) {
+    const summary = summaryCache.get(net)
+    if (summary == undefined) {
+      const r = {}
       lib.get_connectioncount(net, function(connections) {
         lib.get_blockcount(function(blockcount) {
-          // check if this is a footer-only method that should only return the connection count and block count
-          if (req.headers['footer-only'] != null && req.headers['footer-only'] == 'true') {
-            // only return the connection count and block count
-            const v = {
-              connections: (connections ? connections : '-'),
-              blockcount: (blockcount ? blockcount : '-')
-            }
-            summaryCache.set (net, v);
-            debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
-            res.send(v);
-          } else {
-            lib.get_hashrate(function(hashps) {
-              db.get_stats(coin.name, function (stats) {
-                lib.get_masternodecount(net, function(masternodestotal) {
-                  lib.get_difficulty(net, function(difficulties) {
+          if (connections)
+            r.connections = connections
+          if (blockcount) 
+            r.blockcount = blockcount
+          lib.get_hashrate(function(hashps) {
+            db.get_stats(coin.name, function (stats) {
+              lib.get_masternodecount(net, function(mns) {
+                if (mns && mns.total && mns.total > -1) {
+                  r.masternodeCountOnline = mns.total
+                  if (mns.enabled && mns.enabled > -1)
+                    r.masternodeCountOffline = Math.floor(mns.total - mns.enabled)
+                }
+                lib.get_difficulty(net, function(difficulties) {
+                  if (stats) {
+                    r.supply = (stats == null || stats.supply == null ? 0 : stats.supply)
+                  }
+
+                  if (difficulties && difficulties.difficulty) {
                     var difficulty = difficulties.difficulty;
                     difficultyHybrid = '';
 
@@ -736,75 +746,43 @@ app.use('/ext/getsummary/:net?', function(req, res) {
                         difficulty = difficulty['proof-of-stake'];
                     }
 
-                    if (hashps == 'There was an error. Check your console.')
-                      hashps = 0;
+                    r.difficulty = difficulty ? difficulty : '-'
+                    r.difficultyHybrid = difficultyHybrid
 
-                    // check if the masternode count api is enabled
-                    const api_cmds = settings.get(net, 'api_cmds')
-                    if (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') {
-                      // masternode count api is available
-                      var mn_total = 0;
-                      var mn_enabled = 0;
-
-                      if (masternodestotal) {
-                        if (masternodestotal.total)
-                          mn_total = masternodestotal.total;
-
-                        if (masternodestotal.enabled)
-                          mn_enabled = masternodestotal.enabled;
+                    if (hashps) {
+                      if (settings.isButkoin(net)) {
+                        if (hashps.nethash_ghostrider)
+                          r.hashrate_ghostrider = hashps.nethash_ghostrider
+                        if (hashps.nethash_yespower)
+                          r.hashrate_yespower = hashps.nethash_yespower
+                        if (hashps.nethash_lyra2)
+                          r.hashrate_lyra2 = hashps.nethash_lyra2
+                        if (hashps.nethash_sha256d)
+                          r.hashrate_sha256d = hashps.nethash_sha256d
+                        if (hashps.nethash_scrypt) 
+                          r.hashrate_scrypt = hashps.nethash_scrypt
+                        if (hashps.nethash_butkscrypt)
+                          r.hashrate_butk = hashps.nethash_butkscrypt
+                      } else {
+                        r.hashrate = hashps
                       }
-
-                      const v = {
-                        difficulty: (difficulty ? difficulty : '-'),
-                        difficultyHybrid: difficultyHybrid,
-                        supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                        hashrate: hashps.nethash_butkscrypt,
-                        hashrate_ghostrider: hashps.nethash_ghostrider,
-                        hashrate_yespower: hashps.nethash_yespower,
-                        hashrate_lyra2: hashps.nethash_lyra2,
-                        hashrate_sha256d: hashps.nethash_sha256d,
-                        hashrate_scrypt: hashps.nethash_scrypt,
-                        hashrate_butk: hashps.nethash_butkscrypt,
-                        lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
-                        connections: (connections ? connections : '-'),
-                        masternodeCountOnline: (masternodestotal ? mn_enabled : '-'),
-                        masternodeCountOffline: (masternodestotal ? Math.floor(mn_total - mn_enabled) : '-'),
-                        blockcount: (blockcount ? blockcount : '-')
-                      }
-                      summaryCache.set (net, v);
-                      debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
-                      res.send(v);
-                    } else {
-                      // masternode count api is not available
-                      const v = {
-                        difficulty: (difficulty ? difficulty : '-'),
-                        difficultyHybrid: difficultyHybrid,
-                        supply: (stats == null || stats.supply == null ? 0 : stats.supply),
-                        hashrate: hashps.nethash_butkscrypt,
-                        hashrate_ghostrider: hashps.nethash_ghostrider,
-                        hashrate_yespower: hashps.nethash_yespower,
-                        hashrate_lyra2: hashps.nethash_lyra2,
-                        hashrate_sha256d: hashps.nethash_sha256d,
-                        hashrate_scrypt: hashps.nethash_scrypt,
-                        hashrate_butk: hashps.nethash_butkscrypt,
-                        lastPrice: (stats == null || stats.last_price == null ? 0 : stats.last_price),
-                        connections: (connections ? connections : '-'),
-                        blockcount: (blockcount ? blockcount : '-')
-                      }
-                      summaryCache.set (net, v);
-                      debug("Cached summary '%s' %o - mem: %o", net, v, process.memoryUsage());
-                      res.send(v);
                     }
-                  });
-                });
-              }, net);
-            }, net);
-          }
-        }, net);
-      });
+
+                    r.lastPrice = (stats == null || stats.last_price == null ? 0 : stats.last_price)
+
+                    summaryCache.set (net, r);
+                    console.log("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
+                    res.send(r);
+                  }
+                })
+              })
+            }, net)
+          }, net)
+        }, net)
+      }, net)
     } else {
-      debug("Get summary by cache '%s' %o ...", net, r.blockcount)
-      res.send(r)
+      console.log("Get summary by cache '%s' %o ...", net, summary)
+      res.send(summary);
     }
   } else
     res.end('This method is disabled');
@@ -813,8 +791,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
 app.use('/ext/getnetworkpeers/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
-  // check if the getnetworkpeers api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || isInternalRequest(req)) {
     const coin = settings.getCoin(net)  
     const r = peersCache.get(net);
     if (r == undefined) {
@@ -863,8 +840,7 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
-  // check if the getmasternodelist api is enabled or else check the headers to see if it matches an internal ajax request from the explorer itself (TODO: come up with a more secure method of whitelisting ajax calls from the explorer)
-  if ((api_page.enabled == true && api_page.public_apis.ext.getmasternodelist.enabled == true) || (req.headers['x-requested-with'] != null && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' && req.headers.referer != null && req.headers.accept.indexOf('text/javascript') > -1 && req.headers.accept.indexOf('application/json') > -1)) {
+  if ((api_page.enabled == true && api_page.public_apis.ext.getmasternodelist.enabled == true) || isInternalRequest(req)) {
     const r = masternodesCache.get(net);
     if (r == undefined) {
       db.get_masternodes(function(masternodes) {
@@ -1104,6 +1080,7 @@ networks.forEach( function(item, index) {
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('get', settings.get);
+app.set('isButkoin', settings.isButkoin);
 app.set('formatCurrency', settings.formatCurrency);
 app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);

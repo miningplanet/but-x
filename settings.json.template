@@ -269,6 +269,7 @@
       //                       The "network_history.enabled" setting must be set to true for network charts to work correctly
       //                       If the "network_history.enabled" setting is false, all network charts will be completely disabled, regardless of their independent settings
       "network_charts": {
+        "algos": ["ghostrider", "yespower", "lyra2", "sha256d", "scrypt", "butscrypt"],
         // nethash_chart: A collection of settings that pertain to the network hashrate chart
         "nethash_chart": {
           // enabled: Enable/disable the network hashrate chart (true/false)
