@@ -406,50 +406,29 @@ function route_get_index(res, error, net=settings.getDefaultNet()) {
   const shared_pages = settings.get(net, 'shared_pages')
   const index_page = settings.get(net, 'index_page')
   const api_page = settings.get(net, 'api_page')
+  const p = {
+    active: 'home',
+    error: error,
+    last_updated: null,
+    showSync: db.check_show_sync_message(net),
+    customHash: get_file_timestamp('./public/css/custom.scss'),
+    styleHash: get_file_timestamp('./public/css/style.scss'),
+    themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+    page_title_logo: settings.getTitleLogo(net),
+    page_title_prefix: coin.name + ' Explorer',
+    shared_pages: shared_pages,
+    index_page: index_page,
+    api_page: api_page,
+    coin: coin,
+    net: net
+  }
   if (index_page.page_header.show_last_updated == true) {
-    // lookup last updated date
     db.get_stats(coin.name, function (stats) {
-      res.render(
-        'index',
-        {
-          active: 'home',
-          error: error,
-          last_updated: stats.blockchain_last_updated,
-          showSync: db.check_show_sync_message(net),
-          customHash: get_file_timestamp('./public/css/custom.scss'),
-          styleHash: get_file_timestamp('./public/css/style.scss'),
-          themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-          page_title_logo: settings.getTitleLogo(net),
-          page_title_prefix: coin.name + ' Explorer',
-          shared_pages: shared_pages,
-          index_page: index_page,
-          api_page: api_page,
-          coin: coin,
-          net: net
-        }
-      );
+      p.last_updated = stats.network_last_updated
+      res.render('index', p)
     }, net);
   } else {
-    // skip lookup of the last updated date and display the page now
-    res.render(
-      'index',
-      {
-        active: 'home',
-        error: error,
-        last_updated: null,
-        showSync: db.check_show_sync_message(net),
-        customHash: get_file_timestamp('./public/css/custom.scss'),
-        styleHash: get_file_timestamp('./public/css/style.scss'),
-        themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-        page_title_logo: settings.getTitleLogo(net),
-        page_title_prefix: coin.name + ' Explorer',
-        shared_pages: shared_pages,
-        index_page: index_page,
-        api_page: api_page,
-        coin: coin,
-        net: net
-      }
-    );
+    res.render('index', p)
   }
 }
 
@@ -639,69 +618,37 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
         var ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url;
         var referal = market_data.referal == null ? '' : market_data.referal;
 
-        // check if markets page should show last updated date
+        const p = {
+          active: 'markets',
+            marketdata: {
+              market_name: market_name,
+              market_logo: market_logo,
+              ext_market_url: ext_market_url,
+              referal: referal,
+              coin: coin_symbol,
+              exchange: pair_symbol,
+              data: data,
+              url: url
+            },
+            market: market_id,
+            showSync: db.check_show_sync_message(net),
+            customHash: get_file_timestamp('./public/css/custom.scss'),
+            styleHash: get_file_timestamp('./public/css/style.scss'),
+            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+            page_title_logo: settings.getTitleLogo(net),
+            page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
+            shared_pages: shared_pages,
+            markets_page: markets_page,
+            coin: coin,
+            net: net
+        }
         if (markets_page.page_header.show_last_updated == true) {
-          // lookup last updated date
           db.get_stats(coin.name, function (stats) {
-            res.render(
-              './market',
-              {
-                active: 'markets',
-                marketdata: {
-                  market_name: market_name,
-                  market_logo: market_logo,
-                  ext_market_url: ext_market_url,
-                  referal: referal,
-                  coin: coin_symbol,
-                  exchange: pair_symbol,
-                  data: data,
-                  url: url
-                },
-                market: market_id,
-                last_updated: stats.markets_last_updated,
-                showSync: db.check_show_sync_message(net),
-                customHash: get_file_timestamp('./public/css/custom.scss'),
-                styleHash: get_file_timestamp('./public/css/style.scss'),
-                themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-                page_title_logo: settings.getTitleLogo(net),
-                page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
-                shared_pages: shared_pages,
-                markets_page: markets_page,
-                coin: coin,
-                net: net
-              }
-            );
+            p.last_updated = stats.network_last_updated
+            res.render('./market', p)
           }, net);
         } else {
-          // skip looking up the last updated date and display the page now
-          res.render(
-            './market',
-            {
-              active: 'markets',
-              marketdata: {
-                market_name: market_name,
-                market_logo: market_logo,
-                ext_market_url: ext_market_url,
-                referal: referal,
-                coin: coin_symbol,
-                exchange: pair_symbol,
-                data: data,
-                url: url
-              },
-              market: market_id,
-              last_updated: null,
-              showSync: db.check_show_sync_message(net),
-              customHash: get_file_timestamp('./public/css/custom.scss'),
-              styleHash: get_file_timestamp('./public/css/style.scss'),
-              themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-              page_title_logo: settings.getTitleLogo(net),
-              page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
-              shared_pages: shared_pages,
-              markets_page: markets_page,
-              coin: coin,
-              net: net
-            }
-          );
+          res.render('./market', p)
         }
       }, net);
     } else {
