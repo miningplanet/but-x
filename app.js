@@ -4,6 +4,7 @@ var express = require('express'),
     path = require('path'),
     nodeapi = require('./lib/nodeapi'),
     favicon = require('serve-favicon'),
+    serveStatic = require('serve-static'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
@@ -78,8 +79,19 @@ if (settings.webserver.cors.enabled == true) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+function setCustomCacheControl (res, path) {
+  if (serveStatic.mime.lookup(path) === 'text/html') {
+    // Cache HTML files.
+    res.setHeader('Cache-Control', 'public, max-age=30')
+  }
+}
+
 // Always use Butkoin favicon.
 app.use(favicon(path.join('./public', settings.shared_pages.favicons.favicon32)));
+app.use(serveStatic(path.join(__dirname, 'public'), {
+  maxAge: '1d',
+  setHeaders: setCustomCacheControl
+}))
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -50,7 +50,8 @@
     "qr-image": "^3.2.0",
     "readline-sync": "^1.4.10",
     "sass": "^1.63.4",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "serve-static": "^1.15.0"
   },
   "devDependencies": {
     "forever": "^4.0.3",
