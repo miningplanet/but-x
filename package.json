@@ -30,7 +30,7 @@
     "update-explorer": "node ./scripts/update_explorer.js"
   },
   "dependencies": {
-    "@isaacs/ttlcache": "^1.4.0",
+    "@isaacs/ttlcache": "^1.4.1",
     "async": "^3.2.4",
     "bad-words": "^3.0.4",
     "body-parser": "^1.20.2",
@@ -43,13 +43,13 @@
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
     "mongodb": "^5.6.0",
-    "mongoose": "^7.3.0",
+    "mongoose": "^7.3.1",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.33",
     "pug": "~3.0.2",
     "qr-image": "^3.2.0",
     "readline-sync": "^1.4.10",
-    "sass": "^1.63.4",
+    "sass": "^1.63.6",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.15.0"
   },
