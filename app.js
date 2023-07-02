@@ -79,6 +79,9 @@ if (settings.webserver.cors.enabled == true) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// security
+app.disable('x-powered-by')
+
 function setCustomCacheControl (res, path) {
   if (serveStatic.mime.lookup(path) === 'text/html') {
     // Cache HTML files.
