@@ -55,7 +55,7 @@
   "masternodecount": "Smartnodes",
   "network": "Network",
   "height": "Height",
-  "timestamp": "Time (UTC)",
+  "timestamp": "Time",
   "size": "Size",
   "transactions": "Transactions",
   "total_sent": "Total Sent",
@@ -165,7 +165,7 @@
   "mkt_total": "Total",
   "mkt_trade_history": "Trade History",
   "mkt_type": "Type",
-  "mkt_time_stamp": "Time (UTC)",
+  "mkt_time_stamp": "Time",
   "mkt_select": "Market Selection",
 
   // claim address view

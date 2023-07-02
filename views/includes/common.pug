@@ -1,11 +1,13 @@
-script(type='text/javascript', src='/js/luxon.min.js')
 script.
-  function format_unixtime(unixtime, alt) {
-    if (alt == null)
-      alt = false;
-    // check if this date should be displayed in utc or local timezone
-    if (('#{shared_pages.date_time.timezone}'.toLowerCase() == 'local' && !alt) || ('#{shared_pages.date_time.timezone}'.toLowerCase() == 'utc' && alt))
-      return luxon.DateTime.fromSeconds(unixtime).toLocal().toFormat('#{shared_pages.date_time.display_format}');
+  function format_unixtime(unixtime) {
+    var alt = false
+    if ('#{shared_pages.date_time.enable_alt_timezone_tooltips}' === 'true')
+      alt = true
+    const mdate = new Date(unixtime * 1000)
+    var r = ''
+    if ('#{shared_pages.date_time.timezone}'.toLowerCase() == 'local')
+      r = '<span class="rdate">' + mdate.toLocaleDateString() + '</span>&nbsp;<span class="rtime" ' + (alt === true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + mdate.toUTCString() + '"' : '') + '>' + mdate.toLocaleTimeString() + '</span>'
     else
-      return luxon.DateTime.fromSeconds(unixtime).toUTC().toFormat('#{shared_pages.date_time.display_format}');
+      r = '<span class="rdate">' + mdate.toDateString() + '</span>&nbsp;<span class="rtime"' + (alt === true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + mdate.toUTCString() + '"' : '') + '>' + mdate.toTimeString() + '</span>'
+    return r
   }

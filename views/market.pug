@@ -66,7 +66,7 @@ block content
                   if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true)
                     $(this).attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(parseInt($(this).text()), true));
 
-                  $(this).html(format_unixtime(parseInt($(this).text())).replace(' UTC', ''));
+                  $(this).html(format_unixtime(parseInt($(this).text())));
                 }
               });
 
@@ -424,7 +424,7 @@ block content
                       span.small.fw-normal  (#{marketdata.coin})
                     th.text-center #{settings.locale.mkt_total}
                       span.small.fw-normal  (#{marketdata.exchange})
-                    th.text-center #{settings.locale.mkt_time_stamp}
+                    th.text-center #{settings.locale.timestamp}
                 tbody
                   each order in marketdata.data.history
                     if order.ordertype != null
@@ -432,7 +432,7 @@ block content
                       - var splitPrice = price.split(".");
                       - var quantity = settings.formatCurrency(order.quantity, marketdata.coin);
                       - var splitQuantity = quantity.split(".");
-                      // - var timestamp = order.timestamp ? order.timestamp.toString().replace(' UTC','') : 'N/A'
+                      - var timestamp = settings.formatDateTime(order.timestamp, net, true)
                       if order.total != null
                         - var total = settings.formatCurrency(order.total, marketdata.exchange);
                       else
@@ -447,8 +447,7 @@ block content
                           td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
-                            small
-                              span.timestampCol=order.timestamp
+                            small !{timestamp}
                       else
                         tr
                           td.text-end.text-danger.fw-bold #{splitPrice[0]}.
@@ -458,8 +457,7 @@ block content
                           td.text-end #{splitTotal[0]}.
                             span.decimal #{splitTotal[1]}
                           td.text-center
-                            small
-                              span.timestampCol=order.timestamp
+                            small !{timestamp}
     else
       .alert.alert-danger.alert-dismissible.fade.show(role='alert')
         button.btn-close(type='button', data-bs-dismiss='alert')

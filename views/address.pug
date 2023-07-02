@@ -95,7 +95,7 @@ block content
           var amountParts = amount.split('.');
           $("td:eq(2)", row).html(updown + amountParts[0] + '.<span class="decimal">' + amountParts[1] + '</span>').addClass('text-end');
           $("td:eq(3)", row).html(balanceParts[0] + '.<span class="decimal">' + balanceParts[1] + '</span>').addClass('text-end');
-          $("td:eq(4)", row).html('<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(timestamp, true) + '"' : '') + '>' + format_unixtime(timestamp).replace(' UTC', '') + '</span>').addClass('text-center');
+          $("td:eq(4)", row).html(format_unixtime(timestamp)).addClass('text-center');
         },
         fnDrawCallback: function(settings) {
           enableTooltips();

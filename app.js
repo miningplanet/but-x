@@ -17,7 +17,6 @@ var express = require('express'),
     TTLCache = require('@isaacs/ttlcache');
 var app = express();
 var apiAccessList = [];
-const date = require('date-and-time')
 const { exec } = require('child_process');
 
 const networks = settings.getAllNet();
@@ -1096,6 +1095,7 @@ app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('get', settings.get);
 app.set('isButkoin', settings.isButkoin);
+app.set('formatDateTime', settings.formatDateTime);
 app.set('formatCurrency', settings.formatCurrency);
 app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);

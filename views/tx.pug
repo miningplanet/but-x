@@ -7,7 +7,7 @@ block content
     - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   script.
     $(document).ready(function() {
-      $('span#timestampCol').html(format_unixtime(#{tx.timestamp}).replace(' UTC', ''));
+      $('span#timestampCol').html(format_unixtime(#{tx.timestamp}));
 
       if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
         $('span#timestampCol').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(#{tx.timestamp}, true));

@@ -54,10 +54,10 @@ block content
               var status = json[i]['status'];
               var country = "<span>" + json[i]['country'] + "</span>";
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
-              json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']).replace(' UTC', '') + '</span>';
+              json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
 
               if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
-                json[i]['lastpaid'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastpaid'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastpaid']).replace(' UTC', '') + '</span>';
+                json[i]['lastpaid'] = format_unixtime(json[i]['lastpaid'])
               else
                 json[i]['lastpaid'] = '<em>N/A</em>';
               if (json[i]['activetime'])
@@ -181,9 +181,9 @@ block content
             th.text-center Payout
             th.text-center Protocol
             th.text-center Last seen (UTC)
-            th.text-center Last $ (UTC)
+            th.text-center Last
             th.text-center Last $
             th.text-center Active since
             th.text-center !
-            th.text-center 
+            th.text-center
         tbody.text-center

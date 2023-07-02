@@ -169,6 +169,14 @@ table#block-summary td:nth-child(2) { width: auto; text-align: left !important; 
 table#market-summary td:nth-child(1) { width: var(--xs-2-col-label-width) !important; min-width: var(--xs-2-col-label-width-min) !important; text-align: left !important; }
 table#market-summary td:nth-child(2) { width: auto; text-align: left !important; }
 
+table#markets-table thead th:nth-child(1) { width: 32px !important }
+table#markets-table tbody td:nth-child(1) { width: 32px !important }
+table#markets-table thead th:nth-child(3) { width: 65px !important }
+table#markets-table tbody td:nth-child(3) { width: 65px !important }
+table#markets-table thead th:nth-child(9) { width: 70px !important }
+table#markets-table tbody td:nth-child(9) { width: 70px !important }
+table#markets-table thead th:nth-child(11) { width: 130px !important }
+table#markets-table tbody td:nth-child(11) { width: 130px !important }
 
 table#buy-orders, table#sell-orders, table#history-table { margin-left: 0px !important }
 
@@ -179,6 +187,8 @@ table#address-summary td:nth-child(1) { text-align: left }
 
 td.addressCol a { width: 98%; min-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
 td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; text-align: left !important; }
+
+tbody tr.active { background: red !important; border-color: greenyellow !important }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (max-width: 575px) {
@@ -203,6 +213,10 @@ td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: e
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (max-width: 768px) {
+
+    span.rdate { height: 0; display: none; visibility: hidden !important; overflow: hidden !important }
+    tbody td { padding: 3px 5px !important }
+
     td.full, th.full { width: 0px !important; overflow: hidden !important; display: none !important; visibility: hidden !important }
 
     div#recent-table_wrapper table th:nth-child(6) { width: 100px !important }
@@ -221,6 +235,10 @@ td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: e
 
     table#block-txs td.txCol a { width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;  text-align: left !important; }
     div#block-txs-wrapper table th:nth-child(1) { width: 155px !important }
+    table#markets-table thead th:nth-child(3) { width: 60px !important }
+    table#markets-table tbody td:nth-child(3) { width: 60px !important }
+    table#markets-table thead th:nth-child(9) { width: 65px !important }
+    table#markets-table tbody td:nth-child(9) { width: 65px !important }
 }
 
 @media only screen and (max-width: 991px) {
