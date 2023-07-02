@@ -984,45 +984,16 @@ networks.forEach( function(item, index) {
           tmparray.push(tmp)
           // loop through all trading pairs for this market
           for (var i = 0; i < markets_page.exchanges[key].trading_pairs.length; i++) {
-            var isAlt = false;
             var pair = markets_page.exchanges[key].trading_pairs[i].toUpperCase(); // ensure trading pair setting is always uppercase
             var coin_symbol = pair.split('/')[0];
             var pair_symbol = pair.split('/')[1];
 
-            // determine if using the alt name + logo
-            if (exMarket.market_url_template != null && exMarket.market_url_template != '') {
-              switch ((exMarket.market_url_case == null || exMarket.market_url_case == '' ? 'l' : exMarket.market_url_case.toLowerCase())) {
-                case 'l':
-                case 'lower':
-                  isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : false);
-                  break;
-                case 'u':
-                case 'upper':
-                  isAlt = (exMarket.isAlt != null ? exMarket.isAlt({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : false);
-                  break;
-                default:
-              }
-            }
-
             // add trading pair to market_data
             tmparray[tmparray.length - 1].trading_pairs.push({
-              pair: pair,
-              isAlt: isAlt
+              pair: pair
             });
-
-            // increment the market count
             market_count[item]++;
           }
-
-          // sort trading pairs by alt status
-          tmparray[tmparray.length - 1].trading_pairs.sort(function(a, b) {
-            if (a.isAlt < b.isAlt)
-              return -1;
-            else if (a.isAlt > b.isAlt)
-              return 1;
-            else
-              return 0;
-          });
         }
       }
     });
@@ -1041,22 +1012,8 @@ networks.forEach( function(item, index) {
     });
 
     var ex = markets_page.exchanges;
-    var ex_name = markets_page.default_exchange.exchange_name;
-    var ex_pair = markets_page.default_exchange.trading_pair;
     var ex_keys = Object.keys(ex);
     var ex_error = '';
-
-    // check to ensure default market and trading pair exist and are enabled
-    // if (ex[ex_name] == null) {
-    //   // exchange name does not exist in exchanges list
-    //   ex_error = 'Default exchange name is not valid' + ': ' + ex_name;
-    // } else if (!ex[ex_name].enabled) {
-    //   // exchange is not enabled
-    //   ex_error = 'Default exchange is disabled in settings' + ': ' + ex_name;
-    // } else if (ex[ex_name].trading_pairs.findIndex(p => p.toLowerCase() == ex_pair.toLowerCase()) == -1) {
-    //   // invalid default exchange trading pair
-    //   ex_error = 'Default exchange trading pair is not valid' + ': ' + ex_pair;
-    // }
 
     // check if there was an error msg
     if (ex_error != '') {

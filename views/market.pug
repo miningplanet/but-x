@@ -24,6 +24,17 @@ block content
   if marketdata.data != null && ((marketdata.data.buys != null && marketdata.data.buys.length > 0) || (marketdata.data.sells != null && marketdata.data.sells.length > 0) || (marketdata.data.history != null && marketdata.data.history.length > 0))
     script.
       $(document).ready(function() {
+        $('.markets-table').dataTable({
+          info: false,
+          paging: false,
+          searching: false,
+          ordering: true,
+          autowidth: true,
+          responsive: true,
+          scrollX: true,
+          fnDrawCallback: function(settings) {
+          }
+        });
         $('.summary-table').dataTable({
           info: false,
           paging: false,
@@ -73,7 +84,6 @@ block content
               if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true)
                 enableTooltips();
             }
-
           }
         });
       });
@@ -120,47 +130,71 @@ block content
         .col-md-12.cardSpacer
           .card.card-default.border-0
             .card-header
-              strong #{settings.locale.mkt_select}
+              strong #{settings.locale.mkt_select} (#{settings.market_count[net]})
             .card-body
-              ul.nav.nav-pills
-                if settings.market_data[net]
-                  each mkt in settings.market_data[net]
-                    if mkt != null && mkt.id != null
-                      each pair in mkt.trading_pairs
-                        if market == mkt.id && marketdata.coin.toLowerCase() + '/' + marketdata.exchange.toLowerCase() == pair.pair.toLowerCase()
-                          li.nav-item
-                            a.nav-link.active(href='/markets/' + mkt.id + '/' + pair.pair + '/' + net)
-                              if pair.isAlt == true
-                                if mkt.alt_logo != null && mkt.alt_logo != ''
-                                  img.align-top.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
-                                else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.alt_name}
-                                  span.small.fw-normal  (#{pair.pair})
-                              else
-                                if mkt.logo != null && mkt.logo != ''
-                                  img.align-top.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
-                                else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.name}
-                                  span.small.fw-normal  (#{pair.pair})
-                        else
-                          li.nav-item
-                            a.nav-link(href='/markets/' + mkt.id + '/' + pair.pair + '/' + net)
-                              if pair.isAlt == true
-                                if mkt.alt_logo != null && mkt.alt_logo != ''
-                                  img.align-top.market-logo(src='data:image/png;base64,' + mkt.alt_logo, title=mkt.alt_name + ' (' + pair.pair + ')', alt=mkt.alt_name + ' (' + pair.pair + ')')
-                                else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.alt_name}
-                                  span.small.fw-normal  (#{pair.pair})
-                              else
-                                if mkt.logo != null && mkt.logo != ''
-                                  img.align-top.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.name + ' (' + pair.pair + ')', alt=mkt.name + ' (' + pair.pair + ')')
-                                else
-                                  i.market-logo.fas.fa-question-circle
-                                span #{mkt.name}
-                                  span.small.fw-normal  (#{pair.pair})
+              table#markets-table.table.table-striped.table-bordered.bottom-border-0.market-table(style='border-top:0;margin:0 !important;')
+                thead
+                  tr(class=theadClasses)
+                    th.text-center
+                    th.full.text-center #{settings.locale.mkt_exchange}
+                    th.text-center #{settings.locale.mkt_trade}
+                    th.full.text-center #{settings.locale.mkt_bid}
+                    th.full.text-center #{settings.locale.mkt_ask}
+                    th.text-center #{settings.locale.mkt_last}
+                    th.full.text-center #{settings.locale.mkt_low}
+                      span.small.fw-normal  (24h)
+                    th.full.text-center #{settings.locale.mkt_high}
+                      span.small.fw-normal  (24h)
+                    th.text-center !{'&Delta;'}
+                      span.small.fw-normal  (24h)
+                    th.half.text-center #{settings.locale.mkt_volume}
+                      span.small.fw-normal  (24h&nbsp;Trade)
+                    th.text-center #{settings.locale.mkt_volume}
+                      span.small.fw-normal  (24h&nbsp;#{marketdata.coin})
+                tbody
+                  - let volumeCoin = 0
+                  each mkt in mmdata
+                    if mkt.market != null && mkt.ext_market_url != null
+                      if mkt.summary
+                        if mkt.summary.volume && !isNaN(mkt.summary.volume)
+                          - volumeCoin = Number(volumeCoin) + Number(mkt.summary.volume)
+                      - const isActive = mkt.market.toLowerCase() === marketdata.market_name.toLowerCase() && mkt.pair_symbol.toLowerCase() === marketdata.exchange.toLowerCase()
+                      tr(class=(isActive == true ? 'active': ''))
+                        td.text-center
+                          if mkt.logo && mkt.logo != ''
+                            a(href='/markets/' + mkt.market + '/' + mkt.coin_symbol + '/' + mkt.pair_symbol + '/' + net)
+                              img.align-top.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.market_name + ' (' + mkt.pair_symbol + ')', alt=mkt.market_name + ' (' + mkt.pair_symbol + ')')
+                        td.full.text-start
+                          a(href='/markets/' + mkt.market + '/' + mkt.coin_symbol + '/' + mkt.pair_symbol + '/' + net) #{mkt.market}
+                        td.text-start #{mkt.pair_symbol}
+                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.bid) && mkt.summary.bid > 0 ? settings.formatCurrency(mkt.summary.bid, marketdata.exchange) : '-'} 
+                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.ask) && mkt.summary.ask > 0 ? settings.formatCurrency(mkt.summary.ask, marketdata.exchange) : '-'} 
+                        td.text-end #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
+                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
+                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
+                        td.text-end
+                          - var change = '-'
+                          if mkt.summary && !isNaN(mkt.summary.change)
+                            - change = Number(mkt.summary.change).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
+                          else if mkt.summary && !isNaN(mkt.summary.last) && !isNaN(mkt.summary.prev)
+                            - change = Number((100 - ((parseFloat(mkt.summary.prev) / parseFloat(mkt.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
+                          else if mkt.summary && !isNaN(mkt.summary.last) && !isNaN(mkt.summary.initial)
+                            - change = Number((100 - ((parseFloat(mkt.summary.initial) / parseFloat(mkt.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
+                          span #{change}
+                        td.half.text-end #{mkt.summary && !isNaN(mkt.summary.volume_pair) ? settings.formatCurrency(mkt.summary.volume_pair, mkt.coin_symbol) : '-'}  
+                        td.text-end #{mkt.summary && !isNaN(mkt.summary.volume) ? settings.formatCurrency(mkt.summary.volume, mkt.coin_symbol) : '-'} 
+                  td 
+                  td.full 
+                  td 
+                  td.full.text-end 
+                  td.full.text-end 
+                  td.text-end 
+                  td.full.text-end 
+                  td.full.text-end 
+                  td.text-end 
+                  td.half.text-end 
+                  td.text-end #{Number(volumeCoin) > 0 ? settings.formatCurrency(volumeCoin, 'BTRM') : '-'}
+            
     if marketdata.data != null && ((marketdata.data.buys != null && marketdata.data.buys.length > 0) || (marketdata.data.sells != null && marketdata.data.sells.length > 0) || (marketdata.data.history != null && marketdata.data.history.length > 0))
       block market_view
         script.
@@ -235,102 +269,103 @@ block content
                 strong  - #{settings.locale.mkt_hours}
                 if marketdata.data.chartdata == 'null' || marketdata.data.chartdata == '' || marketdata.data.chartdata == '[]'
                   span.fas.fa-chart-line.float-end.view-chart-disabled.market-toggle(style='cursor: pointer;color: var(--bs-body-color);', data-bs-toggle='tooltip', data-bs-placement='bottom', title=settings.locale.mkt_no_chart)
-              table#market-summary.table.table-bordered.bottom-border-0.summary-table.single-row-table(style='border-top:0;margin-top:0 !important;')
-                thead(style='visibility: collapse !important;')
-                  tr
-                    th
-                    th
-                tbody
-                  tr
-                    if marketdata.data.summary.change != null || (marketdata.data.summary.last != null && marketdata.data.summary.prev != null)
-                      if marketdata.data.summary.change != null
-                        if marketdata.data.summary.change == '' || marketdata.data.summary.change == '-'
-                          - var price_change = "0.00";
+              .card-body
+                table#market-summary.table.table-bordered.bottom-border-0.summary-table.single-row-table(style='border-top:0;margin-top:0 !important;')
+                  thead(style='visibility: collapse !important;')
+                    tr
+                      th
+                      th
+                  tbody
+                    tr
+                      if marketdata.data.summary.change != null || (marketdata.data.summary.last != null && marketdata.data.summary.prev != null)
+                        if marketdata.data.summary.change != null
+                          if marketdata.data.summary.change == '' || marketdata.data.summary.change == '-'
+                            - var price_change = "0.00";
+                          else
+                            - var price_change = Number(marketdata.data.summary.change).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+                        else if marketdata.data.summary.last != 0
+                          - var price_change = Number((100 - ((parseFloat(marketdata.data.summary.prev) / parseFloat(marketdata.data.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                         else
-                          - var price_change = Number(marketdata.data.summary.change).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                      else if marketdata.data.summary.last != 0
-                        - var price_change = Number((100 - ((parseFloat(marketdata.data.summary.prev) / parseFloat(marketdata.data.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                      else
-                        - var price_change = Number(0).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                      - var splitChange = price_change.split(".");
-                      td #{settings.locale.mkt_change}
-                      if price_change > 0
-                        td.text-success.fw-bold +#{splitChange[0]}.
-                          span.decimal #{splitChange[1]}
-                          span  %
-                      else if price_change < 0
-                        td.text-danger.fw-bold #{splitChange[0]}.
-                          span.decimal #{splitChange[1]}
-                          span  %
-                      else
-                        td.fw-bold #{splitChange[0]}.
-                          span.decimal #{splitChange[1]}
-                          span  %
-                  if marketdata.data.summary.initial != null
-                    tr
-                      - var initialValue = settings.formatCurrency(marketdata.data.summary.initial, marketdata.exchange);
-                      - var splitLast = initialValue.split(".");
-                      td #{settings.locale.mkt_initial}
-                      td #{splitLast[0]}.
-                        span.decimal #{splitLast[1]}
-                  if marketdata.data.summary.last != null
-                    tr
-                      - var lastValue = settings.formatCurrency(marketdata.data.summary.last, marketdata.exchange);
-                      - var splitLast = lastValue.split(".");
-                      td #{settings.locale.mkt_last}
-                      td #{splitLast[0]}.
-                        span.decimal #{splitLast[1]}
-                  if marketdata.data.summary.high != null
-                    tr
-                      - var highValue = settings.formatCurrency(marketdata.data.summary.high, marketdata.exchange);
-                      - var splitHigh = highValue.split(".");
-                      td #{settings.locale.mkt_high}
-                      td #{splitHigh[0]}.
-                        span.decimal #{splitHigh[1]}
-                  if marketdata.data.summary.low != null
-                    tr
-                      - var lowValue = settings.formatCurrency(marketdata.data.summary.low, marketdata.exchange);
-                      - var splitLow = lowValue.split(".");
-                      td #{settings.locale.mkt_low}
-                      td #{splitLow[0]}.
-                        span.decimal #{splitLow[1]}
-                  if marketdata.data.summary.volume != null
-                    tr
-                      - var volumeValue = settings.formatCurrency(marketdata.data.summary.volume, marketdata.coin);
-                      - var splitVolume = volumeValue.split(".");
-                      td #{settings.locale.mkt_volume}
-                        span.small.fw-normal  (#{marketdata.coin})
-                      td #{splitVolume[0]}.
-                        span.decimal #{splitVolume[1]}
-                  if marketdata.data.summary.volume_btc != null
-                    tr
-                      - var volumeBTCValue = settings.formatCurrency(marketdata.data.summary.volume_btc, 'BTC');
-                      - var splitVolumeBTC = volumeBTCValue.split(".");
-                      td #{settings.locale.mkt_volume}
-                        span.small.fw-normal  (#{marketdata.exchange})
-                      td #{splitVolumeBTC[0]}.
-                        span.decimal #{splitVolumeBTC[1]}
-                  if marketdata.data.summary.bid != null
-                    tr
-                      - var bidValue = settings.formatCurrency(marketdata.data.summary.bid, marketdata.exchange);
-                      - var splitBid = bidValue.split(".");
-                      td #{settings.locale.mkt_top_bid}
-                      td #{splitBid[0]}.
-                        span.decimal #{splitBid[1]}
-                  if marketdata.data.summary.ask != null
-                    tr
-                      - var askValue = settings.formatCurrency(marketdata.data.summary.ask, marketdata.exchange);
-                      - var splitAsk = askValue.split(".");
-                      td #{settings.locale.mkt_top_ask}
-                      td #{splitAsk[0]}.
-                        span.decimal #{splitAsk[1]}
-                  if marketdata.data.summary.prev != null
-                    tr
-                      - var prevValue = settings.formatCurrency(marketdata.data.summary.prev, marketdata.exchange);
-                      - var splitPrev = prevValue.split(".");
-                      td #{settings.locale.mkt_yesterday}
-                      td #{splitPrev[0]}.
-                        span.decimal #{splitPrev[1]}
+                          - var price_change = Number(0).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+                        - var splitChange = price_change.split(".");
+                        td #{settings.locale.mkt_change}
+                        if price_change > 0
+                          td.text-success.fw-bold +#{splitChange[0]}.
+                            span.decimal #{splitChange[1]}
+                            span  %
+                        else if price_change < 0
+                          td.text-danger.fw-bold #{splitChange[0]}.
+                            span.decimal #{splitChange[1]}
+                            span  %
+                        else
+                          td.fw-bold #{splitChange[0]}.
+                            span.decimal #{splitChange[1]}
+                            span  %
+                    if marketdata.data.summary.initial != null
+                      tr
+                        - var initialValue = settings.formatCurrency(marketdata.data.summary.initial, marketdata.exchange);
+                        - var splitLast = initialValue.split(".");
+                        td #{settings.locale.mkt_initial}
+                        td #{splitLast[0]}.
+                          span.decimal #{splitLast[1]}
+                    if marketdata.data.summary.last != null
+                      tr
+                        - var lastValue = settings.formatCurrency(marketdata.data.summary.last, marketdata.exchange);
+                        - var splitLast = lastValue.split(".");
+                        td #{settings.locale.mkt_last}
+                        td #{splitLast[0]}.
+                          span.decimal #{splitLast[1]}
+                    if marketdata.data.summary.high != null
+                      tr
+                        - var highValue = settings.formatCurrency(marketdata.data.summary.high, marketdata.exchange);
+                        - var splitHigh = highValue.split(".");
+                        td #{settings.locale.mkt_high}
+                        td #{splitHigh[0]}.
+                          span.decimal #{splitHigh[1]}
+                    if marketdata.data.summary.low != null
+                      tr
+                        - var lowValue = settings.formatCurrency(marketdata.data.summary.low, marketdata.exchange);
+                        - var splitLow = lowValue.split(".");
+                        td #{settings.locale.mkt_low}
+                        td #{splitLow[0]}.
+                          span.decimal #{splitLow[1]}
+                    if marketdata.data.summary.volume != null
+                      tr
+                        - var volumeValue = settings.formatCurrency(marketdata.data.summary.volume, marketdata.coin);
+                        - var splitVolume = volumeValue.split(".");
+                        td #{settings.locale.mkt_volume}
+                          span.small.fw-normal  (#{marketdata.coin})
+                        td #{splitVolume[0]}.
+                          span.decimal #{splitVolume[1]}
+                    if marketdata.data.summary.volume_pair != null
+                      tr
+                        - var volumeCoinValue = settings.formatCurrency(marketdata.data.summary.volume_pair, 'BTC');
+                        - var splitvolumeCoin = volumeCoinValue.split(".");
+                        td #{settings.locale.mkt_volume}
+                          span.small.fw-normal  (#{marketdata.exchange})
+                        td #{splitvolumeCoin[0]}.
+                          span.decimal #{splitvolumeCoin[1]}
+                    if marketdata.data.summary.bid != null
+                      tr
+                        - var bidValue = settings.formatCurrency(marketdata.data.summary.bid, marketdata.exchange);
+                        - var splitBid = bidValue.split(".");
+                        td #{settings.locale.mkt_top_bid}
+                        td #{splitBid[0]}.
+                          span.decimal #{splitBid[1]}
+                    if marketdata.data.summary.ask != null
+                      tr
+                        - var askValue = settings.formatCurrency(marketdata.data.summary.ask, marketdata.exchange);
+                        - var splitAsk = askValue.split(".");
+                        td #{settings.locale.mkt_top_ask}
+                        td #{splitAsk[0]}.
+                          span.decimal #{splitAsk[1]}
+                    if marketdata.data.summary.prev != null
+                      tr
+                        - var prevValue = settings.formatCurrency(marketdata.data.summary.prev, marketdata.exchange);
+                        - var splitPrev = prevValue.split(".");
+                        td #{settings.locale.mkt_yesterday}
+                        td #{splitPrev[0]}.
+                          span.decimal #{splitPrev[1]}
         if marketdata.data.chartdata != 'null' && marketdata.data.chartdata != '' && marketdata.data.chartdata != '[]'
           #marketChart.row
             .col-md-12.cardSpacer

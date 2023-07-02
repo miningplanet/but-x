@@ -996,6 +996,7 @@ if (db.lib.is_locked([database], net) == false) {
             if (markets_page.exchanges[key].enabled == true) {
               // check if market is installed/supported
               if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
+                var exMarket = require('../lib/markets/' + key + '.js');
                 // loop through all trading pairs
                 markets_page.exchanges[key].trading_pairs.forEach(function(pair_key, pair_index, pair_map) {
                   // split the pair data
@@ -1005,8 +1006,31 @@ if (db.lib.is_locked([database], net) == false) {
                     // lookup the exchange in the market collection
                     db.check_market(key, split_pair[0], split_pair[1], function(mkt, exists) {
                       // check if exchange trading pair exists in the market collection
-                      if (exists) {
-                        // automatically pause for 2 seconds in between requests
+                      if (!exists) {
+                        // exchange doesn't exist in the market collection so add a default definition now
+                        console.log('No %s: %s entry found. Creating new entry now..', exMarket.market_name, pair_key);
+                        db.create_market(split_pair[0], split_pair[1], exMarket.market_name.toLowerCase(), exMarket.ext_market_url, exMarket.referal, exMarket.market_logo, function() {
+                          // automatically pause for 2 seconds in between requests
+                          rateLimit.schedule(function() {
+                            // update market data
+                            db.update_markets_db(key, split_pair[0], split_pair[1], function(err) {
+                              if (!err) {
+                                console.log('%s[%s]: Market data updated successfully.', key, pair_key);
+                                complete++;
+
+                                if (complete == total_pairs || stopSync)
+                                  get_last_usd_price(net);
+                              } else {
+                                console.log('%s[%s] Error: %s', key, pair_key, err);
+                                complete++;
+
+                                if (complete == total_pairs || stopSync)
+                                  get_last_usd_price(net);
+                              }
+                            }, net);
+                          });
+                        }, net);
+                      } else {
                         rateLimit.schedule(function() {
                           // update market data
                           db.update_markets_db(key, split_pair[0], split_pair[1], function(err) {
@@ -1025,11 +1049,6 @@ if (db.lib.is_locked([database], net) == false) {
                             }
                           }, net);
                         });
-                      } else {
-                        console.log('Error: Entry for %s[%s] does not exist in markets database.', key, pair_key);
-                        complete++;
-                        if (complete == total_pairs || stopSync)
-                          get_last_usd_price(net);
                       }
                     }, net);
                   }

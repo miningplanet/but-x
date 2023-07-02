@@ -143,6 +143,10 @@
   "api_getnextrewardwhenstr": "Returns a string describing how long until the votes are tallied and the next block reward is computed.",
 
   // markets view
+  "mkt_market": "Market",
+  "mkt_exchange": "Exchange",
+  "mkt_ask": "Ask",
+  "mkt_bid": "Bid",
   "mkt_title": "{1} Market Details",
   "mkt_description": "Viewing {1} market data for the {2} exchange",
   "mkt_hours": "24 hours",
@@ -155,7 +159,7 @@
   "mkt_top_bid": "Top Bid",
   "mkt_top_ask": "Top Ask",
   "mkt_initial": "Initial Price",
-  "mkt_last": "Last Price",
+  "mkt_last": "Last",
   "mkt_yesterday": "Yesterday",
   "mkt_change": "Change",
   "mkt_sell_orders": "Sell Orders",
@@ -163,6 +167,7 @@
   "mkt_price": "Price",
   "mkt_amount": "Amount",
   "mkt_total": "Total",
+  "mkt_trade": "Trade",
   "mkt_trade_history": "Trade History",
   "mkt_type": "Type",
   "mkt_time_stamp": "Time",

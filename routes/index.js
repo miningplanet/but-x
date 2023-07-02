@@ -581,75 +581,71 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
   const shared_pages = settings.get(net, 'shared_pages')
   const markets_page = settings.get(net, 'markets_page')
 
-  // ensure markets page is enabled
   if (markets_page.enabled == true) {
-    var market_id = req.params['market'];
-    var coin_symbol = req.params['coin_symbol'];
-    var pair_symbol = req.params['pair_symbol'];
+    const market_id = req.params['market'];
+    const coin_symbol = req.params['coin_symbol'];
+    const pair_symbol = req.params['pair_symbol'];
+    const exchange = markets_page.exchanges[market_id]
 
-    // check if the market and trading pair exists and market is enabled in settings.json
-    if (markets_page.exchanges[market_id] != null && markets_page.exchanges[market_id].enabled == true && markets_page.exchanges[market_id].trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
-      // lookup market data
-      db.get_market(market_id, coin_symbol, pair_symbol, function(data) {
-        // load market data
-        var market_data = require('../lib/markets/' + market_id);
-        var isAlt = false;
-        var url = '';
+    if (exchange != null && exchange.enabled == true && exchange.trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
+      db.get_markets_summary(function(mmdata) {
+        db.get_market(market_id, coin_symbol, pair_symbol, function(data) {
+          const market_data = require('../lib/markets/' + market_id);
+          var url = '';
 
-        // build the external exchange url link and determine if using the alt name + logo
-        if (market_data.market_url_template != null && market_data.market_url_template != '') {
-          switch ((market_data.market_url_case == null || market_data.market_url_case == '' ? 'l' : market_data.market_url_case.toLowerCase())) {
-            case 'l':
-            case 'lower':
-              url = market_data.market_url_template.replace('{base}', pair_symbol.toLowerCase()).replace('{coin}', coin_symbol.toLowerCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : ''));
-              isAlt = (market_data.isAlt != null ? market_data.isAlt({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : false);
-              break;
-            case 'u':
-            case 'upper':
-              url = market_data.market_url_template.replace('{base}', pair_symbol.toUpperCase()).replace('{coin}', coin_symbol.toUpperCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : ''));
-              isAlt = (market_data.isAlt != null ? market_data.isAlt({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : false);
-              break;
-            default:
+          // build the external exchange url link and determine if using the alt name + logo
+          const tpl = market_data.market_url_template
+          if (tpl != null && tpl != '') {
+            switch ((market_data.market_url_case == null || market_data.market_url_case == '' ? 'l' : market_data.market_url_case.toLowerCase())) {
+              case 'l':
+              case 'lower':
+                url = tpl.replace('{base}', pair_symbol.toLowerCase()).replace('{coin}', coin_symbol.toLowerCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : ''));
+                break;
+              case 'u':
+              case 'upper':
+                url = tpl.replace('{base}', pair_symbol.toUpperCase()).replace('{coin}', coin_symbol.toUpperCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : ''));
+                break;
+              default:
+            }
           }
-        }
 
-        var market_name = (isAlt ? (market_data.market_name_alt == null ? '' : market_data.market_name_alt) : (market_data.market_name == null ? '' : market_data.market_name));
-        var market_logo = (isAlt ? (market_data.market_logo_alt == null ? '' : market_data.market_logo_alt) : (market_data.market_logo == null ? '' : market_data.market_logo));
-        var ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url;
-        var referal = market_data.referal == null ? '' : market_data.referal;
+          const ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url;
+          const referal = market_data.referal == null ? '' : market_data.referal;
 
-        const p = {
-          active: 'markets',
-            marketdata: {
-              market_name: market_name,
-              market_logo: market_logo,
-              ext_market_url: ext_market_url,
-              referal: referal,
-              coin: coin_symbol,
-              exchange: pair_symbol,
-              data: data,
-              url: url
-            },
-            market: market_id,
-            showSync: db.check_show_sync_message(net),
-            customHash: get_file_timestamp('./public/css/custom.scss'),
-            styleHash: get_file_timestamp('./public/css/style.scss'),
-            themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
-            page_title_logo: settings.getTitleLogo(net),
-            page_title_prefix: locale.mkt_title.replace('{1}', market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
-            shared_pages: shared_pages,
-            markets_page: markets_page,
-            coin: coin,
-            net: net
-        }
-        if (markets_page.page_header.show_last_updated == true) {
-          db.get_stats(coin.name, function (stats) {
-            p.last_updated = stats.network_last_updated
+          const p = {
+            active: 'markets',
+              marketdata: {
+                market_name: market_data.market_name,
+                market_logo: market_data.market_logo,
+                ext_market_url: ext_market_url,
+                referal: referal,
+                coin: coin_symbol,
+                exchange: pair_symbol,
+                data: data,
+                url: url
+              },
+              mmdata: mmdata,
+              market: market_id,
+              showSync: db.check_show_sync_message(net),
+              customHash: get_file_timestamp('./public/css/custom.scss'),
+              styleHash: get_file_timestamp('./public/css/style.scss'),
+              themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+              page_title_logo: settings.getTitleLogo(net),
+              page_title_prefix: locale.mkt_title.replace('{1}', market_data.market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'),
+              shared_pages: shared_pages,
+              markets_page: markets_page,
+              coin: coin,
+              net: net
+          }
+          if (markets_page.page_header.show_last_updated == true) {
+            db.get_stats(coin.name, function (stats) {
+              p.last_updated = stats.network_last_updated
+              res.render('./market', p)
+            }, net);
+          } else {
             res.render('./market', p)
-          }, net);
-        } else {
-          res.render('./market', p)
-        }
+          }
+        }, net);
       }, net);
     } else {
       // selected market does not exist or is not enabled so default to the index page
