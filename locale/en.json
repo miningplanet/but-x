@@ -124,6 +124,7 @@
   "api_calls": "API Calls",
   "api_getnetworkhashps": "Returns the current network hashrate. (hash/s)",
   "api_getblockchaininfo": "Returns the current block chain info including various stats.",
+  "api_getmininginfo": "Returns the current block chain info including various stats.",
   "api_getdifficulty": "Returns the current Proof of work (PoW) difficulty for",
   "api_getconnectioncount": "Returns the number of connections the explorer has to other nodes.",
   "api_getmasternodelist": "Returns the complete list of masternodes on the network.",

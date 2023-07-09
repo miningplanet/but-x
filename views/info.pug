@@ -45,6 +45,16 @@ block content
                     a(href='/api/getblockchaininfo/' + net) #{address}/api/getblockchaininfo/#{net}
                   else
                     a(href='/api/getblockchaininfo') #{address}/api/getblockchaininfo
+            if api_page.public_apis.rpc.getmininginfo.enabled == true && api_cmds['getmininginfo'] != null && api_cmds['getmininginfo'] != ''
+              li
+                p
+                  div.fw-bold getmininginfo [net]
+                  div
+                    em #{settings.locale.api_getmininginfo}
+                  if !isMainnet
+                    a(href='/api/getmininginfo/' + net) #{address}/api/getmininginfo/#{net}
+                  else
+                    a(href='/api/getmininginfo') #{address}/api/getmininginfo
             if api_page.public_apis.rpc.getdifficulty.enabled == true && api_cmds['getdifficulty'] != null && api_cmds['getdifficulty'] != ''
               li
                 p

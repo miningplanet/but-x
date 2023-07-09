@@ -157,6 +157,7 @@ ___
 but-eiquidus supports the following API functions.
 
 - **api/getblockchaininfo/{net}:** Returns statistics about the coin such as chain, header count, block count, difficulty, circulating supply or USD price.
+- **api/getmininginfo/{net}:** Returns statistics about the coin such as chain, header count, block count, difficulty, circulating supply or USD price.
 - **api/getdifficulty/{net}:** Returns the current difficulty.
 - **api/getconnectioncount/{net}:** Returns the number of connections the block explorer has to other nodes.
 - **api/getblockcount/{net}:** Returns the current block index.
