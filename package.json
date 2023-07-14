@@ -6,9 +6,6 @@
     "start": "node --stack-size=10000 ./bin/cluster",
     "stop": "node ./scripts/stop_explorer.js",
     "start-instance": "npm run prestart && node --stack-size=10000 ./bin/cluster 1",
-    "start-forever": "npm run prestart \"forever\"",
-    "stop-forever": "forever stop \"explorer\"",
-    "reload-forever": "forever restart \"explorer\"",
     "start-pm2": "npm run prestart \"pm2\" && pm2 start ./bin/instance -i 0 -n explorer -p \"./tmp/pm2.pid\" --node-args=\"--stack-size=10000\"",
     "start-pm2-debug": "npm run prestart \"pm2\" && pm2 start ./bin/instance -i 0 -n explorer -p \"./tmp/pm2.pid\" --node-args=\"--stack-size=10000\" && pm2 logs",
     "stop-pm2": "pm2 stop explorer",
@@ -53,7 +50,6 @@
     "serve-static": "^1.15.0"
   },
   "devDependencies": {
-    "forever": "^4.0.3",
     "jasmine": "^5.0.2",
     "pm2": "^5.3.0"
   }
