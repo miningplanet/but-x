@@ -60,6 +60,7 @@ block content
           }
         });
         $('#history-table').dataTable({
+          paging: true,
           searching: false,
           ordering: false,
           responsive: true,
@@ -172,15 +173,7 @@ block content
                         td.text-end #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
-                        td.text-end
-                          - var change = '-'
-                          if mkt.summary && !isNaN(mkt.summary.change)
-                            - change = Number(mkt.summary.change).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
-                          else if mkt.summary && !isNaN(mkt.summary.last) && !isNaN(mkt.summary.prev)
-                            - change = Number((100 - ((parseFloat(mkt.summary.prev) / parseFloat(mkt.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
-                          else if mkt.summary && !isNaN(mkt.summary.last) && !isNaN(mkt.summary.initial)
-                            - change = Number((100 - ((parseFloat(mkt.summary.initial) / parseFloat(mkt.summary.last)) * 100))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true})
-                          span #{change}
+                        td.text-end #{mkt.summary && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : mkt.summary.change}
                         td.half.text-end #{mkt.summary && !isNaN(mkt.summary.volume_pair) ? settings.formatCurrency(mkt.summary.volume_pair, mkt.coin_symbol) : '-'}  
                         td.text-end #{mkt.summary && !isNaN(mkt.summary.volume) ? settings.formatCurrency(mkt.summary.volume, mkt.coin_symbol) : '-'} 
                   td 
