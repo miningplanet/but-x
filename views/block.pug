@@ -121,7 +121,7 @@ block content
                 // td.text-center.d-table-cell.d-md-none
                   a(href='/tx/' + txn.txid)
                     span.entity(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_tx) &#8627
-                td.text-begin.txCol.d-md-table-cell
+                td.text-start.txCol.d-md-table-cell
                   a.breakWord(href='/tx/' + txn.txid + '/' + net) #{txn.txid}
                 td.text-center #{txn.vout.length}
                 if txn.vout.length > 0

@@ -11,3 +11,12 @@ script.
       r = '<span class="rdate">' + mdate.toDateString() + '</span>&nbsp;<span class="rtime"' + (alt === true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + mdate.toUTCString() + '"' : '') + '>' + mdate.toTimeString() + '</span>'
     return r
   }
+  function format_unixtime_blank(unixtime) {
+    const mdate = new Date(unixtime * 1000)
+    var r = ''
+    if ('#{shared_pages.date_time.timezone}'.toLowerCase() == 'local')
+      r = mdate.toLocaleString()
+    else
+      r = mdate.toUTCString()
+    return r
+  }

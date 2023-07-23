@@ -876,6 +876,7 @@ if (db.lib.is_locked([database], net) == false) {
               /* node.lastseen = node.lastseentime; */
               node.lastpaid = node.lastpaidtime;
               node.last_paid_block = node.lastpaidblock;
+              node.pose_score = node.pospenaltyscore;
               node.txhash = node.proTxHash;
               // Copy for BUTK end.
               var address = node.address;

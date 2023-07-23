@@ -15,6 +15,7 @@ var MasternodeSchema = new Schema({
   claim_name: { type: String, default: '', index: true },
   ip_address: { type: String, default: '', index: true },
   last_paid_block: {type: Number, default: 0},
+  pose_score: {type: Number, default: 0},
   country: { type: String, default: "" },
   country_code: { type: String, default: "" }
 }, {id: false});

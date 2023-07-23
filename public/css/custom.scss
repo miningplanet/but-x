@@ -16,6 +16,7 @@
 body { display: block !important; align-items: baseline; font-family: 'Courier New',monospace !important; background: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%); }
 table thead th { background-color: transparent !important }
 tbody tr td a, div.card-body a, input, select, option, .btn, .form-control { background-color: transparent !important; color: greenyellow !important }
+tbody td { padding: 4px 6px !important }
 .btn, .form-control, select { border: solid 1px #aaa; border-radius: 0.25rem }
 .text-success { color: rgba(213,255,87) !important }
 code { color: #adff2f !important }
@@ -45,7 +46,7 @@ div#cockpit div.card-header, div#cockpit div.card-body { padding: 1px }
 div#cockpit div.card-body label strong { font-size: 22px !important }
 
 footer div.navbar-nav label.nav-link { color: greenyellow !important }
-footer { min-height: 120px; height: auto; text-align: center !important }
+footer { min-height: 120px; height: auto; padding-top: 1rem !important; text-align: center !important }
 footer a span { margin: 6px; display: inline-block; width: 36px; height: 36px; }
 
 div#social { position: relative; margin: 0 auto }
@@ -56,6 +57,8 @@ div#copy small { font-size: 11px !important }
 div#nethashChartParent, div#difficultyChartParent { padding: 0.25rem !important; text-align: center; font-family: 'Courier New',monospace !important }
 div#difficultyChartFooter, div#hashChartFooter { background-color: transparent !important; border-top: none; margin: 0 !important }
 div#difficultyChartFooter > button, div#hashChartFooter > button { background-color: transparent; color: greenyellow; width: 28%; border: solid 2px #888; margin: 2px 10px 2px 10px }
+
+span.rdate { visibility: visible !important }
 
 div.border-0 { border-radius: 0.5rem !important }
 
@@ -73,20 +76,34 @@ div#recent-table_wrapper table td:nth-child(5) { width: 100px !important }
 div#recent-table_wrapper table th:nth-child(6) { width: 180px !important }
 div#recent-table_wrapper table td:nth-child(6) { width: 180px !important }
 
+
+td.addressCol, th.addressCol { width: 270px !important }
+td.addressCol { text-align: center }
+
+td.ipAddressCol, th.ipAddressCol { width: 90px !important }
+td.ipAddressCol { text-align: right }
+
+td.ipAddressAndPortCol, th.ipAddressAndPortCol { width: 164px !important }
+td.ipAddressAndPortCol { text-align: right }
+
+td.lastPaidCol, th.lastPaidCol { width: 170px !important }
+td.lastPaidCol { text-align: center }
+
+td.lastPaidBlockCol, th.lastPaidBlockCol { width: 46px !important }
+td.lastPaidBlockCol { text-align: center }
+
+td.statusCol, th.statusCol { width: 50px !important }
+td.statusCol { text-align: center }
+
+td.poseCol, th.poseCol { width: 32px !important }
+td.poseCol { text-align: center }
+
+td.countryWithNameCol, th.countryWithNameCol {  min-width: 140px !important; width: auto; word-wrap: normal !important }
+
+td.flagCol, th.flagCol { width: 25px !important; text-align: center }
+
 div#masternodes-table_wrapper table { margin-left: 0px !important }
 div#masternodes-table_wrapper table thead { max-height: 24px; }
-div#masternodes-table_wrapper table th:nth-child(1) { width: 155px }
-div#masternodes-table_wrapper table td:nth-child(1) { width: 155px }
-div#masternodes-table_wrapper table th:nth-child(2) { width: 270px }
-div#masternodes-table_wrapper table td:nth-child(2) { width: 270px; text-align: left }
-div#masternodes-table_wrapper table th:nth-child(3) { width: 170px }
-div#masternodes-table_wrapper table td:nth-child(3) { width: 170px; text-align: center }
-div#masternodes-table_wrapper table th:nth-child(4) { width: 64px }
-div#masternodes-table_wrapper table td:nth-child(4) { width: 64px; text-align: center }
-div#masternodes-table_wrapper table th:nth-child(5) { width: 22px}
-div#masternodes-table_wrapper table td:nth-child(5) { width: 22px; text-align: center }
-div#masternodes-table_wrapper table th:nth-child(6) { min-width: 140px !important; width: auto; word-wrap: normal !important }
-div#masternodes-table_wrapper table td:nth-child(6) { min-width: 140px !important; width: auto; word-wrap: normal !important }
 
 div#movement-table_wrapper > div:nth-child(1) { text-align: center; }
 div#movement-table_wrapper > div:nth-child(1)  > div:nth-child(1) { width: 100% }
@@ -145,13 +162,13 @@ div#address-txs_wrapper table td:nth-child(5) { width: 180px }
 table#tx-table td:nth-child(1) { width: var(--xs-2-col-label-width) !important; min-width: var(--xs-2-col-label-width-min) !important; text-align: left !important; }
 table#tx-table td:nth-child(2) { width: auto; text-align: left !important; }
 
-table#contributors th:nth-child(1) { width: 200px }
-table#contributors td:nth-child(1) { width: 200px }
+table#contributors th:nth-child(1) { width: 310px}
+table#contributors td:nth-child(1) { width: 310px; text-align: left !important }
 table#contributors th:nth-child(2) { width: auto }
 table#contributors td:nth-child(2) { width: auto }
 
-table#recipients th:nth-child(1) { width: 200px }
-table#recipients td:nth-child(1) { width: 200px; text-align: left !important; }
+table#recipients th:nth-child(1) { width: 310px }
+table#recipients td:nth-child(1) { width: 310px; text-align: left !important }
 table#recipients th:nth-child(2) { width: auto }
 table#recipients td:nth-child(2) { width: auto }
 
@@ -193,11 +210,9 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (max-width: 575px) {
     td.full, th.full, td.half, th.half, span.half { width: 0px !important; overflow: hidden !important; display: none !important; visibility: hidden !important }
+    // td.small, td.small { display: table-cell !important; visibility: visible !important }
 
     div#body-container { min-height: 700px }
-
-    div#masternodes-table_wrapper table th:nth-child(2) { width: 110px }
-    div#masternodes-table_wrapper table td:nth-child(2) { width: 110px }
 
     table#rich th:nth-child(2) { width: 110px }
     table#rreceive th:nth-child(2) { width: 110px }
@@ -222,19 +237,15 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
     div#recent-table_wrapper table th:nth-child(6) { width: 100px !important }
     div#recent-table_wrapper table td:nth-child(6) { width: 100px !important }
 
-    div#masternodes-table_wrapper table th:nth-child(2) { width: 180px }
-    div#masternodes-table_wrapper table td:nth-child(2) { width: 180px }
-
     td.countryCol { width: var(--xs-width-col-country) !important }
     td.countryCol span { display: none !important; width: 0 !important }
 
-    div#masternodes-table_wrapper table th:nth-child(6) { min-width: 30px !important; width: auto; word-wrap: normal !important }
-    div#masternodes-table_wrapper table td:nth-child(6) { min-width: 30px !important; width: auto; word-wrap: normal !important }
     div#connections-table_wrapper table th:nth-child(5) { min-width: 30px !important; width: auto !important; word-wrap: normal !important }
     div#connections-table_wrapper table td:nth-child(5) { min-width: 30px !important; width: auto !important; word-wrap: normal !important }
 
     table#block-txs td.txCol a { width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;  text-align: left !important; }
     div#block-txs-wrapper table th:nth-child(1) { width: 155px !important }
+
     table#markets-table thead th:nth-child(3) { width: 60px !important }
     table#markets-table tbody td:nth-child(3) { width: 60px !important }
     table#markets-table thead th:nth-child(9) { width: 65px !important }
@@ -244,6 +255,9 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
 @media only screen and (max-width: 991px) {
     div#body-container { min-height: 800px }
 
+    td.small, th.small { display: table-cell !important; visibility: visible !important }
+    td.wide, th.wide { display: none !important; visibility: hidden !important }
+
     /* div#recent-table_wrapper table th:nth-child(3) { width: 320px !important } */
     /* div#recent-table_wrapper table td:nth-child(3) { width: 320px !important } */
     table#address-txs th:nth-child(2) { width: 320px !important }
@@ -252,6 +266,8 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
 
 @media only screen and (min-width: 992px) {
     div#body-container { min-height: 900px }
+
+    td.small, th.small { display: none !important; visibility: hidden !important }
 }
 
 .navbar-nav span, #search-header-button span { background-repeat: no-repeat !important; display: inline-block !important; }

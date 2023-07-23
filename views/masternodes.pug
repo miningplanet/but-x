@@ -27,13 +27,12 @@ block content
         return ('0' + dy).slice(-2) + " day" + (('0' + dy).slice(-2) == 1 ? "" : "s") + " " + ('0' + h).slice(-2) + "h " + ('0' + m).slice(-2) + "m " + ('0' + s).slice(-2) + "s";
     }
     $(document).ready(function() {
-      var useNewDashFormat = false;
       var labels = !{JSON.stringify(settings.labels)};
       var ctable = $('#masternodes-table').dataTable({
         autoWidth: false,
         searching: true,
         ordering: true,
-        order: [[ 7, 'desc' ]],
+        order: [[ 4, 'desc' ]],
         responsive: true,
         lengthChange: true,
         processing: true,
@@ -50,16 +49,27 @@ block content
           url: '/ext/getmasternodelist/#{net}',
           dataSrc: function(json) {
             for (i = 0; i < json.length; i++) {
-              var addr = json[i]['addr'];
-              var status = json[i]['status'];
-              var country = "<span>" + json[i]['country'] + "</span>";
+              const addr = json[i]['addr'];
+              const status = json[i]['status'];
+
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
               json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
 
-              if (typeof json[i]['lastpaid'] != 'undefined' && json[i]['lastpaid'] != '' && json[i]['lastpaid'] != '0')
-                json[i]['lastpaid'] = format_unixtime(json[i]['lastpaid'])
-              else
+              const ipAddr = json[i]['ip_address']
+              if (ipAddr && ipAddr.includes(':')) {
+                json[i]['ip_address_without_port'] = ipAddr.substring(0, ipAddr.indexOf(':'))
+              }
+
+              const lastPaid = json[i]['lastpaid']
+              const lastPaidBlock = json[i]['last_paid_block']
+              if (!isNaN(lastPaid)) {
+                json[i]['lastpaid'] = format_unixtime(lastPaid)
+                json[i]['last_paid_block'] = '<span title="' + format_unixtime_blank(lastPaid) + '">' + lastPaidBlock + '</span>';
+              } else {
                 json[i]['lastpaid'] = '<em>N/A</em>';
+                json[i]['last_paid_block'] = '<span>' + lastPaidBlock + '</span>';
+              }
+              
               if (json[i]['activetime'])
                 json[i]['activetime'] = secondsToHms(json[i]['activetime']);
               else
@@ -75,53 +85,53 @@ block content
               }
 
               var entity="&#9888;"
-              if (status && status == "ENABLED") {
-                entity="&#10004;"
+              if (status) {
+                if (status == "ENABLED") {
+                  entity="&#10004;"
+                } else {
+                  // Pose penalty is usually not required here.
+                  json[i]['pose_score'] = '-'
+                }
               }
+
               json[i]['status'] = '<span class="entitybig"><b>' + entity + '</b></span>';
 
+              const country = "<span>" + json[i]['country'] + "</span>"
               if (json[i]['country_code'].length > 1) {
-                json[i]['country'] = country + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>';
+                json[i]['countryWithFlag'] = country + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>'
+                json[i]['flag'] = '<div title="' + json[i]['country'] + '" class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>'
               }
-            }
- 
-            useNewDashFormat = json.length > 0 && json[0].ip_address != null && json[0].ip_address != '';
- 
+            } 
             return json;
           }
         },
         columns: [
-          { name: 'rank', data: 'rank', className: "rankCol" },
-          { name: 'network', data: 'network', className: "networkCol" },
-          { name: 'ip_address', data: 'ip_address', className: "ipAddressCol" },
-          { name: 'addr', data: 'addr', className: "addressCol" },
-          { name: 'version', data: 'version', className: "versionCol" },
-          { name: 'lastseen', data: 'lastseen', className: "lastSeenCol" },
-          { name: 'lastpaid', data: 'lastpaid', className: "lastPaidCol" },
+          // { name: 'rank', data: 'rank', className: "rankCol" },
+          // { name: 'network', data: 'network', className: "networkCol" },
+          { name: 'ip_address_port', data: 'ip_address', className: "ipAddressAndPortCol wide" },
+          { name: 'ip_address', data: 'ip_address_without_port', className: "ipAddressCol small" },
+          { name: 'addr', data: 'addr', className: "addressCol full" },
+          // { name: 'version', data: 'version', className: "versionCol" },
+          // { name: 'lastseen', data: 'lastseen', className: "lastSeenCol" },
+          { name: 'lastpaid', data: 'lastpaid', className: "lastPaidCol full" },
           { name: 'last_paid_block', data: 'last_paid_block', className: "lastPaidBlockCol" },
-          { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
+          // { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
           { name: 'status', data: 'status', className: "statusCol" },
-          { name: 'country', data: 'country', className: "countryCol" }
+          { name: 'pose', data: 'pose_score', className: "poseCol" },
+          { name: 'country', data: 'countryWithFlag', className: "countryWithNameCol wide" },
+          { name: 'flag', data: 'flag', className: "flagCol small" }
         ],
         rowCallback: function(row, data, index) {
-          $("td.addressCol", row).addClass("breakWord");
-          if (useNewDashFormat)
-            $("td.ipAddressCol", row).addClass("breakWord");
+          // $("td.addressCol", row).addClass("breakWord");
+          // $("td.ipAddressCol", row).addClass("breakWord");
         },
         fnDrawCallback: function(settings) {
           enableTooltips();
         },
         fnInitComplete: function(settings, json) {
           setTimeout(function () {
-            // Hide/show columns based on which Dash masternode format is used
-            ctable.api().column('rank:name').visible(!useNewDashFormat, false);
-            ctable.api().column('network:name').visible(!useNewDashFormat, false);
-            ctable.api().column('version:name').visible(!useNewDashFormat, false);
-            ctable.api().column('lastseen:name').visible(!useNewDashFormat, false);
-            /* ctable.api().column('lastpaid:name').visible(false, false); */
-            ctable.api().column('activetime:name').visible(!useNewDashFormat, false);
-            ctable.api().column('ip_address:name').visible(useNewDashFormat, false);
-            ctable.api().column('last_paid_block:name').visible(useNewDashFormat);
+            // Hide/show columns.
+            // ctable.api().column('rank:name').visible(<true|false>, false);
           }, 0);
         }
       });
@@ -175,15 +185,13 @@ block content
           - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
         thead
           tr(class=theadClasses)
-            th.text-center Pay rank
-            th.text-center Protocol
-            th.text-center IP:port
-            th.text-center Payout
-            th.text-center Protocol
-            th.text-center Last seen (UTC)
+            th.text-center(class="wide") IP:port
+            th.text-center(class="small") IP
+            th.text-center(class="full") Payout
+            th.text-center(class="full") Last payed
             th.text-center Last
-            th.text-center Last $
-            th.text-center Active since
-            th.text-center !
-            th.text-center
+            th.text-center State
+            th.text-center PoS
+            th.text-center(class="wide") Country
+            th.text-center(class="small") C
         tbody.text-center
