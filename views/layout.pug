@@ -419,7 +419,17 @@ html(lang='en')
                 if (nethashChart == null) {
                   const netHashSets = []
                   const algos = '#{shared_pages.page_header.network_charts.algos}'
-                  if (algos.includes("ghostrider")) {
+                  const isBut = '#{isButkoin}'
+                  if (isBut === 'false' && algos.includes("ghostrider")) {
+                    netHashSets.push({
+                      label: 'Ghostrider',
+                      data: result.map(function(a) {return a.nethash;}),
+                      backgroundColor: ['#{shared_pages.page_header.network_charts.nethash_chart.ghostrider_fill_color}'],
+                      borderColor: ['#{shared_pages.page_header.network_charts.nethash_chart.ghostrider_line_color}'],
+                      fill: 'start'
+                    });
+                  }
+                  if (isBut === 'true' && algos.includes("ghostrider")) {
                     netHashSets.push({
                       label: 'Ghostrider',
                       data: result.map(function(a) {return a.nethash_ghostrider;}),
@@ -428,7 +438,7 @@ html(lang='en')
                       fill: 'start'
                     });
                   }
-                  if (algos.includes("yespower")) {
+                  if (isBut === 'true' && algos.includes("yespower")) {
                     netHashSets.push({
                       label: 'Yespower',
                       data: result.map(function(a) {return a.nethash_yespower / 1000;}),
@@ -437,7 +447,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("lyra2")) {
+                  if (isBut === 'true' && algos.includes("lyra2")) {
                     netHashSets.push({
                       label: 'Lyra2',
                       data: result.map(function(a) {return a.nethash_lyra2;}),
@@ -446,7 +456,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("sha256d")) {
+                  if (isBut === 'true' && algos.includes("sha256d")) {
                     netHashSets.push({
                       label: 'Sha256d',
                       data: result.map(function(a) {return a.nethash_sha256d / 1000;}),
@@ -455,7 +465,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("scrypt")) {
+                  if (isBut === 'true' && algos.includes("scrypt")) {
                     netHashSets.push({
                       label: 'Scrypt',
                       data: result.map(function(a) {return a.nethash_scrypt;}),
@@ -464,7 +474,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("butkscrypt")) {
+                  if (isBut === 'true' && algos.includes("butkscrypt")) {
                     netHashSets.push({
                       label: 'Butkscrypt',
                       data: result.map(function(a) {return a.nethash_butkscrypt;}),
@@ -494,7 +504,7 @@ html(lang='en')
                         yAxis: {
                           title: {
                             display: true,
-                            text: 'KH/s or MH/s',
+                            text: 'Network (MH/s)',
                             font: {
                               weight: 'bold'
                             }
@@ -590,14 +600,14 @@ html(lang='en')
                 var showPOS = false;
 
                 for (var i = 0; i < result.length; i++) {
-                  if (result[i].difficulty_pow != 0)
-                    showPOW = true;
+                  //- if (result[i].difficulty_pow != 0)
+                  //-   showPOW = true;
                   if (result[i].difficulty_pos != 0)
                     showPOS = true;
                 }
 
                 const algos = '#{shared_pages.page_header.network_charts.algos}'
-
+                const isBut = '#{isButkoin}'
                 if (showPOS) {
                   if (algos.includes("ghostrider")) {
                     diffDataSets.push({
@@ -608,7 +618,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("yespower")) {
+                  if (isBut === 'true' && algos.includes("yespower")) {
                     diffDataSets.push({
                       label: 'Yespower',
                       data: result.map(function(a) {return a.difficulty_yespower;}),
@@ -617,7 +627,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("lyra2")) {
+                  if (isBut === 'true' && algos.includes("lyra2")) {
                     diffDataSets.push({
                       label: 'Lyra2',
                       data: result.map(function(a) {return a.difficulty_lyra2;}),
@@ -626,7 +636,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("sha256d")) {
+                  if (isBut === 'true' && algos.includes("sha256d")) {
                     diffDataSets.push({
                       label: 'Sha256d',
                       data: result.map(function(a) {return a.difficulty_sha256d}),
@@ -635,7 +645,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("scrypt")) {
+                  if (isBut === 'true' && algos.includes("scrypt")) {
                     diffDataSets.push({
                       label: 'Scrypt',
                       data: result.map(function(a) {return a.difficulty_scrypt;}),
@@ -644,7 +654,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (algos.includes("butkscrypt")) {
+                  if (isBut === 'true' && algos.includes("butkscrypt")) {
                     diffDataSets.push({
                       label: 'Butkscrypt',
                       data: result.map(function(a) {return a.difficulty_butkscrypt}),
