@@ -1151,7 +1151,7 @@ html(lang='en')
         }
         setInterval(function() {
           update_stats();
-        }, 60000);
+        }, #{index_page.refresh_interval} || 60000);
         if (#{network_history.enabled} == true && ((#{showNethashChart} == true && #{shared_pages.page_header.network_charts.nethash_chart.enabled} == true && #{shared_pages.show_hashrate} == true) || (#{showDifficultyChart} == true && #{shared_pages.page_header.network_charts.difficulty_chart.enabled} == true))) {
           var setting_reload_chart_seconds = #{shared_pages.page_header.network_charts.reload_chart_seconds};
           if (setting_reload_chart_seconds > 0) {
