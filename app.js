@@ -23,6 +23,7 @@ const networks = settings.getAllNet();
 
 // application cache
 const wlength = settings.wallets.length
+const foreverCache = new TTLCache({ max: 10, ttl: Infinity, updateAgeOnGet: false, noUpdateTTL: false })
 const summaryCache = new TTLCache({ max: wlength, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const networkChartCache = new TTLCache({ max: wlength, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const statsCache = new TTLCache({ max: wlength, ttl: settings.cache.stats * 1000, updateAgeOnGet: false, noUpdateTTL: false })
@@ -33,6 +34,8 @@ const balancesCache = new TTLCache({ max: 100, ttl: settings.cache.balances * 10
 const distributionCache = new TTLCache({ max: wlength, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const peersCache = new TTLCache({ max: wlength, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const masternodesCache = new TTLCache({ max: wlength, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const allnetCache = new TTLCache({ max: 10, ttl: settings.cache.allnet, updateAgeOnGet: false, noUpdateTTL: false })
+
 
 var request = require('postman-request');
 var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
@@ -235,10 +238,11 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
     db.get_tx(txid, function(tx) {
       const shared_pages = settings.get(net, 'shared_pages')
       if (tx && tx != null) {
-        lib.get_blockcount(function(blockcount) {
-          res.send({ active: 'tx', tx: tx, confirmations: shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
-        }, net);
+        db.get_stats(coin.name, function (stats) {
+          res.send({ active: 'tx', tx: tx, confirmations: shared_pages.confirmations, blockcount: (stats && !isNaN(stats.count) ? stats.count : 0), coin: coin, net: net})
+        }, net)
       } else {
+        // TODO: Only get by DB.
         lib.get_rawtransaction(txid, function(rtx) {
           if (rtx && rtx != null && rtx.txid) {
             lib.prepare_vin(net, rtx, function(vin, tx_type_vin) {
@@ -267,8 +271,8 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
                       blockindex: rtx.blockheight
                     };
 
-                    lib.get_blockcount(function(blockcount) {
-                      res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount: (blockcount ? blockcount : 0), coin: coin, net: net});
+                    db.get_stats(coin.name, function (stats) {
+                      res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount: (stats && !isNaN(stats.count) ? stats.count : 0), coin: coin, net: net});
                     }, net);
                   }
                 });
@@ -414,27 +418,30 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
     const coin = settings.getCoin(net)
-    const api_cmds = settings.get(net, 'api_cmds')
-    const markets_page = settings.get(net, 'markets_page')
     const r = statsCache.get(net);
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
-        // check if the masternode count api is enabled
-        if (api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') {
-          // masternode count api is available
-          lib.get_masternodecount(net, function(masternodestotal) {
-            eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price, "masternode_count": masternodestotal.total }');
-            statsCache.set (net, p_ext);
-            debug("Cached coin stats '%s' %o - mem: %o", net, p_ext, process.memoryUsage());
-            res.send(p_ext);
-          });
-        } else {
-          // masternode count api is not available
-          eval('var p_ext = { "block_count": (stats.count ? stats.count : 0), "money_supply": (stats.supply ? stats.supply : 0), "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '": stats.last_price, "last_price_usd": stats.last_usd_price }');
-          statsCache.set (net, p_ext);
-          debug("Cached coin stats '%s' %o - mem: %o", net, p_ext, process.memoryUsage());
-          res.send(p_ext);
-        }
+        if (stats) {
+          const s = {}
+          if (!isNaN(stats.count))
+            s.block_count = stats.count
+          if (!isNaN(stats.supply))
+            s.money_supply = stats.supply
+          if (!isNaN(stats.count))
+            s.block_count = stats.count
+          if (!isNaN(stats.smartnodes_enabled)) 
+            s.masternode_enabled = stats.smartnodes_enabled
+          if (!isNaN(stats.smartnodes_total)) 
+            s.masternode_count = stats.smartnodes_total
+          if (!isNaN(stats.last_usd_price)) 
+            s.last_price_usd = stats.last_usd_price,
+
+          // eval('var p_ext = {  "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '":   }');
+          statsCache.set(net, s);
+          debug("Cached coin stats '%s' %o - mem: %o", net, s, process.memoryUsage());
+          res.send(s);
+        } else 
+          res.end('This method is disabled')
       }, net);
     } else {
       debug("Get coin stats by cache '%s' %o ...", net, r.block_count);
@@ -448,6 +455,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
+  const algos = settings.algos
   if (api_page.enabled == true && api_page.public_apis.ext.getticker.enabled == true) {
     if (settings.cache.enabled == true) {
       var r = tickerCache.get(net);
@@ -472,53 +480,41 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                     console.warn(distribution);
                     distribution = {};
                   }
-                  request({uri: base_url + 'api/getdifficulty/' + net, json: true}, function (error, response, diffdata) {
-                    var algos = diffdata;
-                    if (typeof algos === 'string') {
-                      console.warn(algos);
-                      algos = {};
-                    } else {
-                      algos = algos.pow_difficulties;
+                  
+                  db.get_latest_networkhistory(stats.count, function(networkhist) {
+                    if (networkhist) {
+                      for (i = 0; i < algos.length; i++) {
+                        if ((!isNaN(networkhist['nethash_' + algos[i].algo.toLowerCase()]))) {
+                          const algo = algos[i].algo.toLowerCase()
+                          algos[i].hashps = networkhist['nethash_' + algo]
+                          algos[i].diff = networkhist['difficulty_' + algo]
+                        }
+                      }
                     }
 
-                    request({uri: base_url + 'api/getnetworkhashps/' + net, json: true}, function (error, response, hashdata) {
-                      var hashps = hashdata;
-                      if (typeof hashps === 'string') {
-                        console.warn(hashps);
-                        hashps = {};
-                      }
-
-                      if (algos[0] && hashps.ghostrider) algos[0].hashps = hashps.ghostrider
-                      if (algos[1] && hashps.yespower) algos[1].hashps = hashps.yespower
-                      if (algos[2] && hashps.lyra2) algos[2].hashps = hashps.lyra2
-                      if (algos[3] && hashps.sha256d) algos[3].hashps = hashps.sha256d
-                      if (algos[4] && hashps.scrypt) algos[4].hashps = hashps.scrypt
-                      if (algos[5] && hashps.butkscrypt) algos[5].hashps = hashps.butkscrypt
-
-                      var r = {}
-                      // r.rank = 1234
-                      r.coin = coin.name
-                      r.code = coin.symbol
-                      r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
-                      r.tip = stats.count
-                      r.supply = stats.supply
-                      r.supply_max = 21000000000
-                      r.price = stats.last_price
-                      r.price_usd = stats.last_usd_price
-                      r.txes = stats.txes
-                      r.markets = markets
-                      r.rates = rates;
-                      r.node_collateral = 15000000
-                      r.node_count = mn.count;
-                      r.node_active = mn.active;
-                      r.distribution = distribution
-                      r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
-                      r.algos = algos
-                      tickerCache.set (net, r);
-                      debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage());
-                      res.send(r);
-                    });
-                  });
+                    const r = {}
+                    // r.rank = 1234
+                    r.coin = coin.name
+                    r.code = coin.symbol
+                    r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
+                    r.tip = stats.count
+                    r.supply = stats.supply
+                    r.supply_max = 21000000000
+                    r.price = stats.last_price
+                    r.price_usd = stats.last_usd_price
+                    r.txes = stats.txes
+                    r.markets = markets
+                    r.rates = rates;
+                    r.node_collateral = 15000000
+                    r.node_count = mn.count;
+                    r.node_active = mn.active;
+                    r.distribution = distribution
+                    r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
+                    r.algos = algos
+                    tickerCache.set (net, r);
+                    debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage());
+                    res.send(r);
+                   }, net);
                 });
               });
             }, net);
@@ -583,7 +579,7 @@ function isInternalRequest(req) {
 }
 
 app.use('/ext/getlasttxs/:net/:min', function(req, res) {
-  // TODO: Fix functionality and add cache.
+  // TODO: Add cache.
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -726,72 +722,83 @@ app.use('/ext/getsummary/:net?', function(req, res) {
     const summary = summaryCache.get(net)
     if (summary == undefined) {
       const r = {}
-      lib.get_connectioncount(net, function(connections) {
-        lib.get_blockcount(function(blockcount) {
-          if (connections)
-            r.connections = connections
-          if (blockcount) 
-            r.blockcount = blockcount
-          lib.get_hashrate(function(hashps) {
-            db.get_stats(coin.name, function (stats) {
-              lib.get_masternodecount(net, function(mns) {
-                if (mns && mns.total && mns.total > -1) {
-                  r.masternodeCountOnline = mns.total
-                  if (mns.enabled && mns.enabled > -1)
-                    r.masternodeCountOffline = Math.floor(mns.total - mns.enabled)
-                }
-                lib.get_difficulty(net, function(difficulties) {
-                  if (stats) {
-                    r.supply = (stats == null || stats.supply == null ? 0 : stats.supply)
-                  }
+      lib.get_hashrate(function(hashps) {
+        db.get_stats(coin.name, function (stats) {
+          if (!isNaN(stats.count)) 
+            r.blockcount = stats.count
+          if (!isNaN(stats.connections)) 
+            r.connections = stats.connections
+          if (!isNaN(stats.smartnodes_enabled)) 
+            r.masternodeCountOnline = stats.smartnodes_enabled
+          if (!isNaN(stats.smartnodes_total) && !isNaN(stats.smartnodes_enabled)) 
+            r.masternodeCountOffline = stats.smartnodes_total - stats.smartnodes_enabled
 
-                  if (difficulties && difficulties.difficulty) {
-                    var difficulty = difficulties.difficulty;
-                    difficultyHybrid = '';
+          lib.get_difficulty(net, function(difficulties) {
+            if (stats) {
+              r.supply = (stats == null || stats.supply == null ? 0 : stats.supply)
+            }
 
-                    const shared_pages = settings.get(net, 'shared_pages')
-                    if (difficulty && difficulty['proof-of-work']) {
-                      if (shared_pages.difficulty == 'Hybrid') {
-                        difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
-                        difficulty = 'POW: ' + difficulty['proof-of-work'];
-                      } else if (shared_pages.difficulty == 'POW')
-                        difficulty = difficulty['proof-of-work'];
-                      else
-                        difficulty = difficulty['proof-of-stake'];
-                    }
+            if (difficulties && difficulties.difficulty) {
+              var difficulty = difficulties.difficulty;
+              difficultyHybrid = '';
 
-                    r.difficulty = difficulty ? difficulty : '-'
-                    r.difficultyHybrid = difficultyHybrid
+              const shared_pages = settings.get(net, 'shared_pages')
+              if (difficulty && difficulty['proof-of-work']) {
+                if (shared_pages.difficulty == 'Hybrid') {
+                  difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
+                  difficulty = 'POW: ' + difficulty['proof-of-work'];
+                } else if (shared_pages.difficulty == 'POW')
+                  difficulty = difficulty['proof-of-work'];
+                else
+                  difficulty = difficulty['proof-of-stake'];
+              }
 
-                    if (hashps) {
-                      if (settings.isButkoin(net)) {
-                        if (hashps.nethash_ghostrider)
-                          r.hashrate_ghostrider = hashps.nethash_ghostrider
-                        if (hashps.nethash_yespower)
-                          r.hashrate_yespower = hashps.nethash_yespower
-                        if (hashps.nethash_lyra2)
-                          r.hashrate_lyra2 = hashps.nethash_lyra2
-                        if (hashps.nethash_sha256d)
-                          r.hashrate_sha256d = hashps.nethash_sha256d
-                        if (hashps.nethash_scrypt) 
-                          r.hashrate_scrypt = hashps.nethash_scrypt
-                        if (hashps.nethash_butkscrypt)
-                          r.hashrate_butk = hashps.nethash_butkscrypt
-                      } else {
-                        r.hashrate = hashps
-                      }
-                    }
+              r.difficulty = difficulty ? difficulty : '-'
+              r.difficultyHybrid = difficultyHybrid
 
-                    r.lastPrice = (stats == null || stats.last_price == null ? 0 : stats.last_price)
+              if (!isNaN(hashps))
+                r.hashrate = hashps
 
-                    summaryCache.set (net, r);
-                    console.log("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
-                    res.send(r);
-                  }
-                })
-              })
-            }, net)
-          }, net)
+              if (!isNaN(hashps.nethash_ghostrider))
+                r.hashrate_ghostrider = hashps.nethash_ghostrider
+              if (!isNaN(hashps.nethash_yespower))
+                r.hashrate_yespower = hashps.nethash_yespower
+              if (!isNaN(hashps.nethash_lyra2))
+                r.hashrate_lyra2 = hashps.nethash_lyra2
+              if (!isNaN(hashps.nethash_sha256d))
+                r.hashrate_sha256d = hashps.nethash_sha256d
+              if (!isNaN(hashps.nethash_scrypt))
+                r.hashrate_scrypt = hashps.nethash_scrypt
+              if (!isNaN(hashps.nethash_butkscrypt))
+                r.hashrate_butk = hashps.nethash_butkscrypt
+
+              // if (hashps) {
+              //   if (settings.isButkoin(net)) {
+              //     if (hashps.nethash_ghostrider)
+              //       r.hashrate_ghostrider = hashps.nethash_ghostrider
+              //     if (hashps.nethash_yespower)
+              //       r.hashrate_yespower = hashps.nethash_yespower
+              //     if (hashps.nethash_lyra2)
+              //       r.hashrate_lyra2 = hashps.nethash_lyra2
+              //     if (hashps.nethash_sha256d)
+              //       r.hashrate_sha256d = hashps.nethash_sha256d
+              //     if (hashps.nethash_scrypt) 
+              //       r.hashrate_scrypt = hashps.nethash_scrypt
+              //     if (hashps.nethash_butkscrypt)
+              //       r.hashrate_butk = hashps.nethash_butkscrypt
+              //   } else {
+              //     r.hashrate = hashps
+              //   }
+              // }
+
+              r.lastPrice = (stats == null || stats.last_price == null ? 0 : stats.last_price)
+
+              summaryCache.set (net, r);
+              console.log("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
+              res.send(r);
+            }
+          })
+          // })
         }, net)
       }, net)
     } else {
@@ -939,6 +946,33 @@ app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
     debug("Get network chart by cache '%s' ...", net);
     res.send(r);
   }
+});
+
+const allnet_modes = ['markets']
+
+// net apis
+app.use('/net/getallnet/:mode?', function(req, res) {
+  const net = settings.getDefaultNet()
+  const mode = req.params['mode']
+  const api_page = settings.get(net, 'api_page')
+
+  if (api_page.enabled == true && api_page.public_apis.net.getallnet.enabled == true) {
+    if (mode) {
+      if (!allnet_modes.includes(mode)) {
+        res.end('This mode is not supported');    
+      }
+    } else {
+      const r = foreverCache.get('allnet');
+      if (r == undefined) {
+        const allnet = settings.getAllNet()
+        foreverCache.set(net, allnet);
+        res.send(allnet);
+      } else {
+        res.send(r);
+      }
+    }
+  } else
+    res.end('This method is disabled');
 });
 
 app.use('/system/restartexplorer', function(req, res, next) {

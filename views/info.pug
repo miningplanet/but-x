@@ -28,9 +28,7 @@ block content
         if api_page.show_logo == true
           img(src=shared_pages.logo, style='margin:0;height:128px;')
           hr
-        - var hide_rpc_api_section = !(api_page.public_apis.rpc.getdifficulty.enabled == true && api_cmds['getdifficulty'] != null && api_cmds['getdifficulty'] != '') && !(api_page.public_apis.rpc.getconnectioncount.enabled == true && api_cmds['getconnectioncount'] != null && api_cmds['getconnectioncount'] != '') && !(api_page.public_apis.rpc.getblockcount.enabled == true && api_cmds['getblockcount'] != null && api_cmds['getblockcount'] != '') && !(api_page.public_apis.rpc.getblockhash.enabled == true && api_cmds['getblockhash'] != null && api_cmds['getblockhash'] != '') && !(api_page.public_apis.rpc.getblock.enabled == true && api_cmds['getblock'] != null && api_cmds['getblock'] != '') && !(api_page.public_apis.rpc.getrawtransaction.enabled == true && api_cmds['getrawtransaction'] != null && api_cmds['getrawtransaction'] != '') && !(api_page.public_apis.rpc.getnetworkhashps.enabled == true && shared_pages.show_hashrate == true && api_cmds['getnetworkhashps'] != null && api_cmds['getnetworkhashps'] != '') && !(api_page.public_apis.rpc.getvotelist.enabled == true && api_cmds['getvotelist'] != null && api_cmds['getvotelist'] != '') && !(api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != '') && (!settings.blockchain_specific.heavycoin.enabled || (!(settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getmaxvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getvote.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != null && settings.blockchain_specific.heavycoin.api_cmds['getvote'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getphase.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != null && settings.blockchain_specific.heavycoin.api_cmds['getphase'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getreward.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != null && settings.blockchain_specific.heavycoin.api_cmds['getreward'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getsupply.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != null && settings.blockchain_specific.heavycoin.api_cmds['getsupply'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardestimate.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardestimate'] != '') && !(settings.blockchain_specific.heavycoin.public_apis.getnextrewardwhenstr.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != null && settings.blockchain_specific.heavycoin.api_cmds['getnextrewardwhenstr'] != '')));
-        - var hide_ext_api_section = !api_page.public_apis.ext.getmoneysupply.enabled && !api_page.public_apis.ext.getdistribution.enabled && !api_page.public_apis.ext.getaddress.enabled && !api_page.public_apis.ext.getaddresstxs.enabled && !api_page.public_apis.ext.gettx.enabled && !api_page.public_apis.ext.getbalance.enabled && !api_page.public_apis.ext.getlasttxs.enabled && !api_page.public_apis.ext.getcurrentprice.enabled && !api_page.public_apis.ext.getnetworkpeers.enabled && !api_page.public_apis.ext.getbasicstats.enabled && !api_page.public_apis.ext.getsummary.enabled && !(api_page.public_apis.ext.getmasternodelist.enabled && api_cmds['getmasternodelist'] != null && api_cmds['getmasternodelist'] != '') && !api_page.public_apis.ext.getmasternoderewards.enabled && !api_page.public_apis.ext.getmasternoderewardstotal.enabled;
-        if !hide_rpc_api_section
+        if !api_page.public_apis.hide_rpc_api_section
           h3 #{settings.locale.api_calls}
           p
             em Return data from coind
@@ -257,7 +255,7 @@ block content
                     else 
                       a(href='/api/getnextrewardwhenstr') #{address}/api/getnextrewardwhenstr
           hr
-        if !hide_ext_api_section
+        if !api_page.public_apis.hide_ext_api_section
           h3 Extended API
           p
             em Return data from local indexes
@@ -443,6 +441,19 @@ block content
                   else
                     a(href='/ext/getmasternoderewardstotal/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex) #{address}/ext/getmasternoderewardstotal/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}
           hr
+        if !api_page.public_apis.hide_net_api_section
+          h3 Net API
+          p
+            em Data accross all chains.
+          ul
+            if api_page.public_apis.net.getallnet.enabled == true
+              li
+                p
+                  div.fw-bold getallnet [mode]
+                  div
+                    em Returns a list and data about all nets available.
+                  a(href='/net/getallnet') #{address}/net/getallnet
+          hr
         h3 Linking (GET)
         p
           em Linking to the explorer
@@ -476,7 +487,7 @@ block content
               else
                 a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
           hr
-        if api_page.show_electrum_api_section
+        if !api_page.public_apis.hide_electrum_api_section
           h3 ElectrumX API (JSON-RPC 2.0)
           p ElectrumX servers for ButKoin light wallets (former Bitcoin Lightning) are available at 
             ul 
