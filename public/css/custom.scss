@@ -146,6 +146,12 @@ table#rreceive td:nth-child(2) { text-align: left }
 table#rreceive th:nth-child(3) { width: auto; }
 table#rreceive td:nth-child(3) { width: auto; text-align: right !important }
 
+table#rtoptx th:nth-child(1) { width: 44px }
+table#rtoptx th:nth-child(2) { width: 80px }
+table#rtoptx th:nth-child(3) { width: 100px }
+table#rtoptx th:nth-child(4) { width: 80px }
+table#rtoptx th:nth-child(5) { width: auto }
+
 div#summary-panel table th:nth-child(3) { width: 58px }
 
 div#address-txs_wrapper table { margin-left: 0px !important }

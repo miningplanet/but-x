@@ -674,6 +674,7 @@ router.get('/richlist/:net?', function(req, res) {
                 active: 'richlist',
                 balance: richlist.balance,
                 received: richlist.received,
+                toptx: richlist.toptx,
                 burned: richlist.burned,
                 stats: stats,
                 dista: distribution.t_1_25,

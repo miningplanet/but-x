@@ -464,19 +464,21 @@ if (db.lib.is_locked([database], net) == false) {
                               db.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
                                 db.update_richlist('received', function() {
                                   db.update_richlist('balance', function() {
-                                    // update richlist_last_updated value
-                                    db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
-                                      db.get_stats(coin.name, function(nstats) {
-                                        // check for and update heavycoin data if applicable
-                                        update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
-                                          // check for and update network history data if applicable
-                                          const network_history = settings.get(net, 'network_history')
-                                          update_network_history(nstats.last, network_history.enabled, function(network_hist) {
-                                            // always check for and remove the sync msg if exists
-                                            db.remove_sync_message(net);
+                                    db.update_richlist('toptx', function() {
+                                      // update richlist_last_updated value
+                                      db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                                        db.get_stats(coin.name, function(nstats) {
+                                          // check for and update heavycoin data if applicable
+                                          update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
+                                            // check for and update network history data if applicable
+                                            const network_history = settings.get(net, 'network_history')
+                                            update_network_history(nstats.last, network_history.enabled, function(network_hist) {
+                                              // always check for and remove the sync msg if exists
+                                              db.remove_sync_message(net);
 
-                                            console.log('Reindex complete (block: %s)', nstats.last);
-                                            exit(0);
+                                              console.log('Reindex complete (block: %s)', nstats.last);
+                                              exit(0);
+                                            }, net);
                                           }, net);
                                         }, net);
                                       }, net);
@@ -640,19 +642,21 @@ if (db.lib.is_locked([database], net) == false) {
                     db.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
                       db.update_richlist('received', function() {
                         db.update_richlist('balance', function() {
-                          // update richlist_last_updated value
-                          db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {                              
-                            db.get_stats(coin.name, function(nstats) {
-                              // check for and update heavycoin data if applicable
-                              update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
-                                // check for and update network history data if applicable
-                                const network_history = settings.get(net, 'network_history')
-                                update_network_history(nstats.last, network_history.enabled, function(network_hist) {
-                                  // always check for and remove the sync msg if exists
-                                  db.remove_sync_message(net);
+                          db.update_richlist('toptx', function() {
+                            // update richlist_last_updated value
+                            db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {                              
+                              db.get_stats(coin.name, function(nstats) {
+                                // check for and update heavycoin data if applicable
+                                update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
+                                  // check for and update network history data if applicable
+                                  const network_history = settings.get(net, 'network_history')
+                                  update_network_history(nstats.last, network_history.enabled, function(network_hist) {
+                                    // always check for and remove the sync msg if exists
+                                    db.remove_sync_message(net);
 
-                                  console.log('Block sync complete (block: %s)', nstats.last);
-                                  exit(0);
+                                    console.log('Block sync complete (block: %s)', nstats.last);
+                                    exit(0);
+                                  }, net);
                                 }, net);
                               }, net);
                             }, net);
@@ -680,10 +684,12 @@ if (db.lib.is_locked([database], net) == false) {
                         console.log('Richlist updated received');
 
                         db.update_richlist('balance', function() {
-                          // update richlist_last_updated value
-                          db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
-                            console.log("Richlist update complete for net '%s'", net);
-                            exit(0);
+                          db.update_richlist('toptx', function() {
+                            // update richlist_last_updated value
+                            db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                              console.log("Richlist update complete for net '%s'", net);
+                              exit(0);
+                            }, net);
                           }, net);
                         }, net);
                       }, net);

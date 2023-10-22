@@ -108,6 +108,9 @@ block content
             if richlist_page.show_received_coins == true
               li.nav-item(role='presentation')
                 a(class='nav-link' + (!richlist_page.show_current_balance ? ' active' : ''), href='#received', aria-controls='received', role='tab', data-bs-toggle='tab') #{settings.locale.rl_received_coins}
+            if richlist_page.show_top_tx == true
+              li.nav-item(role='presentation')
+                a(class='nav-link' + (!richlist_page.show_top_tx ? ' active' : ''), href='#toptx', aria-controls='toptx', role='tab', data-bs-toggle='tab') #{settings.locale.rl_top_tx}
         .tab-content
           if richlist_page.show_current_balance == true
             #balance(class='container tab-pane' + (richlist_page.show_current_balance == true ? ' active' : ''), style='margin-top:0;')
@@ -168,6 +171,36 @@ block content
                             a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.name}
                           include ./includes/rl_labels.pug
                         td.text-center #{itemFixedParts[0]}.
+                          span.decimal #{itemFixedParts[1]}
+          if richlist_page.show_top_tx == true
+            #toptx(class='container tab-pane' + (!richlist_page.show_top_tx ? ' active' : ''), style='margin-top:0;')
+              .card.card-default.border-0
+                table#rtoptx.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
+                  thead
+                    tr(class=theadClasses)
+                      th.text-center
+                        span.position
+                      th #{settings.locale.rl_block_height}
+                      th.text-center #{settings.locale.rl_tx_timestamp}
+                      th.text-center #{settings.locale.rl_tx_size}
+                      th.text-center #{settings.locale.rl_total_out}
+                  tbody
+                    - var count = 0;
+                    each tx in toptx
+                      - count = count + 1;
+                      - var itemFixed = Number(parseInt(tx.total) / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+                      - var itemFixedParts = itemFixed.split(".");
+                      - var timestamp = new Date(tx.timestamp * 1000).toLocaleDateString();
+                      tr
+                        td.text-center
+                          =count
+                        td.text-center
+                          a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockindex}
+                        td.text-center
+                          span #{timestamp}
+                        td.text-end
+                          span #{tx.size}
+                        td.text-end #{itemFixedParts[0]}.
                           span.decimal #{itemFixedParts[1]}
     if richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true
       div(class=(richlist_page.show_received_coins == true || richlist_page.show_current_balance == true ? 'col-xs-12 col-lg-4' : 'col-12'))
