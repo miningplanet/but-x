@@ -58,6 +58,8 @@ block content
               const ipAddr = json[i]['ip_address']
               if (ipAddr && ipAddr.includes(':')) {
                 json[i]['ip_address_without_port'] = ipAddr.substring(0, ipAddr.indexOf(':'))
+              } else {
+                json[i]['ip_address_without_port'] = ipAddr
               }
 
               const lastPaid = json[i]['lastpaid']
@@ -97,9 +99,12 @@ block content
               json[i]['status'] = '<span class="entitybig"><b>' + entity + '</b></span>';
 
               const country = "<span>" + json[i]['country'] + "</span>"
-              if (json[i]['country_code'].length > 1) {
+              if (json[i]['country_code'] && json[i]['country_code'].length > 1) {
                 json[i]['countryWithFlag'] = country + '<div class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>'
                 json[i]['flag'] = '<div title="' + json[i]['country'] + '" class="margin-left-5 flag-icon flag-icon-'+json[i]['country_code'].toLowerCase()+'"></div>'
+              } else {
+                json[i]['countryWithFlag'] = '<div></div>'
+                json[i]['flag'] = '<div></div>'
               }
             } 
             return json;
