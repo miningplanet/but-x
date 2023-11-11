@@ -47,9 +47,6 @@ Table of Contents
   - [Start Explorer Using PM2 and Log Viewer](#start-explorer-using-pm2-and-log-viewer)
   - [Stop Explorer Using PM2 (Recommended for Production)](#stop-explorer-using-pm2-recommended-for-production)
   - [Reload Explorer Using PM2 (Recommended for Production)](#reload-explorer-using-pm2-recommended-for-production)
-  - [Start Explorer Using Forever (Alternate Production Option)](#start-explorer-using-forever-alternate-production-option)
-  - [Stop Explorer Using Forever (Alternate Production Option)](#stop-explorer-using-forever-alternate-production-option)
-  - [Reload Explorer Using Forever (Alternate Production Option)](#reload-explorer-using-forever-alternate-production-option)
 - [Syncing Databases with the Blockchain](#syncing-databases-with-the-blockchain)
   - [Commands for Manually Syncing Databases](#commands-for-manually-syncing-databases)
   - [Sample Crontab](#sample-crontab)
@@ -382,58 +379,6 @@ or (useful for crontab):
 
 ```
 cd /path/to/explorer && /path/to/pm2 reload explorer
-```
-
-#### Start Explorer Using Forever (Alternate Production Option)
-
-[Forever](https://www.npmjs.com/package/forever) is an alternative to PM2 which is another useful Node.js module that is used to always keep the explorer alive and running even if the explorer crashes or stops. Once you have configured the explorer to work properly in a production environment, forever can be used as an alternative to PM2 to start and stop the explorer instead of `npm start` and `npm stop` to keep the explorer constantly running without the need to always keep a terminal window open.
-
-You can start the explorer using forever with one of the following terminal cmds (be sure to run from within the explorer directory):
-
-```
-npm run start-forever
-```
-
-or (useful for crontab):
-
-```
-cd /path/to/explorer && /path/to/npm run prestart "forever"
-```
-
-**NOTE:** Use the following cmd to find the install path for forever (Linux only):
-
-```
-which forever
-```
-
-#### Stop Explorer Using Forever (Alternate Production Option)
-
-To stop the explorer when it is running via forever you can use one of the following terminal cmds (be sure to run from within the explorer directory):
-
-```
-npm run stop-forever
-```
-
-or (useful for crontab):
-
-```
-cd /path/to/explorer && /path/to/forever stop "explorer"
-```
-
-#### Reload Explorer Using Forever (Alternate Production Option)
-
-The explorer can be stopped and restarted in a single cmd when it is running via forever, which is often necessary after updating the explorer code for example. Use one of the following terminal cmds to reload the explorer (be sure to run from within the explorer directory):
-
-**NOTE:** The explorer will be inaccessible for a few seconds while the restart is being performed.
-
-```
-npm run reload-forever
-```
-
-or (useful for crontab):
-
-```
-cd /path/to/explorer && /path/to/forever restart "explorer"
 ```
 ___
 
