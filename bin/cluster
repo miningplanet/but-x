@@ -1,26 +1,29 @@
-var cluster = require('cluster');
+const cluster = require('cluster')
+const numCpu = require('os').cpus().length
 
 if (cluster.isMaster) {
-  const isWinOS = process.platform == 'win32';
-  const lib = require('../lib/explorer');
-  const instances = (process.argv[2] != null && process.argv[2] != '' && !isNaN(process.argv[2]) && Number.isInteger(parseFloat(process.argv[2])) ? parseInt(process.argv[2]) : require('os').cpus().length);
-
-  console.log('Starting cluster with pid: ' + process.pid);
-
+  const isWinOS = process.platform == 'win32'
+  const lib = require('../lib/explorer')
+  const instances = (process.argv[2] != null && process.argv[2] != '' && !isNaN(process.argv[2]) && Number.isInteger(parseFloat(process.argv[2])) ? parseInt(process.argv[2]) : numCpu)
+  const pid = process.pid
+  if (instances > 1)
+    console.log('Starting single instance with PID %s.', pid)
+  else
+    console.log('Starting cluster with %d instances and PID %s.', instances, pid)
+  
   function startWorkers() {
     // create worker instances
     for (var i = 0; i < instances; i += 1)
-      cluster.fork();
+      cluster.fork()
   }
 
   function killAllWorkers(isRestart) {
     // send kill cmd to all workers
     for (var id in cluster.workers) {
-      console.log('Worker (' + id + ') shutting down...');
-
+      console.log('Worker (' + id + ') shutting down...')
       if (!isWinOS || isRestart) {
         // only kill the worker if not on windows (otherwise an error is displayed) or if the cluster is being restarted
-        process.kill(cluster.workers[id]['process']['pid'], 'SIGINT');
+        process.kill(cluster.workers[id]['process']['pid'], 'SIGINT')
       }
     }
   }
@@ -28,62 +31,50 @@ if (cluster.isMaster) {
   function waitForWorkerShutdown(isRestart) {
     if (Object.keys(cluster.workers).length > 0) {
       // continue waiting since worker threads are still open
-      setTimeout(waitForWorkerShutdown, 100, isRestart);
+      setTimeout(waitForWorkerShutdown, 100, isRestart)
     } else {
       // all worker threads have closed
       // check if the cluster process should stop or if the workers should be restarted
       if (isRestart) {
-        // start new worker threads
-        startWorkers();
+        startWorkers()
       } else {
         // exit the master process
-        
         if (isWinOS) {
           // command line in windows doesn't seem to release itself
           // show a message that the app has finished
-          console.log('The application is now safe to close');
+          console.log('The application is now safe to close')
         }
-
-        process.exit(0);
+        process.exit(0)
       }
     }
   }
 
-  // ensure workers exit cleanly
+  // ensure workers exit cleanly. send kill and wait for shutdown.
   process.on('SIGINT', () => {
-    console.log('Cluster shutting down..');
+    console.log('Cluster shutting down..')
+    killAllWorkers(false)
+    waitForWorkerShutdown(false)
+  })
 
-    // send kill cmd to all workers
-    killAllWorkers(false);
-
-    // wait for workers to stop
-    waitForWorkerShutdown(false);
-  });
-
-  startWorkers();
+  startWorkers()
 
   // listen for dying workers
   cluster.on('exit', function (worker, code, signal) {
     if (worker['process']['exitCode'] === 0) {
-      console.log('Worker (' + worker['id'] + ') shutdown complete');
+      console.log('Worker (' + worker['id'] + ') shutdown complete')
     } else if (signal != 'SIGINT' && worker['process']['exitCode'] !== 0 && worker['process']['exitCode'] !== 999 && worker.exitedAfterDisconnect !== true) {
-      console.log('Cluster restarting...');
-      cluster.fork();
+      console.log('Cluster restarting...')
+      cluster.fork()
     }
-  });
+  })
 
-  // listen for the restart cmd
+  // if restart, kill all workers and wait for shutdown.
   cluster.on('message', function (data, msg) {
-      // check if this was the restart cmd
       if (msg != null && msg == 'restart') {
-        console.log('Cluster restarting..');
-
-        // send kill cmd to all workers
-        killAllWorkers(true);
-
-        // wait for workers to stop
-        waitForWorkerShutdown(true);
+        console.log('Cluster restarting..')
+        killAllWorkers(true)
+        waitForWorkerShutdown(true)
       }
-  });
+  })
 } else
-  require('./instance');
+  require('./instance')
