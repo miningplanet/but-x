@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@isaacs/ttlcache": "^1.4.1",
-    "async": "^3.2.4",
+    "async": "^3.2.5",
     "bad-words": "^3.0.4",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
@@ -45,7 +45,7 @@
     "pug": "~3.0.2",
     "qr-image": "^3.2.0",
     "readline-sync": "^1.4.10",
-    "sass": "^1.69.4",
+    "sass": "^1.69.5",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.15.0"
   },
