@@ -1,6 +1,6 @@
 {
   "name": "explorer",
-  "version": "1.101.0",
+  "version": "1.102.0",
   "private": true,
   "scripts": {
     "start": "node --stack-size=10000 ./bin/cluster",
@@ -38,8 +38,8 @@
     "intl": "^1.2.5",
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
-    "mongodb": "^6.2.0",
-    "mongoose": "^8.0.0",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.1",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.33",
     "pug": "~3.0.2",
