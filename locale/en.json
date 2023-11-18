@@ -28,6 +28,8 @@
   "tx_title": "{1} Transaction Details",
   "tx_description": "Viewing tx data from {1} block # {2}",
   "tx_block_hash": "Block Hash",
+  "tx_type": "Type",
+  "tx_version": "Version",
   "tx_recipients": "Recipients",
   "tx_contributors": "Input Addresses",
   "tx_hash": "Tx Hash",
@@ -35,6 +37,49 @@
   "tx_nonstandard": "NONSTANDARD TX",
   "view_raw_tx_data": "View Raw Transaction Data",
   "view_block": "View Block",
+
+  // BUTK tx_type 1 JSON to array. See validation.h -> TRANSACTION_PROVIDER_REGISTER.
+  "tx_protx_reg_version": "Protx Register Service Version",
+  "tx_protx_reg_height": "Height",
+  "tx_protx_reg_collateral_hash": "Collateral Hash",
+  "tx_protx_reg_collateral_index": "Collateral Index",
+  "tx_protx_reg_service": "Host:IP",
+  "tx_protx_reg_owner_address": "Owner Address",
+  "tx_protx_reg_voting_address": "Voting Address",
+  "tx_protx_reg_payout_address": "Payout Address",
+  "tx_protx_reg_operator_pk": "Operator PK",
+  "tx_protx_reg_operator_reward": "Operator Reqard [%]",
+  "tx_protx_reg_inputs_hash": "Inputs Hash",
+
+  // BUTK tx_type 2 JSON to array. See validation.h -> TRANSACTION_PROVIDER_UPDATE_SERVICE.
+  "tx_protx_update_version": "Protx Update Service Version",
+  "tx_protx_update_protx_hash": "Collateral Hash",
+  "tx_protx_update_service": "Host:IP",
+  "tx_protx_update_inputs_hash": "Inputs Hash",
+
+  // BUTK tx_type 3 JSON to array. See validation.h -> TRANSACTION_PROVIDER_UPDATE_REGISTRAR.
+  "tx_protx_update_revoke_version": "Protx Revoke Service Version",
+  "tx_protx_update_revoke_protx_hash": "ProTx Hash",
+  "tx_protx_update_revoke_reason": "Reason",
+  "tx_protx_update_revoke_inputs_hash": "Inputs Hash",
+
+  // BUTK tx_type 4 JSON to array. See validation.h -> TRANSACTION_PROVIDER_UPDATE_REVOKE.
+  "tx_protx_update_reg_version": "Protx Update Service Version",
+  "tx_protx_update_reg_protx_hash": "Collateral Hash",
+  "tx_protx_update_reg_voting_address": "Voting Address",
+  "tx_protx_update_reg_payout_address": "Payout Address",
+  "tx_protx_update_reg_operator_pk": "Operator PK",
+  "tx_protx_update_req_inputs_hash": "Inputs Hash",
+
+  // BUTK tx_type 6 JSON to array. See validation.h -> TRANSACTION_QUORUM_COMMITMENT.
+  "tx_qc_version": "Quorum Version",
+  "tx_qc_height": "Height",
+  "tx_qc_commitment_version": "Commitment Version",
+  "tx_qc_commitment_llmq_type": "LLMQ Type",
+  "tx_qc_commitment_hash": "Quorum Hash",
+  "tx_qc_commitment_signers": "Signers",
+  "tx_qc_commitment_valid_members": "Valid Members",
+  "tx_qc_commitment_pk": "Quorum PK",
 
   // block view
   "block_title": "{1} Block Details",

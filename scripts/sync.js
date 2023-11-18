@@ -1,16 +1,16 @@
 const debug = require('debug')('sync')
-const mongoose = require('mongoose'),
-      settings = require('../lib/settings'),
-      async = require('async'),
-      db = require('../lib/database');
-
+const mongoose = require('mongoose')
+const settings = require('../lib/settings')
+const async = require('async')
+const datautil = require('../lib/datautil')
+const db = require('../lib/database')
 const { StatsDb, AddressDb, AddressTxDb, TxDb, RichlistDb } = require('../lib/database')
 
 var net = settings.getDefaultNet()
 var coin = settings.getCoin(net)
 var mode = 'update'
 var database = 'index'
-var block_start = 1
+var block_start = 0
 var lockCreated = false
 var stopSync = false
 
@@ -115,13 +115,9 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
               TxDb[net].findOne({txid: txid}).then((tx) => {
                 debug("Got block tx: %s", txid)
                 if (tx) {
-                  setTimeout( function() {                    tx = null
-                    // check if the script is stopping
-                    if (stopSync) {
-                      // stop the loop
-                      next_tx({})
-                    } else
-                      next_tx()
+                  setTimeout( function() {
+                    tx = null
+                    stopSync ? next_tx({}) : next_tx() // stop or next
                   }, timeout)
                 } else {
                   db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
@@ -136,12 +132,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
 
                     setTimeout( function() {
                       tx = null
-                      // check if the script is stopping
-                      if (stopSync) {
-                        // stop the loop
-                        next_tx({})
-                      } else
-                        next_tx()
+                      stopSync ? next_tx({}) : next_tx() // stop or next
                     }, timeout)
                   })
                 }
@@ -153,34 +144,19 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
               setTimeout( function() {
                 blockhash = null
                 block = null
-                // check if the script is stopping
-                if (stopSync) {
-                  // stop the loop
-                  next_block({})
-                } else
-                  next_block()
+                stopSync ? next_block({}) : next_block() // stop or next
               }, timeout)
             })
           } else {
             console.log('Block not found: %s', blockhash)
             setTimeout( function() {
-              // check if the script is stopping
-              if (stopSync) {
-                // stop the loop
-                next_block({})
-              } else
-                next_block()
+              stopSync ? next_block({}) : next_block() // stop or next
             }, timeout)
           }
         }, net)
       } else {
         setTimeout( function() {
-          // check if the script is stopping
-          if (stopSync) {
-            // stop the loop
-            next_block({})
-          } else
-            next_block()
+          stopSync ? next_block({}) : next_block() // stop or next
         }, timeout)
       }
     }, net)
@@ -250,46 +226,25 @@ function get_last_usd_price(net=settings.getDefaultNet()) {
   }, net)
 }
 
-/** Function that counts occurrences of a substring in a string;
- * @param {String} string               The string
- * @param {String} subString            The sub string to search for
- * @param {Boolean} [allowOverlapping]  Optional. (Default:false)
- *
- * @author Vitim.us https://gist.github.com/victornpb/7736865
- * @see Unit Test https://jsfiddle.net/Victornpb/5axuh96u/
- * @see http://stackoverflow.com/questions/4009756/how-to-count-string-occurrence-in-string/7924240#7924240
- */
-function occurrences(string, subString, allowOverlapping) {
-  string += ""
-  subString += ""
-  if (subString.length <= 0) return (string.length + 1)
+const folder = process.argv[0]
+const script = process.argv[1]
 
-  var n = 0,
-      pos = 0,
-      step = allowOverlapping ? 1 : subString.length
 
-  while (true) {
-      pos = string.indexOf(subString, pos)
-      if (pos >= 0) {
-          ++n
-          pos += step
-      } else break
-  }
-  return n
-}
-
-console.log("Sync args '%s' '%s' '%s' '%s' '%s'", process.argv[0], process.argv[1], process.argv[2], process.argv[3], process.argv[4])
+console.log("Sync args: '%s'", process.argv)
 
 // 0 -> folder
 // 1 -> sync.js
 // 2 -> mode [update]
 // 3 -> database
-// 4 -> net
+// . -> ...
+// . -> ...
+// L -> net
 
-if (process.argv[4]) {
-  net = settings.getNetOrNull(process.argv[4])
+const last = process.argv[process.argv.length - 1]
+if (last) {
+  net = settings.getNetOrNull(last)
   if (net == null) {
-    console.error("Chain '%s' not found.", process.argv[4])
+    console.error("Chain '%s' not found.", last)
     exit(1)
   }
   coin = settings.getCoin(net)
@@ -306,7 +261,7 @@ if (enabled) {
 }
 
 // check options
-if (process.argv[2] == null || process.argv[2] == 'index' || process.argv[2] == 'update') {
+if (mode == null || mode == 'index' || mode == 'update') {
   mode = null
 
   switch (process.argv[3]) {
@@ -320,14 +275,11 @@ if (process.argv[2] == null || process.argv[2] == 'index' || process.argv[2] == 
       mode = 'check'
       // check if the block start value was passed in and is an integer
       if (!isNaN(process.argv[4]) && Number.isInteger(parseFloat(process.argv[4])))
-        block_start = Math.max(1, parseInt(process.argv[4]))
+        block_start = Math.max(0, parseInt(process.argv[4]))
       break
     case 'enrichtx':
       console.log("Enrich TX...")
       mode = 'enrichtx'
-      // check if the block start value was passed in and is an integer
-      if (!isNaN(process.argv[4]) && Number.isInteger(parseFloat(process.argv[4])))
-        block_start = Math.max(1, parseInt(process.argv[4]))
       break
     case 'reindex':
       // check if readlinesync module is installed
@@ -475,22 +427,26 @@ if (db.lib.is_locked([database], net) == false) {
               } else if (mode == 'enrichtx') {
                 console.log('Enrich TX... Please wait..')
 
+                // check if the block start value was passed in and is an integer
+                if (!isNaN(process.argv[4])) {
+                  block_start = Math.max(1, parseInt(process.argv[4]))
+                } else {
+                  block_start = 0
+                }
+
                 var end = stats.count
                 // check if the block end value was passed in and is an integer
-                if (!isNaN(process.argv[5]) && Number.isInteger(parseFloat(process.argv[5]))) {
+                if (!isNaN(process.argv[5])) {
                   // Check if the block start value is less than 1
-                  var newEnd = parseInt(process.argv[5])
+                  const newEnd = parseInt(process.argv[5])
                   if (newEnd >= block_start && newEnd <= end)
                     end = newEnd
                 }
 
-                console.log('Scan blocks from height #d to #d...', block_start, end)
-                var blocks_to_scan = []
-                var task_limit_blocks = settings.sync.block_parallel_tasks
-                var task_limit_txs = 1
-
-                if (typeof block_start === 'undefined' || block_start < 0) 
-                  block_start = 0
+                console.log('Scan blocks from height %d to %d...', block_start, end)
+                const blocks_to_scan = []
+                const task_limit_blocks = settings.sync.block_parallel_tasks
+                // var task_limit_txs = 1
 
                 if (task_limit_blocks < 1)
                   task_limit_blocks = 1
@@ -502,76 +458,78 @@ if (db.lib.is_locked([database], net) == false) {
 
                 async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
                   db.lib.get_blockhash(block_height, function(blockhash) {
-                    console.log('Check block %s', block_height)
                     if (blockhash) {
-                      console.log('and hash %s', blockhash)
+                      console.log('Check block %s (%s)', block_height, blockhash)
                       db.lib.get_block(blockhash, function(block) {
                         if (block) {
                           var task_limit_txs = 1
                           async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-                            TxDb[net].findOne({txid: txid}, function(err, tx) {
+                            TxDb[net].findOne({txid: txid}).then((tx) => {
                               debug('Check TX with ID %s', txid)
-                              if (tx) {
-                                debug(" and type %s", tx.tx_type)
-                                if (tx.tx_type == null) {
-                                  debug(" will be updated ")
-                                  db.lib.get_rawtransaction(txid, function(rtx) {
-                                    if (rtx && rtx.txid) {
-                                      debug(" with TX from daemon and type: %s", rtx.type)
-                                      TxDb[net].updateOne({txid: txid}, {
-                                        version: rtx.version,
-                                        tx_type: rtx.type,
-                                        size: rtx.size,
-                                        locktime: rtx.locktime,
-                                        instantlock: rtx.instantlock,
-                                        chainlock: rtx.chainlock
-                                      }, function() {
-                                        setTimeout( function() {
-                                          tx = next_tx
-                                          // next_tx()
-                                        }, settings.sync.update_timeout)
-                                        console.log("TX %s updated.", txid)
-                                      })
+                              if (tx === undefined || tx === null) {
+                                console.log(" ... not found %o! Exit.", tx)
+                                exit(1)
+                              } else if (tx && tx != null && tx !== undefined) {
+                                debug(" and type %s will be updated.", tx.tx_type)
+                                
+                                db.lib.get_rawtransaction(txid, function(rtx) {
+                                  if (rtx && rtx.txid) {
+                                    debug(" with TX from daemon and type: %s", rtx.type)
+                                    const tx_types = settings.get(net, 'tx_types')
+                                    var extra = null
+                                    if (settings.isButkoin(net)) {
+                                      switch (tx.tx_type) {
+                                        case tx_types.indexOf('TRANSACTION_NORMAL').toString(): break // -> NORMAL
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER').toString(): extra = datautil.protxRegisterServiceTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE').toString(): extra = datautil.protxUpdateServiceTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR').toString(): extra = datautil.protxUpdateRegistrarTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE').toString(): extra = datautil.protxUpdateRevokeTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_COINBASE').toString(): break // COINBASE, Array.from(rtx.extraPayload).reverse().join("")
+                                        case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT').toString(): extra = datautil.protxQuorumCommitmentTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_FUTURE').toString(): break // FUTURE
+                                        default: console.warn('*** Unknown TX type %s.', tx.tx_type)
+                                      }
                                     }
-                                  }, net)
-                                } else {
-                                  console.log(" No updated required.")
-                                }
+                                    TxDb[net].updateOne({txid: txid}, {
+                                      version: rtx.version,
+                                      tx_type: rtx.type,
+                                      size: rtx.size,
+                                      locktime: rtx.locktime,
+                                      instantlock: rtx.instantlock,
+                                      chainlock: rtx.chainlock,
+                                      extra: extra
+                                    }).then(() => {
+                                      setTimeout( function() {
+                                        tx = next_tx
+                                        // next_tx()
+                                      }, settings.sync.update_timeout)
+                                      console.log("TX %s updated.", txid)
+                                      // return cb()
+                                    }).catch((err) => {
+                                      console.error("Failed to update TX with ID '%s': %s", txid, tx_type)
+                                    })
+                                  }
+                                }, net)
                                 setTimeout( function() {
                                   tx = null
-                                  // check if the script is stopping
-                                  if (stopSync) {
-                                    // stop the loop
-                                    next_tx({})
-                                  } else
-                                    next_tx()
+                                  stopSync ? next_tx({}) : next_tx() // stop or next
                                 }, settings.sync.update_timeout)
-                              } else {
-                                console.log(" ... not found! Exit.")
-                                exit(1)
                               }
+                            }).catch((err) => {
+                              console.error("Failed to find TX '%s' for chain '%s': %s", tx, net, err)
+                              return cb()
                             })
                           }, function() {
                             setTimeout( function() {
                               blockhash = null
                               block = null
-                              // check if the script is stopping
-                              if (stopSync) {
-                                // stop the loop
-                                next_block({})
-                              } else
-                                next_block()
+                              stopSync ? next_block({}) : next_block() // stop or next
                             }, settings.sync.update_timeout)
                           })
                         } else {
                           console.log('Block not found: %s', blockhash)
                           setTimeout( function() {
-                            // check if the script is stopping
-                            if (stopSync) {
-                              // stop the loop
-                              next_block({})
-                            } else
-                              next_block()
+                            stopSync ? next_block({}) : next_block() // stop or next
                           }, settings.sync.update_timeout)
                         }
                       }, net)
@@ -701,7 +659,7 @@ if (db.lib.is_locked([database], net) == false) {
             var address = body[i].addr
             var port = null
 
-            if (occurrences(address, ':') == 1 || occurrences(address, ']:') == 1) {
+            if (address.includes(':') || address.includes(']:')) {
               // Separate the port # from the IP address
               address = address.substring(0, address.lastIndexOf(":")).replace("[", "").replace("]", "")
               port = body[i].addr.substring(body[i].addr.lastIndexOf(":") + 1)

@@ -36,6 +36,7 @@ block content
         if api_page.public_apis.rpc.getrawtransaction.enabled == true
           a.d-none.d-md-inline(href=`/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
+      - const tx_types = settings.get(net, 'tx_types')
       table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
         tbody
           - var confirms = (blockcount - tx.blockindex + 1);
@@ -43,6 +44,12 @@ block content
             td.d-md-table-cell #{settings.locale.tx_block_hash}
             td.d-md-table-cell
               a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockhash}
+          tr
+            td.d-md-table-cell #{settings.locale.tx_type}
+            td.breakWord #{tx.tx_type} #{tx_types[tx.tx_type]}
+          tr
+            td.d-md-table-cell #{settings.locale.tx_version}
+            td.breakWord #{tx.version}
           tr
             if transaction_page.show_op_return == true
               td='OP_RETURN'
@@ -59,9 +66,120 @@ block content
             td #{settings.locale.timestamp}
             td
               span#timestampCol
-    if tx.vout.length < 1
-      .alert.alert-info.text-center(role='alert', style='margin-bottom:0;')
-        strong #{settings.locale.tx_nonstandard}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_protx_reg_version} #{tx.extra[0]}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_hash}
+              td.breakWord #{tx.extra[1]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_index}
+              td.breakWord #{tx.extra[2]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_service}
+              td.breakWord #{tx.extra[3]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_owner_address}
+              td.breakWord #{tx.extra[4]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_voting_address}
+              td.breakWord #{tx.extra[5]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_payout_address}
+              td.breakWord #{tx.extra[6]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_operator_pk}
+              td.breakWord #{tx.extra[7]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_operator_reward}
+              td.breakWord #{tx.extra[8]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
+              td.breakWord #{tx.extra[9]}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_protx_update_version} #{tx.extra[0]}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_protx_hash}
+              td.breakWord #{tx.extra[1]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_service}
+              td.breakWord #{tx.extra[2]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
+              td.breakWord #{tx.extra[3]}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_protx_update_reg_version} #{tx.extra[0]}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_reg_protx_hash}
+              td.breakWord #{tx.extra[1]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_reg_voting_address}
+              td.breakWord #{tx.extra[2]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_reg_payout_address}
+              td.breakWord #{tx.extra[3]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_reg_operator_pk}
+              td.breakWord #{tx.extra[4]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
+              td.breakWord #{tx.extra[5]}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_protx_update_revoke_version} #{tx.extra[0]}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_revoke_protx_hash}
+              td.breakWord #{tx.extra[1]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_revoke_reason}
+              td.breakWord #{tx.extra[2]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
+              td.breakWord #{tx.extra[3]}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_qc_version} #{tx.extra[0]}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_height}
+              td.breakWord #{tx.extra[1]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_version}
+              td.breakWord #{tx.extra[2]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_llmq_type}
+              td.breakWord #{tx.extra[3]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_hash}
+              td.breakWord #{tx.extra[4]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_signers}
+              td.breakWord #{tx.extra[5]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_valid_members}
+              td.breakWord #{tx.extra[6]}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_qc_commitment_pk}
+              td.breakWord #{tx.extra[7] == '0' ? '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' : tx.extra[7]}
+    else if tx.vout.length < 1
+      .text-center(role='alert', style='margin-bottom:0;')
+        strong #{settings.locale.tx_nonstandard} #{tx.tx_type}
     else
       .row
         .col-md-6.cardSpacer
