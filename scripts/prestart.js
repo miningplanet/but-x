@@ -1,7 +1,7 @@
 const debug = require('debug')('debug')
 const package_metadata = require('../package.json')
-const minNodeVersionMajor = '17'
-const minNodeVersionMinor = '19'
+const minNodeVersionMajor = '19'
+const minNodeVersionMinor = '9'
 const minNodeVersionRevision = '0'
 
 // get the nodejs version
