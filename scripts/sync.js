@@ -278,7 +278,6 @@ if (mode == null || mode == 'index' || mode == 'update') {
         block_start = Math.max(0, parseInt(process.argv[4]))
       break
     case 'enrichtx':
-      console.log("Enrich TX...")
       mode = 'enrichtx'
       break
     case 'reindex':
@@ -456,6 +455,11 @@ if (db.lib.is_locked([database], net) == false) {
 
                 check_only = true
 
+                const tx_types = settings.get(net, 'tx_types')
+                const isButkoin = settings.isButkoin(net)
+                const isBitoreum = settings.isBitoreum(net)
+                const isRaptoreum = settings.isRaptoreum(net)
+
                 async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
                   db.lib.get_blockhash(block_height, function(blockhash) {
                     if (blockhash) {
@@ -475,9 +479,8 @@ if (db.lib.is_locked([database], net) == false) {
                                 db.lib.get_rawtransaction(txid, function(rtx) {
                                   if (rtx && rtx.txid) {
                                     debug(" with TX from daemon and type: %s", rtx.type)
-                                    const tx_types = settings.get(net, 'tx_types')
                                     var extra = null
-                                    if (settings.isButkoin(net)) {
+                                    if (isButkoin || isBitoreum || isRaptoreum) {
                                       switch (tx.tx_type) {
                                         case tx_types.indexOf('TRANSACTION_NORMAL').toString(): break // -> NORMAL
                                         case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER').toString(): extra = datautil.protxRegisterServiceTxToArray(rtx); break
