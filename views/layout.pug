@@ -38,18 +38,18 @@ html(lang='en')
     link(rel='stylesheet', href='/css/OverlayScrollbars.min.css')
     link(rel='stylesheet', href='/css/style.min.css' + (styleHash == null ? '' : '?h=' + styleHash))
     link(rel='stylesheet', href='/css/custom.min.css' + (customHash == null ? '' : '?h=' + customHash))
-    script(type='text/javascript', src='/js/jquery.min.js', integrity='sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==', crossorigin='anonymous', referrerpolicy='no-referrer')
-    script(type='text/javascript', src='/js/bootstrap.bundle.min.js', integrity='sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p', crossorigin='anonymous')
-    script(type='text/javascript', src='/js/custom.js')
+    script(type='text/javascript', src='/js/jquery.min.js', integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==', crossorigin='anonymous', referrerpolicy='no-referrer')
+    script(type='text/javascript', src='/js/bootstrap.bundle.min.js', integrity='sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==', crossorigin='anonymous')
+    script(type='text/javascript', src='/js/custom.js' integrity='sha512-msgKdlSc7RJ0hIfFKrOzeHxxHAIZBvAdxK8U8vzEj20iMLns5SaZjxWECaMb4hHq2Ww9NvBr8s2kZjsVqMHcRg==')
     if active == 'markets' || active == 'richlist'
-      script(type='text/javascript', src='/js/jquery.jqplot.min.js')
+      script(type='text/javascript', src='/js/jquery.jqplot.min.js' integrity='sha512-FQKKXM+/7s6LVHU07eH2zShZHunHqkBCIcDqodXfdV/NNXW165npscG8qOHdxVsOM4mJx38Ep1oMBcNXGB3BCw==')
     if active == 'markets'
-      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.dateAxisRenderer.min.js')
-      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.ohlcRenderer.min.js')
-      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.dateAxisRenderer.min.js' integrity='sha512-yJjgvCexVLrfcNiaB+R/82eXqsyGO4zAde3AWF1rGYPxBWFGLpNkVw5iFz/2DLyTPq7qcC2/Ujzzg/77I1OMJQ==')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.ohlcRenderer.min.js' integrity='sha512-8dFX06JuD6JKaQ6CFNwJRx7wvymy27G64Dz3NBBQD482d2RQCacBKyyow8LKrsT5N74zJ4/mly1ino+UZzMatQ==')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js' integrity='sha512-TR38mFALO4a3kHTCbtQIZvn0qtemTauEJx5rnuXQsHaRLAHyHEQdV+KVC81GZ6hgNqGNukESKnsrkQfTj6uUGg==')
     if active == 'richlist'
-      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.pieRenderer.min.js')
-    script(type='text/javascript', src='/js/datatables.min.js')
+      script(type='text/javascript', src='/js/jqPlot/1.0.9/plugins/jqplot.pieRenderer.min.js' integrity='sha512-aTgJc5LAZwVJGYScGUq8unQx1qYLrqtrTBAVFaLQoJ00sFc3rPrgFbeQzO5POMW19QE+qqjF78tuPF7H/FtRTA==')
+    script(type='text/javascript', src='/js/datatables.min.js', integrity="sha512-ONQixi38lWHD4KDFx/xLD01RI31TOTJ1pTSOXPaYOQ+YCurDIklLP5SwweVTSM99P6hZdIQx85hSuY3n/Sl/IQ==")
     script(type='text/javascript', src='/js/jquery.overlayScrollbars.min.js', integrity="sha512-PviP63d43OXLyLjCv3TawK1Rw4LQQsnH6yschHgK63LBvLpd1U1+7LM/OESlV/cSze5lFI3+f7JwKFEBEWNp1w==", crossorigin="anonymous", referrerpolicy="no-referrer")
     - var showPanels = false
     - var showNethashChart = false
@@ -149,7 +149,7 @@ html(lang='en')
     if active == 'reward' || (network_history.enabled == true && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true)))
       script(type='text/javascript', src='/js/chart.min.js')
     if (network_history.enabled == true) && ((showNethashChart == true && shared_pages.page_header.network_charts.nethash_chart.enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && shared_pages.page_header.network_charts.difficulty_chart.enabled == true))
-      script(type='text/javascript', src='/js/chartjs-plugin-crosshair.js')
+      script(type='text/javascript', src='/js/chartjs-plugin-crosshair.min.js')
     - var sideBarClasses = [];
     if shared_pages.page_header.bgcolor != null && shared_pages.page_header.bgcolor != ''
       - sideBarClasses.push('bg-' + shared_pages.page_header.bgcolor);
