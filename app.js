@@ -1086,6 +1086,8 @@ app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('get', settings.get);
 app.set('isButkoin', settings.isButkoin);
+app.set('getLogo', settings.getLogo);
+app.set('getTitleLogo', settings.getTitleLogo);
 app.set('formatDateTime', settings.formatDateTime);
 app.set('formatCurrency', settings.formatCurrency);
 app.set('panelOffset', settings.panelOffset);

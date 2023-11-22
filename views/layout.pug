@@ -14,6 +14,7 @@ html(lang='en')
   - const error_page = settings.get(net, 'error_page')
   - const network_history = settings.get(net, 'network_history')
   - const isButkoin = settings.isButkoin(net)
+  - const search_enabled = shared_pages.page_header.search.enabled
 
   head
     meta(charset='UTF-8')
@@ -846,7 +847,7 @@ html(lang='en')
           return s;
         }
         function getLogoPanel() {
-          return '<img src="#{shared_pages.logo}" style="margin-top:-15px;height:128px;" alt="#{coin.name} Logo" title="#{coin.name} Logo" />';
+          return '<img src="#{logo}" style="margin-top:-15px;height:128px;" alt="#{coin.name} Logo" title="#{coin.name} Logo" />';
         }
         function getActivePanel(panelName) {
           var sReturn='';
@@ -923,7 +924,7 @@ html(lang='en')
         }
         if ('#{shared_pages.page_header.menu}' == 'side') {
           function positionSidebarSearch() {
-            if (#{shared_pages.page_header.search.enabled} == true && '#{shared_pages.page_header.search.position.toString().toLowerCase()}' == 'inside-header') {
+            if (#{search_enabled} == true && '#{shared_pages.page_header.search.position.toString().toLowerCase()}' == 'inside-header') {
               if ($(window).outerWidth() < 992) {
                 if ($('div#inner-header-side > div.container > div#search-navbar-collapse').length)
                   $('div#search-navbar-collapse').addClass('collapse').removeClass('flexGrow1').appendTo('header#main-header-side');
@@ -1293,11 +1294,11 @@ html(lang='en')
                     a.nav-link(href='/claim/' + net)
                       span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
-            if shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
+            if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
                   span.search
-        if shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
+        if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
               form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
@@ -1317,11 +1318,11 @@ html(lang='en')
                 img.logo-main(src=(shared_pages.page_header.home_link_logo == null || shared_pages.page_header.home_link_logo == '' ? shared_pages.logo : shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
             div#side-header-toggle.side-header-toggle
               span.fas.fa-bars(alt='Expand Menu', title='Expand Menu', data-bs-toggle='tooltip', data-bs-placement='right')
-            if shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
+            if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
                   span.fas.fa-search
-        if shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
+        if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse.flexGrow1
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
               form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
@@ -1409,7 +1410,7 @@ html(lang='en')
                   span.fas.fa-exclamation-triangle(style='margin-right:5px;')
                   strong #{settings.locale.ex_warning}
                 div #{settings.locale.initial_index_alert}
-          if showPanels == true || (shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header')
+          if showPanels == true || (search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header')
             .col-lg-12
               if showPanels == true
                 div#cockpit.row.text-center.d-flex.justify-content-center
@@ -1433,7 +1434,7 @@ html(lang='en')
                   .col-lg-2
                     .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
                   - }
-              if shared_pages.page_header.search.enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header'
+              if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header'
                 div#search-row.row.text-center
                   form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
                     #index-search.form-group.d-flex.justify-content-center

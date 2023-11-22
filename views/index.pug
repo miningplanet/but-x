@@ -3,9 +3,9 @@ extends layout
 block content
   include ./includes/common.pug
   script.
-    var setting_maxTxCount = parseInt("#{api_page.public_apis.ext.getlasttxs.max_items_per_query}");
-    var setting_txPerPage = parseInt("#{index_page.transaction_table.items_per_page}");
-    var lengthMenuOptsAdd = !{JSON.stringify(index_page.transaction_table.page_length_options)};
+    const setting_maxTxCount = parseInt("#{api_page.public_apis.ext.getlasttxs.max_items_per_query}");
+    const setting_txPerPage = parseInt("#{index_page.transaction_table.items_per_page}");
+    const lengthMenuOptsAdd = !{JSON.stringify(index_page.transaction_table.page_length_options)};
     var lengthMenuOpts = [];
     var addedLength = false;
     for (i = 0; i < lengthMenuOptsAdd.length; i++) {
