@@ -34,6 +34,7 @@ function usage() {
   console.log('update           Updates index from last sync to current block')
   console.log('check            Checks index for (and adds) any missing transactions/addresses')
   console.log('                 Optional parameter: block number to start checking from')
+  console.log('insert-blocks    Inserts blocks not in the DB')
   console.log('enrichtx         Only for TX data synced prior to commit b14ae8d5636fd75e8e464323d9ba50ef0914a8c2:')
   console.log('                 Enriches TXs with further fields like version, type, locktime and more.')
   console.log('                 Optional parameters: block number start and end inclusive')
@@ -111,42 +112,91 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
         db.lib.get_block(blockhash, function(block) {
           debug("Got block: %s", blockhash)
           if (block) {
-            async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-              TxDb[net].findOne({txid: txid}).then((tx) => {
-                debug("Got block tx: %s", txid)
-                if (tx) {
-                  setTimeout( function() {
-                    tx = null
-                    stopSync ? next_tx({}) : next_tx() // stop or next
-                  }, timeout)
-                } else {
-                  db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
-                    debug("Saved block tx: %s", txid)
-                    if (err)
-                      console.log(err)
-                    else
-                      console.log('%s: %s', block_height, txid)
+            db.find_block_by_height(block_height, function(blockc) {
+              if (blockc) {
+                console.log('Block %d is in DB.', block_height)
+                async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
+                  TxDb[net].findOne({txid: txid}).then((tx) => {
+                    debug("Got block tx: %s", txid)
+                    if (tx) {
+                      setTimeout( function() {
+                        tx = null
+                        stopSync ? next_tx({}) : next_tx() // stop or next
+                      }, timeout)
+                    } else {
+                      db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
+                        debug("Saved block tx: %s", txid)
+                        if (err)
+                          console.log(err)
+                        else
+                          console.log('%s: %s', block_height, txid)
 
-                    if (tx_has_vout)
-                      txes++
+                        if (tx_has_vout)
+                          txes++
 
-                    setTimeout( function() {
-                      tx = null
-                      stopSync ? next_tx({}) : next_tx() // stop or next
-                    }, timeout)
+                        setTimeout( function() {
+                          tx = null
+                          stopSync ? next_tx({}) : next_tx() // stop or next
+                        }, timeout)
+                      })
+                    }
+                  }).catch((err) => {
+                    console.error("Failed to find tx database: %s", err)
+                    return cb(null)
                   })
-                }
-              }).catch((err) => {
-                console.error("Failed to find tx database: %s", err)
-                return cb(null)
-              })
-            }, function() {
-              setTimeout( function() {
-                blockhash = null
-                block = null
-                stopSync ? next_block({}) : next_block() // stop or next
-              }, timeout)
-            })
+                }, function() {
+                  setTimeout( function() {
+                    blockhash = null
+                    block = null
+                    stopSync ? next_block({}) : next_block() // stop or next
+                  }, timeout)
+                })
+              } else {
+                db.create_block(block, function(blockr) {
+                  if (blockr) {
+                    async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
+                      TxDb[net].findOne({txid: txid}).then((tx) => {
+                        debug("Got block tx: %s", txid)
+                        if (tx) {
+                          setTimeout( function() {
+                            tx = null
+                            stopSync ? next_tx({}) : next_tx() // stop or next
+                          }, timeout)
+                        } else {
+                          db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
+                            debug("Saved block tx: %s", txid)
+                            if (err)
+                              console.log(err)
+                            else
+                              console.log('%s: %s', block_height, txid)
+
+                            if (tx_has_vout)
+                              txes++
+
+                            setTimeout( function() {
+                              tx = null
+                              stopSync ? next_tx({}) : next_tx() // stop or next
+                            }, timeout)
+                          })
+                        }
+                      }).catch((err) => {
+                        console.error("Failed to find tx database: %s", err)
+                        return cb(null)
+                      })
+                    }, function() {
+                      setTimeout( function() {
+                        blockhash = null
+                        block = null
+                        stopSync ? next_block({}) : next_block() // stop or next
+                      }, timeout)
+                    })
+                  } else {
+                    console.error("Failed to insert block at height %d hash '%s'. Exit.", block.height, block.hash)
+                    exit(1)
+                  }
+                }, net)
+              }
+            }, net)
           } else {
             console.log('Block not found: %s', blockhash)
             setTimeout( function() {
@@ -280,6 +330,9 @@ if (mode == null || mode == 'index' || mode == 'update') {
     case 'enrichtx':
       mode = 'enrichtx'
       break
+    case 'insert-blocks':
+      mode = 'insert-blocks'
+      break
     case 'reindex':
       // check if readlinesync module is installed
       if (!db.fs.existsSync('./node_modules/readline-sync')) {
@@ -409,7 +462,7 @@ if (db.lib.is_locked([database], net) == false) {
                   })
                 })
               } else if (mode == 'check') {
-                console.log('Checking blocks.. Please wait..')
+                console.log('Checking blocks. Please wait...')
 
                 update_tx_db(net, coin.name, block_start, stats.count, stats.txes, settings.sync.check_timeout, true, function() {
                   // check if the script stopped prematurely
@@ -423,8 +476,67 @@ if (db.lib.is_locked([database], net) == false) {
                     }, net)
                   }
                 })
+              } else if (mode == 'insert-blocks') {
+                console.log('Insert blocks. Please wait...')
+
+                // check if the block start value was passed in and is an integer
+                if (!isNaN(process.argv[4])) {
+                  block_start = Math.max(0, parseInt(process.argv[4]))
+                } else {
+                  block_start = 0
+                }
+
+                var end = stats.count
+                // check if the block end value was passed in and is an integer
+                if (!isNaN(process.argv[5])) {
+                  // Check if the block start value is less than 1
+                  const newEnd = parseInt(process.argv[5])
+                  if (newEnd >= block_start && newEnd <= end)
+                    end = newEnd
+                }
+
+                console.log('Insert blocks from height %d to %d...', block_start, end)
+                const blocks_to_scan = []
+                const task_limit_blocks = settings.sync.block_parallel_tasks
+                // var task_limit_txs = 1
+
+                if (task_limit_blocks < 1)
+                  task_limit_blocks = 1
+
+                for (i = block_start; i <= end; i++)
+                  blocks_to_scan.push(i)
+
+                async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
+                  db.find_block_by_height(block_height, function(block) {
+                    if (block) {
+                      console.log('Block %d is in DB.', block_height)
+                    } else {
+                      db.lib.get_blockhash(block_height, function(blockhash) {
+                        if (blockhash) {
+                          db.lib.get_block(blockhash, function(blockd) {
+                            console.log('Sync block from daemon %s (%s)', block_height, blockhash)
+                            if (blockd) {
+                              debug("Block: %o", blockd)
+                              db.create_block(blockd, function(blockr) {
+                                
+                              }, net) 
+                            }
+                          }, net)
+                        }
+                      }, net)
+                    }
+                    setTimeout( function() {
+                      tx = null
+                      stopSync ? next_block({}) : next_block() // stop or next
+                    }, settings.sync.update_timeout)
+                  }, net)
+                }, function() {
+                  console.log( "Finished insert blocks.")
+                  exit(0)
+                })
+
               } else if (mode == 'enrichtx') {
-                console.log('Enrich TX... Please wait..')
+                console.log('Enrich TX. Please wait...')
 
                 // check if the block start value was passed in and is an integer
                 if (!isNaN(process.argv[4])) {
