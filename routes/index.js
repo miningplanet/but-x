@@ -9,9 +9,7 @@ const networks = settings.getAllNet()
 
 function route_get_block(res, blockhash, coin, net) {
   lib.get_block(blockhash, function (block) {
-    const shared_pages = settings.get(net, 'shared_pages')
     const block_page = settings.get(net, 'block_page')
-    const api_page = settings.get(net, 'api_page')
     if (block && block != 'There was an error. Check your console.') {
       if (blockhash == block_page.genesis_block) {
         const p = blockParam('block', coin, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
@@ -456,7 +454,7 @@ router.get('/masternodes/:net?', function(req, res) {
     const p = param('masternodes', coin, net, db, settings, coin.name + ' - Smartnodes')
     p.masternodes_page = masternodes_page
     p.claim_address_page = settings.get(net, 'claim_address_page')
-    
+
     if (masternodes_page.page_header.show_last_updated == true) {
       db.get_stats(coin.name, function (stats) {
         p.last_updated = stats.network_last_updated

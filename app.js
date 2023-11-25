@@ -794,7 +794,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
               r.lastPrice = (stats == null || stats.last_price == null ? 0 : stats.last_price)
 
               summaryCache.set (net, r);
-              console.log("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
+              debug("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
               res.send(r);
             }
           })
@@ -802,7 +802,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
         }, net)
       }, net)
     } else {
-      console.log("Get summary by cache '%s' %o ...", net, summary)
+      debug("Get summary by cache '%s' %o ...", net, summary)
       res.send(summary);
     }
   } else
