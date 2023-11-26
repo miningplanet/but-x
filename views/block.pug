@@ -44,17 +44,17 @@ block content
     .card.card-default.border-0.cardSpacer
       .card-header
         div(style='display: flex;flex-wrap: wrap;')
-          if block.previousblockhash != null
-            a(href='/block/' + block.previousblockhash)
-              span.fa.fa-chevron-left.block-last(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_previous, style='color: var(--bs-body-color);')
+          if block.prev_hash != null
+            a(href='/block/' + block.prev_hash + '/' + net)
+              span.fa.fa-chevron-left.block-last(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_previous, style='color: var(--bs-body-color);') <-
             strong.d-none.d-md-block #{settings.locale.tx_block_hash}: #{block.hash}
             strong.d-block.d-md-none #{settings.locale.ex_summary}
           else
-            strong.d-none.d-md-block(style='margin-left:10px;') #{settings.locale.tx_block_hash}: #{block.hash}
+            strong.d-none.d-md-block(style='margin-left:10px;') #{settings.locale.tx_block_hash}: #{block.hash}  #{block.nextblockhash} #{block.nextblockhash}
             strong.d-block.d-md-none(style='margin-left:10px;') #{settings.locale.ex_summary}
-          if block.nextblockhash != null
-            a(href='/block/' + block.nextblockhash)
-              span.fa.fa-chevron-right.block-next(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_next, style='color: var(--bs-body-color);')
+          if block.next_hash
+            a(href='/block/' + block.next_hash + '/' + net)
+              span.fa.fa-chevron-right.block-next(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_next, style='color: var(--bs-body-color);') ->
           if api_page.public_apis.rpc.getblock.enabled == true
             a.d-none.d-md-block(href='/api/getblock?hash=' + block.hash, style='margin-left:auto;', data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_block_data)
               span.fa.fa-info-circle(style='color: var(--bs-body-color);')
@@ -72,17 +72,15 @@ block content
             td #{settings.locale.height}
             td=block.height
           tr
+            td #{settings.locale.algo}
+            td=block.algo
+          tr
             td #{settings.locale.difficulty}
             td #{splitDifficulty[0]}.
               span.decimal #{splitDifficulty[1]}
           tr
             td #{settings.locale.confirmations}
-            if block.confirmations >= confirmations
-              td=block.confirmations
-            else if block.confirmations < (confirmations / 2)
-              td=block.confirmations
-            else
-              td=block.confirmations
+            td=confirmations
           if settings.blockchain_specific.heavycoin.enabled == true
             tr
               td Vote

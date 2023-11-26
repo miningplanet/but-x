@@ -8,47 +8,49 @@ const qr = require('qr-image')
 const networks = settings.getAllNet()
 
 function route_get_block(res, blockhash, coin, net) {
-  lib.get_block(blockhash, function (block) {
+  db.find_block_by_hash(blockhash, function (block) {
     const block_page = settings.get(net, 'block_page')
     if (block && block != 'There was an error. Check your console.') {
-      if (blockhash == block_page.genesis_block) {
-        const p = blockParam('block', coin, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
-        res.render('block', p)
-      } else {
-        db.get_txs(block, function(txs) {
-          if (txs.length > 0) {
-            const p = blockParam('block', coin, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
-            res.render('block', p)
-          } else {
-            // cannot find block in local database so get the data from the wallet directly
-            var ntxs = []
-            lib.syncLoop(block.tx.length, function (loop) {
-              var i = loop.iteration()
+      db.get_stats(coin.name, function(stats) {
+        if (blockhash == block_page.genesis_block) {
+          const p = blockParam(stats, 'block', coin, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
+          res.render('block', p)
+        } else {
+          db.find_txs_by_blockhash(block.hash, function(txs) {
+            if (txs.length > 0) {
+              const p = blockParam(stats, 'block', coin, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
+              res.render('block', p)
+            } else {
+              // cannot find block in local database so get the data from the wallet directly
+              var ntxs = []
+              lib.syncLoop(block.tx.length, function (loop) {
+                var i = loop.iteration()
 
-              lib.get_rawtransaction(block.tx[i], function(tx) {
-                if (tx && tx != 'There was an error. Check your console.') {
-                  lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
-                    lib.prepare_vout(net, tx.vout, block.tx[i], vin, ((!settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null) ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
-                      lib.calculate_total(vout, function(total) {
-                        ntxs.push({
-                          txid: block.tx[i],
-                          vout: vout,
-                          total: total.toFixed(8)
+                lib.get_rawtransaction(block.tx[i], function(tx) {
+                  if (tx && tx != 'There was an error. Check your console.') {
+                    lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
+                      lib.prepare_vout(net, tx.vout, block.tx[i], vin, ((!settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null) ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
+                        lib.calculate_total(vout, function(total) {
+                          ntxs.push({
+                            txid: block.tx[i],
+                            vout: vout,
+                            total: total.toFixed(8)
+                          })
+                          loop.next()
                         })
-                        loop.next()
                       })
                     })
-                  })
-                } else
-                  loop.next()
-              }, net)
-            }, function() {
-              const p = blockParam('block', coin, net, db, settings, block, ntxs, coin.name + ' Block ' + block.height)
-              res.render('block', p)
-            })
-          }
-        }, net)
-      }
+                  } else
+                    loop.next()
+                }, net)
+              }, function() {
+                const p = blockParam(stats, 'block', coin, net, db, settings, block, ntxs, coin.name + ' Block ' + block.height)
+                res.render('block', p)
+              })
+            }
+          }, net)
+        }
+      }, net)
     } else {
       if (!isNaN(blockhash)) {
         lib.get_blockhash(blockhash, function(hash) {
@@ -80,7 +82,7 @@ function route_get_tx(res, txid, coin, net) {
   } else {
     db.get_tx(txid, function(tx) {
       if (tx) {
-        lib.get_blockcount(function(blockcount) {
+        db.get_tip_by_blocks(function(blockcount) {
           if (settings.get(net, 'claim_address_page').enabled == true) {
             db.populate_claim_address_names(tx, function(tx) {
               const p = txParam('tx', coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
@@ -622,11 +624,10 @@ function param(page, coin, net, db, settings, prefix) {
   return r
 }
 
-function blockParam(page, coin, net, db, settings, block, txs, prefix) {
+function blockParam(stats, page, coin, net, db, settings, block, txs, prefix) {
   const r = param(page, coin, net, db, settings, prefix)
-  const shared_pages = settings.get(net, 'shared_pages')
   r.block = block
-  r.confirmations = shared_pages.confirmations
+  r.confirmations = stats.count - block.height + 1
   r.txs = txs
   r.block_page = settings.get(net, 'block_page') 
   r.api_page = settings.get(net, 'api_page') 

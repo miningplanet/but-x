@@ -722,92 +722,70 @@ app.use('/ext/getsummary/:net?', function(req, res) {
     const summary = summaryCache.get(net)
     if (summary == undefined) {
       const r = {}
-      lib.get_hashrate(function(hashps) {
-        db.get_stats(coin.name, function (stats) {
-          if (!isNaN(stats.count)) 
-            r.blockcount = stats.count
-          if (!isNaN(stats.connections)) 
-            r.connections = stats.connections
-          if (!isNaN(stats.smartnodes_enabled)) 
-            r.masternodeCountOnline = stats.smartnodes_enabled
-          if (!isNaN(stats.smartnodes_total) && !isNaN(stats.smartnodes_enabled)) 
-            r.masternodeCountOffline = stats.smartnodes_total - stats.smartnodes_enabled
+      db.get_stats(coin.name, function (stats) {
+        if (!isNaN(stats.count)) 
+          r.blockcount = stats.count
+        if (!isNaN(stats.connections)) 
+          r.connections = stats.connections
+        if (!isNaN(stats.smartnodes_enabled)) 
+          r.masternodeCountOnline = stats.smartnodes_enabled
+        if (!isNaN(stats.smartnodes_total) && !isNaN(stats.smartnodes_enabled)) 
+          r.masternodeCountOffline = stats.smartnodes_total - stats.smartnodes_enabled
+        if (!isNaN(stats.supply)) 
+          r.supply = stats.supply
+        else 
+          r.supply = 0
+        if (!isNaN(stats.last_price))
+          r.lastPrice = stats.last_price
+        else {
+          r.lastPrice = 0
+        }
 
-          lib.get_difficulty(net, function(difficulties) {
-            if (stats) {
-              r.supply = (stats == null || stats.supply == null ? 0 : stats.supply)
-            }
+        if (!isNaN(stats.nethash))
+              r.hashrate = stats.nethash
 
-            if (difficulties && difficulties.difficulty) {
-              var difficulty = difficulties.difficulty;
-              difficultyHybrid = '';
+        if (!isNaN(stats.nethash_ghostrider))
+          r.hashrate_ghostrider = stats.nethash_ghostrider
+        if (!isNaN(stats.nethash_yespower))
+          r.hashrate_yespower = stats.nethash_yespower
+        if (!isNaN(stats.nethash_lyra2))
+          r.hashrate_lyra2 = stats.nethash_lyra2
+        if (!isNaN(stats.nethash_sha256d))
+          r.hashrate_sha256d = stats.nethash_sha256d
+        if (!isNaN(stats.nethash_scrypt))
+          r.hashrate_scrypt = stats.nethash_scrypt
+        if (!isNaN(stats.nethash_butkscrypt))
+          r.hashrate_butk = stats.nethash_butkscrypt
 
-              const shared_pages = settings.get(net, 'shared_pages')
-              if (difficulty && difficulty['proof-of-work']) {
-                if (shared_pages.difficulty == 'Hybrid') {
-                  difficultyHybrid = 'POS: ' + difficulty['proof-of-stake'];
-                  difficulty = 'POW: ' + difficulty['proof-of-work'];
-                } else if (shared_pages.difficulty == 'POW')
-                  difficulty = difficulty['proof-of-work'];
-                else
-                  difficulty = difficulty['proof-of-stake'];
-              }
+        if (!isNaN(stats.difficulty))
+          r.difficulty = stats.difficulty_pow
+        else
+          r.difficulty = stats.difficulty_ghostrider
 
-              r.difficulty = difficulty ? difficulty : '-'
-              r.difficultyHybrid = difficultyHybrid
+        if (!isNaN(stats.difficulty_ghostrider))
+          r.difficulty_ghostrider = stats.difficulty_ghostrider
+        if (!isNaN(stats.difficulty_yespower))
+          r.difficulty_yespower = stats.difficulty_yespower
+        if (!isNaN(stats.difficulty_lyra2))
+          r.difficulty_lyra2 = stats.difficulty_lyra2
+        if (!isNaN(stats.difficulty_sha256d))
+          r.difficulty_sha256d = stats.difficulty_sha256d
+        if (!isNaN(stats.difficulty_scrypt))
+          r.difficulty_scrypt = stats.difficulty_scrypt
+        if (!isNaN(stats.difficulty_butkscrypt))
+          r.difficulty_butkscrypt = stats.difficulty_butkscrypt
 
-              if (!isNaN(hashps))
-                r.hashrate = hashps
-
-              if (!isNaN(hashps.nethash_ghostrider))
-                r.hashrate_ghostrider = hashps.nethash_ghostrider
-              if (!isNaN(hashps.nethash_yespower))
-                r.hashrate_yespower = hashps.nethash_yespower
-              if (!isNaN(hashps.nethash_lyra2))
-                r.hashrate_lyra2 = hashps.nethash_lyra2
-              if (!isNaN(hashps.nethash_sha256d))
-                r.hashrate_sha256d = hashps.nethash_sha256d
-              if (!isNaN(hashps.nethash_scrypt))
-                r.hashrate_scrypt = hashps.nethash_scrypt
-              if (!isNaN(hashps.nethash_butkscrypt))
-                r.hashrate_butk = hashps.nethash_butkscrypt
-
-              // if (hashps) {
-              //   if (settings.isButkoin(net)) {
-              //     if (hashps.nethash_ghostrider)
-              //       r.hashrate_ghostrider = hashps.nethash_ghostrider
-              //     if (hashps.nethash_yespower)
-              //       r.hashrate_yespower = hashps.nethash_yespower
-              //     if (hashps.nethash_lyra2)
-              //       r.hashrate_lyra2 = hashps.nethash_lyra2
-              //     if (hashps.nethash_sha256d)
-              //       r.hashrate_sha256d = hashps.nethash_sha256d
-              //     if (hashps.nethash_scrypt) 
-              //       r.hashrate_scrypt = hashps.nethash_scrypt
-              //     if (hashps.nethash_butkscrypt)
-              //       r.hashrate_butk = hashps.nethash_butkscrypt
-              //   } else {
-              //     r.hashrate = hashps
-              //   }
-              // }
-
-              r.lastPrice = (stats == null || stats.last_price == null ? 0 : stats.last_price)
-
-              summaryCache.set (net, r);
-              debug("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage());
-              res.send(r);
-            }
-          })
-          // })
-        }, net)
+        summaryCache.set (net, r);
+        debug("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage())
+        res.send(r);
       }, net)
     } else {
       debug("Get summary by cache '%s' %o ...", net, summary)
-      res.send(summary);
+      res.send(summary)
     }
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 app.use('/ext/getnetworkpeers/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])

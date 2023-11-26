@@ -119,6 +119,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                   TxDb[net].findOne({txid: txid}).then((tx) => {
                     debug("Got block tx: %s", txid)
                     if (tx) {
+                      debug('TX %s is in DB.', txid)
                       setTimeout( function() {
                         tx = null
                         stopSync ? next_tx({}) : next_tx() // stop or next
@@ -158,6 +159,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                       TxDb[net].findOne({txid: txid}).then((tx) => {
                         debug("Got block tx: %s", txid)
                         if (tx) {
+                          debug('TX %s is in DB.', txid)
                           setTimeout( function() {
                             tx = null
                             stopSync ? next_tx({}) : next_tx() // stop or next
@@ -233,9 +235,9 @@ function update_heavy(coin, height, count, heavycoin_enabled, cb) {
     return cb(false)
 }
 
-function update_network_history(height, network_history_enabled, cb, net) {
+function update_network_history(coin, height, network_history_enabled, cb, net) {
   if (network_history_enabled == true) {
-    db.update_network_history(height, function() {
+    db.update_network_history(coin, height, function() {
       return cb(true)
     }, net)
   } else
@@ -441,7 +443,7 @@ if (db.lib.is_locked([database], net) == false) {
                                           update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
                                             // check for and update network history data if applicable
                                             const network_history = settings.get(net, 'network_history')
-                                            update_network_history(nstats.last, network_history.enabled, function(network_hist) {
+                                            update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
                                               // always check for and remove the sync msg if exists
                                               db.remove_sync_message(net)
                                               console.log('Reindex complete (block: %s)', nstats.last)
@@ -680,7 +682,7 @@ if (db.lib.is_locked([database], net) == false) {
                                 update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
                                   // check for and update network history data if applicable
                                   const network_history = settings.get(net, 'network_history')
-                                  update_network_history(nstats.last, network_history.enabled, function(network_hist) {
+                                  update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
                                     // always check for and remove the sync msg if exists
                                     db.remove_sync_message(net)
                                     console.log('Block sync complete (block: %s)', nstats.last)

@@ -18,7 +18,23 @@ var StatsSchema = new Schema({
   masternodes_last_updated: { type: Number, default: 0 },
   network_last_updated: { type: Number, default: 0 },
   richlist_last_updated: { type: Number, default: 0 },
-  markets_last_updated: { type: Number, default: 0 }
+  markets_last_updated: { type: Number, default: 0 },
+  nethash: { type: Number, default: 0 },
+  nethash_ghostrider: { type: Number, default: 0 },
+  nethash_yespower: { type: Number, default: 0 },
+  nethash_lyra2: { type: Number, default: 0 },
+  nethash_sha256d: { type: Number, default: 0 },
+  nethash_scrypt: { type: Number, default: 0 },
+  nethash_butkscrypt: { type: Number, default: 0 },
+  difficulty: { type: Number, default: 0 },
+  difficulty_pow: { type: Number, default: 0 },
+  difficulty_pos: { type: Number, default: 0 },
+  difficulty_ghostrider: { type: Number, default: 0 },
+  difficulty_yespower: { type: Number, default: 0 },
+  difficulty_lyra2: { type: Number, default: 0 },
+  difficulty_sha256d: { type: Number, default: 0 },
+  difficulty_scrypt: { type: Number, default: 0 },
+  difficulty_butkscrypt: { type: Number, default: 0 }
 });
 
 module.exports = StatsSchema;
