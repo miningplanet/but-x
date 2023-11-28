@@ -1057,6 +1057,11 @@ tr {
   }
 }
 
+#panel-img {
+  height:96px;
+  margin-top:-15px;margin-bottom:-10px;
+}
+
 .badge {
   a:link, a:visited, a:hover, a:active {
     color: #ffffff;
@@ -1521,8 +1526,9 @@ div.navbar-expand-lg {
 }
 
 #header-img {
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
 }
 
 #page-title {
