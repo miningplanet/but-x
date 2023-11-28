@@ -47,7 +47,7 @@ block content
           if block.prev_hash != null
             a(href='/block/' + block.prev_hash + '/' + net)
               span.fa.fa-chevron-left.block-last(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.block_previous, style='color: var(--bs-body-color);') <-
-            strong.d-none.d-md-block #{settings.locale.tx_block_hash}: #{block.hash}
+            strong.d-none.d-md-block #{settings.locale.height}: #{block.height}
             strong.d-block.d-md-none #{settings.locale.ex_summary}
           else
             strong.d-none.d-md-block(style='margin-left:10px;') #{settings.locale.tx_block_hash}: #{block.hash}  #{block.nextblockhash} #{block.nextblockhash}
@@ -64,41 +64,70 @@ block content
             th
             th
         tbody
-          - var difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
-          - var splitDifficulty = difficulty.split('.');
-          - var block_size = Number(block.size/1024).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-          - var splitBlockSize = block_size.split('.');
+          - const difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
+          - const splitDifficulty = difficulty.split('.');
+          - const block_size = Number(block.size/1024).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+          - const splitBlockSize = block_size.split('.');
+          if block.hash
+            tr
+              td #{settings.locale.block_hash}
+              td=block.hash
+          if block.pow_hash
+            tr
+              td #{settings.locale.block_hash_pow}
+              td=block.pow_hash
+          if block.algo
+            tr
+              td #{settings.locale.block_algo}
+              td=block.algo
           tr
-            td #{settings.locale.height}
-            td=block.height
-          tr
-            td #{settings.locale.algo}
-            td=block.algo
-          tr
-            td #{settings.locale.difficulty}
+            td #{settings.locale.block_difficulty}
             td #{splitDifficulty[0]}.
               span.decimal #{splitDifficulty[1]}
           tr
-            td #{settings.locale.confirmations}
+            td #{settings.locale.block_confirmations}
             td=confirmations
           if settings.blockchain_specific.heavycoin.enabled == true
             tr
               td Vote
               td=block.vote
           tr
-            td #{settings.locale.size} (kB)
+            td #{settings.locale.block_size} (kB)
             td #{splitBlockSize[0]}.
               span.decimal #{splitBlockSize[1]}
-          tr
-            td #{settings.locale.bits}
-            td=block.bits
-          tr
-            td #{settings.locale.nonce}
-            td=block.nonce
-          tr
-            td #{settings.locale.timestamp}
-            td
-              span#timestampCol=block.time
+          if block.bits
+            tr
+              td #{settings.locale.block_bits}
+              td=block.bits
+          if block.nonce
+            tr
+              td #{settings.locale.block_nonce}
+              td=block.nonce
+          if block.time
+            tr
+              td #{settings.locale.block_timestamp}
+              td
+                span#timestampCol=block.time
+          if block.version
+            tr
+              td #{settings.locale.block_version}
+              td=block.version
+          if block.version_hex
+            tr
+              td #{settings.locale.block_version_hex}
+              td=block.version_hex
+          if block.merkle_root
+            tr
+              td #{settings.locale.block_merkle_root}
+              td=block.merkle_root
+          if block.chainwork
+            tr
+              td #{settings.locale.block_chainwork}
+              td=block.chainwork
+          if block.cbtx
+            tr
+              td #{settings.locale.block_cbtx}
+              td=block.cbtx
     if block.hash == block_page.genesis_block
       .alert.alert-info(role='alert', style='text-align:center;')
         strong #{settings.locale.block_genesis}
