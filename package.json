@@ -22,9 +22,7 @@
     "reindex-txcount": "node ./scripts/sync.js index reindex-txcount",
     "reindex-last": "node ./scripts/sync.js index reindex-last",
     "create-backup": "node ./scripts/create_backup.js",
-    "restore-backup": "node ./scripts/restore_backup.js",
-    "delete-database": "node ./scripts/delete_database.js",
-    "update-explorer": "node ./scripts/update_explorer.js"
+    "restore-backup": "node ./scripts/restore_backup.js"
   },
   "dependencies": {
     "@isaacs/ttlcache": "^1.4.1",
@@ -39,7 +37,7 @@
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.3.0",
-    "mongoose": "^8.0.1",
+    "mongoose": "^8.0.2",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.33",
     "pug": "~3.0.2",
