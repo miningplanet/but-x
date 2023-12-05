@@ -1453,6 +1453,8 @@ html(lang='en')
                     #index-search.form-group.d-flex.justify-content-center
                       input.form-control(type='text', name='search', placeholder=settings.locale.ex_search_message, style='min-width:80%;margin-right:5px;')
                       button.btn.btn-success(type='submit') #{settings.locale.ex_search_button}
+          if shared_pages.page_header.network_charts.align == 'bottom'
+            block content
           if network_history.enabled == true && ((showNethashChart == true && nethash_enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && difficulty_enabled == true))
             .container
               .row.align-items-start
@@ -1483,7 +1485,8 @@ html(lang='en')
                           button(onclick='diffonlycpu()') CPU
                           button(onclick='diffonlygpu()') GPU
                           button(onclick='diffonlyasic()') ASIC
-          block content
+          if shared_pages.page_header.network_charts.align == 'top'
+            block content
     footer
       div#social
         each social in shared_pages.page_footer.social_links
