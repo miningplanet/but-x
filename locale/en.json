@@ -48,7 +48,7 @@
   "tx_protx_reg_voting_address": "Voting Address",
   "tx_protx_reg_payout_address": "Payout Address",
   "tx_protx_reg_operator_pk": "Operator PK",
-  "tx_protx_reg_operator_reward": "Operator Reqard [%]",
+  "tx_protx_reg_operator_reward": "Operator Reward [%]",
   "tx_protx_reg_inputs_hash": "Inputs Hash",
 
   // BUTK tx_type 2 JSON to array. See validation.h -> TRANSACTION_PROVIDER_UPDATE_SERVICE.
