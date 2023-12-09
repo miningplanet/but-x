@@ -67,7 +67,7 @@ block content
         }
 
         $('#connections-table').dataTable({
-          autoWidth: false,
+          autoWidth: true,
           searching: false,
           ordering: true,
           order: [],
@@ -139,7 +139,7 @@ block content
           addNodeRows.push({'nodes': 'addnode=' + (addNodePeers[i]['address'] != null && addNodePeers[i]['address'].indexOf(':') > -1 ? '[' + addNodePeers[i]['address'] + ']' : addNodePeers[i]['address']) + (addNodePeers[i]['port'] == null ? '' : ':' + addNodePeers[i]['port'])});
 
         $('#addnodes-table').dataTable({
-          autoWidth: false,
+          autoWidth: true,
           searching: false,
           ordering: false,
           responsive: true,
@@ -198,7 +198,7 @@ block content
           oneTryRows.push({'nodes': 'addnode ' + (peers[i]['address'] != null && peers[i]['address'].indexOf(':') > -1 ? '[' + peers[i]['address'] + ']' : peers[i]['address']) + (peers[i]['port'] == null ? '' : ':' + peers[i]['port']) + ' onetry'});
 
         $('#onetry-table').dataTable({
-          autoWidth: false,
+          autoWidth: true,
           searching: false,
           ordering: false,
           responsive: true,

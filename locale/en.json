@@ -25,7 +25,7 @@
   "ex_block": "Block",
 
   // transaction view
-  "tx_title": "{1} Transaction Details",
+  "tx_title": "{1} Tx Details",
   "tx_description": "Viewing tx data from {1} block # {2}",
   "tx_block_hash": "Block Hash",
   "tx_type": "Type",

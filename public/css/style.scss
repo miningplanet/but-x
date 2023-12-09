@@ -11,7 +11,7 @@ $theme-name: to-lower-case(theme-selector.$theme-name);
   } @else if $theme-name == "cyborg" {
     border-color: cyborg.$gray-700 if($important == 0, null, !important);
   } @else if $theme-name == "darkly" {
-    border-color: darkly.$gray-700 if($important == 0, null, !important);
+    border-color: darkly.$black if($important == 0, null, !important);
   } @else if $theme-name == "exor" {
     border-color: exor.$gray-700 if($important == 0, null, !important);
   } @else if $theme-name == "flatly" {

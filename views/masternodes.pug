@@ -29,7 +29,7 @@ block content
     $(document).ready(function() {
       var labels = !{JSON.stringify(settings.labels)};
       var ctable = $('#masternodes-table').dataTable({
-        autoWidth: false,
+        autoWidth: true,
         searching: true,
         ordering: true,
         order: [[ 4, 'desc' ]],
