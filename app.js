@@ -1,25 +1,27 @@
-const debug = require('debug')('debug');
-const debugChart = require('debug')('chart');
-var express = require('express'),
-    path = require('path'),
-    nodeapi = require('./lib/nodeapi'),
-    favicon = require('serve-favicon'),
-    serveStatic = require('serve-static'),
-    logger = require('morgan'),
-    cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
-    settings = require('./lib/settings'),
-    routes = require('./routes/index'),
-    lib = require('./lib/explorer'),
-    db = require('./lib/database'),
-    package_metadata = require('./package.json'),
-    locale = require('./lib/locale'),
-    TTLCache = require('@isaacs/ttlcache');
-var app = express();
-var apiAccessList = [];
-const { exec } = require('child_process');
-
-const networks = settings.getAllNet();
+const debug = require('debug')('debug')
+const debugChart = require('debug')('chart')
+const express = require('express')
+const path = require('path')
+const nodeapi = require('./lib/nodeapi')
+const favicon = require('serve-favicon')
+const serveStatic = require('serve-static')
+const logger = require('morgan')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+const settings = require('./lib/settings')
+const routes = require('./routes/index')
+const lib = require('./lib/explorer')
+const db = require('./lib/database')
+const package_metadata = require('./package.json')
+const locale = require('./lib/locale')
+const TTLCache = require('@isaacs/ttlcache')
+const app = express()
+const apiAccessList = []
+const { exec } = require('child_process')
+const networks = settings.getAllNet()
+const request = require('postman-request')
+const base_server = 'http://127.0.0.1:' + settings.webserver.port + "/"
+const base_url = base_server + '' // api/
 
 // application cache
 const wlength = settings.wallets.length
@@ -36,13 +38,8 @@ const peersCache = new TTLCache({ max: wlength, ttl: settings.cache.peers * 1000
 const masternodesCache = new TTLCache({ max: wlength, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const allnetCache = new TTLCache({ max: 10, ttl: settings.cache.allnet, updateAgeOnGet: false, noUpdateTTL: false })
 
-
-var request = require('postman-request');
-var base_server = 'http://127.0.0.1:' + settings.webserver.port + "/";
-var base_url = base_server + ''; // api/
-
 // pass wallet rpc connections info to nodeapi
-nodeapi.setWalletDetails(settings.wallets);
+nodeapi.setWalletDetails(settings.wallets)
 
 // dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value
 networks.forEach( function(item, index) {
@@ -102,6 +99,32 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// // RPC API by DB.
+// // -> get_difficulty  // only sync.js
+// app.use('/api/getblockchaininfo/:net?', function(req, res) {
+//   const net = settings.getNet(req.params['net'])
+//   const coin = settings.getCoin(net)
+//   db.get_stats(coin.name, function(stats) {
+//     if (stats)
+//       return res.end("HOHO1")
+//     else
+//       return res.end("ERROR")
+//   })
+// })
+
+// // RPC API by DB.
+// only API
+// app.use('/api/getmininginfo/:net?', function(req, res) {
+//   const net = settings.getNet(req.params['net'])
+//   const coin = settings.getCoin(net)
+//   db.get_stats(coin.name, function(stats) {
+//     if (stats)
+//       return res.end("HOHO2")
+//     else
+//       return res.end("ERROR")
+//   })
+// })
 
 // routes
 app.use('/api', nodeapi.app);
@@ -742,7 +765,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
         }
 
         if (!isNaN(stats.nethash))
-              r.hashrate = stats.nethash
+          r.hashrate = stats.nethash
 
         if (!isNaN(stats.nethash_ghostrider))
           r.hashrate_ghostrider = stats.nethash_ghostrider
@@ -758,7 +781,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
           r.hashrate_butk = stats.nethash_butkscrypt
 
         if (!isNaN(stats.difficulty))
-          r.difficulty = stats.difficulty_pow
+          r.difficulty = stats.difficulty
         else
           r.difficulty = stats.difficulty_ghostrider
 
