@@ -959,18 +959,6 @@
         //                Ex: "LTC/BTC", "LTC/USDT", "LTC/ETH"
         "trading_pairs": [ "LTC/BTC" ]
       },
-      // txbit: a collection of settings that pertain to the txbit exchange
-      //        NOTE: txbit does not display a 24-hour chart due to a lack of OHLCV api data
-      "txbit": {
-        // enabled: Enable/disable the txbit exchange (true/false)
-        //          If set to false, the txbit page will be completely inaccessible and no market data will be downloaded for this exchange
-        "enabled": false,
-        // trading_pairs: An array of market trading pair symbols
-        //                You can add as many trading pairs as necessary
-        //                All entries must specify your coins symbol as it is displayed on the exchange, followed by a slash (/) and ending with the symbol of the market or asset that is being traded against
-        //                Ex: "LTC/BTC", "LTC/USDT", "LTC/ETH"
-        "trading_pairs": [ "LTC/ETH" ]
-      },
       // unnamed: a collection of settings that pertain to the unnamed exchange
       "unnamed": {
         // enabled: Enable/disable the unnamed exchange (true/false)
