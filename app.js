@@ -746,6 +746,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
     if (summary == undefined) {
       const r = {}
       db.get_stats(coin.name, function (stats) {
+        const algos = settings.get(net, 'algos')
         if (!isNaN(stats.count)) 
           r.blockcount = stats.count
         if (!isNaN(stats.connections)) 
@@ -767,40 +768,24 @@ app.use('/ext/getsummary/:net?', function(req, res) {
         if (!isNaN(stats.nethash))
           r.hashrate = stats.nethash
 
-        if (!isNaN(stats.nethash_ghostrider))
-          r.hashrate_ghostrider = stats.nethash_ghostrider
-        if (!isNaN(stats.nethash_yespower))
-          r.hashrate_yespower = stats.nethash_yespower
-        if (!isNaN(stats.nethash_lyra2))
-          r.hashrate_lyra2 = stats.nethash_lyra2
-        if (!isNaN(stats.nethash_sha256d))
-          r.hashrate_sha256d = stats.nethash_sha256d
-        if (!isNaN(stats.nethash_scrypt))
-          r.hashrate_scrypt = stats.nethash_scrypt
-        if (!isNaN(stats.nethash_butkscrypt))
-          r.hashrate_butk = stats.nethash_butkscrypt
+        algos.forEach((algo) => {
+          if (!isNaN(stats['nethash_' + algo.algo]))
+            r['hashrate_' + algo.algo] = stats['nethash_' + algo.algo]
+        })
 
         if (!isNaN(stats.difficulty))
           r.difficulty = stats.difficulty
         else
           r.difficulty = stats.difficulty_ghostrider
 
-        if (!isNaN(stats.difficulty_ghostrider))
-          r.difficulty_ghostrider = stats.difficulty_ghostrider
-        if (!isNaN(stats.difficulty_yespower))
-          r.difficulty_yespower = stats.difficulty_yespower
-        if (!isNaN(stats.difficulty_lyra2))
-          r.difficulty_lyra2 = stats.difficulty_lyra2
-        if (!isNaN(stats.difficulty_sha256d))
-          r.difficulty_sha256d = stats.difficulty_sha256d
-        if (!isNaN(stats.difficulty_scrypt))
-          r.difficulty_scrypt = stats.difficulty_scrypt
-        if (!isNaN(stats.difficulty_butkscrypt))
-          r.difficulty_butkscrypt = stats.difficulty_butkscrypt
+        algos.forEach((algo) => {
+          if (!isNaN(stats['difficulty_' + algo.algo]))
+            r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
+        })
 
-        summaryCache.set (net, r);
+        summaryCache.set (net, r)
         debug("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage())
-        res.send(r);
+        res.send(r)
       }, net)
     } else {
       debug("Get summary by cache '%s' %o ...", net, summary)
