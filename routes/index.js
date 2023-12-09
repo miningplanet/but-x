@@ -287,7 +287,7 @@ router.get('/info/:net?', function(req, res) {
   if (api_page.enabled == true) {  
     const markets_page = settings.get(net, 'markets_page')
     const p = param('info', api_page, coin, net, db, settings, coin.name + ' Public API ' + net)
-    p.address = 'https://explorer.butkoin.com'
+    p.address = settings.webserver.url
     p.markets_page = markets_page
     p.api_page = api_page
     p.api_cmds = settings.get(net, 'api_cmds')

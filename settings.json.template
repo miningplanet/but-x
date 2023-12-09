@@ -56,6 +56,8 @@
 
   // webserver: a collection of settings that pertain to the node.js express web framework (read more: https://www.npmjs.com/package/express)
   "webserver": {
+    // The base URL of the explorer site. Overwrite for other chains.
+    "url": "https://explorer.butkoin.com",
     // port: Port # to configure the express webserver to listen for http requests on
     //       NOTE: Be sure to configure firewalls to allow traffic through this port or the explorer website may not be accessible remotely
     "port": 3001,
