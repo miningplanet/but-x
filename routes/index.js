@@ -13,12 +13,12 @@ function route_get_block(res, blockhash, coin, net) {
     if (block && block != 'There was an error. Check your console.') {
       db.get_stats(coin.name, function(stats) {
         if (blockhash == block_page.genesis_block) {
-          const p = blockParam(stats, 'block', coin, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
+          const p = blockParam(stats, 'block', block_page, coin, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
           res.render('block', p)
         } else {
           db.find_txs_by_blockhash(block.hash, function(txs) {
             if (txs.length > 0) {
-              const p = blockParam(stats, 'block', coin, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
+              const p = blockParam(stats, 'block', block_page, coin, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
               res.render('block', p)
             } else {
               // cannot find block in local database so get the data from the wallet directly
@@ -44,7 +44,7 @@ function route_get_block(res, blockhash, coin, net) {
                     loop.next()
                 }, net)
               }, function() {
-                const p = blockParam(stats, 'block', coin, net, db, settings, block, ntxs, coin.name + ' Block ' + block.height)
+                const p = blockParam(stats, 'block', block_page, coin, net, db, settings, block, ntxs, coin.name + ' Block ' + block.height)
                 res.render('block', p)
               })
             }
@@ -85,11 +85,11 @@ function route_get_tx(res, txid, coin, net) {
         db.get_tip_by_blocks(function(blockcount) {
           if (settings.get(net, 'claim_address_page').enabled == true) {
             db.populate_claim_address_names(tx, function(tx) {
-              const p = txParam('tx', coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
+              const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
               res.render('tx', p)
             }, net)
           } else {
-            const p = txParam('tx', coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
+            const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
             res.render('tx', p)
           }
         }, net)
@@ -112,11 +112,11 @@ function route_get_tx(res, txid, coin, net) {
 
                     if (settings.get(net, 'claim_address_page').enabled == true) {
                       db.populate_claim_address_names(utx, function(utx) {
-                        const p = txParam('tx', coin, net, db, settings, utx, -1, coin.name + ' Transaction ' + tx.txid)
+                        const p = txParam('tx', transaction_page, coin, net, db, settings, utx, -1, coin.name + ' Transaction ' + tx.txid)
                         res.render('tx', p)
                       }, net)
                     } else {
-                      const p = txParam('tx', coin, net, db, settings, utx, -1, coin.name + ' Transaction ' + utx.txid)
+                      const p = txParam('tx', transaction_page, coin, net, db, settings, utx, -1, coin.name + ' Transaction ' + utx.txid)
                       res.render('tx', p)
                     }
                   } else {
@@ -139,11 +139,11 @@ function route_get_tx(res, txid, coin, net) {
                           lib.get_blockcount(function(blockcount) {
                             if (settings.get(net, 'claim_address_page').enabled == true) {
                               db.populate_claim_address_names(utx, function(utx) {
-                                const p = txParam('tx', coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
+                                const p = txParam('tx', transaction_page, coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
                                 res.render('tx', p)
                               }, net)
                             } else {
-                              const p = txParam('tx', coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
+                              const p = txParam('tx', transaction_page, coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
                               res.render('tx', p)
                             }
                           }, net)
@@ -167,11 +167,11 @@ function route_get_tx(res, txid, coin, net) {
                       lib.get_blockcount(function(blockcount) {
                         if (settings.get(net, 'claim_address_page').enabled == true) {
                           db.populate_claim_address_names(utx, function(utx) {
-                            const p = txParam('tx', coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
+                            const p = txParam('tx', transaction_page, coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
                             res.render('tx', p)
                           }, net)
                         } else {
-                          const p = txParam('tx', coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
+                          const p = txParam('tx', transaction_page, coin, net, db, settings, utx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + utx.txid)
                           res.render('tx', p)
                         }
                       }, net)
@@ -192,7 +192,7 @@ function route_get_index(res, error, net=settings.getDefaultNet()) {
   const coin = settings.getCoin(net)
   const index_page = settings.get(net, 'index_page')
   const api_page = settings.get(net, 'api_page')
-  const p = param('home', coin, net, db, settings, coin.name + ' Explorer')
+  const p = param('home', index_page, coin, net, db, settings, coin.name + ' Explorer')
   p.error = error
   p.last_updated = null
   p.index_page = index_page
@@ -218,7 +218,7 @@ function route_get_address(res, hash, coin, net=settings.getDefaultNet()) {
     db.get_address(hash, false, function(address) {
       const api_page = settings.get( net, 'api_page')
       if (address) {
-        const p = param('address', coin, net, db, settings, coin.name + ' Address ' + (address['name'] == null || address['name'] == '' ? address.a_id : address['name']))
+        const p = param('address', address_page, coin, net, db, settings, coin.name + ' Address ' + (address['name'] == null || address['name'] == '' ? address.a_id : address['name']))
         p.address = address
         p.address_page = address_page
         p.api_page = api_page
@@ -241,8 +241,8 @@ function route_get_claim_form(res, hash, coin, net=settings.getDefaultNet()) {
     // check if a hash was passed in
     if (hash == null || hash == '') {
       // no hash so just load the claim page without an address
-      const p = param('claim-address', coin, net, db, settings, coin.name + ' Claim Wallet Address')
-      p.hash = hash,
+      const p = param('claim-address', claim_address_page, coin, net, db, settings, coin.name + ' Claim Wallet Address')
+      p.hash = hash
       p.claim_name = ''
       p.address_page = address_page
       p.claim_address_page = claim_address_page
@@ -250,11 +250,14 @@ function route_get_claim_form(res, hash, coin, net=settings.getDefaultNet()) {
     } else {
       db.get_address(hash, false, function(address) {
         // load the claim page regardless of whether the address exists or not
-        const p = param('claim-address', coin, net, db, settings, coin.name + ' Claim Wallet Address ' + hash)
+        const p = param('claim-address', claim_address_page, coin, net, db, settings, coin.name + ' Claim Wallet Address ' + hash)
         p.hash = hash,
         p.claim_name = (address == null || address.name == null ? '' : address.name)
         p.address_page = address_page
         p.claim_address_page = claim_address_page
+        p.show_panels = claim_address_page.show_panels
+        p.showNethashChart = claim_address_page.show_nethash_chart
+        p.showDifficultyChart = claim_address_page.show_difficulty_chart
         res.render('claim_address', p)
       }, net)
     }
@@ -283,7 +286,7 @@ router.get('/info/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true) {  
     const markets_page = settings.get(net, 'markets_page')
-    const p = param('info', coin, net, db, settings, coin.name + ' Public API ' + net)
+    const p = param('info', api_page, coin, net, db, settings, coin.name + ' Public API ' + net)
     p.address = 'https://explorer.butkoin.com'
     p.markets_page = markets_page
     p.api_page = api_page
@@ -330,7 +333,7 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
 
           const ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url
           const referal = market_data.referal == null ? '' : market_data.referal
-          const p = param('markets', coin, net, db, settings, locale.mkt_title.replace('{1}', market_data.market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'))
+          const p = param('markets', markets_page, coin, net, db, settings, locale.mkt_title.replace('{1}', market_data.market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'))
           p.marketdata =  {
             market_name: market_data.market_name,
             market_logo: market_data.market_logo,
@@ -374,7 +377,7 @@ router.get('/richlist/:net?', function(req, res) {
       db.get_richlist(coin.name, function(richlist) {
         if (richlist) {
           db.get_distribution(richlist, stats, function(distribution) {
-            const p = param('richlist', coin, net, db, settings, 'Top ' + coin.name + ' Holders, Received and Transactions.')
+            const p = param('richlist', richlist_page, coin, net, db, settings, 'Top ' + coin.name + ' Holders, Received and Transactions.')
             p.balance = richlist.balance
             p.received = richlist.received
             p.toptx = richlist.toptx
@@ -408,7 +411,7 @@ router.get('/movement/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const movement_page = settings.get(net, 'movement_page')
   if (movement_page.enabled == true) {
-    const p = param('movement', coin, net, db, settings, coin.name + ' - Coin Movements')
+    const p = param('movement', movement_page, coin, net, db, settings, coin.name + ' - Coin Movements')
     p.movement_page = movement_page
     p.api_page = settings.get(net, 'api_page')
 
@@ -431,7 +434,7 @@ router.get('/network/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const network_page = settings.get(net, 'network_page')
   if (network_page.enabled == true) {
-    const p = param('network', coin, net, db, settings, coin.name + ' - Network Peers')
+    const p = param('network', network_page, coin, net, db, settings, coin.name + ' - Network Peers')
     p.network_page = network_page
 
     if (network_page.page_header.show_last_updated == true) {
@@ -453,7 +456,7 @@ router.get('/masternodes/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const masternodes_page = settings.get(net, 'masternodes_page')
   if (masternodes_page.enabled == true) {
-    const p = param('masternodes', coin, net, db, settings, coin.name + ' - Smartnodes')
+    const p = param('masternodes', masternodes_page, coin, net, db, settings, coin.name + ' - Smartnodes')
     p.masternodes_page = masternodes_page
     p.claim_address_page = settings.get(net, 'claim_address_page')
 
@@ -473,6 +476,8 @@ router.get('/masternodes/:net?', function(req, res) {
 router.get('/reward/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  // TODO: Fix.
+  const reward_page = settings.get(net, 'reward_page')
   if (settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true) {
     db.get_stats(coin.name, function (stats) {
       db.get_heavy(coin.name, function (heavy) {
@@ -489,7 +494,7 @@ router.get('/reward/:net?', function(req, res) {
             return 0
         })
 
-        const p = param('reward', coin, net, db, settings, coin.name + ' - Reward/Voting Details')
+        const p = param('reward', reward_page, coin, net, db, settings, coin.name + ' - Reward/Voting Details')
         p.stats = stats
         p.heavy = heavy
         p.votes = votes
@@ -606,10 +611,10 @@ router.get('/qr/:string/:net?', function(req, res) {
   }
 })
 
-function param(page, coin, net, db, settings, prefix) {
+function param(pageKey, page, coin, net, db, settings, prefix) {
   const shared_pages = settings.get(net, 'shared_pages')
   const r = {
-    active: page,
+    active: pageKey,
     showSync: db.check_show_sync_message(net),
     customHash: get_file_timestamp('./public/css/custom.scss'),
     styleHash: get_file_timestamp('./public/css/style.scss'),
@@ -618,14 +623,17 @@ function param(page, coin, net, db, settings, prefix) {
     page_title_logo: settings.getTitleLogo(net),
     page_title_prefix: prefix,
     shared_pages: shared_pages,
+    showPanels: page.show_panels,
+    showNethashChart: page.show_nethash_chart,
+    showDifficultyChart: page.show_difficulty_chart,
     coin: coin,
     net: net
   }
   return r
 }
 
-function blockParam(stats, page, coin, net, db, settings, block, txs, prefix) {
-  const r = param(page, coin, net, db, settings, prefix)
+function blockParam(stats, pageKey, page, coin, net, db, settings, block, txs, prefix) {
+  const r = param(pageKey, page, coin, net, db, settings, prefix)
   r.block = block
   r.confirmations = stats.count - block.height + 1
   r.txs = txs
@@ -634,8 +642,8 @@ function blockParam(stats, page, coin, net, db, settings, block, txs, prefix) {
   return r
 }
 
-function txParam(page, coin, net, db, settings, tx, height, prefix) {
-  const r = param(page, coin, net, db, settings, prefix)
+function txParam(pageKey, page, coin, net, db, settings, tx, height, prefix) {
+  const r = param(pageKey, page, coin, net, db, settings, prefix)
   const shared_pages = settings.get(net, 'shared_pages')
   r.tx = tx
   r.confirmations = shared_pages.confirmations
