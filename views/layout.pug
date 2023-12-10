@@ -838,6 +838,7 @@ html(lang='en')
           hideShowPanel('#{settings.panel(3, net)}', 'pnlThree');
           hideShowPanel('#{settings.panel(4, net)}', 'pnlFour');
           hideShowPanel('#{settings.panel(5, net)}', 'pnlFive');
+          hideShowPanel('#{settings.panel(6, net)}', 'pnlSix');
         }
         if ('#{shared_pages.page_header.menu}' == 'side') {
           function positionSidebarSearch() {
@@ -1350,6 +1351,10 @@ html(lang='en')
                   - if (settings.panel(5, net) != '') {
                   .col-lg-2
                     .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
+                  - }
+                  - if (settings.panel(6, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
                   - }
               if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header'
                 div#search-row.row.text-center

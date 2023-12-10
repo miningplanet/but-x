@@ -202,7 +202,7 @@
       // home_link_logo_height: The max-height value of the "shared_pages.page_header.home_link" logo image (value in px, only valid if "shared_pages.page_header.home_link" = 'logo')
       "home_link_logo_height": 50,
       // panels: default settings for panels displayed on page header (NOTE: you can show/hide the entire group of panels on each page independently).
-      // Shows max. 5 panels (others hidden) in the sequence they are configured here (enabled=true)
+      // Shows max. 6 panels (others hidden) in the sequence they are configured here (enabled=true)
       "panels": {
         "network_panel": {
           "enabled": false,
