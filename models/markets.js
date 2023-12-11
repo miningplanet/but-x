@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-
-var MarketsSchema = new Schema({
+module.exports = new require('mongoose').Schema({
   market: { type: String, index: true },
   ext_market_url: { type: String },
   referal: { type: String },
@@ -13,6 +10,4 @@ var MarketsSchema = new Schema({
   buys: { type: Array, default: [] },
   sells: { type: Array, default: [] },
   history: { type: Array, default: [] },
-});
-
-module.exports = MarketsSchema;
+})

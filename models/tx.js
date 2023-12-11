@@ -1,24 +1,17 @@
-var mongoose = require('mongoose'),
-   Schema = mongoose.Schema;
-
-var TxSchema = new Schema({
-  txid: { type: String, lowercase: true, unique: true, index: true},
-  version: {type: Number, default: 0 },
-  tx_type: { type: String, default: null },
-  size: {type: Number, default: 0 },
-  locktime: {type: Number, default: 0 },
+module.exports = new require('mongoose').Schema({
+  txid: { type: String, lowercase: true, unique: true, index: true },
+  version: {type: Number, default: 0, index: false },
+  tx_type: { type: String, default: null, index: false },
+  size: {type: Number, default: 0, index: false },
+  locktime: {type: Number, default: 0, index: false },
   instantlock: {type: Boolean, default: false },
   chainlock: {type: Boolean, default: false },
-  vin: { type: Array, default: [] },
-  vout: { type: Array, default: [] },
-  total: { type: Number, default: 0, index: true },
-  timestamp: { type: Number, default: 0, index: true },
+  vin: { type: Array, default: [], index: false },
+  vout: { type: Array, default: [], index: false },
+  total: { type: Number, default: 0, index: false },
+  timestamp: { type: Number, default: 0, index: false },
   blockhash: { type: String, index: true },
   blockindex: {type: Number, default: 0, index: true},
   op_return: { type: String, default: null },
   extra: { type: [String], default: null }
-}, {id: false});
-
-TxSchema.index({total: 1, total: -1, blockindex: 1, blockindex: -1});
-
-module.exports = TxSchema;
+}, {id: false})

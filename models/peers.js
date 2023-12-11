@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-
-var PeersSchema = new Schema({
+module.exports = new require('mongoose').Schema({
   createdAt: { type: Date, expires: 86400, default: Date.now() },
   address: { type: String, default: "", index: true },
   port: { type: String, default: "" },
@@ -9,6 +6,4 @@ var PeersSchema = new Schema({
   version: { type: String, default: "" },
   country: { type: String, default: "" },
   country_code: { type: String, default: "" }
-});
-
-module.exports = PeersSchema;
+})

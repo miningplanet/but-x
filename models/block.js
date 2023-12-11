@@ -1,7 +1,4 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-const BlockSchema = new Schema({
+module.exports = new require('mongoose').Schema({
   hash: { type: String, unique: true, default: '', index: true },
   pow_hash: { type: String, default: '', index: false },
   algo: { type: String, default: '', index: false },
@@ -21,5 +18,3 @@ const BlockSchema = new Schema({
   chainlock: { type: Boolean, default: false, index: false },
   cbtx: { type: Array, default: [], index: false },
 }, {id: false})
-
-module.exports = BlockSchema

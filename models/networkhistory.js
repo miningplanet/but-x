@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-   Schema = mongoose.Schema;
-
-var NetworkHistorySchema = new Schema({
+module.exports = new require('mongoose').Schema({
   blockindex: {type: Number, default: 0, index: true},
   nethash: { type: Number, default: 0 },
   nethash_ghostrider: { type: Number, default: 0 },
@@ -18,6 +15,4 @@ var NetworkHistorySchema = new Schema({
   difficulty_sha256d: { type: Number, default: 0 },
   difficulty_scrypt: { type: Number, default: 0 },
   difficulty_butkscrypt: { type: Number, default: 0 }
-}, {id: false});
-
-module.exports = NetworkHistorySchema;
+}, {id: false})

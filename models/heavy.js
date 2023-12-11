@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
-
-var HeavySchema = new Schema({
+module.exports = new require('mongoose').Schema({
   coin: { type: String },
   lvote: { type: Number, default: 0 },
   reward: { type: Number, default: 0 },
@@ -12,6 +9,4 @@ var HeavySchema = new Schema({
   maxvote: { type: Number, default: 0 },
   nextin: { type: String, default: 'N/A'},
   votes: { type: Array, default: [] }
-});
-
-module.exports = HeavySchema
+})

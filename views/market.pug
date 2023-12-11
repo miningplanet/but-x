@@ -455,7 +455,7 @@ block content
                     th.text-center #{settings.locale.timestamp}
                 tbody
                   each order in marketdata.data.history
-                    if order.ordertype != null
+                    if order.type != null
                       - var price = settings.formatCurrency(order.price, marketdata.exchange);
                       - var splitPrice = price.split(".");
                       - var quantity = settings.formatCurrency(order.quantity, marketdata.coin);
@@ -466,7 +466,7 @@ block content
                       else
                         - var total = settings.formatCurrency(parseFloat(order.price).toFixed(8) * parseFloat(order.quantity).toFixed(8), marketdata.exchange);
                       - var splitTotal = total.split(".");
-                      if order.ordertype.toUpperCase() == 'BUY'
+                      if order.type == 0
                         tr
                           td.text-end.text-success.fw-bold #{splitPrice[0]}.
                             span.decimal #{splitPrice[1]}   

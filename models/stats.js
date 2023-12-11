@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-
-var StatsSchema = new Schema({
+module.exports = new require('mongoose').Schema({
   coin: { type: String },
   count: { type: Number, default: 1 },
   last: { type: Number, default: 1 },
@@ -35,6 +32,4 @@ var StatsSchema = new Schema({
   difficulty_sha256d: { type: Number, default: 0 },
   difficulty_scrypt: { type: Number, default: 0 },
   difficulty_butkscrypt: { type: Number, default: 0 }
-});
-
-module.exports = StatsSchema;
+})

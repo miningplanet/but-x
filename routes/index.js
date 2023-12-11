@@ -313,49 +313,63 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
     if (exchange != null && exchange.enabled == true && exchange.trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
       db.get_markets_summary(function(mmdata) {
         db.get_market(market_id, coin_symbol, pair_symbol, function(data) {
-          const market_data = require('../lib/markets/' + market_id)
-          var url = ''
-          // build the external exchange url link and determine if using the alt name + logo
-          const tpl = market_data.market_url_template
-          if (tpl != null && tpl != '') {
-            switch ((market_data.market_url_case == null || market_data.market_url_case == '' ? 'l' : market_data.market_url_case.toLowerCase())) {
-              case 'l':
-              case 'lower':
-                url = tpl.replace('{base}', pair_symbol.toLowerCase()).replace('{coin}', coin_symbol.toLowerCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : ''))
-                break
-              case 'u':
-              case 'upper':
-                url = tpl.replace('{base}', pair_symbol.toUpperCase()).replace('{coin}', coin_symbol.toUpperCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : ''))
-                break
-              default:
-            }
-          }
+          db.get_market_trade_history(market_id, coin_symbol, pair_symbol, function(trade_history_data) {
+            if (trade_history_data)
+              data.history = trade_history_data
+            db.get_buy_order_aggregation(market_id, coin_symbol, pair_symbol, function(buy_orders) {
+              if (buy_orders)
+                data.buys = buy_orders
+              db.get_sell_order_aggregation(market_id, coin_symbol, pair_symbol, function(sell_orders) {
+                if (sell_orders)
+                  data.sells = sell_orders
 
-          const ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url
-          const referal = market_data.referal == null ? '' : market_data.referal
-          const p = param('markets', markets_page, coin, net, db, settings, locale.mkt_title.replace('{1}', market_data.market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'))
-          p.marketdata =  {
-            market_name: market_data.market_name,
-            market_logo: market_data.market_logo,
-            ext_market_url: ext_market_url,
-            referal: referal,
-            coin: coin_symbol,
-            exchange: pair_symbol,
-            data: data,
-            url: url
-          },
-          p.mmdata = mmdata
-          p.market = market_id
-          p.markets_page = markets_page
+                const market_data = require('../lib/markets/' + market_id)
+                var url = ''
+                // build the external exchange url link and determine if using the alt name + logo
+                const tpl = market_data.market_url_template
+                if (tpl != null && tpl != '') {
+                  switch ((market_data.market_url_case == null || market_data.market_url_case == '' ? 'l' : market_data.market_url_case.toLowerCase())) {
+                    case 'l':
+                    case 'lower':
+                      url = tpl.replace('{base}', pair_symbol.toLowerCase()).replace('{coin}', coin_symbol.toLowerCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toLowerCase(), exchange: pair_symbol.toLowerCase()}) : ''))
+                      break
+                    case 'u':
+                    case 'upper':
+                      url = tpl.replace('{base}', pair_symbol.toUpperCase()).replace('{coin}', coin_symbol.toUpperCase()).replace('{url_prefix}', (market_data.market_url != null ? market_data.market_url({coin: coin_symbol.toUpperCase(), exchange: pair_symbol.toUpperCase()}) : ''))
+                      break
+                    default:
+                  }
+                }
 
-          if (markets_page.page_header.show_last_updated == true) {
-            db.get_stats(coin.name, function (stats) {
-              p.last_updated = stats.network_last_updated
-              res.render('./market', p)
+                const ext_market_url = market_data.ext_market_url == null ? '' : market_data.ext_market_url
+                const referal = market_data.referal == null ? '' : market_data.referal
+
+                const p = param('markets', markets_page, coin, net, db, settings, locale.mkt_title.replace('{1}', market_data.market_name + ' (' + coin_symbol + '/' + pair_symbol + ')'))
+                p.marketdata =  {
+                  market_name: market_data.market_name,
+                  market_logo: market_data.market_logo,
+                  ext_market_url: ext_market_url,
+                  referal: referal,
+                  coin: coin_symbol,
+                  exchange: pair_symbol,
+                  data: data,
+                  url: url
+                },
+                p.mmdata = mmdata
+                p.market = market_id
+                p.markets_page = markets_page
+
+                if (markets_page.page_header.show_last_updated == true) {
+                  db.get_stats(coin.name, function (stats) {
+                    p.last_updated = stats.network_last_updated
+                    res.render('./market', p)
+                  }, net)
+                } else {
+                  res.render('./market', p)
+                }
+              }, net)  
             }, net)
-          } else {
-            res.render('./market', p)
-          }
+          }, net)
         }, net)
       }, net)
     } else {

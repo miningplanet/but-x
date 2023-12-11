@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-
-var MasternodeSchema = new Schema({
+module.exports = new require('mongoose').Schema({
   rank: { type: Number, default: 0 },
   network: { type: String, default: "" },
   txhash: { type: String, default: "" },
@@ -18,6 +15,4 @@ var MasternodeSchema = new Schema({
   pose_score: {type: Number, default: 0},
   country: { type: String, default: "" },
   country_code: { type: String, default: "" }
-}, {id: false});
-
-module.exports = MasternodeSchema;
+}, {id: false})
