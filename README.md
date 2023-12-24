@@ -1,4 +1,4 @@
-# but-eiquidus
+ # but-eiquidus
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/team-exor/eiquidus?color=ffbd11&label=version)
 ![GitHub Release Date](https://img.shields.io/github/release-date/team-exor/eiquidus)
@@ -6,32 +6,47 @@
 <img src="public/img/screenshots/platform-windows macos linux-lightgrey.svg" />
 ![GitHub](https://img.shields.io/github/license/team-exor/eiquidus?color=ffbd11)
 
-Stable, secure and customizable multicoin open-source block explorer with support for virtually any altcoin that implements some form of the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html).
+
+Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-eiquidus' features first or see our [Installation Guide](https://github.com/miningplanet/but-eiquidus/INSTALL.MD) to get started.
 
 
-![Homepage](public/img/screenshots/homepage-1-101-0.png)
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10"/>
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
+<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
 
-### Support
+![Homepage](public/img/screenshots/homepage-1-101-0.png =250x250)
 
-In general but-eiquidus is open-source but comes without support! You might contact us at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2) 
-___
+## Support
 
-### See it in Action
+**but-eiquidus is open-source** and comes without support. Contact us at Github or at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2).
+
+## Samples
+
+**but-eiquidus** Multicoin Explorer is tested with these coins.
 
 -  https://explorer.butkoin.com/mainnet
 -  https://explorer.butkoin.com/testnet
 -  https://explorer.butkoin.com/bitoreum
-___
+-  https://explorer.butkoin.com/raptoreum
+-  https://explorer.butkoin.com/pepew
 
-Table of Contents
-------------------
+Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node and need an explorer. Or you just run a blockchain node and want to provide us with data for an explorer.
 
-- [Prerequisites](#prerequisites)
-  - [Hardware](#hardware)
-  - [Software](#software)
-- [Features](#features)
-- [API functions](#api-function)
-- [Exchanges](#exchanges)
+## Table of Contents
+
+- [System Overview](#system-overview)
+  - [Prerequisites](#prerequisites)
+    - [Hardware](#hardware)
+    - [Software](#software)
+  - [Features](#features)
+- [Features and functions in more detail](#features-and-functions-in-more-detail)
+  - [API functions](#api-function)
+  - [Exchanges](#exchanges)
+  - [Configurable Web UI](#configurable-web-ui)
+  - [Blockchain Specific Functionality](#blockchain-specific-functionality)
 - [Installation](#installation)
   - [Full Setup Guide](#full-setup-guide)
   - [Quick Install Instructions](#quick-install-instructions)
@@ -61,23 +76,24 @@ Table of Contents
 - [CORS Support](#cors-support)
   - [What is CORS?](#what-is-cors)
   - [How to Benefit From Using CORS?](#how-to-benefit-from-using-cors)
-- [Useful Scripts](#useful-scripts)
+- [Data synchronization](#useful-scripts)
   - [Update Explorer Script](#update-explorer-script)
-  - [Backup Database Script](#backup-database-script)
-  - [Restore Database Script](#restore-database-script)
-  - [Delete Database Script](#delete-database-script)
 - [Known Issues](#known-issues)
 - [Donations / Support Us](#donations--support-us)
 - [Special Thanks](#special-thanks)
 - [License](#license)
 - [Disclaimer](#disclaimer)
-___
+
+
+## System Overview
+
+but-eiquidus is a multicoin backend system and comes with several APIs and a web UI.
 
 ### Prerequisites
 
 #### Hardware
 
-The hardware system requirements heavily depend on the data processed and the type of deployment(s). For a single chain deployment with a small blockchain or testnet with block-height up to 100.000, the following is considered as minimum requirements.
+The hardware system requirements depend on the data processed and stored and the type of deployment(s). For a single chain deployment with a small blockchain or testnet with tip up to 100.000 blocks, the following is considered as minimum requirements.
 
 - 2 CPU core or more
 - 2 GB or more of RAM
@@ -85,29 +101,114 @@ The hardware system requirements heavily depend on the data processed and the ty
 
 #### Software
 
+but-eiquidus is platform independent and requires:
+
 - Linux, MacOS or MS Windows
-- Node.js - min. v17.9.1, current dev and prod version is v19.9.0
-- MongoDB - v5.3.0 or newer recommended
-___
+- Node.js - min. v19.9.0, current dev and prod version is v20.9.0
+- MongoDB - v6.3.0 or newer
+- Reverse-Proxy Apache2 or Nginx (optional)
 
 ### Features
 
+- Multicoin blockchain explorer
+- Supports various mining algorithms grouped by CPU, GPU or ASIC
+- Rich JSON API
+- Exchange and other external data
+- External data synchronization
+- Individual blockchain functions
+- Frontend cache
+- Configurable and mobile-friendly web UI
+- i18n support
+- Dezentralized architecture
+- Distributed deployments
 - Platform independent
-- Mobile-friendly
-- Sass support
-- Pages/features:
-  - **Home/Explorer:** Displays latest blockchain transactions
-  - **Smartnodes:** Displays the current listing of all masternodes known to be active on the network. *\*only applicable to masternode coins*
+
+## Features and functions in more detail
+
+### API Functions
+
+but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [Butkoin API](https://explorer.butkoin.com/info/mainnet) for comprehensive information.
+
+#### Coin Daemon Related API
+
+- **api/getblockchaininfo/{net}:** Returns coin stats incl. circulating supply or USD price.
+- **api/getmininginfo/{net}:** Returns mining related information and stats.
+- **api/getdifficulty/{net}:** Returns the current difficulty.
+- **api/getconnectioncount/{net}:** Returns the number of peers.
+- **api/getblockcount/{net}:** Returns the current tip.
+- **api/getblockhash/{net}?index={height}:** Returns block hash for the height.
+- **api/getblock/{net}:** Returns information about the block with the given hash.
+- **api/getrawtransaction/{net}?txid={txid}&decrypt={0|1}:** Returns raw or decoded TX information for ID.
+- **api/getnetworkhashps/{net}:** Returns the current network hashrate(s).
+- **api/getvotelist/{net}:** Returns the current vote list.
+- **api/getmasternodecount/{net}:** Returns the number of masternodes.
+
+#### Extended API
+
+- **ext/getmoneysupply/{net}:** Returns current money supply.
+- **ext/getdistribution/{net}:** Returns the wealth distribution and some stats.
+- **ext/getaddress/{address}/{net}:** Returns information for the given address.
+- **ext/getaddresstxs/{address}/{net}/{start}/{length}:** Returns TXs for a wallet address starting with an offset.
+- **ext/gettx/{hash}/{net}:** Returns information for given TX hash.
+- **ext/getbalance/{address}/{net}:** Returns current balance of the given address.
+- **ext/getlasttxs/{net}/{min}/{length}/{start}:** Returns a number TXs with min. a amount and offset.
+- **ext/getcurrentprice/{net}:** Returns last known exchange prices.
+- **ext/getbasicstats/{net}:** Returns basic coin stats including: block count, circulating supply, USD price, etc.
+- **ext/getticker/{mode}/{net}:** Returns various ticker data.
+- **ext/getmarkets/{net}:** Returns various market data.
+- **ext/getsummary/{net}:** Returns a summary including: (hybrid) difficulty, supply, hash rate, market prices, other coin and masternode stats.
+- **ext/getnetworkpeers/{net}:** Returns the list of current network peers.
+- **ext/getmasternodelist/{net}:** Returns the list of current masternodes in the network.
+- **ext/getmasternoderewards/{net}:** Returns a list of masternode reward TX after a block height for an address.
+- **ext/getmasternoderewardstotal/{net}:** Returns the total reward of a masternode after a block height for an address.
+
+#### Net API
+
+- **getallnet:** Returns a list of the current chains the API supports.
+
+### Exchange data
+
+but-eiquidus supports the following crypto currency exchanges.
+
+- [AltMarkets](https://altmarkets.io)
+- [Bittrex](https://bittrex.com)
+- [BitxOnex](https://www.bitxonex.comrefid=ID1906858745)
+- [Bitoreum Exchange](https://www.bitoreum.exchange?refid=ID19CBFFCE97)
+- [CoinEx](https://www.coinex.com/)
+- [Crex24](https://crex24.com)
+- [Dex-Trade](https://dex-trade.com)
+- [Exbitron](https://www.exbitron.com?refid=ID5FE45E2B3D)
+- [Finexbox](https://finexbox.com)
+- [FreiExchange](https://freiexchange.com)/[FreiXLite](https://freixlite.com) *\*no chart support due to a lack of OHLCV api data*
+- [Poloniex](https://poloniex.com)
+- [SouthXchange](https://southxchange.com)
+- [Tradeogre](https://tradeogre.com)
+- [Unnamed](https://unnamed.exchange)
+- [Yobit](https://yobit.io) *\*no chart support due to a lack of OHLCV api data*
+
+### Configurable Web UI
+
+The but-eiquidus web UI is highly configurable. Content and design can be defined individually for each blockchain.
+
+#### Customizable pages
+
+  - **Home/Explorer:** Displays latest blockchain TX.
+  - **Smartnodes:** Lists the current masternodes in the network.
   - **Movement:** Displays latest blockchain transactions that are greater than a certain configurable amount
   - **Network:** Displays a list of peers that have connected to the coind wallet in the past 24 hours, along with useful addnode data that can be used to connect your own wallets to the network easier
-  - **Top 100:** Displays the top 100 richest wallet addresses, the top 100 wallet addresses that have the highest total number of coins received based on adding up all received transactions, as well as a table and pie chart breakdown of wealth distribution. Additional support for omitting burned coins from top 100 lists
+  - **Top 100:** Top 100 richest wallet addresses, top 100 wallet addresses received coins, top 100 TX and a pie chart breakdown of the wealth distribution.
   - **Markets:** Displays a number of exchange-related metrics including market summary, 24 hour chart, most recent buy/sell orders and latest trade history. The last known default exchange price is automatically converted to USD using the coingecko API. See [Exchanges](#exchanges).
   - **API:** A listing of available public API's that can be used to retrieve information from the network without the need for a local wallet. See [API functions](#api-functions).
   - **Claim Address:** Allows anyone to set custom display names for wallet addresses that they own using the **Sign Message** feature from their local wallet. Includes *bad word* filter support.
-  - **Block Info:** Displays block summary and list of transactions for a specific block height
-  - **Transaction Info:** Displays transaction summary, optional OP_RETURN value, list of input addresses and output addresses for a specific transaction
-  - **Address Info:** Displays wallet address summary (balance, total sent, total received, QR code) and a list of latest transactions for a specific wallet address
-- but-eiquidus comes with a dark layout.
+  - **Block Info:** Displays block detail information and the list of TX.
+  - **Transaction Info:** Displays TX detail information for various TX types incl. protx and quorom TX.
+  - **Address Info:** Wallet address summary (balance, total sent, total received, QR code) and latest TX.
+
+
+- Custom social links like twitter, facebook, instgram github, or others like coingecko, coinmarketcapm paprika or any other external links.
+
+#### Customizable panels
+
 - Customizable panels at the top of every page to display the following information:
   - **Network:** Displays the current network hash rate *\*only applicable to POW coins*
   - **Difficulty:** Displays the current proof-of-work and/or proof-of-stake difficulty
@@ -116,104 +217,47 @@ ___
   - **Price:** Displays the current market price (value measured using default market pair)
   - **Market Cap:** Displays the current market cap value in (value measured using default market pair)
   - **Logo:** Display an image of your coin logo
-- Configurable network charts that can be independently displayed in the header of any page
-  - **Hashrate chart:** Line graph listing of the estimated network hashes per second over the last number of blocks *\*Requires a full sync before network data will start being collected*
-  - **Difficulty chart:** Line graph listing of the block difficulty over the last number of blocks *\*Requires a full sync before network data will start being collected*
-- Add as many custom social links to the explorer footer as desired. Useful for linking to github, twitter, coinmarketcap or any other social media or external links as necessary. 
-- Custom rpc/api command support via mapping in settings.json per chain which increases blockchain compatibility.
-- Additional support for the following custom blockchain features:
-  - Bitcoin P2PK transactions
-    - Bitcoin rpc/api cmds:
-      - **getdescriptorinfo:** Accepts a descriptor as input and returns an object with more detailed information, including its computed checksum
-      - **deriveaddresses:** Accepts an output descriptor as input and returns an array containing one or more P2PKH addresses
-  - Heavycoin democratic voting and reward support
-    - **Reward Page:** Displays reward/voting information
-    - Heavycoin rpc/api cmds:
-      - **getmaxmoney:** Returns the number of coins that will be produced in total
-      - **getmaxvote:** Returns the maximum allowed vote for the current phase of voting
-      - **getvote:** Returns the current block reward vote setting
-      - **getphase:** Returns the current voting phase name
-      - **getreward:** Returns the current block reward
-      - **getsupply:** Returns the current money supply
-      - **getnextrewardestimate:** Returns an estimate for the next block reward based on the current state of decentralized voting
-      - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed
-    - Heavycoin public API's:
-      - **getmaxmoney:** Returns the maximum possible money supply
-      - **getmaxvote:** Returns the maximum allowed vote for the current phase of voting
-      - **getvote:** Returns the current block reward vote setting
-      - **getphase:** Returns the current voting phase
-      - **getreward:** Returns the current block reward, which has been decided democratically in the previous round of block reward voting
-      - **getsupply:** Returns the current money supply
-      - **getnextrewardestimate:** Returns an estimate for the next block reward based on the current state of decentralized voting
-      - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed
-  - Zcash/zk-SNARKs private tx support
-___
 
-### API functions
+- Configurable network charts that can independently be displayed at the top or bottom of any page. Supports individual mining algorithm configuration per blockchain.
+  - **Hashrate chart:** Line graph listing the estimated network hashes per second.
+  - **Difficulty chart:** Line graph listing the block difficulty.
 
-but-eiquidus supports the following API functions.
+### Blockchain Specific Functionality
 
-- **api/getblockchaininfo/{net}:** Returns statistics about the coin such as chain, header count, block count, difficulty, circulating supply or USD price.
-- **api/getmininginfo/{net}:** Returns statistics about the coin such as chain, header count, block count, difficulty, circulating supply or USD price.
-- **api/getdifficulty/{net}:** Returns the current difficulty.
-- **api/getconnectioncount/{net}:** Returns the number of connections the block explorer has to other nodes.
-- **api/getblockcount/{net}:** Returns the current block index.
-- **api/getblockhash/{net}?index={height}:** Returns the hash of the block at a specific index.
-- **api/getblock/{net}:** Returns information about the block with the given hash.
-- **api/getrawtransaction/{net}?txid={txid}&decrypt={0|1}:** Returns raw transaction representation for given transaction id.
-- **api/getnetworkhashps/{net}:** Returns the current network hashrate.
-- **api/getvotelist/{net}:** Returns the current vote list.
-- **api/getmasternodecount/{net}:** Returns the total number of masternodes on the network *\*only applicable to masternode coins*.
-
-- **ext/getmoneysupply/{net}:** Returns current money supply.
-- **ext/getdistribution/{net}:** Returns wealth distribution stats.
-- **ext/getaddress/{address}/{net}:** Returns information for given address.
-- **ext/getaddresstxs/{address}/{net}/{start}/{length}:** Returns transactions for a wallet address starting from a particular offset.
-- **ext/gettx/{hash}/{net}:** Returns information for given tx hash.
-- **ext/getbalance/{address}/{net}:** Returns current balance of given address.
-- **ext/getlasttxs/{net}/{min}/{length}/{start}:** Returns transactions greater than a specific number of coins, starting from a particular offset.
-- **ext/getcurrentprice/{net}:** Returns last known exchange prices.
-- **ext/getbasicstats/{net}:** Returns basic statistics about the coin including: block count, circulating supply, USD price, default market price and # of masternodes *\*# of masternodes is only applicable to masternode coins*.
-- **ext/getticker/{mode}/{net}:** Returns various ticker data.
-- **ext/getmarkets/{net}:** Returns various market data.
-- **ext/getsummary/{net}:** Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, default market price, network connection count, block count, count of online masternodes and count of offline masternodes *\*masternode counts are only applicable to masternode coins*.
-- **ext/getnetworkpeers/{net}:** Returns the list of network peers that have connected to the explorer node in the last 24 hours.
-- **ext/getmasternodelist/{net}:** Returns the complete list of masternodes on the network *\*only applicable to masternode coins*.
-- **ext/getmasternoderewards/{net}:** Returns a list of masternode reward transactions for a specific address that arrived after a specific block height *\*only applicable to masternode coins*.
-- **ext/getmasternoderewardstotal/{net}:** Returns the total number of coins earned in masternode rewards for a specific address that arrived after a specific block height *\*only applicable to masternode coins*.
-___
-
-### Exchanges
-
-but-eiquidus supports the following crypto currency exchanges.
-
-- [AltMarkets](https://altmarkets.io)
-- [Bittrex](https://bittrex.com)
-- [Bleutrade](https://bleutrade.com)
-- [BitxOnex](https://www.bitxonex.comrefid=ID1906858745)
-- [Bitoreum Exchange](https://www.bitoreum.exchange?refid=ID19CBFFCE97)
-- [Crex24](https://crex24.com)
-- [Dex-Trade](https://dex-trade.com)
-- [Exbitron](https://www.exbitron.com?refid=ID5FE45E2B3D)
-- [FreiExchange](https://freiexchange.com)/[FreiXLite](https://freixlite.com) *\*no chart support due to a lack of OHLCV api data*
-- [Poloniex](https://poloniex.com)
-- [SouthXchange](https://southxchange.com)
-- [Stex](https://stex.com)
-- [Txbit](https://txbit.io) *\*no chart support due to a lack of OHLCV api data*
-- [Unnamed](https://unnamed.exchange)
-- [Yobit](https://yobit.io) *\*no chart support due to a lack of OHLCV api data*
-___
+- Support for Dash special TX and extra payloads as described in [Dash Special Transactions](https://docs.dash.org/projects/core/en/stable/docs/reference/transactions-special-transactions.html).
+- Zcash/zk-SNARKs private TX support
+- Bitcoin P2PK transactions
+  - Bitcoin RPC / API commands:
+    - **getdescriptorinfo:** Accepts a descriptor as input and returns an object with more detailed information, including its computed checksum
+    - **deriveaddresses:** Accepts an output descriptor as input and returns an array containing one or more P2PKH addresses
+- Heavycoin democratic voting and reward support
+  - **Reward Page:** Displays reward/voting information
+  - Heavycoin RPC / API commands:
+    - **getmaxmoney:** Returns the number of coins that will be produced in total
+    - **getmaxvote:** Returns the maximum allowed vote for the current phase of voting
+    - **getvote:** Returns the current block reward vote setting
+    - **getphase:** Returns the current voting phase name
+    - **getreward:** Returns the current block reward
+    - **getsupply:** Returns the current money supply
+    - **getnextrewardestimate:** Returns an estimate for the next block reward based on the current state of decentralized voting
+    - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed
+  - Heavycoin public API's:
+    - **getmaxmoney:** Returns the maximum possible money supply
+    - **getmaxvote:** Returns the maximum allowed vote for the current phase of voting
+    - **getvote:** Returns the current block reward vote setting
+    - **getphase:** Returns the current voting phase
+    - **getreward:** Returns the current block reward, which has been decided democratically in the previous round of block reward voting
+    - **getsupply:** Returns the current money supply
+    - **getnextrewardestimate:** Returns an estimate for the next block reward based on the current state of decentralized voting
+    - **getnextrewardwhenstr:** Returns a string describing how long until the votes are tallied and the next block reward is computed.
 
 ### Installation
 
-#### Full Setup Guide
+#### Distributed Deployments
 
-While we do not yet have our own step-by-step setup instructions, there are a few well-written guides out there already that detail how to set up and install the [original iquidus explorer](https://github.com/iquidus/explorer). Because the setup process for iquidus is more-or-less identical to eIquidus at this moment in time (making changes to settings.json is probably the biggest difference although we have helpful comments for each setting), here are some of the more complete guides that may be useful for anyone who needs more detailed instructions than are provided in the [Quick Install Instructions](#quick-install-instructions):
+but-eiquidus is a multicoin explorer and requires a synchronized fully indexed node for each coin to enable full functionality. It supports distributed deployments to ensure scalability and reliability with low operating costs.
 
-1. [Beginners Guide for Iquidus Explorer Setup](https://gist.github.com/samqju/b9fc6c007f083e6429387051e24da1c3)
-2. [Node and Iquidus Explorer Setup for Dummies](https://gist.github.com/scottie/b6179c34ce3cf200fcc5d08727a46623)
-3. [Iquidus Block Explorer Guide](https://www.reddit.com/r/BiblePay/comments/7elm7r/iquidus_block_explorer_guide)
-4. [The Ultimate Iquidus Explorer Installation Guide - WAYBACKMACHINE](https://web.archive.org/web/20210228210054/https://stakeandnodes.net/iquidus-explorer-installation-guide/)
+Instances or clusters can perform tasks for one or more coins in different roles such as explorer frontend or data synchronizer. Blockchain nodes, frontends, data synchronizers and databases can be operated on separate hosts. Frontends can be configured with individual caching options.
 
 #### Quick Install Instructions
 
@@ -275,7 +319,7 @@ ___
 
 #### Start Explorer (Use for Testing)
 
-You can launch the explorer in a terminal window that will output all warnings and error msgs with one of the following cmds (be sure to run from within the explorer directory):
+You can launch the explorer in a terminal window that will output all warnings and error msgs with one of the following commands (be sure to run from within the explorer directory):
 
 ```
 npm start
@@ -303,7 +347,7 @@ cd /path/to/explorer && /path/to/npm run prestart && /path/to/node --stack-size=
 
 #### Stop Explorer (Use for Testing)
 
-To stop the explorer running with `npm start` you can end the process with the key combination `CTRL+C` in the terminal that is running the explorer, or from another terminal you can use one of the following cmds (be sure to run from within the explorer directory):
+To stop the explorer running with `npm start` you can end the process with the key combination `CTRL+C` in the terminal that is running the explorer, or from another terminal you can use one of the following commands (be sure to run from within the explorer directory):
 
 ```
 npm stop
@@ -319,7 +363,7 @@ cd /path/to/explorer && /path/to/node ./scripts/stop_explorer.js
 
 [PM2](https://www.npmjs.com/package/pm2) is a process manager for Node.js applications with a built-in load balancer that allows you to always keep the explorer alive and running even if it crashes. Once you have configured the explorer to work properly in a production environment, it is recommended to use PM2 to start and stop the explorer instead of `npm start` and `npm stop` to keep the explorer constantly running without the need to always keep a terminal window open.
 
-You can start the explorer using PM2 with one of the following terminal cmds (be sure to run from within the explorer directory):
+You can start the explorer using PM2 with one of the following terminal commands (be sure to run from within the explorer directory):
 
 ```
 npm run start-pm2
@@ -339,7 +383,7 @@ which pm2
 
 #### Start Explorer Using PM2 and Log Viewer
 
-Alternatively, you can start the explorer using PM2 and automatically open the log viewer which will allow for viewing all warnings and error msgs as they come up by using one of the following terminal cmds (be sure to run from within the explorer directory):
+Alternatively, you can start the explorer using PM2 and automatically open the log viewer which will allow for viewing all warnings and error msgs as they come up by using one of the following terminal commands (be sure to run from within the explorer directory):
 
 ```
 npm run start-pm2-debug
@@ -353,7 +397,7 @@ cd /path/to/explorer && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./
 
 #### Stop Explorer Using PM2 (Recommended for Production)
 
-To stop the explorer when it is running via PM2 you can use one of the following terminal cmds (be sure to run from within the explorer directory):
+To stop the explorer when it is running via PM2 you can use one of the following terminal commands (be sure to run from within the explorer directory):
 
 ```
 npm run stop-pm2
@@ -367,7 +411,7 @@ cd /path/to/explorer && /path/to/pm2 stop explorer
 
 #### Reload Explorer Using PM2 (Recommended for Production)
 
-The explorer can be stopped and restarted in a single cmd when it is running via PM2, which is often necessary after updating the explorer code for example. Use one of the following terminal cmds to reload the explorer (be sure to run from within the explorer directory):
+The explorer can be stopped and restarted in a single cmd when it is running via PM2, which is often necessary after updating the explorer code for example. Use one of the following terminal commands to reload the explorer (be sure to run from within the explorer directory):
 
 **NOTE:** Assuming the explorer has access to 2 or more cpus, this reload will be done in such a way that there will be zero-downtime while the restart is being performed. If you only have a single cpu then the explorer will be inaccessible for a few seconds while the restart is being performed.
 
@@ -827,25 +871,25 @@ Where [SIZE] is an integer higher than the default.
 
 *note: SIZE will depend on which blockchain you are using, you may need to play around a bit to find an optimal setting*
 
-
 **Error: bind EACCES ...**
 
 This error can appear when you try to run the explorer on a port number lower than 1024. There are a couple solutions to this problem which are explained in more detail in the [Run Express Webserver on Port 80](#run-express-webserver-on-port-80) section.
-___
+
 
 ### Donations / Support Us
 
-The eIquidus block explorer is brought to you by the tireless efforts of the [Exor development team](https://exor.io/#section-team) for the benefit of the greater crypto community. If you enjoy our work, please consider supporting our continued development of this and many other cool crypto projects which you can find on our [github page](https://github.com/team-exor).
+If you enjoy our work, please consider supporting our continued development of this project which you can find on our [github page](https://github.com/miningplanet).
 
 Please consider supporting us with a small donation by sending us some cryptocurrency:
 
-- **BTC:** [15zQAQFB9KR35nPWEJEKvmytUF6fg2zvdP](https://www.blockchain.com/btc/address/15zQAQFB9KR35nPWEJEKvmytUF6fg2zvdP)
-- **EXOR:** [EYYW8Nvz5aJz33M3JNHXG2FEHWUsntozrd](https://explorer.exor.io/address/EYYW8Nvz5aJz33M3JNHXG2FEHWUsntozrd)
+- **BUTK:** [XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs](https://explorer.butkoin.com/address/XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs/mainnet)
+- **BTRM:** [BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL](https://explorer.butkoin.com/address/BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL/bitoreum)
 
-We also encourage submitting quality pull requests from software developers looking to help make the block explorer even better.
+We also encourage submitting quality pull requests from developers to further improve but-eiquius.
 
 ### Special Thanks
 
+- **[Team Exor](https://github.com/team-exor):** from which this project had been forked -> [eiquidus](https://github.com/team-exor/eiquidus)
 - **[Luke Williams (aka iquidus)](https://github.com/iquidus):** for creating the original [Iquidus explorer](https://github.com/iquidus/explorer)
 - **[Alan Rudolf (aka suprnurd)](https://github.com/suprnurd):** for the custom changes found in the [Ciquidus explorer](https://github.com/suprnurd/ciquidus)
 - **[Tim Garrity (aka uaktags)](https://github.com/uaktags):** for his many contributions to the Iquidus explorer and custom features from the [uaktags explorer](https://github.com/uaktags/explorer)
