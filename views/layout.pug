@@ -797,11 +797,6 @@ html(lang='en')
           var oPanel = document.getElementById(panelName);
           if (typeof(oPanel) != 'undefined' && oPanel != null) {
             document.getElementById(panelName).innerHTML=getActivePanel(panelID);
-
-            if (panelID == 'logo_panel') {
-              // Remove css classes from logo panel
-              $(oPanel).removeClass();
-            }
           }
         }
         function hideMarketDropdown() {
@@ -1111,9 +1106,7 @@ html(lang='en')
     if shared_pages.page_header.sticky_header == true
       - headerClasses.push('fixed-top');
     if shared_pages.page_footer.sticky_footer == true
-      //- if (outerWidth() > 991) {
       - footerClasses.push('fixed-bottom');
-      //- }
     if shared_pages.page_header.bgcolor != null && shared_pages.page_header.bgcolor != ''
       - headerClasses.push('bg-' + shared_pages.page_header.bgcolor);
       - dropdownClasses.push('bg-' + shared_pages.page_header.bgcolor);
@@ -1328,14 +1321,14 @@ html(lang='en')
                   span.fas.fa-exclamation-triangle(style='margin-right:5px;')
                   strong #{settings.locale.ex_warning}
                 div #{settings.locale.initial_index_alert}
-          if showPanels == true || (search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header')
+          if (showPanels == true && showPanelsPosition == 'top') || (search_enabled == true && shared_pages.page_header.search.position == 'below-header')
             .col-lg-12
-              if showPanels == true
+              if showPanels == true && showPanelsPosition == 'top'
                 div#cockpit.row.text-center.d-flex.justify-content-center
-                  div(class="col-lg-2 col-lg-offset-" + settings.panelOffset(net))
-                    - if (settings.panel(1, net) != '') {
+                  - if (settings.panel(1, net) != '') {
+                    div(class="col-lg-2 col-lg-offset-" + settings.panelOffset(net))
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlOne')
-                    - }
+                  - }
                   - if (settings.panel(2, net) != '') {
                     .col-lg-2
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlTwo')
@@ -1349,14 +1342,14 @@ html(lang='en')
                       .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFour')
                   - }
                   - if (settings.panel(5, net) != '') {
-                  .col-lg-2
-                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
+                    .col-lg-2
+                      .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
                   - }
                   - if (settings.panel(6, net) != '') {
-                  .col-lg-2
-                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
+                    .col-lg-2
+                      .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
                   - }
-              if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'below-header'
+              if search_enabled == true && shared_pages.page_header.search.position == 'below-header'
                 div#search-row.row.text-center
                   form.form-inline.col-12.d-flex.justify-content-center(method='post', action='/search/' + net)
                     #index-search.form-group.d-flex.justify-content-center
@@ -1364,6 +1357,33 @@ html(lang='en')
                       button.btn.btn-success(type='submit') #{settings.locale.ex_search_button}
           if shared_pages.page_header.network_charts.align == 'bottom'
             block content
+          if showPanels == true && showPanelsPosition == 'center'
+            .col-lg-12
+              div#cockpit.row.text-center.d-flex.justify-content-center
+                - if (settings.panel(1, net) != '') {
+                  div(class="col-lg-2 col-lg-offset-" + settings.panelOffset(net))
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlOne')
+                - }
+                - if (settings.panel(2, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlTwo')
+                - }
+                - if (settings.panel(3, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlThree')
+                - }
+                - if (settings.panel(4, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFour')
+                - }
+                - if (settings.panel(5, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
+                - }
+                - if (settings.panel(6, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
+                - }
           if network_history.enabled == true && ((showNethashChart == true && nethash_enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && difficulty_enabled == true))
             .container
               .row.align-items-start
@@ -1396,6 +1416,33 @@ html(lang='en')
                           button(onclick='diffonlyasic()') ASIC
           if shared_pages.page_header.network_charts.align == 'top'
             block content
+          if showPanels == true && showPanelsPosition == 'bottom'
+            .col-lg-12
+              div#cockpit.row.text-center.d-flex.justify-content-center
+                - if (settings.panel(1, net) != '') {
+                  div(class="col-lg-2 col-lg-offset-" + settings.panelOffset(net))
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlOne')
+                - }
+                - if (settings.panel(2, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlTwo')
+                - }
+                - if (settings.panel(3, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlThree')
+                - }
+                - if (settings.panel(4, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFour')
+                - }
+                - if (settings.panel(5, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlFive')
+                - }
+                - if (settings.panel(6, net) != '') {
+                  .col-lg-2
+                    .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
+                - }
     footer
       div#social
         each social in shared_pages.page_footer.social_links

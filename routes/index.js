@@ -638,6 +638,7 @@ function param(pageKey, page, coin, net, db, settings, prefix) {
     page_title_prefix: prefix,
     shared_pages: shared_pages,
     showPanels: page.show_panels,
+    showPanelsPosition: page.show_panels_position,
     showNethashChart: page.show_nethash_chart,
     showDifficultyChart: page.show_difficulty_chart,
     coin: coin,
