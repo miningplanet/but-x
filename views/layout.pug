@@ -17,6 +17,7 @@ html(lang='en')
   - const search_enabled = shared_pages.page_header.search.enabled
   - const nethash_enabled = shared_pages.page_header.network_charts.nethash_chart.enabled
   - const difficulty_enabled = shared_pages.page_header.network_charts.difficulty_chart.enabled
+  - const home_url = settings.get(net, 'home_url')
   head
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -70,7 +71,6 @@ html(lang='en')
       var sideMarketVisible = false;
       var topMenuExpanded = false;
       var sideBarClasses = '!{sideBarClasses}'.replace(/,/g, " ");
-      /* Special thanks to the stackoverflow community for the getParameterByName function: https://stackoverflow.com/a/901144/3038650 */
       function undefinedOrFalse(i) {
         return typeof i === 'undefined' || i == null || i == false;
       }
@@ -1142,11 +1142,11 @@ html(lang='en')
                 button.navbar-light.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
                   span.navbar-toggler-icon
             if shared_pages.page_header.home_link == 'title'
-              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{shared_pages.page_title}
+              a.navbar-brand(href=home_url, style='order:-1;') #{shared_pages.page_title}
             else if shared_pages.page_header.home_link == 'coin'
-              a.navbar-brand(href='https://butkoin.com', style='order:-1;') #{coin.name}
+              a.navbar-brand(href=home_url, style='order:-1;') #{coin.name}
             else if shared_pages.page_header.home_link == 'logo'
-              a(href='https://butkoin.com', alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
+              a(href=home_url, alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
                 img.logo-main(src=(shared_pages.page_header.home_link_logo == null || shared_pages.page_header.home_link_logo == '' ? shared_pages.logo : shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
             .collapse.navbar-collapse(id='navbar-collapse')
               ul.navbar-nav(style='width:100%;')

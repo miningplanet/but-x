@@ -4,6 +4,9 @@
   Please edit settings.json, not settings.json.template
 */
 {
+  // The URL of the embedding site.
+  "home_url": "https://butkoin.com",
+
   // locale: Change language definitions. Only English is supported for now
   "locale": "locale/en.json",
 
