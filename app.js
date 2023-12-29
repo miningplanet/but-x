@@ -1071,6 +1071,7 @@ networks.forEach( function(item, index) {
 app.set('explorer_version', package_metadata.version);
 app.set('locale', locale);
 app.set('get', settings.get);
+app.set('getWallet', settings.getWallet);
 app.set('isButkoin', settings.isButkoin);
 app.set('getLogo', settings.getLogo);
 app.set('getTitleLogo', settings.getTitleLogo);
@@ -1080,6 +1081,7 @@ app.set('panelOffset', settings.panelOffset);
 app.set('panel', settings.panel);
 app.set('panels', settings.panels);
 app.set('coins', settings.coins);
+app.set('wallets', settings.wallets);
 app.set('default_wallet', settings.wallets[0].id);
 app.set('currencies', settings.currencies);
 app.set('cache', settings.cache);

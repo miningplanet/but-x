@@ -178,10 +178,8 @@
       // Home link settings (top-left corner of the header menu).
       // title: display "shared_pages.page_title" text setting
       // coin: display "coin.name" text setting
-      // logo: display the "shared_pages.page_header.home_link_logo"
+      // logo: display the "wallets[net].logo_title"
       "home_link": "logo",
-      // Logo image to be displayed on page header when the "shared_pages.page_header.home_link" setting is set to "logo".
-      "home_link_logo": "/img/logo.svg",
       // The max-height value of the "shared_pages.page_header.home_link" logo image in pixel.
       "home_link_logo_height": 50,
       // panels: default settings for panels displayed on page header (NOTE: you can show/hide the entire group of panels on each page independently).

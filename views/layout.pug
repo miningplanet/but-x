@@ -18,6 +18,7 @@ html(lang='en')
   - const nethash_enabled = shared_pages.page_header.network_charts.nethash_chart.enabled
   - const difficulty_enabled = shared_pages.page_header.network_charts.difficulty_chart.enabled
   - const home_url = settings.get(net, 'home_url')
+  - const logo_title = settings.getWallet(net).logo_title
   head
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
@@ -1143,7 +1144,7 @@ html(lang='en')
               a.navbar-brand(href=home_url, style='order:-1;') #{coin.name}
             else if shared_pages.page_header.home_link == 'logo'
               a(href=home_url, alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
-                img.logo-main(src=(shared_pages.page_header.home_link_logo == null || shared_pages.page_header.home_link_logo == '' ? shared_pages.logo : shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
+                img.logo-main(src=(logo_title), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
             .collapse.navbar-collapse(id='navbar-collapse')
               ul.navbar-nav(style='width:100%;')
                 li#home.nav-item
@@ -1229,7 +1230,7 @@ html(lang='en')
               a.navbar-brand.nav-link(href='/', style='order:-1;') #{coin.name}
             else if shared_pages.page_header.home_link == 'logo'
               a(href='/', alt=coin.name + ' Home', title=coin.name + ' Home', style='order:-1;', data-bs-toggle='tooltip', data-bs-placement='bottom')
-                img.logo-main(src=(shared_pages.page_header.home_link_logo == null || shared_pages.page_header.home_link_logo == '' ? shared_pages.logo : shared_pages.page_header.home_link_logo), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
+                img.logo-main(src=(logo_title), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
             div#side-header-toggle.side-header-toggle
               span.fas.fa-bars(alt='Expand Menu', title='Expand Menu', data-bs-toggle='tooltip', data-bs-placement='right')
             if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'

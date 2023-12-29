@@ -26,7 +26,7 @@ block content
         strong #{settings.locale.api_documentation}
       .card-body
         if api_page.show_logo == true
-          img(src=shared_pages.logo, style='margin:0;height:128px;')
+          img(src=settings.getWallet(net).logo_title, style='margin:0;height:128px;')
           hr
         if !api_page.public_apis.hide_rpc_api_section
           h3 #{settings.locale.api_calls}
