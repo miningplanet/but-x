@@ -138,6 +138,8 @@
     "theme": "Darkly",
     // Displayed at the end of the HTML title tag and also in the page header if "shared_pages.page_header.home_link" is set to "title".
     "page_title": "butkoin.com",
+    "page_description": "Secure digital currency and asset storage. Butkoin supports instant transactions, CPU, GPU, ASIC mining and PoSe Smartnodes.",
+    "page_tags": "crypto, currency, coin, governance, secure, bitcoin, explorer, mining, Ghostrider, Yespower, Lyra2, Sha256d, Scrypt, defi markets",
     // Base directory is public
     "favicon32": "img/logo.svg",
     "favicon128": "img/logo.svg",

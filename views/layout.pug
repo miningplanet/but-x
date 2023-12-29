@@ -22,6 +22,9 @@ html(lang='en')
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
     meta(http-equiv='Content-Language', content='en')
+    meta(name='title', content=shared_pages.page_title)
+    meta(name='description', content=shared_pages.page_description)
+    meta(name='tags', content=shared_pages.page_tags)
     title=(page_title_prefix == null || page_title_prefix == '' ? settings.locale.error_title.replace('{1}', coin.name) : page_title_prefix) + ' - ' + shared_pages.page_title
     if shared_pages.favicons.favicon32 != ''
       link(rel='icon', href='/' + shared_pages.favicons.favicon32, sizes='32x32')
