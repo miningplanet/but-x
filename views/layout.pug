@@ -229,7 +229,7 @@ html(lang='en')
           if ($('#' + loadingElement).length) {
             $('#' + loadingElement).fadeOut('slow', function() {
               $('#' + loadingElement).remove();
-              $('#' + dataElement).fadeIn();
+              $('#' + dataElement).fadeIn(20);
             });
           }
         }
@@ -411,15 +411,10 @@ html(lang='en')
                         }
                       },
                       scales: {
-                        yAxis: {
-                          title: {
-                            display: true,
-                            text: 'Network (MH/s)',
-                            font: {
-                              weight: 'bold'
-                            }
-                          },
-                          type: 'linear'
+                        y: {
+                          ticks: {
+                              callback: (val) => (val.toExponential(1))
+                          }
                         }
                       },
                       plugins: {
@@ -497,7 +492,7 @@ html(lang='en')
                       }
                     }
                   });
-                  $('#nethashChartParent').fadeIn();
+                  $('#nethashChartParent').fadeIn(20);
                 } else {
                   nethashChart.data.labels = result.map(function(a) {return a.blockindex;});
                   nethashChart.data.datasets[0].data = result.map(function(a) {return a.nethash;});
@@ -615,15 +610,10 @@ html(lang='en')
                         }
                       },
                       scales: {
-                        yAxis: {
-                          title: {
-                            display: true,
-                            text: 'Difficulty',
-                            font: {
-                              weight: 'bold'
-                            }
-                          },
-                          type: 'logarithmic'
+                        y: {
+                          ticks: {
+                              callback: (val) => (val.toExponential(1))
+                          }
                         }
                       },
                       plugins: {
@@ -679,7 +669,7 @@ html(lang='en')
                       }
                     }
                   });
-                  $('#difficultyChartParent').fadeIn();
+                  $('#difficultyChartParent').fadeIn(20);
                 } else {
                   difficultyChart.data.labels = result.map(function(a) {return a.blockindex;});
 

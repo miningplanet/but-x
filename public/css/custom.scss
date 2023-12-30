@@ -1,95 +1,206 @@
 /* Add custom css rules here */
 :root {
-    --but: #00ee43; --but2: #adff2f; --navbg: #000; --bg1: #08022a; --bg2: #040116; --fg: #0f0; --fgs: #0b0; --fgt: #cdc; --fgt2: #889988; --fgt3: #606060; --fgt4: #444;--fgs1: #fff;  --fgs2: #ecc502; --fgs3: #f32;
-    --bs-body-bg: #080808;
+    --but: #00ee43;
+    --but2: #adff2f; /* green yellow */
+    --bg0: #000;
+    --bg1: #08022a;
+    --bg2: #040116;
+    --fg: #0f0;
+    --fgs: #0b0;
+    --fgt: #cdc;
+    --fgt2: #889988;
+    --fgs2: #ecc502;
+    --fgs3: #f32;
+    --bs-body-bg: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%);
+    --title-shadow: 0.2rem 0.2rem 0.1rem #000;
+    --panel-border: none;
     --width-col-entity: 20px;
     --xs-width-col-country: 30px;
     --xs-2-col-label-width: 45%;
     --xs-2-col-label-width-min: 250px;
-    --image-butkoin: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360"><g style="fill:rgb(0,255,0);stroke:rgb(100,255,100);stroke-width:0.1vw"><path d="M191.454 39.202 C 189.504 39.388,186.624  39.815,185.054 40.152 C 183.484 40.488,181.120 40.868,179.800 40.996 C  174.615 41.499,153.808 46.921,150.255 48.696 C 149.625 49.010,148.109  49.528,146.886 49.846 C 134.930 52.961,112.420 66.368,97.933 79.005 C  95.660 80.987,92.904 83.327,91.809 84.205 C 89.206 86.290,85.287  90.303,81.800 94.453 C 80.260 96.286,78.080 98.778,76.954 99.993 C  75.829 101.207,73.039 104.763,70.754 107.895 C 63.731 117.521,61.463  121.156,56.740 130.351 C 55.680 132.414,54.661 134.304,54.474 134.551 C  53.895 135.317,51.149 142.011,49.778 146.000 C 49.060 148.090,47.898  151.420,47.195 153.400 C 46.493 155.380,45.573 158.260,45.151 159.800 C  42.785 168.435,41.505 173.818,41.012 177.200 C 40.708 179.290,40.172  182.334,39.821 183.964 C 38.208 191.469,38.223 222.354,39.844 229.800 C  40.179 231.340,40.697 234.220,40.994 236.200 C 42.104 243.593,43.972  250.086,49.682 266.400 C 56.991 287.279,76.056 312.588,97.199 329.480 C  97.530 329.744,99.100 331.038,100.688 332.356 C 102.276 333.674,104.436  335.245,105.488 335.848 C 106.540 336.451,108.390 337.602,109.600  338.406 C 114.794 341.858,123.148 346.512,127.000 348.100 C 127.880  348.463,129.950 349.331,131.600 350.029 C 137.303 352.443,143.551  354.577,149.622 356.183 C 151.505 356.681,153.398 357.278,153.830  357.509 C 154.262 357.740,156.142 358.151,158.008 358.422 C 159.873  358.692,162.120 359.169,163.000 359.481 C 163.880 359.792,167.120  360.300,170.200 360.609 C 173.280 360.917,176.970 361.389,178.400  361.657 C 181.884 362.310,200.116 362.310,203.600 361.657 C 205.030  361.389,208.732 360.919,211.826 360.612 C 214.920 360.304,218.160  359.781,219.026 359.450 C 219.892 359.118,221.892 358.656,223.472  358.424 C 225.052 358.191,226.852 357.798,227.472 357.548 C 228.092  357.299,229.860 356.766,231.400 356.363 C 234.270 355.612,240.284  353.598,241.000 353.149 C 241.220 353.011,242.410 352.608,243.645  352.254 C 244.880 351.900,246.410 351.339,247.045 351.007 C 247.680  350.676,248.369 350.404,248.575 350.402 C 251.231 350.385,271.063  338.414,279.000 332.038 C 285.878 326.512,298.319 313.725,302.252  308.139 C 304.203 305.367,306.160 302.603,306.600 301.997 C 311.224  295.619,315.348 288.317,317.779 282.200 C 318.391 280.660,319.213  278.770,319.606 278.000 C 320.000 277.230,320.508 275.970,320.736  275.200 C 320.964 274.430,321.809 272.090,322.614 270.000 C 323.419  267.910,324.331 265.210,324.640 264.000 C 324.950 262.790,325.551  260.630,325.978 259.200 C 326.404 257.770,326.870 255.880,327.012  255.000 C 327.155 254.120,327.612 252.140,328.028 250.600 C 328.720  248.038,329.992 236.570,330.623 227.200 C 330.764 225.110,330.679  221.330,330.433 218.800 C 330.188 216.270,329.728 211.541,329.412  208.292 C 329.096 205.043,328.482 201.083,328.049 199.492 C 327.615  197.901,327.141 195.790,326.995 194.800 C 326.271 189.881,320.465  174.084,316.410 166.000 C 312.269 157.744,302.409 143.827,300.158  143.060 C 299.051 142.683,297.761 143.393,293.400 146.779 C 292.080  147.805,289.740 149.463,288.200 150.464 C 286.660 151.465,284.205  153.255,282.745 154.442 C 279.820 156.820,271.082 163.336,263.011  169.160 C 249.979 178.563,250.482 177.802,254.330 182.283 C 263.741  193.244,267.299 201.723,269.207 217.735 C 270.005 224.432,270.052  225.721,269.632 229.335 C 269.372 231.571,268.976 235.020,268.753  237.000 C 267.523 247.922,262.188 260.683,255.208 269.400 C 253.975  270.940,252.306 273.114,251.499 274.231 C 245.365 282.728,225.632  295.341,214.600 297.817 C 213.280 298.113,211.457 298.619,210.548  298.943 C 209.640 299.266,207.930 299.634,206.748 299.761 C 191.050  301.447,189.896 301.475,180.200 300.394 C 170.335 299.295,156.185  295.145,151.000 291.830 C 150.560 291.549,148.940 290.628,147.400  289.784 C 143.031 287.390,135.965 282.847,134.200 281.298 C 126.389  274.444,119.027 266.269,115.600 260.646 C 114.170 258.299,112.480  255.529,111.844 254.489 C 108.836 249.572,106.166 243.561,104.165  237.200 C 103.646 235.550,102.963 233.390,102.647 232.400 C 100.159  224.594,98.972 195.445,100.863 188.600 C 101.228 187.280,101.646  185.300,101.793 184.200 C 102.336 180.129,105.615 170.238,108.600  163.667 C 111.534 157.210,116.969 147.694,120.184 143.387 C 122.584  140.171,127.030 134.971,128.198 134.015 C 128.859 133.474,131.200  131.204,133.400 128.972 C 135.600 126.740,138.480 124.111,139.800  123.129 C 141.120 122.148,142.917 120.817,143.794 120.172 C 148.794  116.495,162.150 109.474,168.800 107.027 C 170.450 106.420,172.566  105.582,173.501 105.166 C 174.437 104.750,175.967 104.304,176.901  104.177 C 177.836 104.049,180.040 103.515,181.800 102.991 C 183.560  102.467,186.980 101.732,189.400 101.359 C 191.820 100.985,194.700  100.540,195.800 100.369 C 199.681 99.766,219.874 99.954,224.200 100.633  C 226.400 100.979,229.730 101.493,231.600 101.776 C 233.470  102.059,236.350 102.661,238.000 103.115 C 239.650 103.569,241.720  104.111,242.600 104.319 C 243.480 104.527,245.100 105.015,246.200  105.403 C 252.604 107.660,254.753 108.486,256.079 109.202 C 256.893  109.641,257.750 110.000,257.984 110.000 C 258.637 110.000,264.353  112.788,266.600 114.202 C 267.700 114.894,270.220 116.304,272.200  117.334 C 278.678 120.706,286.557 126.903,297.089 136.914 C 301.340  140.954,300.776 140.920,305.536 137.415 C 306.931 136.389,309.351  134.729,310.914 133.727 C 312.477 132.725,315.565 130.440,317.778  128.649 C 319.990 126.857,322.430 124.949,323.200 124.407 C 323.970  123.865,324.780 123.280,325.000 123.106 C 327.360 121.244,329.183  119.933,332.400 117.785 C 336.807 114.843,347.897 106.681,348.848  105.681 C 349.335 105.169,349.412 104.701,349.160 103.792 C 348.719  102.204,334.526 87.538,330.822 84.844 C 329.306 83.741,326.836  81.787,325.333 80.502 C 323.830 79.217,321.880 77.637,321.000 76.992 C  320.120 76.347,318.500 75.073,317.400 74.162 C 314.080 71.413,302.531  63.936,296.767 60.803 C 290.056 57.156,279.100 52.122,275.000 50.802 C  272.800 50.093,269.830 49.091,268.400 48.575 C 264.249 47.076,252.934  43.779,250.600 43.387 C 249.720 43.240,247.567 42.764,245.816 42.329 C  244.064 41.895,240.734 41.291,238.416 40.987 C 236.097 40.683,232.760  40.142,231.000 39.786 C 227.304 39.038,197.759 38.602,191.454 39.202  M202.400 163.234 C 192.763 164.050,182.540 168.815,175.059 175.976 C  159.591 190.783,157.817 217.236,171.383 230.800 C 177.206  236.621,184.767 239.071,194.726 238.363 C 202.930 237.780,210.045  230.976,209.503 224.231 C 209.189 220.316,206.664 216.245,204.031  215.410 C 202.137 214.809,203.452 213.685,224.746 197.707 C 228.626  194.795,232.520 191.813,233.400 191.079 C 235.787 189.089,240.591  185.549,244.178 183.137 C 248.089 180.506,249.033 179.349,248.399  177.957 C 247.781 176.602,241.394 171.940,236.720 169.435 C 233.042 167.462,231.873 167.022,224.000 164.637 C 218.648 163.016,210.907 162.513,202.400 163.234" fill-rule="evenodd" transform="translate(-16,-20)"></path></g></svg>');
 }
 
-*, ::after, ::before { box-sizing: border-box; }
+.alert, .alert A {
+    color: var(--fgs2) !important;
+    animation: blink-animation 3s steps(10, start) infinite;
+    -webkit-animation: blink-animation 3s steps(10, start) infinite;
+}
 
-/* { box-sizing: border-box } */
-/* html { background: transparent } */
+.btn, .form-control, select {
+    border: solid 1px var(--fgt2); border-radius: 0.25rem;
+}
 
-body { min-height: 100vh; display: block !important; align-items: baseline; font-family: 'Courier New',monospace !important; background: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%); }
-table { table-layout: fixed; padding: 1px }
-table thead th { background-color: transparent !important }
-tbody tr td a, div.card-body a, input, select, option, .btn, .form-control { background-color: transparent !important; color: greenyellow !important }
-tbody td { padding: 4px 6px !important }
-.btn, .form-control, select { border: solid 1px #aaa; border-radius: 0.25rem }
-.text-success { color: rgba(213,255,87) !important }
-code { color: #adff2f !important }
+#page-title {
+    text-shadow: var(--title-shadow);
+}
 
-h1,h2,h3,h4,h5,h6,i { color: var(--fgt) !important }
-p,a,b,small,span { color: var(--fgt2) !important }
-span.pos, td.pos { color: var(--fgs) !important }
-span.neg, td.neg { color: var(--fgs3) !important }
-strong,#mainnav a,div#cr p small { color: var(--fgt2) !important }
-h1,h2,h3 { font-weight: 500; line-height: 1.2rem }
-h1 { font-size: 1.75rem; text-shadow: 0.2rem 0.2rem 0.1rem #000 }
-h2 { font-size: 1.5rem; text-shadow: 0.2rem 0.2rem 0.1rem #000 }
-h3 { font-size: 1.45rem; text-shadow: 0.2rem 0.2rem 0.1rem #000 }
-h4 { font-size: 1.40rem }
-h5 { font-size: 1.35rem }
-h6 { font-size: 1.25rem }
-p,a { text-decoration: none }
-a[target="_blank"]::after { content: ''; background: var(--icon-external-link) no-repeat; padding-right: 0.8rem; }
+body {
+    background: var(--bs-body-bg);
+}
 
-img.logo-main { margin-right: 14px !important }
+tbody tr.active {
+    background: var(--fgs3) !important;
+    border-color: var(--but2) !important;
+}
 
-a.page-link { background-color: transparent !important }
+tbody tr td a, div.card-body a, input, select, option, .btn, .form-control {
+    background-color: transparent !important;
+    color: var(--but2) !important;
+}
 
-.navbar-light .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28173, 255, 47, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important; }
-div.navbar { height: 54px }
+tbody td {
+    padding: 4px 6px !important;
+}
+ 
+code, .text-success {
+    color: var(--but2);
+}
+
+h1, h2 ,h3 ,h4 ,h5 ,h6 ,i {
+    color: var(--fgt) !important;
+    text-shadow: var(--title-shadow);
+}
+
+p, a, b, small, span, strong, #mainnav a, div#cr p small {
+    color: var(--fgt2) !important;
+}
+
+span.pos, td.pos {
+    color: var(--fgs) !important;
+}
+
+span.neg, td.neg {
+    color: var(--fgs3) !important;
+}
+
+span.rdate {
+    visibility: visible !important
+}
+
+p, a {
+    text-decoration: none;
+}
+
+a[target="_blank"]::after {
+    content: '';
+    background: var(--icon-external-link) no-repeat;
+    padding-right: 0.8rem;
+}
+
+img.logo-main {
+    margin-right: 14px !important;
+}
+
+.navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28173, 255, 47, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
 div.navbar div.container { margin-top: 6px }
-.bg-black { background-color: #000 !important }
-div#navbar-collapse { background: #000 }
+
+div#navbar-collapse {
+    background: var(--bg0)
+}
+
+/* body-container > main-container > main-child-container */
 div#main-child-container div.col-lg-12 { margin-top: 30px !important; }
-div#body-container { margin: 50px auto !important }
 
-div.container { display: block; max-width: 1180px !important; padding: 4px 7px 4px 4px !important; background: transparent  } /* transform-style: preserve-3d; */
+div.container {
+    max-width: 1180px !important;
+    padding: 4px 7px 4px 4px !important;
+} /* transform-style: preserve-3d; */
 
-div#page-header-container { margin-top: 15px !important; align-items: flex-start; display: flex  }
+div.align-items-start {
+    margin-bottom: 10px !important;
+}
 
-#page-title { margin: 0 }
-H3#page-title { font-size: calc(1.325rem + .9vw); font-weight: 500; line-height: 1.2; text-shadow: .2rem .2rem .1rem #000; }
-.sub-page-header { font-size: 90% };
-.sub-page-header .fw-bold { font-weight: 700 !important; }
+div#pnlOne, div#pnlTwo, div#pnlThree, div#pnlFour, div#pnlFive, div#pnlSix {
+    border: var(--panel-border) !important
+}
 
-div.align-items-start { margin-bottom: 20px !important; } 
-div.border-0 { min-height: 40px !important; border: solid 2px black !important }
-div.card, div.card-header { background: transparent !important }
-div.card-header, div.card-body { border: none !important }
-div#pnlOne, div#pnlTwo, div#pnlThree, div#pnlFour, div#pnlFive, div#pnlSix { border: none !important }
-div#pnlThree { margin-bottom: 25px !important }
+div#cockpit div.card-header, div#cockpit div.card-body {
+    padding: 1px
+}
 
-div#cockpit div.card-header, div#cockpit div.card-body { padding: 1px }
+div#cockpit div.card-body label strong {
+    font-size: 22px !important
+}
 
-div#cockpit div.card-body label strong { font-size: 22px !important }
+div.border-0 {
+    border: solid 2px var(--bg0) !important;
+    border-radius: 0.5rem !important;
+}
 
-footer div.navbar-nav label.nav-link { color: greenyellow !important }
-footer { min-height: 120px; height: auto; padding-top: 1rem !important; text-align: center !important }
-footer a span { margin: 6px; display: inline-block; width: 36px; height: 36px; }
+div.card, div.card-header {
+    background: transparent !important
+}
+
+div.card-header, div.card-body {
+    border: none !important
+}
+
+footer div.navbar-nav label.nav-link {
+    color: var(--but2)!important
+}
 
 /* Footer */
-footer { position: relative; display: block; margin: 20px 0 0 0; min-height: 120px; height: auto; width: 100%; padding: 0 1.5rem 1rem 1.5rem; text-align: center;  background: #000; border: none; z-index: 100; }
-footer div#social { position: relative; margin: 0 auto }
-footer div#social a[target="_blank"]::after { content: ''; background: var(--icon-external-link) no-repeat; padding-right: 0 }
-footer div#copy { display: flex; -ms-flex-direction: column; flex-direction: column }
-footer div#copy small { font-size: 11px !important }
-footer div.blocks { position: absolute; top: 0; right: 0; padding: 0.8rem 1rem; }
-footer div.blocks p { font-size: .75em; font-weight: 700; line-height: 1; color: var(--but2) !important }
+footer {
+    position: relative;
+    display: block;
+    margin: 20px 0 0 0;
+    min-height: 120px;
+    height: auto;
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 1.5rem;
+    text-align: center !important;
+    background: var(--bg0);
+    border: none; z-index: 100;
+}
 
-div#nethashChartParent, div#difficultyChartParent { padding: 0.25rem !important; text-align: center; font-family: 'Courier New',monospace !important }
-div#difficultyChartFooter, div#hashChartFooter { background-color: transparent !important; border-top: none; margin: 0 !important }
-div#difficultyChartFooter > button, div#hashChartFooter > button { background-color: transparent; color: greenyellow; width: 28%; border: solid 2px #888; margin: 2px 10px 2px 10px }
+footer div#social {
+    position: relative;
+    margin: 0 auto;
+}
 
-span.rdate { visibility: visible !important }
+footer div#social a[target="_blank"]::after {
+    content: ''; background: var(--icon-external-link) no-repeat;
+    padding-right: 0;
+}
 
-div.border-0 { border-radius: 0.5rem !important }
+footer div#copy {
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+footer div#copy small {
+    font-size: 11px !important;
+}
+
+footer div.blocks {
+    position: absolute; 
+    top: 0; 
+    right: 0;
+    padding: 0.8rem 1rem;
+}
+
+footer div.blocks p {
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--but2) !important;
+}
+
+footer a span {
+    margin: 6px;
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+}
+
+div#difficultyChartFooter > button, div#hashChartFooter > button {
+    color: var(--but2);
+    border: solid 2px var(--fgt2);
+}
 
 div#recent-table_wrapper table { margin-left: 0px !important }
 div#recent-table_wrapper table th:nth-child(1) { width: var(--width-col-entity) }
@@ -107,6 +218,11 @@ div#recent-table_wrapper table td:nth-child(6) { width: 180px !important }
 
 td.addressCol, th.addressCol { width: 270px !important }
 td.addressCol { text-align: center }
+td.addressCol a { width: 98%; min-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+
+td.countryWithNameCol, th.countryWithNameCol {  min-width: 140px !important; width: auto; word-wrap: normal !important }
+
+td.flagCol, th.flagCol { width: 25px !important; text-align: center }
 
 td.ipAddressCol, th.ipAddressCol { width: 90px !important }
 td.ipAddressCol { text-align: right }
@@ -120,15 +236,13 @@ td.lastPaidCol { text-align: center }
 td.lastPaidBlockCol, th.lastPaidBlockCol { width: 46px !important }
 td.lastPaidBlockCol { text-align: center }
 
-td.statusCol, th.statusCol { width: 50px !important }
-td.statusCol { text-align: center }
-
 td.poseCol, th.poseCol { width: 32px !important }
 td.poseCol { text-align: center }
 
-td.countryWithNameCol, th.countryWithNameCol {  min-width: 140px !important; width: auto; word-wrap: normal !important }
+td.statusCol, th.statusCol { width: 50px !important }
+td.statusCol { text-align: center }
 
-td.flagCol, th.flagCol { width: 25px !important; text-align: center }
+td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; text-align: left !important; }
 
 div#masternodes-table_wrapper table { margin-left: 0px !important }
 div#masternodes-table_wrapper table thead { max-height: 24px; }
@@ -234,21 +348,10 @@ table#buy-orders, table#sell-orders, table#history-table { margin-left: 0px !imp
 
 table#address-summary td:nth-child(1) { text-align: left }
 
-.entity, .entitybig { font-size: 24px !important; line-height: 24px !important; font-weight: 900 !important }
-.entitybig { font-size: 30px !important }
-
-td.addressCol a { width: 98%; min-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
-td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; text-align: left !important; }
-
-tbody tr.active { background: red !important; border-color: greenyellow !important }
-
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (max-width: 575px) {
     td.full, th.full, td.half, th.half, span.half { width: 0px !important; overflow: hidden !important; display: none !important; visibility: hidden !important }
     // td.small, td.small { display: table-cell !important; visibility: visible !important }
-
-    div#body-container { min-height: 700px }
-
     table#rich th:nth-child(2) { width: 110px }
     table#rreceive th:nth-child(2) { width: 110px }
 
@@ -288,8 +391,6 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
 }
 
 @media only screen and (max-width: 991px) {
-    div#body-container { min-height: 800px }
-
     td.small, th.small { display: table-cell !important; visibility: visible !important }
     td.wide, th.wide { display: none !important; visibility: hidden !important }
 
@@ -300,13 +401,9 @@ tbody tr.active { background: red !important; border-color: greenyellow !importa
 }
 
 @media only screen and (min-width: 992px) {
-    div#body-container { min-height: 900px }
-
     td.small, th.small { display: none !important; visibility: hidden !important }
 }
 
-/* Alert */
-.alert, .alert A { color: var(--fgs2) !important; animation: blink-animation 3s steps(10, start) infinite; -webkit-animation: blink-animation 3s steps(10, start) infinite; }
 @keyframes blink-animation { to { visibility: hidden; } }
 @-webkit-keyframes blink-animation { to { visibility: hidden; } }
 
