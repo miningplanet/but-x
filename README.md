@@ -7,7 +7,7 @@
 ![GitHub](https://img.shields.io/github/license/team-exor/eiquidus?color=ffbd11)
 
 
-Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-eiquidus' features first or see our [Installation Guide](https://github.com/miningplanet/but-eiquidus/INSTALL.MD) to get started.
+Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-eiquidus' features first or see our [Installation Guide](#installation) to get started.
 
 
 <img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10"/>
@@ -25,13 +25,13 @@ Stable, secure and customizable multicoin open-source blockchain explorer with s
 
 ## Samples
 
-**but-eiquidus** Multicoin Explorer is tested with these coins.
+but-x is tested with these coins.
 
--  https://explorer.butkoin.com/mainnet
--  https://explorer.butkoin.com/testnet
--  https://explorer.butkoin.com/bitoreum
--  https://explorer.butkoin.com/raptoreum
--  https://explorer.butkoin.com/pepew
+-  https://x.butkoin.com/mainnet
+-  https://x.butkoin.com/testnet
+-  https://x.butkoin.com/bitoreum
+-  https://x.butkoin.com/raptoreum
+-  https://x.butkoin.com/pepew
 
 Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node and need an explorer. Or you just run a blockchain node and want to provide us with data for an explorer.
 
@@ -54,14 +54,14 @@ Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node a
     - [Database Setup](#database-setup)
     - [Download Source Code](#download-source-code)
     - [Install Node Modules](#install-node-modules)
-    - [Configure Explorer Settings](#configure-explorer-settings)
-- [Start/Stop the Explorer](#startstop-the-explorer)
-  - [Start Explorer (Use for Testing)](#start-explorer-use-for-testing)
-  - [Stop Explorer (Use for Testing)](#stop-explorer-use-for-testing)
-  - [Start Explorer Using PM2 (Recommended for Production)](#start-explorer-using-pm2-recommended-for-production)
-  - [Start Explorer Using PM2 and Log Viewer](#start-explorer-using-pm2-and-log-viewer)
-  - [Stop Explorer Using PM2 (Recommended for Production)](#stop-explorer-using-pm2-recommended-for-production)
-  - [Reload Explorer Using PM2 (Recommended for Production)](#reload-explorer-using-pm2-recommended-for-production)
+    - [Configure X Settings](#configure-but-x-settings)
+- [Start/Stop the but-x](#startstop-but-x)
+  - [Start but-x (Use for Testing)](#start-but-x-use-for-testing)
+  - [Stop but-x (Use for Testing)](#stop-but-x-use-for-testing)
+  - [Start but-x Using PM2 (Recommended for Production)](#start-but-x-using-pm2-recommended-for-production)
+  - [Start but-x Using PM2 and Log Viewer](#start-but-x-using-pm2-and-log-viewer)
+  - [Stop but-x Using PM2 (Recommended for Production)](#stop-but-x-using-pm2-recommended-for-production)
+  - [Reload but-x Using PM2 (Recommended for Production)](#reload-but-x-using-pm2-recommended-for-production)
 - [Syncing Databases with the Blockchain](#syncing-databases-with-the-blockchain)
   - [Commands for Manually Syncing Databases](#commands-for-manually-syncing-databases)
   - [Sample Crontab](#sample-crontab)
@@ -71,13 +71,13 @@ Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node a
   - [Use Another Webserver as a Reverse Proxy](#use-another-webserver-as-a-reverse-proxy)
 - [TLS/SSL Support](#tlsssl-support)
   - [Prerequisites](#prerequisites)
-  - [Manually Link TLS/SSL Certificates to the Explorer](#manually-link-tlsssl-certificates-to-the-explorer)
+  - [Manually Link TLS/SSL Certificates to but-x](#manually-link-tlsssl-certificates-to-but-x)
   - [Use Nginx as a Reverse Proxy](#use-nginx-as-a-reverse-proxy)
 - [CORS Support](#cors-support)
   - [What is CORS?](#what-is-cors)
   - [How to Benefit From Using CORS?](#how-to-benefit-from-using-cors)
 - [Data synchronization](#useful-scripts)
-  - [Update Explorer Script](#update-explorer-script)
+  - [Update but-x Script](#update-but-x-script)
 - [Known Issues](#known-issues)
 - [Donations / Support Us](#donations--support-us)
 - [Special Thanks](#special-thanks)
@@ -127,7 +127,7 @@ but-eiquidus is platform independent and requires:
 
 ### API Functions
 
-but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [Butkoin API](https://explorer.butkoin.com/info/mainnet) for comprehensive information.
+but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [X API](https://x.butkoin.com/info/mainnet) for comprehensive information.
 
 #### Coin Daemon Related API
 
@@ -192,7 +192,7 @@ The but-eiquidus web UI is highly configurable. Content and design can be define
 
 #### Customizable pages
 
-  - **Home/Explorer:** Displays latest blockchain TX.
+  - **Home/X:** Displays latest blockchain TX.
   - **Smartnodes:** Lists the current masternodes in the network.
   - **Movement:** Displays latest blockchain transactions that are greater than a certain configurable amount
   - **Network:** Displays a list of peers that have connected to the coind wallet in the past 24 hours, along with useful addnode data that can be used to connect your own wallets to the network easier
@@ -255,15 +255,15 @@ The but-eiquidus web UI is highly configurable. Content and design can be define
 
 #### Distributed Deployments
 
-but-eiquidus is a multicoin explorer and requires a synchronized fully indexed node for each coin to enable full functionality. It supports distributed deployments to ensure scalability and reliability with low operating costs.
+but-x is a multicoin explorer and requires a synchronized fully indexed node for each coin to enable full functionality. It supports distributed deployments to ensure scalability and reliability with low operating costs.
 
-Instances or clusters can perform tasks for one or more coins in different roles such as explorer frontend or data synchronizer. Blockchain nodes, frontends, data synchronizers and databases can be operated on separate hosts. Frontends can be configured with individual caching options.
+Instances or clusters can perform tasks for one or more coins in different roles such as X frontend or data synchronizer. Blockchain nodes, frontends, data synchronizers and databases can be operated on separate hosts. Frontends can be configured with individual caching options.
 
 #### Quick Install Instructions
 
 ##### Pre-Install
 
-The following prerequisites must be installed before using the explorer:
+The following prerequisites must be installed before using but-x:
 
 - [Node.js](https://nodejs.org/en/) (v17.9.1 or newer recommended)
 - [MongoDB](https://www.mongodb.com/) (v5.3.0 or newer recommended)
@@ -280,7 +280,7 @@ mongo
 
 Select database:
 
-**NOTE:** `` is the name of the database where you will be storing local explorer data. You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbs[i].database` setting.
+**NOTE:** `` is the name of the database where you will be storing local but-x data. You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbs[i].database` setting.
 
 ```
 use explorerdb
@@ -295,16 +295,16 @@ db.createUser( { user: "eiquidus", pwd: "Nd^p2d77ceBX!L", roles: [ "readWrite" ]
 ##### Download Source Code
 
 ```
-git clone https://github.com/miningplanet/but-eiquidus explorer
+git clone https://github.com/miningplanet/but-x
 ```
 
 ##### Install Node Modules
 
 ```
-cd explorer && npm install --only=prod
+cd but-x && npm install --only=prod
 ```
 
-##### Configure Explorer Settings
+##### Configure but-x Settings
 
 ```
 cp ./settings.json.template ./settings.json
@@ -312,14 +312,14 @@ cp ./settings.json.template ./settings.json
 
 *Make required changes in settings.json*
 
-**NOTE:** You can further customize the site by adding your own javascript code to the `public/js/custom.js` file and css rules to the `public/css/custom.scss` file. Adding changes to `custom.js` and `custom.scss` is the preferred method of customizing your site, without affecting the ability to receive explorer code updates in the future.
+**NOTE:** You can further customize the site by adding your own javascript code to the `public/js/custom.js` file and css rules to the `public/css/custom.scss` file. Adding changes to `custom.js` and `custom.scss` is the preferred method of customizing your site, without affecting the ability to receive but-x code updates in the future.
 ___
 
-### Start/Stop the Explorer
+### Start/Stop but-x
 
-#### Start Explorer (Use for Testing)
+#### Start but-x (Use for Testing)
 
-You can launch the explorer in a terminal window that will output all warnings and error msgs with one of the following commands (be sure to run from within the explorer directory):
+You can launch but-x in a terminal window that will output all warnings and error msgs with one of the following commands (be sure to run from within but-x directory):
 
 ```
 npm start
@@ -328,12 +328,12 @@ npm start
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/npm run prestart && /path/to/node --stack-size=10000 ./bin/cluster
+cd /path/to/but-x && /path/to/npm run prestart && /path/to/node --stack-size=10000 ./bin/cluster
 ```
 
-**NOTE:** mongod must be running to start the explorer.
+**NOTE:** mongod must be running to start but-x.
 
-The explorer defaults to cluster mode by forking an instance of its process to each cpu core, which results in increased performance and stability. Load balancing gets automatically taken care of and any instances that for some reason die, will be restarted automatically. If desired, a single instance can be launched with:
+but-x defaults to cluster mode by forking an instance of its process to each cpu core, which results in increased performance and stability. Load balancing gets automatically taken care of and any instances that for some reason die, will be restarted automatically. If desired, a single instance can be launched with:
 
 ```
 npm run start-instance
@@ -342,12 +342,12 @@ npm run start-instance
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/npm run prestart && /path/to/node --stack-size=10000 ./bin/cluster 1
+cd /path/to/but-x && /path/to/npm run prestart && /path/to/node --stack-size=10000 ./bin/cluster 1
 ```
 
-#### Stop Explorer (Use for Testing)
+#### Stop but-x (Use for Testing)
 
-To stop the explorer running with `npm start` you can end the process with the key combination `CTRL+C` in the terminal that is running the explorer, or from another terminal you can use one of the following commands (be sure to run from within the explorer directory):
+To stop but-x running with `npm start` you can end the process with the key combination `CTRL+C` in the terminal that is running but-x, or from another terminal you can use one of the following commands (be sure to run from within but-x directory):
 
 ```
 npm stop
@@ -356,14 +356,14 @@ npm stop
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/node ./scripts/stop_explorer.js
+cd /path/to/but-x && /path/to/node ./scripts/stop_explorer.js
 ```
 
-#### Start Explorer Using PM2 (Recommended for Production)
+#### Start but-x Using PM2 (Recommended for Production)
 
-[PM2](https://www.npmjs.com/package/pm2) is a process manager for Node.js applications with a built-in load balancer that allows you to always keep the explorer alive and running even if it crashes. Once you have configured the explorer to work properly in a production environment, it is recommended to use PM2 to start and stop the explorer instead of `npm start` and `npm stop` to keep the explorer constantly running without the need to always keep a terminal window open.
+[PM2](https://www.npmjs.com/package/pm2) is a process manager for Node.js applications with a built-in load balancer that allows you to always keep but-x alive and running even if it crashes. Once you have configured but-x to work properly in a production environment, it is recommended to use PM2 to start and stop but-x instead of `npm start` and `npm stop` to keep but-x constantly running without the need to always keep a terminal window open.
 
-You can start the explorer using PM2 with one of the following terminal commands (be sure to run from within the explorer directory):
+You can start but-x using PM2 with one of the following terminal commands (be sure to run from within the but-x directory):
 
 ```
 npm run start-pm2
@@ -372,7 +372,7 @@ npm run start-pm2
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./bin/instance -i 0 -n explorer -p "./tmp/pm2.pid" --node-args="--stack-size=10000"
+cd /path/to/but-x && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./bin/instance -i 0 -n but-x -p "./tmp/pm2.pid" --node-args="--stack-size=10000"
 ```
 
 **NOTE:** Use the following cmd to find the install path for PM2 (Linux only):
@@ -381,9 +381,9 @@ cd /path/to/explorer && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./
 which pm2
 ```
 
-#### Start Explorer Using PM2 and Log Viewer
+#### Start but-x Using PM2 and Log Viewer
 
-Alternatively, you can start the explorer using PM2 and automatically open the log viewer which will allow for viewing all warnings and error msgs as they come up by using one of the following terminal commands (be sure to run from within the explorer directory):
+Alternatively, you can start but-x using PM2 and automatically open the log viewer which will allow for viewing all warnings and error msgs as they come up by using one of the following terminal commands (be sure to run from within the but-x directory):
 
 ```
 npm run start-pm2-debug
@@ -392,12 +392,12 @@ npm run start-pm2-debug
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./bin/instance -i 0 -n explorer -p "./tmp/pm2.pid" --node-args="--stack-size=10000" && /path/to/pm2 logs
+cd /path/to/but-x && /path/to/npm run prestart "pm2" && /path/to/pm2 start ./bin/instance -i 0 -n but-x -p "./tmp/pm2.pid" --node-args="--stack-size=10000" && /path/to/pm2 logs
 ```
 
-#### Stop Explorer Using PM2 (Recommended for Production)
+#### Stop but-x Using PM2 (Recommended for Production)
 
-To stop the explorer when it is running via PM2 you can use one of the following terminal commands (be sure to run from within the explorer directory):
+To stop but-x when it is running via PM2 you can use one of the following terminal commands (be sure to run from within the but-x directory):
 
 ```
 npm run stop-pm2
@@ -406,14 +406,14 @@ npm run stop-pm2
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/pm2 stop explorer
+cd /path/to/but-x && /path/to/pm2 stop but-x
 ```
 
-#### Reload Explorer Using PM2 (Recommended for Production)
+#### Reload but-x Using PM2 (Recommended for Production)
 
-The explorer can be stopped and restarted in a single cmd when it is running via PM2, which is often necessary after updating the explorer code for example. Use one of the following terminal commands to reload the explorer (be sure to run from within the explorer directory):
+but-x can be stopped and restarted in a single cmd when it is running via PM2, which is often necessary after updating but-x code for example. Use one of the following terminal commands to reload but-x (be sure to run from within the but-x directory):
 
-**NOTE:** Assuming the explorer has access to 2 or more cpus, this reload will be done in such a way that there will be zero-downtime while the restart is being performed. If you only have a single cpu then the explorer will be inaccessible for a few seconds while the restart is being performed.
+**NOTE:** Assuming but-x has access to 2 or more cpus, this reload will be done in such a way that there will be zero-downtime while the restart is being performed. If you only have a single cpu then but-x will be inaccessible for a few seconds while the restart is being performed.
 
 ```
 npm run reload-pm2
@@ -422,7 +422,7 @@ npm run reload-pm2
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/pm2 reload explorer
+cd /path/to/but-x && /path/to/pm2 reload but-x
 ```
 ___
 
@@ -456,17 +456,17 @@ Notes:
 
 #### Commands for Manually Syncing Databases
 
-A number of npm scripts are included with the explorer for easy syncing of the various explorer databases. The following scripts are the main commands used for syncing the explorer with your blockchain:
+A number of npm scripts are included with but-x for easy syncing of the various but-x databases. The following scripts are the main commands used for syncing but-x with your blockchain:
 
-- `npm run sync-blocks`: Connect to the wallet daemon to pull blocks/transactions into the explorer, starting from genesis to current block. Repeat calls of this command will remember the last block downloaded, to allow continuous syncing of new blocks.
+- `npm run sync-blocks`: Connect to the wallet daemon to pull blocks/transactions into but-x, starting from genesis to current block. Repeat calls of this command will remember the last block downloaded, to allow continuous syncing of new blocks.
 - `npm run sync-markets`: Connect to the various exchange apis as defined in the `settings.json` file to provide market related data such as market summaries, orderbooks, trade history and charts.
 - `npm run sync-peers`: Connect to the wallet daemon and pull in data regarding connected nodes.
 - `npm run sync-masternodes`: Connect to the wallet daemon and pull in the list of active masternodes on the network. *\*only applicable to masternode coins*
 
-A small handful of useful scripts are also included to assist in solving various issues you may experience with the explorer:
+A small handful of useful scripts are also included to assist in solving various issues you may experience with but-x:
 
-- `npm run check-blocks`: Recheck all previously synced blocks by comparing against the wallet daemon to look for and add any missing transactions/addresses. Optional parameter: block number to start checking from. Example: `npm run check-blocks 1000` will begin the check starting at block 1000. :warning: **WARNING:** This can take a very long time depending on the length of the blockchain and is generally not recommended unless absolutely necessary. Furthermore, while you are checking for missing data, you will be unable to sync new blocks into the explorer until the check command has finished. If you do find missing transactions with this check (other than new data since last sync), this likely means that `sync.update_timeout` in `settings.json` is set too low.
-- `npm run reindex`: Delete all blocks, transactions and addresses, and resync from genesis to current block. :warning: **WARNING:** This will wipe out all blockchain-related data from the explorer. It is recommended to [backup the explorer database](#backup-database-script) before continuing with this command.
+- `npm run check-blocks`: Recheck all previously synced blocks by comparing against the wallet daemon to look for and add any missing transactions/addresses. Optional parameter: block number to start checking from. Example: `npm run check-blocks 1000` will begin the check starting at block 1000. :warning: **WARNING:** This can take a very long time depending on the length of the blockchain and is generally not recommended unless absolutely necessary. Furthermore, while you are checking for missing data, you will be unable to sync new blocks into but-x until the check command has finished. If you do find missing transactions with this check (other than new data since last sync), this likely means that `sync.update_timeout` in `settings.json` is set too low.
+- `npm run reindex`: Delete all blocks, transactions and addresses, and resync from genesis to current block. :warning: **WARNING:** This will wipe out all blockchain-related data from but-x. It is recommended to [backup the but-x database](#backup-database-script) before continuing with this command.
 - `npm run reindex-rich`: Clears and recreates the richlist data for the top 100 coin holders page. Rarely needed, but can be useful for debugging or if you are certain the richlist data is incorrect for some reason.
 - `npm run reindex-txcount`: Recalculate the count of transactions stored in `stats.txes` by recounting the txes stored in the mongo database. Rarely needed, but can be useful for debugging or if you notice the main list of transactions is showing the wrong number of entries. If this value is off for some reason, you will not be able to page back to the 1st blocks on the main list of transactions for example.
 - `npm run reindex-last`: Lookup the last transaction in the mongo database and reset the `stats.last` value to that most recent block index. Rarely needed, but can be useful for debugging. The `stats.last` value is used to remember which block the last sync left off on to resume syncing from the next block.
@@ -480,19 +480,19 @@ Also see the [Useful Scripts](#useful-scripts) section for more helpful scripts.
 Easier crontab syntax using npm scripts, but may not work on some systems depending on permissions and how nodejs was installed:
 
 ```
-*/1 * * * * cd /path/to/explorer && npm run sync-blocks > /dev/null 2>&1
-*/2 * * * * cd /path/to/explorer && npm run sync-markets > /dev/null 2>&1
-*/5 * * * * cd /path/to/explorer && npm run sync-peers > /dev/null 2>&1
-*/5 * * * * cd /path/to/explorer && npm run sync-masternodes > /dev/null 2>&1
+*/1 * * * * cd /path/to/but-x && npm run sync-blocks > /dev/null 2>&1
+*/2 * * * * cd /path/to/but-x && npm run sync-markets > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && npm run sync-peers > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && npm run sync-masternodes > /dev/null 2>&1
 ```
 
 Or, run the crontab by calling the sync script directly, which should work better in the event you have problems running the npm scripts from a crontab:
 
 ```
-*/1 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js update > /dev/null 2>&1
-*/2 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js market > /dev/null 2>&1
-*/5 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js peers > /dev/null 2>&1
-*/5 * * * * cd /path/to/explorer && /path/to/node scripts/sync.js masternodes > /dev/null 2>&1
+*/1 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js update > /dev/null 2>&1
+*/2 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js market > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js peers > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js masternodes > /dev/null 2>&1
 ```
 ___
 
@@ -525,7 +525,7 @@ ___
 
 A typical webserver binds to port 80 to serve webpages over the http protocol, but the Express webserver cannot do this by default unless it is given root permissions, which isn't recommended for security reasons. Instead, there are two recommended workarounds to achieve the same end result:
 
-**NOTE:** Be sure to allow port 80 through any firewalls you may have configured or the explorer website may not be accessible remotely.
+**NOTE:** Be sure to allow port 80 through any firewalls you may have configured or the but-x website may not be accessible remotely.
 
 #### Use Setcap to Safely Grant User Permissions
 
@@ -537,9 +537,9 @@ A typical webserver binds to port 80 to serve webpages over the http protocol, b
 sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 ```
 
-2. Open the `settings.json` file and change the `webserver.port` setting to a value of 80. Save the change and restart the explorer.
+2. Open the `settings.json` file and change the `webserver.port` setting to a value of 80. Save the change and restart but-x.
 
-You should now be able to browse to the explorer by IP address or domain name without the need for specifying the 3001 port any longer.
+You should now be able to browse to but-x by IP address or domain name without the need for specifying the 3001 port any longer.
 
 #### Use Another Webserver as a Reverse Proxy
 
@@ -592,14 +592,14 @@ sudo ln -s /etc/nginx/sites-available/node /etc/nginx/sites-enabled/node
 sudo service nginx restart
 ```
 
-7. Nginx will now forward all incoming requests to eIquidus and after restarting the explorer it should be browsable via http://example.com without the need for the http://example.com:3001 port any longer.
+7. Nginx will now forward all incoming requests to but-x and after restarting but-x it should be browsable via http://example.com without the need for the http://example.com:3001 port any longer.
 ___
 
 ### TLS/SSL Support
 
-Similar to [the problem with binding to port 80](#run-express-webserver-on-port-80), a typical webserver binds to port 443 to serve webpages over the https protocol, but the Express webserver cannot do this by default unless it is given root permissions, which isn't recommended for security reasons. Instead, there are two recommended workarounds to achieve the same end result: [Manually Link TLS/SSL Certificates to the Explorer](#manually-link-tlsssl-certificates-to-the-explorer) or [Use Nginx as a Reverse Proxy](#use-nginx-as-a-reverse-proxy).
+Similar to [the problem with binding to port 80](#run-express-webserver-on-port-80), a typical webserver binds to port 443 to serve webpages over the https protocol, but the Express webserver cannot do this by default unless it is given root permissions, which isn't recommended for security reasons. Instead, there are two recommended workarounds to achieve the same end result: [Manually Link TLS/SSL Certificates to but-x](#manually-link-tlsssl-certificates-to-but-x) or [Use Nginx as a Reverse Proxy](#use-nginx-as-a-reverse-proxy).
 
-**NOTE:** Be sure to allow port 443 through any firewalls you may have configured or the explorer website may not be accessible remotely.
+**NOTE:** Be sure to allow port 443 through any firewalls you may have configured or the but-x website may not be accessible remotely.
 
 #### Prerequisites
 
@@ -631,7 +631,7 @@ sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 ```
 
-#### Manually Link TLS/SSL Certificates to the Explorer
+#### Manually Link TLS/SSL Certificates to but-x
 
 **NOTE:** The following instructions are for Linux users only, but installing and configuring certbot should be possible on any OS
 
@@ -654,7 +654,7 @@ sudo chmod -R 755 /etc/letsencrypt/live/
 sudo chmod -R 755 /etc/letsencrypt/archive/
 ```
 
-4. The last step is to enable TLS in the explorer's `settings.json` file and specify the paths to the 3 main certificate files that you just generated. Example:
+4. The last step is to enable TLS in but-x' `settings.json` file and specify the paths to the 3 main certificate files that you just generated. Example:
 
 ```
   "webserver": {
@@ -675,7 +675,7 @@ sudo chmod -R 755 /etc/letsencrypt/archive/
 
 Ensure that `webserver.tls.enabled` = true and that you specify the exact path to the `webserver.tls.cert_file`, `webserver.tls.chain_file` and `webserver.tls.key_file` files by changing `example.com` to the domain name that you just generated TLS/SSL certificates for.
 
-5. If all went well, you should now be able to start up the explorer and browse to it using a secure https connection like [https://example.com](https://example.com).
+5. If all went well, you should now be able to start up but-x and browse to it using a secure https connection like [https://example.com](https://example.com).
 
 #### Use Nginx as a Reverse Proxy
 
@@ -691,7 +691,7 @@ sudo certbot --nginx
 
 Certbot will ask a few simple questions and generate the necessary TLS/SSL certificate files for your domain and link them to Nginx. It will also install the necessary files to automatically renew the certificates when they are about to expire, so you shouldn't need to do anything special to keep them up to date.
 
-3. If all went well, you should now be able to start up the explorer and browse to it using a secure https connection like [https://example.com](https://example.com).
+3. If all went well, you should now be able to start up but-x and browse to it using a secure https connection like [https://example.com](https://example.com).
 ___
 
 ### CORS Support
@@ -744,65 +744,65 @@ ___
 
 ### Useful Scripts
 
-#### Update Explorer Script
+#### Update but-x Script
 
-Automatically download and install the newest explorer source code, update out-of-date dependencies and reload the explorer with a single command. This update script can be safely run while the explorer is actively running to prevent needing to manually shut down to do updates, but please note that the website may be inaccessible for a few seconds or more while the explorer is being updated.
+Automatically download and install the newest but-x source code, update out-of-date dependencies and reload but-x with a single command. This update script can be safely run while but-x is actively running to prevent needing to manually shut down to do updates, but please note that the website may be inaccessible for a few seconds or more while but-x is being updated.
 
-**NOTE:** Only explorer installations that were installed via cloning the source from git can be automatically updated. Be sure to follow the [Quick Install Instructions](#quick-install-instructions) to set up the explorer for optimum use with this update script.
+**NOTE:** Only but-x installations that were installed via cloning the source from git can be automatically updated. Be sure to follow the [Quick Install Instructions](#quick-install-instructions) to set up but-x for optimal use with this update script.
 
-Update the explorer with the following command:
+Update but-x with the following command:
 
 ```
-npm run update-explorer
+npm run update-but-x
 ```
 
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/node ./scripts/update_explorer.js
+cd /path/to/but-x && /path/to/node ./scripts/update_explorer.js
 ```
 
 **NOTE:** The update script also supports a couple optional parameters.
 
-Use the following command if you want to update the explorer code only, without checking for out-of-date dependencies:
+Use the following command if you want to update but-x code only, without checking for out-of-date dependencies:
 
 ```
-npm run update-explorer "explorer-only"
-```
-
-or (useful for crontab):
-
-```
-cd /path/to/explorer && /path/to/node ./scripts/update_explorer.js "explorer-only"
-```
-
-Use the following command if you want to upgrade outdated dependencies only, without checking for explorer code updates:
-
-```
-npm run update-explorer "dependencies-only"
+npm run update-but-x "but-x-only"
 ```
 
 or (useful for crontab):
 
 ```
-cd /path/to/explorer && /path/to/node ./scripts/update_explorer.js "dependencies-only"
+cd /path/to/but-x && /path/to/node ./scripts/update_explorer.js "but-x-only"
+```
+
+Use the following command if you want to upgrade outdated dependencies only, without checking for but-x code updates:
+
+```
+npm run update-but-x "dependencies-only"
+```
+
+or (useful for crontab):
+
+```
+cd /path/to/but-x && /path/to/node ./scripts/update_explorer.js "dependencies-only"
 ```
 
 #### Backup Database Script
 
-Make a complete backup of an eIquidus mongo database and save to compressed file. A built-in locking mechanism prevents data from being updated or changed while a backup is in process. Backups can be safely created while the explorer is actively running and/or while the explorer is turned off. The following backup scenarios are supported:
+Make a complete backup of an eIquidus mongo database and save to compressed file. A built-in locking mechanism prevents data from being updated or changed while a backup is in process. Backups can be safely created while but-x is actively running and/or while but-x is turned off. The following backup scenarios are supported:
 
 **Backup Database (No filename specified)**
 
-`npm run create-backup`: Backs up to the explorer/backups directory by default with the current date as the filename in the format  yyyy-MMM-dd.bak
+`npm run create-backup`: Backs up to the but-x/backups directory by default with the current date as the filename in the format  yyyy-MMM-dd.bak
 
 **Backup Database (Partial filename specified)**
 
-`npm run create-backup test`: Backs up the the explorer/backups directory by default with the filename test.bak
+`npm run create-backup test`: Backs up the the but-x/backups directory by default with the filename test.bak
 
 **Backup Database (Full filename specified)**
 
-`npm run create-backup today.bak`: Backs up the the explorer/backups directory by default with the filename today.bak
+`npm run create-backup today.bak`: Backs up the the but-x/backups directory by default with the filename today.bak
 
 **Backup Database (Full path with partial filename specified)**
 
@@ -814,7 +814,7 @@ Make a complete backup of an eIquidus mongo database and save to compressed file
 
 #### Restore Database Script
 
-Restore a previously saved eIquidus mongo database backup. :warning: **WARNING:** This will completely overwrite your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while a backup is being restored. Backups can be safely restored while the explorer is actively running and/or while the explorer is turned off.
+Restore a previously saved eIquidus mongo database backup. :warning: **WARNING:** This will completely overwrite your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while a backup is being restored. Backups can be safely restored while but-x is actively running and/or while but-x is turned off.
 
 **NOTE:** Older v1.x eIquidus database backups were compressed into tar.gz files. These older tar.gz backups can still be restored, but you must specifically add the .tar.gz suffix. Example: `npm run restore-backup /path/to/old_backup.tar.gz`
 
@@ -822,15 +822,15 @@ The following restore scenarios are supported:
 
 **Restore Database (Partial filename specified)**
 
-`npm run restore-backup old`: Restores the explorer/scripts/backups/old.bak file
+`npm run restore-backup old`: Restores the but-x/scripts/backups/old.bak file
 
 **Restore Database (Full filename specified)**
 
-`npm run restore-backup working.bak`: Restores the explorer/scripts/backups/working.bak file
+`npm run restore-backup working.bak`: Restores the but-x/scripts/backups/working.bak file
 
 **Restore Database (Full path with partial filename specified)**
 
-`npm run restore-backup /home/explorer/backup`: Restores the /home/explorer/backup.bak file
+`npm run restore-backup /home/but-x/backup`: Restores the /home/but-x/backup.bak file
 
 **Restore Database (Full path and filename specified)**
 
@@ -838,7 +838,7 @@ The following restore scenarios are supported:
 
 #### Delete Database Script
 
-Wipe the eIquidus mongo database clean to start again from scratch. :warning: **WARNING:** This will completely destroy all data in your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while the database is being deleted. The process to delete the database can be executed while the explorer is actively running and/or while the explorer is turned off.
+Wipe the eIquidus mongo database clean to start again from scratch. :warning: **WARNING:** This will completely destroy all data in your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while the database is being deleted. The process to delete the database can be executed while but-x is actively running and/or while but-x is turned off.
 
 Delete the mongo database with the following command:
 
@@ -873,7 +873,7 @@ Where [SIZE] is an integer higher than the default.
 
 **Error: bind EACCES ...**
 
-This error can appear when you try to run the explorer on a port number lower than 1024. There are a couple solutions to this problem which are explained in more detail in the [Run Express Webserver on Port 80](#run-express-webserver-on-port-80) section.
+This error can appear when you try to run but-x on a port number lower than 1024. There are a couple solutions to this problem which are explained in more detail in the [Run Express Webserver on Port 80](#run-express-webserver-on-port-80) section.
 
 
 ### Donations / Support Us
@@ -882,8 +882,8 @@ If you enjoy our work, please consider supporting our continued development of t
 
 Please consider supporting us with a small donation by sending us some cryptocurrency:
 
-- **BUTK:** [XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs](https://explorer.butkoin.com/address/XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs/mainnet)
-- **BTRM:** [BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL](https://explorer.butkoin.com/address/BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL/bitoreum)
+- **BUTK:** [XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs](https://x.butkoin.com/address/XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs/mainnet)
+- **BTRM:** [BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL](https://x.butkoin.com/address/BqndD9PnCGUrgJ64wzitWYkDYfwyViTsDL/bitoreum)
 
 We also encourage submitting quality pull requests from developers to further improve but-eiquius.
 
@@ -894,7 +894,7 @@ We also encourage submitting quality pull requests from developers to further im
 - **[Alan Rudolf (aka suprnurd)](https://github.com/suprnurd):** for the custom changes found in the [Ciquidus explorer](https://github.com/suprnurd/ciquidus)
 - **[Tim Garrity (aka uaktags)](https://github.com/uaktags):** for his many contributions to the Iquidus explorer and custom features from the [uaktags explorer](https://github.com/uaktags/explorer)
 - **[TheHolyRoger](https://github.com/TheHolyRoger):** for his continued work and contributions to the Iquidus explorer
-- All the rest of the Iquidus contributors who helped shape the Iquidus explorer in some way
+- All the rest of the but-x contributors who helped shape but-x in some way.
 
 ### License
 

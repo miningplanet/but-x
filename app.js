@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const settings = require('./lib/settings')
 const routes = require('./routes/index')
-const lib = require('./lib/explorer')
+const lib = require('./lib/x')
 const db = require('./lib/database')
 const package_metadata = require('./package.json')
 const locale = require('./lib/locale')
@@ -1052,7 +1052,7 @@ networks.forEach( function(item, index) {
 
       // Disable the markets page for this session if no active market and trading pair was found or set the new default market.
       if (new_default_index == -1) {
-        console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart the explorer to resolve the problem');
+        console.log('WARNING: ' + ex_error + '. ' + 'No valid or enabled markets found in settings.json. The markets feature will be temporarily disabled. To restore markets functionality, please enable at least 1 market and ensure at least 1 valid trading pair is added. Finally, restart X to resolve the problem');
         settings.markets_page.enabled = false;
       } else {
         console.log('WARNING: ' + ex_error + '. ' + 'Default exchange will be set to' + ': ' + ex_keys[new_default_index] + ' (' + ex[ex_keys[new_default_index]].trading_pairs[0] + ')');
@@ -1155,7 +1155,7 @@ if (settings.webserver.tls.enabled == true) {
 exec('git rev-parse HEAD', (err, stdout, stderr) => {
   // check if the commit id was returned
   if (stdout != null && stdout != '') {
-    // set the explorer revision code based on the git commit id
+    // set but-x revision code based on the git commit id
     app.set('revision', stdout.substring(0, 7));
   }
 });

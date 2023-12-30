@@ -7,5 +7,5 @@ Disallow: /claim/
 Disallow: /movement/
 
 Sitemap: https://butkoin.com/sitemap.txt
-Sitemap: https://explorer.butkoin.com/sitemap.txt
+Sitemap: https://x.butkoin.com/sitemap.txt
 

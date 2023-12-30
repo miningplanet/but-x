@@ -64,8 +64,8 @@
 
   // Configures node.js express web framework (read more: https://www.npmjs.com/package/express)
   "webserver": {
-    // The base URL of the explorer site. Overwrite for other chains.
-    "url": "https://explorer.butkoin.com",
+    // The base URL of the but-x site. Overwrite for other chains.
+    "url": "https://x.butkoin.com",
     // Express webserver port.
     "port": 3001,
     // Optional TLS (Transport Layer Security) settings.
@@ -221,8 +221,8 @@
       },
       // search: A collection of settings that pertain to the search feature
       "search": {
-        // enabled: Enable/disable the ability to search the explorer website (true/false)
-        //          If set to false, the explorer will not display a search box or respond to search queries
+        // enabled: Enable/disable the ability to search the but-x website (true/false)
+        //          If set to false, but-x will not display a search box or respond to search queries
         "enabled": true,
         // Valid options: inside-header or below-header.
         "position": "inside-header"
@@ -792,7 +792,7 @@
           "enabled": true
         },
         // /ext/getnetworkpeers
-        // Returns the list of network peers that have connected to the explorer node in the last 24 hours.
+        // Returns the list of network peers that have connected to but-x in the last 24 hours.
         "getnetworkpeers": {
           "enabled": true
         },
@@ -1000,7 +1000,7 @@
     // zksnarks: A collection of settings that pertain to Zcash zk-SNARKs private transactions
     "zksnarks": {
       // enabled: Enable/disable Zcash zk-SNARKs private transaction support (true/false)
-      //          If set to false, zk-SNARKs private txs will not be properly read or saved by the explorer
+      //          If set to false, zk-SNARKs private txs will not be properly read or saved by but-x
       //          NOTE: Enabling this feature will require a full reindex of the blockchain data
       "enabled": false
     }

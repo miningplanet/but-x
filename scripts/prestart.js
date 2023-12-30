@@ -83,7 +83,7 @@ function check_argument_passed(cb) {
 }
 
 console.log('\x1B[34m')
-console.log('Launch but-eiquidus %s multicoin explorer', package_metadata.version)
+console.log('Launch but-x %s multicoin Xplorer', package_metadata.version)
 console.log('...')
 console.log('\x1B[0m')
 

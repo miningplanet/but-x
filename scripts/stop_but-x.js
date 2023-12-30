@@ -44,15 +44,15 @@ if (validate_port(settings.webserver.port) == true) {
   check_webserver_running(function(killcmd) {
     // check return value
     if (killcmd != null) {
-      // send a kill signal to the process that is currently using the explorer's server port
+      // send a kill signal to the process that is currently using the but-x server port
       exec(killcmd, (err, stdout, stderr) => {
         // show shutdown msg
-        console.log('Explorer shutting down... Please wait...');
+        console.log('but-x shutting down... Please wait...');
         process.exit(0);
       });
     } else {
       // webserver is not running
-      console.log('Error: Cannot stop explorer because it is not currently running');
+      console.log('Error: Cannot stop but-x because it is not currently running');
       process.exit(1);
     }
   });

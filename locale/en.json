@@ -1,7 +1,7 @@
 /* This file must be valid JSON. But comments are allowed */
 {
   // menu items
-  "menu_explorer": "Explorer",
+  "menu_explorer": "X",
   "menu_api": "API",
   "menu_markets": "Markets",
   "menu_richlist": "Top 100",
@@ -11,8 +11,8 @@
   "menu_network": "Network",
   "menu_claim_address": "Claim Address",
 
-  // explorer view
-  "ex_title": "{1} Explorer",
+  // x view
+  "ex_title": "{1} X",
   "ex_description": "A listing of all verified {1} transactions",
   "ex_search_title": "Search",
   "ex_search_button": "Search",
@@ -105,7 +105,7 @@
   "view_tx": "View Transaction",
 
   // error view
-  "error_title": "{1} Explorer Error",
+  "error_title": "{1} X Error",
   "error_description": "The page you are looking for cannot be found",
   "error_description_alt": "An error occurred which prevented the page from loading correctly",
 
@@ -178,7 +178,7 @@
   "rl_hundredplus": "101+",
 
   "net_title": "{1} Network Peers",
-  "net_description": "A listing of {1} network peers that have connected to the explorer node in the last 24 hours",
+  "net_description": "A listing of {1} network peers that have connected to X in the last 24 hours",
   "net_addnodes": "Add Nodes",
   "net_connections": "Connections",
   "net_address": "Address",
@@ -196,7 +196,7 @@
   "api_getblockchaininfo": "Returns the current block chain info including various stats.",
   "api_getmininginfo": "Returns the current block chain info including various stats.",
   "api_getdifficulty": "Returns the current Proof of work (PoW) difficulty for",
-  "api_getconnectioncount": "Returns the number of connections the explorer has to other nodes.",
+  "api_getconnectioncount": "Returns the number of connections X has to other nodes.",
   "api_getmasternodelist": "Returns the complete list of masternodes on the network.",
   "api_getmasternodecount": "Returns the total number of masternodes on the network.",
   "api_getvotelist": "Returns the current vote list.",
@@ -246,7 +246,7 @@
 
   // claim address view
   "claim_title": "{1} Wallet Address Claim",
-  "claim_description": "Verify ownership of your {1} wallet address and set a custom display name in the explorer",
+  "claim_description": "Verify ownership of your {1} wallet address and set a custom display name in X",
 
   // heavycoin rewards view
   "heavy_title": "{1} Reward/Voting Details",

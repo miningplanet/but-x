@@ -3,7 +3,7 @@ const numCpu = require('os').cpus().length
 
 if (cluster.isMaster) {
   const isWinOS = process.platform == 'win32'
-  const lib = require('../lib/explorer')
+  const lib = require('../lib/x')
   const instances = (process.argv[2] != null && process.argv[2] != '' && !isNaN(process.argv[2]) && Number.isInteger(parseFloat(process.argv[2])) ? parseInt(process.argv[2]) : numCpu)
   const pid = process.pid
   if (instances > 1)

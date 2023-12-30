@@ -10,7 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const settings = require('../lib/settings')
-const lib = require('../lib/explorer')
+const lib = require('../lib/x')
 const archiveSuffix = '.bak';
 const backupLockName = 'backup';
 

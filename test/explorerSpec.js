@@ -1,5 +1,5 @@
 describe('explorer', function() {
-  var lib = require('../lib/explorer');
+  var lib = require('../lib/x.js');
   var data = require('./testData.js');
 
   describe('convert_to_satoshi', function() {

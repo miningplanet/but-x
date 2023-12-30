@@ -3,7 +3,7 @@ const router = express.Router()
 const settings = require('../lib/settings')
 const locale = require('../lib/locale')
 const db = require('../lib/database')
-const lib = require('../lib/explorer')
+const lib = require('../lib/x')
 const qr = require('qr-image')
 const networks = settings.getAllNet()
 
@@ -192,7 +192,7 @@ function route_get_index(res, error, net=settings.getDefaultNet()) {
   const coin = settings.getCoin(net)
   const index_page = settings.get(net, 'index_page')
   const api_page = settings.get(net, 'api_page')
-  const p = param('home', index_page, coin, net, db, settings, coin.name + ' Explorer')
+  const p = param('home', index_page, coin, net, db, settings, coin.name + ' X')
   p.error = error
   p.last_updated = null
   p.index_page = index_page
