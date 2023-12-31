@@ -1306,6 +1306,15 @@ html(lang='en')
                     span.margin-left-5 #{settings.locale.menu_claim_address}
         div#side-offcanvas.offcanvas.offcanvas-start(tabindex='-1')
           div.offcanvas-body.d-block.navbar(class=sideBarClasses)
+      if shared_pages.links.length > 0 && shared_pages.links_position == 'top'
+        div#links.container
+          each link in shared_pages.links
+            a.social-link.border-0(href=link.url, target='_blank', alt=coin.name + ' ' + link.tooltip_text, title=coin.name + ' ' + link.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
+              if link.icon != null && link.icon != ''
+                span(class='vertical-align-middle ' + link.icon)
+              if link.image_path != null && link.image_path != ''
+                img(class='vertical-align-middle', src=link.image_path)
+              span #{link.text}
       div#main-container(class=mainContainerClasses)
         div#main-child-container(class=mainContainerChildClasses)
           if showSync != null && showSync == true
@@ -1437,6 +1446,15 @@ html(lang='en')
                   .col-lg-2
                     .card.card-default.border-0.d-lg-block.d-block.cardSpacer(id='pnlSix')
                 - }
+      if shared_pages.links.length > 0 && shared_pages.links_position == 'bottom'
+        div#links.container
+          each link in shared_pages.links
+            a.social-link.border-0(href=link.url, target='_blank', alt=coin.name + ' ' + link.tooltip_text, title=coin.name + ' ' + link.tooltip_text, data-bs-toggle='tooltip', data-bs-placement='top')
+              if link.icon != null && link.icon != ''
+                span(class='vertical-align-middle ' + link.icon)
+              if link.image_path != null && link.image_path != ''
+                img(class='vertical-align-middle', src=link.image_path)
+              span #{link.text}
     footer
       div#social
         each social in shared_pages.page_footer.social_links

@@ -1699,6 +1699,13 @@ div#difficultyChartFooter > button, div#hashChartFooter > button {
   margin: 2px 10px 2px 10px;
 }
 
+div#links span.vertical-align-middle, div#links img {
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+  margin: 4px !important;
+}
+
 /* Responsivnes */
 @media only screen and (max-width: 575px) {
   div#body-container { min-height: 700px }
