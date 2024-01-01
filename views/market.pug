@@ -378,6 +378,13 @@ block content
                 strong(style='color:var(--bs-body-color)') #{settings.locale.mkt_buy_orders}
               table#buy-orders.table.table-striped.table-bordered.table-hover.order-table.bottom-border-0
                 thead
+                  - var sumBuys = 0;
+                  - var totalBuys = 0;
+                  each buy in marketdata.data.buys
+                    - sumBuys = sumBuys + buy.quantity;
+                    - totalBuys = totalBuys + (buy.quantity * buy.price);
+                  - var splitSumBuys = settings.formatCurrency(sumBuys, marketdata.coin).split(".");
+                  - var splitTotalBuys = settings.formatCurrency(totalBuys, marketdata.exchange).split(".");
                   tr(class=theadClasses)
                     th.text-center #{settings.locale.mkt_price}
                       span.small.fw-normal  (#{marketdata.exchange})
@@ -386,6 +393,13 @@ block content
                     th.text-center #{settings.locale.mkt_total}
                       span.small.fw-normal  (#{marketdata.exchange})
                 tbody
+                  tr 
+                    td.text-end 
+                      span.small #{settings.locale.mkt_sum}
+                    td.text-end #{splitSumBuys[0]}.
+                        span.decimal #{splitSumBuys[1]}
+                    td.text-end #{splitTotalBuys[0]}.
+                      span.decimal #{splitTotalBuys[1]}
                   each buy in marketdata.data.buys
                     - var price = settings.formatCurrency(buy.price, marketdata.exchange);
                     - var splitPrice = price.split(".");
@@ -410,6 +424,13 @@ block content
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
                 strong(style='color:var(--bs-body-color)') #{settings.locale.mkt_sell_orders}
               table#sell-orders.table.table-striped.table-bordered.table-hover.order-table.bottom-border-0
+                - var sumSells = 0;
+                - var totalSells = 0;
+                each sell in marketdata.data.sells
+                  - sumSells = sumSells + sell.quantity;
+                  - totalSells = totalSells + (sell.quantity * sell.price);
+                - var splitSumSells = settings.formatCurrency(sumSells, marketdata.coin).split(".");
+                - var splitTotalSells = settings.formatCurrency(totalSells, marketdata.exchange).split(".");
                 thead
                   tr(class=theadClasses)
                     th.text-end #{settings.locale.mkt_price}
@@ -419,6 +440,13 @@ block content
                     th.text-end #{settings.locale.mkt_total}
                       span.small.fw-normal  (#{marketdata.exchange})
                 tbody
+                  tr 
+                    td.text-end
+                      span.small #{settings.locale.mkt_sum}
+                    td.text-end #{splitSumSells[0]}.
+                        span.decimal #{splitSumSells[1]}
+                    td.text-end #{splitTotalSells[0]}.
+                      span.decimal #{splitTotalSells[1]}
                   each sell in marketdata.data.sells
                     - var price = settings.formatCurrency(sell.price, marketdata.exchange);
                     - var splitPrice = price.split(".");

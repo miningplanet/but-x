@@ -243,6 +243,7 @@
   "mkt_type": "Type",
   "mkt_time_stamp": "Time",
   "mkt_select": "Market Selection",
+  "mkt_sum": "Sum ->",
 
   // claim address view
   "claim_title": "{1} Wallet Address Claim",

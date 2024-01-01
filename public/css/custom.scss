@@ -39,8 +39,7 @@ body {
 }
 
 tbody tr.active {
-    background: var(--fgs3) !important;
-    border-color: var(--but2) !important;
+    border: solid 2px var(--but2) !important;
 }
 
 tbody tr td a, div.card-body a, input, select, option, .btn, .form-control {
