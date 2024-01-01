@@ -1190,8 +1190,8 @@ html(lang='en')
                       span.richlist
                       span.margin-left-5 #{settings.locale.menu_richlist}
                 if api_page.enabled == true
-                  li#info.nav-item
-                    a.nav-link(href='/info/' + net)
+                  li#apidocs.nav-item
+                    a.nav-link(href='/apidocs/' + net)
                       span.api
                       span.margin-left-5 #{settings.locale.menu_api}
                 if claim_address_page.show_header_menu == true && claim_address_page.enabled == true
@@ -1295,8 +1295,8 @@ html(lang='en')
                       span.nav-icon.fas.fa-chart-line
                       span.margin-left-5 #{settings.locale.menu_markets}
               if api_page.enabled == true
-                li#info.nav-item(alt=settings.locale.menu_api, title=settings.locale.menu_api, data-bs-toggle='tooltip', data-bs-placement='right')
-                  a.nav-link(href='/info')
+                li#apidocs.nav-item(alt=settings.locale.menu_api, title=settings.locale.menu_api, data-bs-toggle='tooltip', data-bs-placement='right')
+                  a.nav-link(href='/apidocs')
                     span.nav-icon.fa.fa-info-circle
                     span.margin-left-5 #{settings.locale.menu_api}
               if claim_address_page.show_header_menu == true && claim_address_page.enabled == true

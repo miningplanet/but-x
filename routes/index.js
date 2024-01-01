@@ -280,20 +280,20 @@ networks.forEach( function(net, index) {
   }
 })
 
-router.get('/info/:net?', function(req, res) {
+router.get('/apidocs/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true) {  
     const markets_page = settings.get(net, 'markets_page')
-    const p = param('info', api_page, coin, net, db, settings, coin.name + ' Public API ' + net)
+    const p = param('apidocs', api_page, coin, net, db, settings, coin.name + ' Public API ' + net)
     p.address = settings.webserver.url
     p.markets_page = markets_page
     p.api_page = api_page
     p.api_cmds = settings.get(net, 'api_cmds')
     p.isButkoin = settings.isButkoin(net)
     p.isMainnet = net == 'mainnet'
-    res.render('info', p)
+    res.render('apidocs', p)
   } else {
     route_get_index(res, null, net)
   }
