@@ -1,8 +1,20 @@
 extends layout
 
 block content
-  - const verifymessage = isApiEndpointEnabled(api_page, api_cmds, 'verifymessage')
-  - const validateaddress = isApiEndpointEnabled(api_page, api_cmds, 'validateaddress')
+  - const getblockchaininfo       = isApiEndpointEnabled(api_page, api_cmds, 'getblockchaininfo')
+  - const getmininginfo           = isApiEndpointEnabled(api_page, api_cmds, 'getmininginfo')
+  - const getdifficulty           = isApiEndpointEnabled(api_page, api_cmds, 'getdifficulty')
+  - const getconnectioncount      = isApiEndpointEnabled(api_page, api_cmds, 'getconnectioncount')
+  - const getblockcount           = isApiEndpointEnabled(api_page, api_cmds, 'getblockcount')
+  - const getblockhash            = isApiEndpointEnabled(api_page, api_cmds, 'getblockhash')
+  - const getblock                = isApiEndpointEnabled(api_page, api_cmds, 'getblock')
+  - const getrawtransaction       = isApiEndpointEnabled(api_page, api_cmds, 'getrawtransaction')
+  - const getnetworkhashps        = isApiEndpointEnabled(api_page, api_cmds, 'getnetworkhashps')
+  - const getvotelist             = isApiEndpointEnabled(api_page, api_cmds, 'getvotelist')
+  - const getmasternodecount      = isApiEndpointEnabled(api_page, api_cmds, 'getmasternodecount')
+  - const verifymessage           = isApiEndpointEnabled(api_page, api_cmds, 'verifymessage')
+  - const validateaddress         = isApiEndpointEnabled(api_page, api_cmds, 'validateaddress')
+
   script.
     $(document).ready(function() {
       // NOOP
@@ -35,7 +47,7 @@ block content
           p
             em Return data from coind
           ul
-            if api_page.public_apis.rpc.getblockchaininfo.enabled == true && api_cmds['getblockchaininfo'] != null && api_cmds['getblockchaininfo'] != ''
+            if getblockchaininfo
               li
                 p
                   div.fw-bold getblockchaininfo [net]
@@ -45,7 +57,7 @@ block content
                     a(href='/api/getblockchaininfo/' + net) #{address}/api/getblockchaininfo/#{net}
                   else
                     a(href='/api/getblockchaininfo') #{address}/api/getblockchaininfo
-            if api_page.public_apis.rpc.getmininginfo.enabled == true && api_cmds['getmininginfo'] != null && api_cmds['getmininginfo'] != ''
+            if getmininginfo
               li
                 p
                   div.fw-bold getmininginfo [net]
@@ -55,7 +67,7 @@ block content
                     a(href='/api/getmininginfo/' + net) #{address}/api/getmininginfo/#{net}
                   else
                     a(href='/api/getmininginfo') #{address}/api/getmininginfo
-            if api_page.public_apis.rpc.getdifficulty.enabled == true && api_cmds['getdifficulty'] != null && api_cmds['getdifficulty'] != ''
+            if getdifficulty
               li
                 p
                   div.fw-bold getdifficulty [net]
@@ -77,7 +89,7 @@ block content
                     a(href='/api/getdifficulty/' + net) #{address}/api/getdifficulty/#{net}
                   else
                     a(href='/api/getdifficulty') #{address}/api/getdifficulty
-            if api_page.public_apis.rpc.getconnectioncount.enabled == true && api_cmds['getconnectioncount'] != null && api_cmds['getconnectioncount'] != ''
+            if getconnectioncount
               li
                 p
                   div.fw-bold getconnectioncount [net]
@@ -87,7 +99,7 @@ block content
                     a(href='/api/getconnectioncount/' + net) #{address}/api/getconnectioncount/#{net}
                   else
                     a(href='/api/getconnectioncount') #{address}/api/getconnectioncount
-            if api_page.public_apis.rpc.getblockcount.enabled == true && api_cmds['getblockcount'] != null && api_cmds['getblockcount'] != ''
+            if getblockcount
               li
                 p
                   div.fw-bold getblockcount [net]
@@ -97,7 +109,7 @@ block content
                     a(href='/api/getblockcount/' + net) #{address}/api/getblockcount/#{net}
                   else
                     a(href='/api/getblockcount') #{address}/api/getblockcount
-            if api_page.public_apis.rpc.getblockhash.enabled == true && api_cmds['getblockhash'] != null && api_cmds['getblockhash'] != ''
+            if getblockhash
               li
                 p
                   div.fw-bold getblockhash [net] [index]
@@ -107,7 +119,7 @@ block content
                     a(href='/api/getblockhash/' + net + '?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash/#{net}?index=#{api_page.sample_data.blockindex}
                   else
                     a(href='/api/getblockhash?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash?index=#{api_page.sample_data.blockindex}
-            if api_page.public_apis.rpc.getblock.enabled == true && api_cmds['getblock'] != null && api_cmds['getblock'] != ''
+            if getblock
               li
                 p
                   div.fw-bold getblock [net] [hash]
@@ -117,7 +129,7 @@ block content
                     a(href='/api/getblock/' + net + '?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock/#{net}?hash=#{api_page.sample_data.blockhash}
                   else
                     a(href='/api/getblock?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock?hash=#{api_page.sample_data.blockhash}
-            if api_page.public_apis.rpc.getrawtransaction.enabled == true && api_cmds['getrawtransaction'] != null && api_cmds['getrawtransaction'] != ''
+            if getrawtransaction
               li
                 p
                   div.fw-bold getrawtransaction [net] [txid] [decrypt]
@@ -133,7 +145,7 @@ block content
                       a(href='/api/getrawtransaction/' + net + '?txid=' + api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction/#{net}?txid=#{api_page.sample_data.txhash}&decrypt=1
                     else
                       a(href='/api/getrawtransaction?txid=' + api_page.sample_data.txhash + '&decrypt=1') #{address}/api/getrawtransaction?txid=#{api_page.sample_data.txhash}&decrypt=1
-            if api_page.public_apis.rpc.getnetworkhashps.enabled == true && shared_pages.show_hashrate == true && api_cmds['getnetworkhashps'] != null && api_cmds['getnetworkhashps'] != ''
+            if getnetworkhashps
               li
                 p
                   div.fw-bold getnetworkhashps [net]
@@ -155,7 +167,7 @@ block content
                     a(href='/api/getnetworkhashps/' + net) #{address}/api/getnetworkhashps/#{net}
                   else
                     a(href='/api/getnetworkhashps') #{address}/api/getnetworkhashps
-            if api_page.public_apis.rpc.getvotelist.enabled == true && api_cmds['getvotelist'] != null && api_cmds['getvotelist'] != ''
+            if getvotelist
               li
                 p
                   div.fw-bold getvotelist [net]
@@ -165,7 +177,7 @@ block content
                     a(href='/api/getvotelist') #{address}/api/getvotelist/#{net}
                   else
                     a(href='/api/getvotelist') #{address}/api/getvotelist
-            if api_page.public_apis.rpc.getmasternodecount.enabled == true && api_cmds['getmasternodecount'] != null && api_cmds['getmasternodecount'] != ''
+            if getmasternodecount
               li
                 p
                   div.fw-bold getmasternodecount [net]
@@ -439,7 +451,7 @@ block content
             if api_page.public_apis.ext.getmasternoderewards.enabled == true
               li
                 p
-                  div.fw-bold getmasternoderewards [net] [hash] [since]] (/ext/getmasternoderewards/hash/since)
+                  div.fw-bold getmasternoderewards [net] [hash] [since] (/ext/getmasternoderewards/hash/since)
                   div
                     em Returns a list of masternode reward transactions for address [hash] that arrived after block height [since]
                   if !isMainnet
