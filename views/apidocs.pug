@@ -14,7 +14,7 @@ block content
   - const getmasternodecount      = isApiEndpointEnabled(api_page, api_cmds, 'getmasternodecount')
   - const verifymessage           = isApiEndpointEnabled(api_page, api_cmds, 'verifymessage')
   - const validateaddress         = isApiEndpointEnabled(api_page, api_cmds, 'validateaddress')
-
+  - const getgovernanceinfo       = isApiEndpointEnabled(api_page, api_cmds, 'getgovernanceinfo')
   script.
     $(document).ready(function() {
       // NOOP
@@ -201,6 +201,13 @@ block content
                   div
                     em #{settings.locale.api_validateaddress}
                   a(href='/api/validateaddress/' + net + '?address=' + api_page.sample_data.address) #{address}/api/validateaddress/#{net}?address=#{api_page.sample_data.address}
+            if getgovernanceinfo
+              li
+                p
+                  div.fw-bold getgovernanceinfo [net]
+                  div
+                    em #{settings.locale.api_getgovernanceinfo}
+                  a(href='/api/getgovernanceinfo/' + net) #{address}/api/getgovernanceinfo/#{net}
             if settings.blockchain_specific.heavycoin.enabled == true
               if settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != ''
                 li

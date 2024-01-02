@@ -755,6 +755,9 @@
         // Validates the wallet address.
         "validateaddress": {
           "enabled": true
+        },
+        "getgovernanceinfo": {
+          "enabled": true
         }
       },
       // Extended API.
@@ -926,7 +929,8 @@
     //                message: The message that was signed
     "verifymessage": "verifymessage",
     // Needs a wallet address as parameter.
-    "validateaddress": "validateaddress"
+    "validateaddress": "validateaddress",
+    "getgovernanceinfo": "getgovernanceinfo"
   },
 
   // Non-standard blockchain features (deprecated).
