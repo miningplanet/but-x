@@ -1,6 +1,7 @@
 extends layout
 
 block content
+  - const validateaddress = api_page.public_apis.rpc.validateaddress.enabled == true && api_cmds['validateaddress'] != null && api_cmds['validateaddress'] != ''
   script.
     $(document).ready(function() {
       // NOOP
@@ -173,6 +174,13 @@ block content
                     a(href='/api/getmasternodecount/' + net) #{address}/api/getmasternodecount/#{net}
                   else
                     a(href='/api/getmasternodecount') #{address}/api/getmasternodecount
+            if validateaddress
+              li
+                p
+                  div.fw-bold validateaddress [net]
+                  div
+                    em #{settings.locale.api_validateaddress}
+                  a(href='/api/validateaddress/' + net + '?address=' + api_page.sample_data.address) #{address}/api/validateaddress/#{net}?address=#{api_page.sample_data.address}
             if settings.blockchain_specific.heavycoin.enabled == true
               if settings.blockchain_specific.heavycoin.public_apis.getmaxmoney.enabled == true && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != null && settings.blockchain_specific.heavycoin.api_cmds['getmaxmoney'] != ''
                 li

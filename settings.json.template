@@ -742,6 +742,10 @@
         // Returns the total number of masternodes.
         "getmasternodecount": {
           "enabled": true
+        },
+        // Validates the wallet address.
+        "validateaddress": {
+          "enabled": true
         }
       },
       // Extended API.
@@ -911,7 +915,9 @@
     //                address: The wallet address to use for the signature
     //                signature: The signature provided by the signer in base 64 encoding
     //                message: The message that was signed
-    "verifymessage": "verifymessage"
+    "verifymessage": "verifymessage",
+    // Needs a wallet address as parameter.
+    "validateaddress": "validateaddress"
   },
 
   // Non-standard blockchain features (deprecated).
