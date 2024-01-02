@@ -1,7 +1,8 @@
 extends layout
 
 block content
-  - const validateaddress = api_page.public_apis.rpc.validateaddress.enabled == true && api_cmds['validateaddress'] != null && api_cmds['validateaddress'] != ''
+  - const verifymessage = isApiEndpointEnabled(api_page, api_cmds, 'verifymessage')
+  - const validateaddress = isApiEndpointEnabled(api_page, api_cmds, 'validateaddress')
   script.
     $(document).ready(function() {
       // NOOP
@@ -174,6 +175,13 @@ block content
                     a(href='/api/getmasternodecount/' + net) #{address}/api/getmasternodecount/#{net}
                   else
                     a(href='/api/getmasternodecount') #{address}/api/getmasternodecount
+            if verifymessage
+              li
+                p
+                  div.fw-bold verifymessage [net]
+                  div
+                    em #{settings.locale.api_verifymessage}
+                  a(href='/api/verifymessage/' + net + '?address=' + api_page.sample_data.address + '&signature=' + api_page.sample_data.base64UrlEncodedSignature + '&message=' + api_page.sample_data.base64UrlEncodedMessage) #{address}/api/verifymessage/#{net}?address=#{api_page.sample_data.address}&signature=#{api_page.sample_data.base64UrlEncodedSignature}&message=#{api_page.sample_data.base64UrlEncodedMessage}
             if validateaddress
               li
                 p

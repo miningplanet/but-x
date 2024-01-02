@@ -280,6 +280,10 @@ networks.forEach( function(net, index) {
   }
 })
 
+function isApiEndpointEnabled(api_page, api_cmds, key) {
+  return api_page.public_apis.rpc[key].enabled == true && api_cmds[key] != null && api_cmds[key] != ''
+}
+
 router.get('/apidocs/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
@@ -293,6 +297,7 @@ router.get('/apidocs/:net?', function(req, res) {
     p.api_cmds = settings.get(net, 'api_cmds')
     p.isButkoin = settings.isButkoin(net)
     p.isMainnet = net == 'mainnet'
+    p.isApiEndpointEnabled = isApiEndpointEnabled
     res.render('apidocs', p)
   } else {
     route_get_index(res, null, net)

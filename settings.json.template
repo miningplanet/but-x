@@ -688,7 +688,12 @@
       "blockindex": 500,
       "blockhash": "775d67da29dd6553268061f86368d06654944dd5d5c61db4c97e4c7960c11a74",
       "txhash": "6cb3babd256de253f926f10bc8574dadf0a3e2fc8380107b81eb07c67d1e73ed",
-      "address": "ELvb8AZRgHmdsDnD1HYFwbSY4UkPhoECCW"
+      "address": "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
+      "address": "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
+      // 'HelloWorld' to base64 (SGVsbG9Xb3JsZA==) to URL-encoded
+      "base64UrlEncodedMessage": "SGVsbG9Xb3JsZA%3D%3D",
+      // signature (H1B9Yt0gLf9V/W6L5GJ73O6Kb4RYL12zJ1YPrYS+tv0tIIsnREY92/+F2n9nBFxVzIqQL/L8blE8tnmWE2QAm8E=) to URL-encoded
+      "base64UrlEncodedSignature": "H1B9Yt0gLf9V%2FW6L5GJ73O6Kb4RYL12zJ1YPrYS%2Btv0tIIsnREY92%2F%2BF2n9nBFxVzIqQL%2FL8blE8tnmWE2QAm8E%3D"
     },
     // Public available APIs.
     "public_apis": {
@@ -741,6 +746,10 @@
         // /api/getmasternodecount
         // Returns the total number of masternodes.
         "getmasternodecount": {
+          "enabled": true
+        },
+        // Verifies a message.
+        "verifymessage": {
           "enabled": true
         },
         // Validates the wallet address.
