@@ -69,114 +69,114 @@ block content
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER')
       .card.card-default.border-0.cardSpacer
         .card-header
-          strong #{settings.locale.tx_protx_reg_version} #{tx.extra[0]}
+          strong #{settings.locale.tx_protx_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_hash}
-              td.breakWord #{tx.extra[1]}
+              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_index}
-              td.breakWord #{tx.extra[2]}
+              td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_service}
-              td.breakWord #{tx.extra[3]}
+              td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_owner_address}
-              td.breakWord #{tx.extra[4]}
+              td.breakWord #{tx.extra ? tx.extra[4] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_voting_address}
-              td.breakWord #{tx.extra[5]}
+              td.breakWord #{tx.extra ? tx.extra[5] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_payout_address}
-              td.breakWord #{tx.extra[6]}
+              td.breakWord #{tx.extra ? tx.extra[6] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_operator_pk}
-              td.breakWord #{tx.extra[7]}
+              td.breakWord #{tx.extra ? tx.extra[7] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_operator_reward}
-              td.breakWord #{tx.extra[8]}
+              td.breakWord #{tx.extra ? tx.extra[8] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
-              td.breakWord #{tx.extra[9]}
+              td.breakWord #{tx.extra ? tx.extra[9] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE')
       .card.card-default.border-0.cardSpacer
         .card-header
-          strong #{settings.locale.tx_protx_update_version} #{tx.extra[0]}
+          strong #{settings.locale.tx_protx_update_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_protx_hash}
-              td.breakWord #{tx.extra[1]}
+              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_service}
-              td.breakWord #{tx.extra[2]}
+              td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
-              td.breakWord #{tx.extra[3]}
+              td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR')
       .card.card-default.border-0.cardSpacer
         .card-header
-          strong #{settings.locale.tx_protx_update_reg_version} #{tx.extra[0]}
+          strong #{settings.locale.tx_protx_update_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_reg_protx_hash}
-              td.breakWord #{tx.extra[1]}
+              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_reg_voting_address}
-              td.breakWord #{tx.extra[2]}
+              td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_reg_payout_address}
-              td.breakWord #{tx.extra[3]}
+              td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_reg_operator_pk}
-              td.breakWord #{tx.extra[4]}
+              td.breakWord #{tx.extra ? tx.extra[4] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
-              td.breakWord #{tx.extra[5]}
+              td.breakWord #{tx.extra ? tx.extra[5] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE')
       .card.card-default.border-0.cardSpacer
         .card-header
-          strong #{settings.locale.tx_protx_update_revoke_version} #{tx.extra[0]}
+          strong #{settings.locale.tx_protx_update_revoke_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_revoke_protx_hash}
-              td.breakWord #{tx.extra[1]}
+              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_revoke_reason}
-              td.breakWord #{tx.extra[2]}
+              td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
-              td.breakWord #{tx.extra[3]}
+              td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT')
       .card.card-default.border-0.cardSpacer
         .card-header
-          strong #{settings.locale.tx_qc_version} #{tx.extra[0]}
+          strong #{settings.locale.tx_qc_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_height}
-              td.breakWord #{tx.extra[1]}
+              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_version}
-              td.breakWord #{tx.extra[2]}
+              td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_llmq_type}
-              td.breakWord #{tx.extra[3]}
+              td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_hash}
-              td.breakWord #{tx.extra[4]}
+              td.breakWord #{tx.extra ? tx.extra[4] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_signers}
-              td.breakWord #{tx.extra[5]}
+              td.breakWord #{tx.extra ? tx.extra[5] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_valid_members}
-              td.breakWord #{tx.extra[6]}
+              td.breakWord #{tx.extra ? tx.extra[6] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_pk}
-              td.breakWord #{tx.extra[7] == '0' ? '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' : tx.extra[7]}
+              td.breakWord #{tx.extra ? tx.extra[7] == '0' ? '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' : tx.extra[7] : 'N/A'}
     else if tx.vout.length < 1
       .text-center(role='alert', style='margin-bottom:0;')
         strong #{settings.locale.tx_nonstandard} #{tx.tx_type}
