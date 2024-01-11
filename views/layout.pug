@@ -14,6 +14,8 @@ html(lang='en')
   - const error_page = settings.get(net, 'error_page')
   - const network_history = settings.get(net, 'network_history')
   - const isButkoin = settings.isButkoin(net)
+  - const isPepew = settings.isPepew(net)
+  - const isVkax = settings.isVkax(net)
   - const search_enabled = shared_pages.page_header.search.enabled
   - const nethash_enabled = shared_pages.page_header.network_charts.nethash_chart.enabled
   - const difficulty_enabled = shared_pages.page_header.network_charts.difficulty_chart.enabled
@@ -330,6 +332,8 @@ html(lang='en')
                   const netHashSets = []
                   const algos = '#{shared_pages.page_header.network_charts.algos}'
                   const isBut = '#{isButkoin}'
+                  const isPepew = '#{isPepew}'
+                  const isVkax = '#{isVkax}'
                   if (algos.includes("ghostrider")) {
                     netHashSets.push({
                       label: 'Ghostrider',
@@ -391,7 +395,16 @@ html(lang='en')
                       backgroundColor: ['#{shared_pages.page_header.network_charts.nethash_chart.ghostrider_fill_color}'],
                       borderColor: ['#{shared_pages.page_header.network_charts.nethash_chart.ghostrider_line_color}'],
                       fill: 'start'
-                    });
+                    })
+                  }
+                  if (algos.includes("mike")) {
+                    netHashSets.push({
+                      label: 'Mike',
+                      data: result.map(function(a) {return a.nethash_mike;}),
+                      backgroundColor: ['#{shared_pages.page_header.network_charts.nethash_chart.mike_fill_color}'],
+                      borderColor: ['#{shared_pages.page_header.network_charts.nethash_chart.mike_line_color}'],
+                      fill: 'start'
+                    })
                   }
 
                   nethashChart = new Chart(ctxNethash, {
@@ -471,6 +484,9 @@ html(lang='en')
                                 const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
                                 return n + ' KH/s'
                               } else if (context.dataset.label == 'MemeHash') {
+                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                return n + ' KH/s'
+                              } else if (context.dataset.label == 'Mike') {
                                 const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
                                 return n + ' KH/s'
                               }
@@ -577,6 +593,15 @@ html(lang='en')
                       data: result.map(function(a) {return a.difficulty_butkscrypt}),
                       backgroundColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_fill_color}'],
                       borderColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_line_color}'],
+                      fill: 'start'
+                    })
+                  }
+                  if (algos.includes("mike")) {
+                    diffDataSets.push({
+                      label: 'Mike',
+                      data: result.map(function(a) {return a.difficulty_mike}),
+                      backgroundColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.mike_fill_color}'],
+                      borderColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.mike_line_color}'],
                       fill: 'start'
                     })
                   }

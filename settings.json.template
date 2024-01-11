@@ -101,12 +101,18 @@
     "GBP": { "minfd": 8, "maxfd": 8, "name": "British Pound Sterling", "code": "GBP", "symbol": "&pound;" },
     "RUB": { "minfd": 6, "maxfd": 6, "name": "Russian Ruble", "code": "RUB", "symbol": "&#8381;" },
     "BRL": { "minfd": 7, "maxfd": 7, "name": "Brazilian Real", "code": "BRL", "symbol": "R&#36;" },
-    "BUTK": { "minfd": 2, "maxfd": 2, "name": "Butkoin", "code": "BUTK", "symbol": "BUTK" },
+    "BUTK": { "minfd": 2, "maxfd": 2, "name": "Butkoin", "code": "BUTK", "symsbol": "BUTK" },
     "USDT": { "minfd": 8, "maxfd": 8, "name": "Tether", "code": "USDT", "symbol": "USDT" },
     "BTC": { "minfd": 8, "maxfd": 8, "name": "Bitcoin", "code": "BTC", "symbol": "BTC" },
     "LTC": { "minfd": 7, "maxfd": 7, "name": "Litecoin", "code": "LTC", "symbol": "LTC" },
     "DOGE": { "minfd": 6, "maxfd": 6, "name": "Dogecoin", "code": "DOGE", "symbol": "DOGE" },
-    "EXTO": { "minfd": 7, "maxfd": 7, "name": "Exto", "code": "EXTO", "symbol": "EXT" }
+    "EXTO": { "minfd": 7, "maxfd": 7, "name": "Exto", "code": "EXTO", "symbol": "EXT" },
+    "BTRM": { "minfd": 2, "maxfd": 2, "name": "Bitoreum", "code": "BTRM", "symbol": "BTRM" },
+    "RTM": { "minfd": 2, "maxfd": 2, "name": "Raptoreum", "code": "RTM", "symbol": "RTM" },
+    "DASH": { "minfd": 4, "maxfd": 4, "name": "Dash", "code": "DASH", "symbol": "DASH" },
+    "BNB": { "minfd": 8, "maxfd": 8, "name": "Binance", "code": "BNB", "symbol": "BNB" },
+    "PEPEW": { "minfd": 7, "maxfd": 7, "name": "PEPEPOW", "code": "PEPEW", "symbol": "PEPEW" },
+    "VKAX": { "minfd": 7, "maxfd": 7, "name": "Vkax", "code": "VKAX", "symbol": "VKAX" }
   },
 
   // TTL cache (time in seconds)

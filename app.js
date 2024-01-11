@@ -1073,6 +1073,8 @@ app.set('locale', locale);
 app.set('get', settings.get);
 app.set('getWallet', settings.getWallet);
 app.set('isButkoin', settings.isButkoin);
+app.set('isPepew', settings.isPepew);
+app.set('isVkax', settings.isVkax);
 app.set('getLogo', settings.getLogo);
 app.set('getTitleLogo', settings.getTitleLogo);
 app.set('formatDateTime', settings.formatDateTime);
