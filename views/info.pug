@@ -1,0 +1,165 @@
+extends layout
+
+block content
+  - const info = info_page.info
+  script.
+    $(document).ready(function() {
+      // NOOP
+    });
+  .col-md-12.cardSpacer
+    if info_page.page_header.show_img == true || info_page.page_header.show_title == true || info_page.page_header.show_description == true
+      #page-header-container(style='align-items:' + (info_page.page_header.show_img == true && info_page.page_header.show_title == true && info_page.page_header.show_description == true ? 'flex-start' : 'center'))
+        if info_page.page_header.show_img == true
+          #header-img-container
+            img#header-img(src=page_title_logo)
+        #page-title-container
+          if info_page.page_header.show_title == true
+            if coin.name.toLowerCase() != net.toLowerCase()
+              h3#page-title #{settings.locale.info_title.replace('{1}', coin.name).replace('{2}', net)}
+            else 
+              h3#page-title #{settings.locale.info_title.replace('{1}', coin.name).replace('{2}', '')}
+          if info_page.page_header.show_description == true
+            if info_page.page_header.show_title != true
+              #page-title-container
+                .sub-page-header.text-muted=settings.locale.info_description.replace('{1}', coin.name)
+            else
+              .sub-page-header.text-muted=settings.locale.info_description.replace('{1}', coin.name)
+      .cardSpacer.clearfix
+    .card.card-default.border-0
+      .card-header
+        strong #{settings.locale.info_documentation}
+      .card-body
+        if info_page.show_logo == true
+          img(src=settings.getWallet(net).logo_title, style='margin:0;height:128px;')
+          hr
+        if info.description.length > 0
+          p '#{info.description}'
+          br
+        if info.show_chainstats == true
+          h4 #{settings.locale.info_title_chain}
+          hr
+          table#chainstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            tbody 
+            tr
+              td.text-start #{settings.locale.info_name}
+              td.text-end #{coin.name}
+            tr
+              td.text-start #{settings.locale.info_symbol}
+              td.text-end #{coin.symbol}
+            if info.home_url.length > 0
+              tr
+                td.text-start #{settings.locale.info_home}
+                td.text-end 
+                  a(href=info.home_url) #{info.home_url}
+            if info.whiterpaper_url.length > 0
+              tr
+                td.text-start #{settings.locale.info_whitepaper}
+                td.text-end 
+                  a(href=info.whiterpaper_url) External link
+            tr
+              td.text-start #{settings.locale.info_block_height}
+              td.text-end 
+                a(href=info.whiterpaper_url) #{settings.formatInt(stats.count)}
+            if info.show_last_price == true
+              tr
+                td.text-start #{settings.locale.info_last_price.replace('{1}', "USDT")}
+                td.text-end #{stats.last_price + ' / ' + stats.last_usd_price}
+            tr
+              td.text-start #{settings.locale.info_max_supply}
+              td.text-end #{settings.formatCurrency(21000000000, 'BUTK')}
+            tr
+              td.text-start #{settings.locale.info_current_supply}
+              td.text-end #{settings.formatCurrency(stats.supply, 'BUTK')}
+            if info.show_coinbase == true && latest_coinbase_tx[0] && latest_coinbase_tx[0].vin[0] /* Does not exist for pepew. */
+              tr 
+                td.text-start #{settings.locale.info_latest_coinbase}
+                td.text-end #{settings.formatCurrency(latest_coinbase_tx[0].vin[0].amount / 100000000, 'BUTK')}
+            tr
+              td.text-start #{settings.locale.info_count_addresses}
+              td.text-end #{settings.formatInt(stats.addresses)}
+            tr
+              td.text-start #{settings.locale.info_count_utxos}
+              td.text-end #{settings.formatInt(stats.utxos)}
+            tr
+              td.text-start #{settings.locale.info_count_transactions}
+              td.text-end #{settings.formatInt(stats.txes)}
+            if info.show_txstats == true
+              each tx_type in tx_by_type 
+                tr.sub
+                  td.text-start 
+                    span #{tx_type._id + ' · ' + tx_type.type.replace('TRANSACTION_', '')}
+                  td.text-end
+                    span #{settings.formatInt(tx_type.count)}
+            if info.show_masternode_info == true
+              tr
+                td.text-start #{settings.locale.info_count_masternodes}
+                td.text-end #{stats.smartnodes_enabled + ' / ' + stats.smartnodes_total}
+            if info.show_miningstats == true && algos.length == 1
+              tr
+                td.text-start #{settings.locale.info_hash_ps}
+                td.text-end #{settings.formatDecimal(stats['nethash'], 3, 3)}
+              tr
+                td.text-start #{settings.locale.info_difficulty}
+                td.text-end #{settings.formatDecimal(stats['difficulty'], 6, 6)}
+          br
+        if info.show_markets == true
+          h4 #{settings.locale.info_title_markets}
+          hr
+          table#marketstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            tbody 
+            tr
+              td.text-start #{settings.locale.info_name}
+              td.text-end #{coin.name}
+            tr
+              td.text-start #{settings.locale.info_symbol}
+              td.text-end #{coin.symbol}
+            tr
+              td.text-start Traing pairs
+              td.text-end #{trading_pairs}
+            tr
+              td.text-start Buys (total)
+              td.text-end
+            each buy in buys 
+              tr.sub
+                td.text-start 
+                  span #{buy._id.trade}
+                td.text-end
+                  span #{settings.formatDecimal(buy.sum_val, 2, 2)}
+            tr
+              td.text-start Sells (total)
+              td.text-end
+            each sell in sells 
+              tr.sub
+                td.text-start 
+                  span #{sell._id.trade}
+                td.text-end
+                  span #{settings.formatDecimal(sell.sum_val, 2, 2)}
+          br
+        if info.show_miningstats == true && algos.length > 1
+          h4 #{settings.locale.info_title_mining}
+          hr
+          table#miningstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            thead
+              tr(class=theadClasses)
+                th.text-center.fill #{settings.locale.info_mining_th_algorithm}
+                th.text-center.algotype #{settings.locale.info_mining_th_type}
+                th.text-center.hashps #{settings.locale.info_mining_th_hash_ps}
+                th.text-center #{settings.locale.info_mining_th_difficulty}
+                th.text-center #{settings.locale.info_mining_th_blocks}
+                th.text-center.percent #{settings.locale.info_mining_th_percent}
+            tbody 
+              each algo in algos 
+                tr
+                  - const blocks = blocks_by_algorithm.find((e) => e._id === algo.algo).count
+                  td.text-start #{algo.label}
+                  td.text-center #{algo.type.toUpperCase()}
+                  td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], 0, 0)}
+                  td.text-end #{settings.formatDecimal(stats['difficulty_' + algo.algo], 5, 5)}
+                  td.text-end #{settings.formatInt(blocks)}
+                  td.text-end #{settings.formatDecimal(blocks / stats.count * 100, 2, 2)}
+        //- if info.show_sporks == true
+        //-   h4 Sporks
+        //-   hr
+
+
+

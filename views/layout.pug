@@ -2,6 +2,7 @@ doctype html
 html(lang='en')
   - const markets_page = settings.get(net, 'markets_page')
   - const index_page = settings.get(net, 'index_page')
+  - const info_page = settings.get(net, 'info_page')
   - const block_page = settings.get(net, 'block_page')
   - const transaction_page = settings.get(net, 'transaction_page')
   - const address_page = settings.get(net, 'address_page')
@@ -1194,11 +1195,16 @@ html(lang='en')
                     a.nav-link(href='/reward/' + net)
                       span.fa.fa-star
                       span.margin-left-5 #{settings.locale.menu_reward}
+                if info_page.enabled == true
+                  li#info.nav-item
+                    a.nav-link(href='/info/' + net)
+                      span.info
+                      span.margin-left-5 #{settings.locale.menu_info}
                 if masternodes_page.enabled == true
                   li#masternodes.nav-item
                     a.nav-link(href='/masternodes/' + net)
                       span.smartnodes
-                      span.margin-left-5 Smartnodes
+                      span.margin-left-5 #{settings.locale.menu_masternodes}
                 if movement_page.enabled == true
                   li#movement.nav-item
                     a.nav-link(href='/movement/' + net)
@@ -1271,16 +1277,21 @@ html(lang='en')
                 a.nav-link(href='/')
                   span.nav-icon.fas.fa-cubes
                   span.margin-left-5 #{settings.locale.menu_explorer}
+              if masternodes_page.enabled == true
+                li#masternodes.nav-item(alt=settings.locale.menu_info, title=settings.locale.menu_info, data-bs-toggle='tooltip', data-bs-placement='right')
+                  a.nav-link(href='/info')
+                    span.nav-icon.fa.fa-info-circle
+                    span.margin-left-5 #{settings.locale.menu_info}
               if settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true
                 li#reward.nav-item(alt=settings.locale.menu_reward, title=settings.locale.menu_reward, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/reward')
                     span.nav-icon.fa.fa-star
                     span.margin-left-5 #{settings.locale.menu_reward}
               if masternodes_page.enabled == true
-                li#masternodes.nav-item(alt="Smartnodes", title="Smartnodes", data-bs-toggle='tooltip', data-bs-placement='right')
+                li#masternodes.nav-item(alt=settings.locale.menu_masternodes, title=settings.locale.menu_masternodes, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/masternodes')
                     span.nav-icon.fa.fa-share-alt
-                    span.margin-left-5 Smartnodes
+                    span.margin-left-5 #{settings.locale.menu_masternodes}
               if movement_page.enabled == true
                 li#movement.nav-item(alt=settings.locale.menu_movement, title=settings.locale.menu_movement, data-bs-toggle='tooltip', data-bs-placement='right')
                   a.nav-link(href='/movement')

@@ -208,6 +208,68 @@ function route_get_index(res, error, net=settings.getDefaultNet()) {
   }
 }
 
+function route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net=settings.getDefaultNet()) {
+  const coin = settings.getCoin(net)
+  const shared_pages = settings.get(net, 'shared_pages')
+  const info_page = settings.get(net, 'info_page')
+  const algos = settings.get(net, 'algos')
+
+  const tx_types = settings.get(net, 'tx_types')
+  let i = 0
+  while (i < tx_by_type.length) {
+      tx_by_type[i].type = tx_types[i]
+      i++
+  }
+
+  const trading_pairs = []
+  markets.forEach((e) => {
+    if (!trading_pairs.includes(e.pair_symbol))
+      trading_pairs.push(e.pair_symbol)
+  })
+
+  const p = param('info', info_page, coin, net, db, settings, coin.name + ' X')
+  p.last_updated = null
+  p.shared_pages = shared_pages
+  p.algos = algos
+  // shared_pages.page_header.network_charts.algos.size
+  p.info_page = info_page
+  p.blocks_by_algorithm = blocks_by_algorithm
+  p.tx_by_type = tx_by_type
+  p.latest_coinbase_tx = latest_coinbase_tx
+  p.markets = markets
+  p.trading_pairs = trading_pairs
+  p.sells = sells
+  p.buys = buys
+
+  if (info_page.page_header.show_last_updated == true) {
+    db.get_stats(coin.name, function (stats) {
+      p.stats = stats
+      p.last_updated = stats.network_last_updated
+      res.render('info', p)
+    }, net)
+  } else {
+    res.render('info', p)
+  }
+}
+
+router.get('/info/:net?', function(req, res) {
+  const net = req.params['net']
+  const coin = settings.getCoin(net)
+  db.count_blocks_by_algorithm(0, function (blocks_by_algorithm) {
+    db.count_tx_by_type(0, function (tx_by_type) {
+      db.get_latest_coinbase_tx("5", function (latest_coinbase_tx) {
+        db.get_markets(function(markets) {
+          db.get_order_aggregation(coin.symbol, 0, function (sells) {
+            db.get_order_aggregation(coin.symbol, 1, function (buys) {
+              route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net)
+            }, net)
+          }, net)
+        }, net)
+      }, net)
+    }, net)
+  }, net)
+})
+
 function route_get_address(res, hash, coin, net=settings.getDefaultNet()) {
   net = settings.getNet(net)
   const address_page = settings.get(net, 'address_page')

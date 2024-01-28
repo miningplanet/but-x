@@ -215,12 +215,18 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   }, function() {
     // check if the script stopped prematurely
     if (!stopSync) {
-      StatsDb[net].updateOne({coin: coin}, {
-        last: end,
-        txes: txes
-      }).then(() => {
-        return cb()
-      })
+      db.count_addresses(function(addresses) {
+        db.count_utxos(function(utxos) {
+          StatsDb[net].updateOne({coin: coin}, {
+            last: end,
+            txes: txes,
+            addresses: addresses,
+            utxos: utxos
+          }).then(() => {
+            return cb()
+          })
+        }, net)
+      }, net)
     } else
       return cb()
   })

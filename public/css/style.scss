@@ -1706,6 +1706,34 @@ div#links span.vertical-align-middle, div#links img {
   margin: 4px !important;
 }
 
+table tbody, table tbody tr:first-child {
+  border-color: var(--bg0);
+}
+
+table tr.sub td span {
+  font-size: 0.875em;
+}
+
+table tr.sub td:first-child span {
+  margin-left: 1em;
+}
+
+table th.fill, table td.fill {
+  width: 100%;
+}
+
+table th.percent, table td.percent {
+  min-width: 48px;
+}
+
+table th.algotype, table td.algotype {
+  min-width: 60px;
+}
+
+table th.hashps, table td.hashps {
+  min-width: 104px;
+}
+
 /* Responsivnes */
 @media only screen and (max-width: 575px) {
   div#body-container { min-height: 700px }

@@ -1068,29 +1068,31 @@ networks.forEach( function(item, index) {
 });
 
 // locals
-app.set('explorer_version', package_metadata.version);
-app.set('locale', locale);
-app.set('get', settings.get);
-app.set('getWallet', settings.getWallet);
-app.set('isButkoin', settings.isButkoin);
-app.set('isPepew', settings.isPepew);
-app.set('isVkax', settings.isVkax);
-app.set('getLogo', settings.getLogo);
-app.set('getTitleLogo', settings.getTitleLogo);
-app.set('formatDateTime', settings.formatDateTime);
-app.set('formatCurrency', settings.formatCurrency);
-app.set('panelOffset', settings.panelOffset);
-app.set('panel', settings.panel);
-app.set('panels', settings.panels);
-app.set('coins', settings.coins);
-app.set('wallets', settings.wallets);
-app.set('default_wallet', settings.wallets[0].id);
-app.set('currencies', settings.currencies);
-app.set('cache', settings.cache);
-app.set('labels', settings.labels);
-app.set('blockchain_specific', settings.blockchain_specific);
-app.set('market_data', market_data);
-app.set('market_count', market_count);
+app.set('explorer_version', package_metadata.version)
+app.set('locale', locale)
+app.set('get', settings.get)
+app.set('getWallet', settings.getWallet)
+app.set('isButkoin', settings.isButkoin)
+app.set('isPepew', settings.isPepew)
+app.set('isVkax', settings.isVkax)
+app.set('getLogo', settings.getLogo)
+app.set('getTitleLogo', settings.getTitleLogo)
+app.set('formatDateTime', settings.formatDateTime)
+app.set('formatCurrency', settings.formatCurrency)
+app.set('formatDecimal', settings.formatDecimal)
+app.set('formatInt', settings.formatInt)
+app.set('panelOffset', settings.panelOffset)
+app.set('panel', settings.panel)
+app.set('panels', settings.panels)
+app.set('coins', settings.coins)
+app.set('wallets', settings.wallets)
+app.set('default_wallet', settings.wallets[0].id)
+app.set('currencies', settings.currencies)
+app.set('cache', settings.cache)
+app.set('labels', settings.labels)
+app.set('blockchain_specific', settings.blockchain_specific)
+app.set('market_data', market_data)
+app.set('market_count', market_count)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
