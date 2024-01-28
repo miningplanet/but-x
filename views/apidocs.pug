@@ -20,8 +20,8 @@ block content
       // NOOP
     });
   .col-md-12.cardSpacer
-    if api_page.page_header.show_img == true || api_page.page_header.show_title == true || api_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (api_page.page_header.show_img == true && api_page.page_header.show_title == true && api_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(api_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(api_page, net) ? 'flex-start' : 'center'))
         if api_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

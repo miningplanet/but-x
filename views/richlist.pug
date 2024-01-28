@@ -69,11 +69,11 @@ block content
   - var theadClasses = [];
   if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
     - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
-  if richlist_page.page_header.show_img == true || richlist_page.page_header.show_title == true || richlist_page.page_header.show_last_updated == true || richlist_page.page_header.show_description == true
+  if settings.anyHeader(richlist_page, net)
     .row(style='margin: 0 0 5px 0;')
       div(class=(richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12' : 'col-12'))
         .container
-          #page-header-container(style='align-items:' + (richlist_page.page_header.show_img == true && richlist_page.page_header.show_title == true && richlist_page.page_header.show_last_updated == true && richlist_page.page_header.show_description == true ? 'flex-start' : 'center'))
+          #page-header-container(style='align-items:' + (settings.allHeaders(richlist_page, net) ? 'flex-start' : 'center'))
             if richlist_page.page_header.show_img == true
               #header-img-container
                 img#header-img(src=page_title_logo)

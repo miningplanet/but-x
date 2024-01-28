@@ -121,8 +121,8 @@ block content
   if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
     - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-xs-12.col-md-12
-    if address_page.page_header.show_img == true || address_page.page_header.show_title == true || address_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (address_page.page_header.show_img == true && address_page.page_header.show_title == true && address_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(address_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(address_page, net) ? 'flex-start' : 'center'))
         if address_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

@@ -26,8 +26,8 @@ block content
       }
     });
   .col-xs-12.col-md-12
-    if block_page.page_header.show_img == true || block_page.page_header.show_title == true || block_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (block_page.page_header.show_img == true && block_page.page_header.show_title == true && block_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(block_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(block_page, net) ? 'flex-start' : 'center'))
         if block_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

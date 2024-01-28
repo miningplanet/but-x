@@ -89,8 +89,8 @@ block content
         });
       });
   .col-xs-12.col-md-12
-    if markets_page.page_header.show_img == true || markets_page.page_header.show_title == true || markets_page.page_header.show_last_updated == true || (markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') || markets_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (markets_page.page_header.show_img == true && markets_page.page_header.show_title == true && ((markets_page.page_header.show_last_updated == true && markets_page.page_header.show_description == true) || ((markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') && markets_page.page_header.show_description == true) || ((markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') && markets_page.page_header.show_last_updated == true)) ? 'flex-start' : 'center'))
+    if settings.anyHeader(markets_page, net) || (markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '')
+      #page-header-container(style='align-items:' + (settings.allHeaders(address_page, net) && ((markets_page.page_header.show_last_updated == true == true) || ((markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') && markets_page.page_header.show_description == true) || ((markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != ''))) ? 'flex-start' : 'center'))
         if markets_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

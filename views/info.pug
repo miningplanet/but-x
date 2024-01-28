@@ -7,8 +7,8 @@ block content
       // NOOP
     });
   .col-md-12.cardSpacer
-    if info_page.page_header.show_img == true || info_page.page_header.show_title == true || info_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (info_page.page_header.show_img == true && info_page.page_header.show_title == true && info_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(info_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(info_page, net) ? 'flex-start' : 'center'))
         if info_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

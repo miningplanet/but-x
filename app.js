@@ -1070,6 +1070,8 @@ networks.forEach( function(item, index) {
 // locals
 app.set('explorer_version', package_metadata.version)
 app.set('locale', locale)
+app.set('anyHeader', settings.anyHeader)
+app.set('allHeaders', settings.allHeaders)
 app.set('get', settings.get)
 app.set('getWallet', settings.getWallet)
 app.set('isButkoin', settings.isButkoin)

@@ -156,8 +156,8 @@ block content
       }
     });
   .col-md-12.cardSpacer
-    if masternodes_page.page_header.show_img == true || masternodes_page.page_header.show_title == true || masternodes_page.page_header.show_last_updated == true || masternodes_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (masternodes_page.page_header.show_img == true && masternodes_page.page_header.show_title == true && masternodes_page.page_header.show_last_updated == true && masternodes_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(masternodes_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(masternodes_page, net) == true ? 'flex-start' : 'center'))
         if masternodes_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

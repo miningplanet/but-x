@@ -2,8 +2,8 @@ extends layout
 
 block content
   .col-xs-12.col-md-12
-    if error_page.page_header.show_img == true || error_page.page_header.show_title == true || error_page.page_header.show_description == true
-      #page-header-container(style='align-items:' + (error_page.page_header.show_img == true && error_page.page_header.show_title == true && error_page.page_header.show_description == true ? 'flex-start' : 'center'))
+    if settings.anyHeader(error_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(error_page, net) ? 'flex-start' : 'center'))
         if error_page.page_header.show_img == true
           #header-img-container
             img#header-img(src=page_title_logo)

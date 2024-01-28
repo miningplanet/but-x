@@ -270,8 +270,8 @@ block content
     - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-md-12.cardSpacer
     .container
-      if network_page.page_header.show_img == true || network_page.page_header.show_title == true || network_page.page_header.show_last_updated == true || network_page.page_header.show_description == true
-        #page-header-container(style='align-items:' + (network_page.page_header.show_img == true && network_page.page_header.show_title == true && network_page.page_header.show_last_updated == true && network_page.page_header.show_description == true ? 'flex-start' : 'center'))
+      if settings.anyHeader(network_page, net)
+        #page-header-container(style='align-items:' + (settings.allHeaders(network_page, net) == true ? 'flex-start' : 'center'))
           if network_page.page_header.show_img == true
             #header-img-container
               img#header-img(src=page_title_logo)
