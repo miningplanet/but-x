@@ -181,7 +181,6 @@ but-eiquidus supports the following crypto currency exchanges.
 - [Finexbox](https://finexbox.com)
 - [FreiExchange](https://freiexchange.com)/[FreiXLite](https://freixlite.com) *\*no chart support due to a lack of OHLCV api data*
 - [Poloniex](https://poloniex.com)
-- [SouthXchange](https://southxchange.com)
 - [Tradeogre](https://tradeogre.com)
 - [Unnamed](https://unnamed.exchange)
 - [Yobit](https://yobit.io) *\*no chart support due to a lack of OHLCV api data*
