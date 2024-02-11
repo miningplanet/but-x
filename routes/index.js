@@ -376,17 +376,24 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
     const coin_symbol = req.params['coin_symbol']
     const pair_symbol = req.params['pair_symbol']
     const exchange = markets_page.exchanges[market_id]
+    const reverse = coin.symbol != coin_symbol
 
     if (exchange != null && exchange.enabled == true && exchange.trading_pairs.findIndex(p => p.toLowerCase() == coin_symbol.toLowerCase() + '/' + pair_symbol.toLowerCase()) > -1) {
       db.get_markets_summary(function(mmdata) {
         db.get_market(market_id, coin_symbol, pair_symbol, function(data) {
+          if (!data) {
+            data = {}
+            // TODO: Fix this in a better way.
+            // data ? data.reverse : false
+            // route_get_index(res, merr, net)
+          }
           db.get_market_trade_history(market_id, coin_symbol, pair_symbol, function(trade_history_data) {
             if (trade_history_data)
               data.history = trade_history_data
-            db.get_buy_order_aggregation(market_id, coin_symbol, pair_symbol, function(buy_orders) {
+            db.get_buy_order_aggregation(market_id, coin_symbol, pair_symbol, data ? data.reverse : false, function(buy_orders) {
               if (buy_orders)
                 data.buys = buy_orders
-              db.get_sell_order_aggregation(market_id, coin_symbol, pair_symbol, function(sell_orders) {
+              db.get_sell_order_aggregation(market_id, coin_symbol, pair_symbol, data ? data.reverse : false, function(sell_orders) {
                 if (sell_orders)
                   data.sells = sell_orders
 
@@ -419,6 +426,7 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
                   referal: referal,
                   coin: coin_symbol,
                   exchange: pair_symbol,
+                  reverse: reverse,
                   data: data,
                   url: url
                 },

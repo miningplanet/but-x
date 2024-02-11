@@ -1014,7 +1014,7 @@ if (db.lib.is_locked([database], net) == false) {
         }
       })
     } else {
-      // check if market feature is enabled
+      /* update markets */
       const markets_page = settings.get(net, 'markets_page')
       if (markets_page.enabled == true) {
         var complete = 0
@@ -1043,20 +1043,22 @@ if (db.lib.is_locked([database], net) == false) {
             // check if market is enabled via settings
             if (markets_page.exchanges[key].enabled == true) {
               if (db.fs.existsSync('./lib/markets/' + key + '.js')) {
-                var exMarket = require('../lib/markets/' + key + '.js')
+                const exMarket = require('../lib/markets/' + key + '.js')
                 // loop through all trading pairs
                 markets_page.exchanges[key].trading_pairs.forEach(function(pair_key, pair_index, pair_map) {
-                  var split_pair = pair_key.split('/')
+                  const split_pair = pair_key.split('/')
+                  const reverse = coin.symbol != split_pair[0]
+
                   if (split_pair.length == 2) {
                     // lookup the exchange in the market collection
-                    db.check_market(key, split_pair[0], split_pair[1], function(mkt, exists) {
+                    db.check_market(key, split_pair[0], split_pair[1], reverse, function(mkt, exists) {
                       if (!exists) {
                         // exchange doesn't exist in the market collection so add a default definition now
-                        console.log('No %s: %s entry found. Creating new entry now..', exMarket.market_name, pair_key)
-                        db.create_market(split_pair[0], split_pair[1], exMarket.market_name.toLowerCase(), exMarket.ext_market_url, exMarket.referal, exMarket.market_logo, function() {
+                        console.log('No %s: %s (reverse=%s) entry found. Creating new entry now..', exMarket.market_name, pair_key, reverse)
+                        db.create_market(split_pair[0], split_pair[1], reverse, exMarket.market_name.toLowerCase(), exMarket.ext_market_url, exMarket.referal, exMarket.market_logo, function() {
                           // !!! automatically pause for 2 seconds in between requests
                           rateLimit.schedule(function() {
-                            db.update_markets_db(key, split_pair[0], split_pair[1], function(err) {
+                            db.update_markets_db(key, split_pair[0], split_pair[1], reverse, function(err) {
                               if (!err) {
                                 console.log('%s[%s]: Market data updated successfully.', key, pair_key)
                                 complete++
@@ -1073,7 +1075,7 @@ if (db.lib.is_locked([database], net) == false) {
                         }, net)
                       } else {
                         rateLimit.schedule(function() {
-                          db.update_markets_db(key, split_pair[0], split_pair[1], function(err) {
+                          db.update_markets_db(key, split_pair[0], split_pair[1], reverse, function(err) {
                             if (!err) {
                               console.log('%s[%s]: Market data updated successfully.', key, pair_key)
                               complete++

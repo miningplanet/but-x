@@ -96,7 +96,7 @@ block content
             img#header-img(src=page_title_logo)
         #page-title-container
           if markets_page.page_header.show_title == true
-            h3#page-title !{settings.locale.mkt_title.replace('{1}', marketdata.market_name + ' <span class="small fw-normal">(' + marketdata.coin + '/' + marketdata.exchange + ')</span>')}
+            h3#page-title !{settings.locale.mkt_title.replace('{1}', marketdata.market_name + ' <span class="small fw-normal">(' + (marketdata.reverse ? marketdata.exchange : marketdata.coin) + '/' + (marketdata.reverse ? marketdata.coin : marketdata.exchange) + ')</span>')}
           if markets_page.page_header.show_last_updated == true
             if markets_page.page_header.show_title != true && markets_page.page_header.show_description != true && (markets_page.page_header.show_exchange_url != true && marketdata.url != null && marketdata.url != '')
               #page-title-container
@@ -113,18 +113,18 @@ block content
                 .sub-page-header
                   span.fw-bold='Link to Exchange:'
                   a.sub-page-header(title='Link to Exchange', target='_blank', href=marketdata.url)
-                    span !{' Trade <span class="small fw-normal">(' + marketdata.coin + '/' + marketdata.exchange + ')</span>'}              
+                    span !{' Trade <span class="small fw-normal">(' + (marketdata.reverse ? marketdata.exchange : marketdata.coin) + '/' + marketdata.exchange + ')</span>'}              
             else
               .sub-page-header(style='margin-bottom:' + (markets_page.page_header.show_description == true ? '5' : '0') + 'px')
                 span.fw-bold='Link to Exchange:'
                 a.sub-page-header(title='Link to Exchange', target='_blank', href=marketdata.url)
-                  span !{' Trade <span class="small fw-normal">(' + marketdata.coin + '/' + marketdata.exchange + ')</span>'}
+                  span !{' Trade <span class="small fw-normal">(' + (marketdata.reverse ? marketdata.exchange : marketdata.coin) + '/' + (marketdata.reverse ? marketdata.coin : marketdata.exchange) + ')</span>'}
           if markets_page.page_header.show_description == true
             if markets_page.page_header.show_title != true && markets_page.page_header.show_last_updated != true && (markets_page.page_header.show_exchange_url != true && marketdata.url != null && marketdata.url != '')
               #page-title-container
-                .sub-page-header.text-muted=settings.locale.mkt_description.replace('{1}', marketdata.coin + '/' + marketdata.exchange).replace('{2}', marketdata.market_name)
+                .sub-page-header.text-muted=settings.locale.mkt_description.replace('{1}', (marketdata.reverse ? marketdata.exchange : marketdata.coin) + '/' + (marketdata.reverse ? marketdata.coin : marketdata.exchange)).replace('{2}', marketdata.market_name)
             else
-              .sub-page-header.text-muted=settings.locale.mkt_description.replace('{1}', marketdata.coin + '/' + marketdata.exchange).replace('{2}', marketdata.market_name)
+              .sub-page-header.text-muted=settings.locale.mkt_description.replace('{1}', (marketdata.reverse ? marketdata.exchange : marketdata.coin) + '/' + (marketdata.reverse ? marketdata.coin : marketdata.exchange)).replace('{2}', marketdata.market_name)
       .cardSpacer.clearfix
     if markets_page.show_market_select == true && settings.market_count[net] > 1
       .row
@@ -151,15 +151,26 @@ block content
                     th.half.text-center #{settings.locale.mkt_volume}
                       span.small.fw-normal  (24h&nbsp;Trade)
                     th.text-center #{settings.locale.mkt_volume}
-                      span.small.fw-normal  (24h&nbsp;#{marketdata.coin})
+                      span.small.fw-normal  (24h&nbsp;#{marketdata.reverse ? marketdata.exchange : marketdata.coin})
                 tbody
                   - let volumeCoin = 0
                   each mkt in mmdata
                     if mkt.market != null && mkt.ext_market_url != null
                       if mkt.summary
                         if mkt.summary.volume && !isNaN(mkt.summary.volume)
-                          - volumeCoin = Number(volumeCoin) + Number(mkt.summary.volume)
+                          - volumeCoin = Number(volumeCoin) + Number(mkt.reverse ? mkt.summary.volume_pair : mkt.summary.volume)
                       - const isActive = mkt.market.toLowerCase() === marketdata.market_name.toLowerCase() && mkt.pair_symbol.toLowerCase() === marketdata.exchange.toLowerCase()
+                      - var market = '-'
+                      - var trade = '-'
+                      - var marketVolume = '-'
+                      - var tradeVolume = '-'
+                      - var bid = '-'
+                      - if (mkt.summary) {
+                      -  market = mkt.reverse ? mkt.summary.volume_pair : mkt.summary.volume
+                      -  trade = mkt.reverse ? mkt.summary.volume : mkt.summary.volume_pair
+                      -  marketVolume = !isNaN(market) ? settings.formatDecimal(market, 2, 2) : '-'
+                      -  tradeVolume = !isNaN(trade) ? settings.formatDecimal(trade, 2, 2) : '-'
+                      - }
                       tr(class=(isActive == true ? 'active': ''))
                         td.text-center
                           if mkt.logo && mkt.logo != ''
@@ -167,15 +178,15 @@ block content
                               img.align-top.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.market_name + ' (' + mkt.pair_symbol + ')', alt=mkt.market_name + ' (' + mkt.pair_symbol + ')')
                         td.full.text-start
                           a(href='/markets/' + mkt.market + '/' + mkt.coin_symbol + '/' + mkt.pair_symbol + '/' + net) #{mkt.market}
-                        td.text-start #{mkt.pair_symbol}
+                        td.text-start #{mkt.reverse ? mkt.coin_symbol : mkt.pair_symbol}
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.bid) && mkt.summary.bid > 0 ? settings.formatCurrency(mkt.summary.bid, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.ask) && mkt.summary.ask > 0 ? settings.formatCurrency(mkt.summary.ask, marketdata.exchange) : '-'} 
                         td.text-end #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
                         td.text-end #{mkt.summary && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : mkt.summary.change}
-                        td.half.text-end #{mkt.summary && !isNaN(mkt.summary.volume_pair) ? settings.formatCurrency(mkt.summary.volume_pair, mkt.coin_symbol) : '-'}  
-                        td.text-end #{mkt.summary && !isNaN(mkt.summary.volume) ? settings.formatCurrency(mkt.summary.volume, mkt.coin_symbol) : '-'} 
+                        td.half.text-end #{tradeVolume}  
+                        td.text-end #{marketVolume} 
                   td 
                   td.full 
                   td 
@@ -400,7 +411,7 @@ block content
                         span.decimal #{splitSumBuys[1]}
                     td.text-end #{splitTotalBuys[0]}.
                       span.decimal #{splitTotalBuys[1]}
-                  each buy in marketdata.data.buys
+                  each buy in (marketdata.reverse ? marketdata.data.buys.reverse() : marketdata.data.buys)
                     - var price = settings.formatCurrency(buy.price, marketdata.exchange);
                     - var splitPrice = price.split(".");
                     - var quantity = settings.formatCurrency(buy.quantity, marketdata.coin);

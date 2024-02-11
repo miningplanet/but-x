@@ -5,6 +5,7 @@ module.exports = new require('mongoose').Schema({
   logo: { type: String },
   coin_symbol: { type: String },
   pair_symbol: { type: String },
+  reverse: { type: Boolean, default: false },
   summary: { type: Object, default: {} },
   chartdata: { type: Array, default: [] },
   buys: { type: Array, default: [] },
