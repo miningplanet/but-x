@@ -15,9 +15,9 @@ block content
         #page-title-container
           if info_page.page_header.show_title == true
             if coin.name.toLowerCase() != net.toLowerCase()
-              h3#page-title #{settings.locale.info_title.replace('{1}', coin.name).replace('{2}', net)}
+              h3#page-title #{settings.locale.info_title.replace('{1}', coin.symbol).replace('{2}', net)}
             else 
-              h3#page-title #{settings.locale.info_title.replace('{1}', coin.name).replace('{2}', '')}
+              h3#page-title #{settings.locale.info_title.replace('{1}', coin.symbol).replace('{2}', '')}
           if info_page.page_header.show_description == true
             if info_page.page_header.show_title != true
               #page-title-container
@@ -51,29 +51,29 @@ block content
                 td.text-start #{settings.locale.info_home}
                 td.text-end 
                   a(href=info.home_url) #{info.home_url}
-            if info.whiterpaper_url.length > 0
+            if info.whitepaper_url.length > 0
               tr
                 td.text-start #{settings.locale.info_whitepaper}
                 td.text-end 
-                  a(href=info.whiterpaper_url) External link
+                  a(href=info.whitepaper_url) #{info.whitepaper_title}
             tr
               td.text-start #{settings.locale.info_block_height}
               td.text-end 
-                a(href=info.whiterpaper_url) #{settings.formatInt(stats.count)}
+                a(href=info.whitepaper_url) #{settings.formatInt(stats.count)}
             if info.show_last_price == true
               tr
                 td.text-start #{settings.locale.info_last_price.replace('{1}', "USDT")}
                 td.text-end #{stats.last_price + ' / ' + stats.last_usd_price}
             tr
               td.text-start #{settings.locale.info_max_supply}
-              td.text-end #{settings.formatCurrency(21000000000, 'BUTK')}
+              td.text-end #{settings.formatDecimal(coin.max_supply, 2, 2)}
             tr
               td.text-start #{settings.locale.info_current_supply}
-              td.text-end #{settings.formatCurrency(stats.supply, 'BUTK')}
+              td.text-end #{settings.formatDecimal(stats.supply, 2, 2)}
             if info.show_coinbase == true && latest_coinbase_tx[0] && latest_coinbase_tx[0].vin[0] /* Does not exist for pepew. */
               tr 
                 td.text-start #{settings.locale.info_latest_coinbase}
-                td.text-end #{settings.formatCurrency(latest_coinbase_tx[0].vin[0].amount / 100000000, 'BUTK')}
+                td.text-end #{settings.formatCurrency(latest_coinbase_tx[0].vin[0].amount / 100000000, coin.symbol)}
             tr
               td.text-start #{settings.locale.info_count_addresses}
               td.text-end #{settings.formatInt(stats.addresses)}
@@ -150,7 +150,8 @@ block content
             tbody 
               each algo in algos 
                 tr
-                  - const blocks = blocks_by_algorithm.find((e) => e._id === algo.algo).count
+                  - const obj = blocks_by_algorithm.find((e) => e._id === algo.algo)
+                  - const blocks = obj ? obj.count : -1
                   td.text-start #{algo.label}
                   td.text-center #{algo.type.toUpperCase()}
                   td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], 0, 0)}

@@ -190,7 +190,7 @@
   "net_country": "Country",
 
   "info_title": "{1} Info {2}",
-  "info_description": "All information about the blockchain, markets and mining on one page.",
+  "info_description": "All information about the {1} blockchain, mining and markets.",
   "info_title_chain": "Blockchain Overview",
   "info_title_token": "Token Overview",
   "info_title_markets": "Market Stats",
