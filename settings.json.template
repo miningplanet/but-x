@@ -112,7 +112,9 @@
     "DASH": { "minfd": 4, "maxfd": 4, "name": "Dash", "code": "DASH", "symbol": "DASH" },
     "BNB": { "minfd": 8, "maxfd": 8, "name": "Binance", "code": "BNB", "symbol": "BNB" },
     "PEPEW": { "minfd": 7, "maxfd": 7, "name": "PEPEPOW", "code": "PEPEW", "symbol": "PEPEW" },
-    "VKAX": { "minfd": 7, "maxfd": 7, "name": "Vkax", "code": "VKAX", "symbol": "VKAX" }
+    "VKAX": { "minfd": 7, "maxfd": 7, "name": "Vkax", "code": "VKAX", "symbol": "VKAX" },
+    "GALE": { "minfd": 7, "maxfd": 7, "name": "Galleoncoin", "code": "GALE", "symbol": "GALE" },
+    "MGPC": { "minfd": 7, "maxfd": 7, "name": "Magpiecoin", "code": "MGPC", "symbol": "MGPC" }
   },
 
   // TTL cache (time in seconds)
