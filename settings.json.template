@@ -20,7 +20,8 @@
     {
     "id": "BUTK",
     "name": "Butkoin",
-    "symbol": "BUTK"
+    "symbol": "BUTK",
+    "max_supply": 21000000000
     }
   ],
 
