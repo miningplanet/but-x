@@ -64,14 +64,7 @@ html(lang='en')
       script(type='text/javascript', src='/js/chart.min.js', integrity='sha512-O2fWHvFel3xjQSi9FyzKXWLTvnom+lOYR/AUEThL/fbP4hv1Lo5LCFCGuTXBRyKC4K4DJldg5kxptkgXAzUpvA==')
     if (network_history.enabled == true) && ((showNethashChart == true && nethash_enabled == true && shared_pages.show_hashrate == true) || (showDifficultyChart == true && difficulty_enabled == true))
       script(type='text/javascript', src='/js/chartjs-plugin-crosshair.min.js', integrity='sha512-ZDgEGMJIlOsUYz2GqE97O0IykmPJYB10Rf3ZTZBi2yqMoCkT/V6TA+avigqlIUEKng0rhKXZ7MqTIyV9F3JTDw==')
-    - var sideBarClasses = [];
-    if shared_pages.page_header.bgcolor != null && shared_pages.page_header.bgcolor != ''
-      - sideBarClasses.push('bg-' + shared_pages.page_header.bgcolor);
-      if shared_pages.page_header.bgcolor.toString().toLowerCase() == 'dark' || shared_pages.page_header.bgcolor.toString().toLowerCase() == 'light'
-        - sideBarClasses.push('navbar-' + shared_pages.page_header.bgcolor);
-    else
-      - sideBarClasses.push('bg-primary');
-      - sideBarClasses.push('navbar-dark');
+    - var sideBarClasses = ['bg-primary', 'navbar-dark'];
     script.
       var nethashChart;
       var difficultyChart;
@@ -927,7 +920,7 @@ html(lang='en')
                   $('nav.side-nav li.nav-item').tooltip('enable');
                 $('li.side-market-menu').removeClass('dropdown').addClass('dropend');
                 $('li.side-market-menu > a.nav-link').removeAttr('data-bs-toggle').removeAttr('data-bs-target').removeAttr('aria-controls').removeAttr('aria-expanded');
-                $('div#side-market-menu').removeClass('collapse').addClass('dropdown-menu' + ('#{shared_pages.page_header.bgcolor}' == null || '#{shared_pages.page_header.bgcolor}' == 'null' || '#{shared_pages.page_header.bgcolor}' == '' || '#{shared_pages.page_header.bgcolor}'.toLowerCase() == 'dark' ? ' dropdown-menu-dark' : ''));
+                $('div#side-market-menu').removeClass('collapse').addClass('dropdown-menu dropdown-menu-dark');
                 fixSidebarHeight();
               }
             }
@@ -1120,32 +1113,13 @@ html(lang='en')
       else
         - bodyContainerClasses.push('marginTop20');
   body(class=bodyClasses)
-    - var headerClasses = [];
-    - var footerClasses = ['nav','navbar','navbar-default','d-flex','footer'];
-    - var dropdownClasses = ['dropdown-menu'];
+    - var headerClasses = ['bg-primary', 'navbar-dark'];
+    - var footerClasses = ['nav','navbar','navbar-default', 'd-flex', 'footer', 'bg-primary', 'navbar-dark'];
+    - var dropdownClasses = ['dropdown-menu', 'bg-primary', 'dropdown-menu-dark'];
     if shared_pages.page_header.sticky_header == true
       - headerClasses.push('fixed-top');
     if shared_pages.page_footer.sticky_footer == true
       - footerClasses.push('fixed-bottom');
-    if shared_pages.page_header.bgcolor != null && shared_pages.page_header.bgcolor != ''
-      - headerClasses.push('bg-' + shared_pages.page_header.bgcolor);
-      - dropdownClasses.push('bg-' + shared_pages.page_header.bgcolor);
-      if shared_pages.page_header.bgcolor.toString().toLowerCase() == 'dark' || shared_pages.page_header.bgcolor.toString().toLowerCase() == 'light'
-        - headerClasses.push('navbar-' + shared_pages.page_header.bgcolor);
-        if shared_pages.page_header.bgcolor.toString().toLowerCase() == 'dark'
-          - dropdownClasses.push('dropdown-menu-dark');
-    else
-      - headerClasses.push('bg-primary');
-      - headerClasses.push('navbar-dark');
-      - dropdownClasses.push('bg-primary');
-      - dropdownClasses.push('dropdown-menu-dark');
-    if shared_pages.page_footer.bgcolor != null && shared_pages.page_footer.bgcolor != ''
-      - footerClasses.push('bg-' + shared_pages.page_footer.bgcolor);
-      if shared_pages.page_footer.bgcolor.toString().toLowerCase() == 'dark' || shared_pages.page_footer.bgcolor.toString().toLowerCase() == 'light'
-        - footerClasses.push('navbar-' + shared_pages.page_footer.bgcolor);
-    else
-      - footerClasses.push('bg-primary');
-      - footerClasses.push('navbar-dark');
     if shared_pages.page_header.menu == 'top'
       div#main-header.navbar(class=headerClasses)
         div.navbar.navbar-expand-lg(style=shared_pages.page_header.home_link == 'logo' ? 'padding-left:0;' : '')
@@ -1435,7 +1409,7 @@ html(lang='en')
                       .card-header
                         strong Network Hashrate
                       .card-body(style='padding:0.2rem;')
-                        canvas#nethashChart(style='max-height:300px;background-color:'+shared_pages.page_header.network_charts.nethash_chart.bgcolor+';')
+                        canvas#nethashChart(style='max-height:300px;')
                       if isButkoin
                         .card-footer(id='hashChartFooter')
                           button(onclick='hashonlycpu()') CPU
@@ -1447,7 +1421,7 @@ html(lang='en')
                       .card-header
                         strong Proof of work (PoW) Difficulty
                       .card-body(style='padding:0.2rem;')
-                        canvas#difficultyChart(style='max-height:300px;background-color:'+shared_pages.page_header.network_charts.difficulty_chart.bgcolor+';')
+                        canvas#difficultyChart(style='max-height:300px;')
                       if isButkoin
                         .card-footer(id="difficultyChartFooter")
                           button(onclick='diffonlycpu()') CPU

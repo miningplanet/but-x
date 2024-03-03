@@ -180,8 +180,6 @@
       "menu": "side",
       // sticky_header: Determine whether page header "sticks" to top of page or not (true/false)
       "sticky_header": true,
-      // TODO: Only black until new themes support.
-      "bgcolor": "black",
       // Home link settings (top-left corner of the header menu).
       // title: display "shared_pages.page_title" text setting
       // coin: display "coin.name" text setting
@@ -248,7 +246,6 @@
           //          If set to false, the network hashrate chart will be completely inaccessible
           //          NOTE: The `shared_pages.show_hashrate` option must be set to true or else the network hashrate chart will be completely inaccessible
           "enabled": true,
-          "bgcolor": "#ffffff",
           "pow_line_color": "rgba(173,255,47)",
           "pow_fill_color": "rgba(173,255,47, 0.2)",
           "pos_line_color": "rgba(173,255,47)",
@@ -275,7 +272,6 @@
           // enabled: Enable/disable the network difficulty chart (true/false)
           //          If set to false, the network difficulty chart will be completely inaccessible
           "enabled": true,
-          "bgcolor": "#ffffff",
           "pow_line_color": "rgba(173,255,47)",
           "pow_fill_color": "rgba(173,255,47, 0.2)",
           "pos_line_color": "rgba(173,255,47)",
@@ -307,8 +303,6 @@
     "page_footer": {
       // sticky_footer: Determine whether the page footer "sticks" to bottom of the page or not (true/false)
       "sticky_footer": false,
-      // TODO: Not effectivce until new themes support.
-      "bgcolor": "dark",
       // Pixel or percent (I.e. "50px" or "10%")
       "footer_height_desktop": "50px",
       "footer_height_tablet": "70px",

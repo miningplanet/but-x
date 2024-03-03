@@ -702,6 +702,7 @@ $theme-name: to-lower-case(theme-selector.$theme-name);
 }
 
 body {
+  background: var(--bs-body-bg);
   display: block !important; 
   align-items: baseline;
   min-height: 100vh;
@@ -756,6 +757,10 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   height: 40px;
   position: absolute;
   bottom: 0px;
+}
+
+div.navbar, div#navbar-collapse {
+  background: var(--bg0)
 }
 
 .navbar {
@@ -1549,7 +1554,9 @@ div.navbar-expand-lg {
 #header-img {
   width: 60px;
   height: 60px;
-  margin-right: 10px;
+
+#page-title-container {
+  background: transparent !important;
 }
 
 #page-title {
@@ -1557,6 +1564,7 @@ div.navbar-expand-lg {
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
+  text-shadow: var(--title-shadow);
 }
 
 .sub-page-header {
