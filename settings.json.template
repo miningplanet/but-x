@@ -165,8 +165,6 @@
       // Add UTC+0 time tooltip.
       "enable_alt_timezone_tooltips": false
     },
-    // TODO: Not effectivce until new themes support.
-    "table_header_bgcolor": "transparent",
     // Number of confirmations before a block or TX can be considered valid.
     "confirmations": 40,
     // Network difficulty value to display.

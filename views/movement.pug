@@ -130,11 +130,8 @@ block content
       .card-header
         strong="Latest Movement"
       table#movement-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
-        - var theadClasses = [];
-        if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-          - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
         thead
-          tr(class=theadClasses)
+          tr
             th.d-table-cell.d-md-none
             th.d-none.d-md-table-cell #{settings.locale.tx_hash}
             th.text-center #{coin.symbol}

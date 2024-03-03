@@ -265,9 +265,6 @@ block content
         }
       });
     });
-  - var theadClasses = [];
-  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-md-12.cardSpacer
     .container
       if settings.anyHeader(network_page, net)
@@ -305,7 +302,7 @@ block content
         .card.card-default.border-0
           table#connections-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
             thead
-              tr(class=theadClasses)
+              tr
                 th.text-center IP:port
                 // if network_page.connections_table.port_filter != '-1'
                   th.text-center='Port'

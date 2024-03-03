@@ -185,11 +185,8 @@ block content
       .card-header
         strong Masternode List
       table#masternodes-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
-        - var theadClasses = [];
-        if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-          - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
         thead
-          tr(class=theadClasses)
+          tr
             th.text-center(class="wide") IP:port
             th.text-center(class="small") IP
             th.text-center(class="full") Payout

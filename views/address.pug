@@ -117,9 +117,6 @@ block content
   - var sentParts = sent.split('.');
   - var received = Number(address.received / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
   - var receivedParts = received.split('.');
-  - var theadClasses = [];
-  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   .col-xs-12.col-md-12
     if settings.anyHeader(address_page, net)
       #page-header-container(style='align-items:' + (settings.allHeaders(address_page, net) ? 'flex-start' : 'center'))
@@ -187,7 +184,7 @@ block content
         strong #{settings.locale.ex_latest_transactions}
       table#address-txs.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
         thead
-          tr(class=theadClasses)
+          tr
             th.d-table-cell.d-md-none
             th.d-none.d-md-table-cell #{settings.locale.tx_hash}
             th.text-center #{coin.symbol}

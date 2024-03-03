@@ -3,9 +3,6 @@ extends layout
 block content
   include ./includes/common.pug
   - var block_difficulty = parseFloat(block.difficulty).toFixed(4);
-  - var theadClasses = [];
-  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   script.
     $(document).ready(function() {
       $('#block-summary').dataTable({
@@ -137,7 +134,7 @@ block content
           strong Transactions
         table#block-txs.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
           thead
-            tr(class=theadClasses)
+            tr
               // th.text-center.d-table-cell.d-md-none
               th.d-md-table-cell #{settings.locale.tx_hash}
               th.text-center Txout

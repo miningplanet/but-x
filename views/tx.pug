@@ -2,9 +2,6 @@ extends layout
 
 block content
   include ./includes/common.pug
-  - var theadClasses = [];
-  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   script.
     $(document).ready(function() {
       $('span#timestampCol').html(format_unixtime(#{tx.timestamp}));
@@ -189,7 +186,7 @@ block content
               span.fa.fa-arrow-right.float-end.d-none.d-md-block
             table#contributors.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
               thead
-                tr(class=theadClasses)
+                tr
                   th #{settings.locale.tx_address}
                   if (tx.vin.length > 0)
                     if tx.vin[0].addresses != 'coinbase'
@@ -235,7 +232,7 @@ block content
               strong #{settings.locale.tx_recipients}
             table#recipients.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
               thead
-                tr(class=theadClasses)
+                tr
                   th #{settings.locale.tx_address}
                   th.text-center #{coin.symbol}
               tbody

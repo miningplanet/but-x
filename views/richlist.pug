@@ -66,9 +66,6 @@ block content
           }
         });
       });
-  - var theadClasses = [];
-  if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-    - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
   if settings.anyHeader(richlist_page, net)
     .row(style='margin: 0 0 5px 0;')
       div(class=(richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true ? 'col-xs-12' : 'col-12'))
@@ -117,7 +114,7 @@ block content
               .card.card-default.border-0
                 table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(id="rich" style='margin-bottom:0;', cellspacing='0')
                   thead
-                    tr(class=theadClasses)
+                    tr
                       th.text-center
                         span.position
                       th #{settings.locale.tx_address}
@@ -150,7 +147,7 @@ block content
               .card.card-default.border-0
                 table#rreceive.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
-                    tr(class=theadClasses)
+                    tr
                       th.text-center
                         span.position
                       th #{settings.locale.tx_address}
@@ -177,7 +174,7 @@ block content
               .card.card-default.border-0
                 table#rtoptx.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
-                    tr(class=theadClasses)
+                    tr
                       th.text-center
                         span.position
                       th #{settings.locale.rl_block_height}
@@ -210,7 +207,7 @@ block content
               strong #{settings.locale.rl_wealth}
             table.table.table-hover.table-bordered.summary-table.right-border-0(style='margin-bottom:0;')
               thead
-                tr(class=theadClasses)
+                tr
                   th
                   th.text-center Amount
                     span.small.fw-normal  (#{coin.symbol})

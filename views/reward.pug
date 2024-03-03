@@ -61,11 +61,8 @@ block content
           strong #{settings.locale.heavy_reward_voting_info}
             span.small.fw-normal  (#{coin.symbol})
         table#reward-summary.table.table-bordered.table-striped.summary-table.single-row-table(style='border-top:0;border-bottom:0;margin-top:0 !important;')
-          - var theadClasses = [];
-          if shared_pages.table_header_bgcolor != null && shared_pages.table_header_bgcolor != ''
-            - theadClasses.push('table-' + shared_pages.table_header_bgcolor);
           thead
-            tr(class=theadClasses)
+            tr
               th.text-center #{settings.locale.ex_supply}
                 span.small.fw-normal  (#{coin.symbol})
               th.text-center #{settings.locale.heavy_cap}
