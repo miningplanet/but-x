@@ -686,10 +686,6 @@
         "enabled": false,
         "trading_pairs": [ "LTC/BTC" ]
       },
-      "southxchange": {
-        "enabled": false,
-        "trading_pairs": [ "LTC/BTC" ]
-      },
       "unnamed": {
         "enabled": false,
         "trading_pairs": [ "LTC/BTC" ]
