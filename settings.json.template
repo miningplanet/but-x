@@ -425,7 +425,8 @@
     "info": {
       "description": "",
       "home_url": "https://butkoin.com",
-      "whiterpaper_url": "https://butkoin.com/whitepaper.pdf",
+      "whitepaper_url": "https://butkoin.com/whitepaper.pdf",
+      "whitepaper_title": "Butkoin Whitepaper",
       "show_coinbase": true,
       "show_masternode_info": true,
       "show_markets": true,
