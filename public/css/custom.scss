@@ -1,17 +1,18 @@
 /* Add custom css rules here */
 :root {
+    --bs-body-bg: radial-gradient(ellipse at bottom, #0c1d49 0%, #0c0d13 100%);
+    --navbar-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28173, 255, 47, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     --but: #00ee43;
     --but2: #adff2f; /* green yellow */
-    --bg0: #000;
-    --bg1: #08022a;
-    --bg2: #040116;
+    --bg0: #000; /* header, footer, borders */
+    --bg1: #08022a; /* Unused */
+    --bg2: #040116; /* Unused */
     --fg: #0f0;
-    --fgs: #0b0;
-    --fgt: #cdc;
-    --fgt2: #889988;
-    --fgs2: #ecc502;
-    --fgs3: #f32;
-    --bs-body-bg: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%);
+    --fgt: #bcb; /* Unused */
+    --fgt2: #889988; /* h?, elements, form border, chart border */
+    --alert-color: #ecc502;
+    --pos: #0b0;
+    --neg: #f32;
     --title-shadow: 0.2rem 0.2rem 0.1rem #000;
     --panel-border: none;
     --width-col-entity: 20px;
@@ -20,200 +21,27 @@
     --xs-2-col-label-width-min: 250px;
 }
 
-.alert, .alert A {
-    color: var(--fgs2) !important;
-    animation: blink-animation 3s steps(10, start) infinite;
-    -webkit-animation: blink-animation 3s steps(10, start) infinite;
-}
-
-.btn, .form-control, select {
-    border: solid 1px var(--fgt2); border-radius: 0.25rem;
-}
-
-#page-title {
-    text-shadow: var(--title-shadow);
-}
-
-body {
-    background: var(--bs-body-bg);
-}
-
-tbody tr.active {
-    border: solid 2px var(--but2) !important;
-}
-
-tbody tr td a, div.card-body a, input, select, option, .btn, .form-control {
-    background-color: transparent !important;
-    color: var(--but2) !important;
-}
-
-tbody td {
-    padding: 4px 6px !important;
-}
- 
-code, .text-success {
-    color: var(--but2);
-}
-
-h1, h2 ,h3 ,h4 ,h5 ,h6 ,i {
-    color: var(--fgt) !important;
-    text-shadow: var(--title-shadow);
-}
-
-p, a, b, small, span, strong, #mainnav a, div#cr p small {
-    color: var(--fgt2) !important;
-}
-
-span.pos, td.pos {
-    color: var(--fgs) !important;
-}
-
-span.neg, td.neg {
-    color: var(--fgs3) !important;
-}
-
-span.rdate {
-    visibility: visible !important
-}
-
-p, a {
-    text-decoration: none;
-}
-
-a[target="_blank"]::after {
-    content: '';
-    background: var(--icon-external-link) no-repeat;
-    padding-right: 0.8rem;
-}
-
-img.logo-main {
-    margin-right: 14px !important;
-}
-
-.navbar-light .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28173, 255, 47, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-}
-
-/* body-container > main-container > main-child-container */
-div#main-child-container div.col-lg-12 { margin-top: 30px !important; }
-
-div.container {
-    max-width: 1180px !important;
-    padding: 4px 7px 4px 4px !important;
-} /* transform-style: preserve-3d; */
-
-div.align-items-start {
-    margin-bottom: 10px !important;
-}
-
-div#pnlOne, div#pnlTwo, div#pnlThree, div#pnlFour, div#pnlFive, div#pnlSix {
-    border: var(--panel-border) !important
-}
-
-div#cockpit div.card-header, div#cockpit div.card-body {
-    padding: 1px
-}
-
-div#cockpit div.card-body label strong {
-    font-size: 22px !important
-}
-
-div.border-0 {
-    border: solid 2px var(--bg0) !important;
-    border-radius: 0.5rem !important;
-}
-
-div.card, div.card-header {
-    background: transparent !important
-}
-
-div.card-header, div.card-body {
-    border: none !important
-}
-
-footer div.navbar-nav label.nav-link {
-    color: var(--but2)!important
-}
-
-/* Footer */
-footer {
-    position: relative;
-    display: block;
-    margin: 20px 0 0 0;
-    min-height: 120px;
-    height: auto;
-    width: 100%;
-    padding: 1rem 1.5rem 1rem 1.5rem;
-    text-align: center !important;
-    background: var(--bg0);
-    border: none; z-index: 100;
-}
-
-footer div#social {
-    position: relative;
-    margin: 0 auto;
-}
-
-footer div#social a[target="_blank"]::after {
-    content: ''; background: var(--icon-external-link) no-repeat;
-    padding-right: 0;
-}
-
-footer div#copy {
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-}
-
-footer div#copy small {
-    font-size: 11px !important;
-}
-
-footer div.blocks {
-    position: absolute; 
-    top: 0; 
-    right: 0;
-    padding: 0.8rem 1rem;
-}
-
-footer div.blocks p {
-    font-size: .75em;
-    font-weight: 700;
-    line-height: 1;
-    color: var(--but2) !important;
-}
-
-footer a span {
-    margin: 6px;
-    display: inline-block;
-    width: 36px;
-    height: 36px;
-}
-
-div#difficultyChartFooter > button, div#hashChartFooter > button {
-    color: var(--but2);
-    border: solid 2px var(--fgt2);
-}
-
-div#recent-table_wrapper table { margin-left: 0px !important }
-div#recent-table_wrapper table th:nth-child(1) { width: var(--width-col-entity) }
-div#recent-table_wrapper table td:nth-child(1) { width: var(--width-col-entity) }
-div#recent-table_wrapper table th:nth-child(2) { width: 75px !important }
-div#recent-table_wrapper table td:nth-child(2) { width: 75px !important; text-align: center }
-div#recent-table_wrapper table th:nth-child(3) { width: 460px !important }
-div#recent-table_wrapper table td:nth-child(3) { width: 460px !important }
-div#recent-table_wrapper table th:nth-child(4) { width: 44px !important }
-div#recent-table_wrapper table td:nth-child(4) { width: 44px !important }
-div#recent-table_wrapper table th:nth-child(5) { width: 100px !important }
-div#recent-table_wrapper table td:nth-child(5) { width: 100px !important }
-div#recent-table_wrapper table th:nth-child(6) { width: 180px !important }
-div#recent-table_wrapper table td:nth-child(6) { width: 180px !important }
+table#recent-table { margin-left: 0px !important }
+table#recent-table th:nth-child(1) { width: var(--width-col-entity) }
+table#recent-table td:nth-child(1) { width: var(--width-col-entity) }
+table#recent-table th:nth-child(2) { width: 75px !important }
+table#recent-table td:nth-child(2) { width: 75px !important; text-align: center }
+table#recent-table th:nth-child(3) { width: 460px !important }
+table#recent-table td:nth-child(3) { width: 460px !important }
+table#recent-table th:nth-child(4) { width: 44px !important }
+table#recent-table td:nth-child(4) { width: 44px !important }
+table#recent-table th:nth-child(5) { width: 100px !important }
+table#recent-table td:nth-child(5) { width: 100px !important }
+table#recent-table th:nth-child(6) { width: 180px !important }
+table#recent-table td:nth-child(6) { width: 180px !important }
 
 td.addressCol, th.addressCol { width: 270px !important }
 td.addressCol { text-align: center }
-td.addressCol a { width: 98%; min-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
 
-td.countryWithNameCol, th.countryWithNameCol {  min-width: 140px !important; width: auto; word-wrap: normal !important }
+/* display: inline-block; */
+td.addressCol a { width: 98%; min-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+td.countryWithNameCol, th.countryWithNameCol {  min-width: 140px !important; width: auto; word-wrap: normal !important; text-align: right !important }
 
 td.flagCol, th.flagCol { width: 25px !important; text-align: center }
 
@@ -235,24 +63,25 @@ td.poseCol { text-align: center }
 td.statusCol, th.statusCol { width: 50px !important }
 td.statusCol { text-align: center }
 
-td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; text-align: left !important; }
+/* display: inline-block; */
+td.txCol a { width: 98%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important; }
 
-div#masternodes-table_wrapper table { margin-left: 0px !important }
-div#masternodes-table_wrapper table thead { max-height: 24px; }
-div#masternodes-table_wrapper table td:nth-child(8) { text-align: right !important }
+/*div#masternodes-table_wrapper table { margin-left: 0px !important }*/
+/*div#masternodes-table_wrapper table thead { max-height: 24px; }*/
+/*table#masternodes-table td:nth-child(8) { text-align: right !important }*/
 
-div#movement-table_wrapper > div:nth-child(1) { text-align: center; }
-div#movement-table_wrapper > div:nth-child(1)  > div:nth-child(1) { width: 100% }
+/*div#movement-table_wrapper > div:nth-child(1) { text-align: center; }
+div#movement-table_wrapper > div:nth-child(1)  > div:nth-child(1) { width: 100% }*/
 
-table#movement-table { margin-left: 0px !important }
-table#movement-table th:nth-child(1) { width: var(--width-col-entity) }
-table#movement-table td:nth-child(1) { width: var(--width-col-entity) }
-table#movement-table th:nth-child(2) { width: 550px !important }
-table#movement-table td:nth-child(2) { width: 550px !important }
-div#movement-table_wrapper table th:nth-child(3) { width: auto; word-wrap: normal !important }
-div#movement-table_wrapper table td:nth-child(3) { width: auto; word-wrap: normal !important }
-table#movement-table th:nth-child(4) { width: 185px !important }
-table#movement-table td:nth-child(4) { width: 185px !important; text-align: center }
+div#movement-table-wrapper table { margin-left: 0px !important }
+div#movement-table-wrapper table th:nth-child(1) { width: var(--width-col-entity) }
+div#movement-table-wrapper table td:nth-child(1) { width: var(--width-col-entity) }
+div#movement-table-wrapper table th:nth-child(2) { width: 550px !important }
+div#movement-table-wrapper table td:nth-child(2) { width: 550px !important }
+div#movement-table-wrapper table th:nth-child(3) { width: auto; word-wrap: normal !important }
+div#movement-table-wrapper table td:nth-child(3) { width: auto; word-wrap: normal !important }
+div#movement-table-wrapper table th:nth-child(4) { width: 185px !important }
+div#movement-table-wrapper table td:nth-child(4) { width: 185px !important; text-align: center }
 
 div#connections-table_wrapper > div:nth-child(1) { text-align: center }
 div#connections-table_wrapper > div:nth-child(1) > div:nth-child(1) { width: 100% }
@@ -348,7 +177,8 @@ table#address-summary td:nth-child(1) { text-align: left }
     table#rich th:nth-child(2) { width: 110px }
     table#rreceive th:nth-child(2) { width: 110px }
 
-    table#block-txs td.txCol A { width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;  text-align: left !important; }
+    /* display: inline-block; */
+    table#block-txs td.txCol A { width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important; }
     div#block-txs-wrapper table th:nth-child(1) { width: 130px !important }
 
     table#contributors th:nth-child(1) { width: 62% }
@@ -365,8 +195,8 @@ table#address-summary td:nth-child(1) { text-align: left }
 
     td.full, th.full { width: 0px !important; overflow: hidden !important; display: none !important; visibility: hidden !important }
 
-    div#recent-table_wrapper table th:nth-child(6) { width: 100px !important }
-    div#recent-table_wrapper table td:nth-child(6) { width: 100px !important }
+    table#recent-table th:nth-child(6) { width: 100px !important }
+    table#recent-table td:nth-child(6) { width: 100px !important }
 
     td.countryCol { width: var(--xs-width-col-country) !important }
     td.countryCol span { display: none !important; width: 0 !important }
@@ -374,7 +204,8 @@ table#address-summary td:nth-child(1) { text-align: left }
     div#connections-table_wrapper table th:nth-child(5) { min-width: 30px !important; width: auto !important; word-wrap: normal !important }
     div#connections-table_wrapper table td:nth-child(5) { min-width: 30px !important; width: auto !important; word-wrap: normal !important }
 
-    table#block-txs td.txCol a { width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;  text-align: left !important; }
+    /* display: inline-block; */
+    table#block-txs td.txCol a { width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important; }
     div#block-txs-wrapper table th:nth-child(1) { width: 155px !important }
 
     table#markets-table thead th:nth-child(3) { width: 60px !important }

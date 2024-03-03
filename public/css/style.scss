@@ -729,6 +729,27 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   line-height: 1.2rem;
   margin-bottom: 0.2rem;
   margin-top: 0.5rem;
+  color: var(--fgt2) !important;
+  text-shadow: var(--title-shadow);
+}
+
+/* Footer */
+
+footer {
+  position: relative;
+  display: block;
+  margin: 20px 0 0 0;
+  min-height: 120px;
+  height: auto;
+  width: 100%;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  text-align: center !important;
+  background: var(--bg0);
+  border: none; z-index: 100;
+}
+
+#footer-container {
+  z-index: 100;
 }
 
 .footer {
@@ -757,6 +778,52 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   height: 40px;
   position: absolute;
   bottom: 0px;
+}
+
+footer div#social {
+  position: relative;
+  margin: 0 auto;
+}
+
+footer div#social a[target="_blank"]::after {
+  content: ''; background: var(--icon-external-link) no-repeat;
+  padding-right: 0;
+}
+
+footer div#copy {
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+footer div#copy small {
+  font-size: 11px !important;
+}
+
+footer div.blocks {
+  position: absolute; 
+  top: 0; 
+  right: 0;
+  padding: 0.8rem 1rem;
+}
+
+footer div.blocks p {
+  font-size: .75em;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--but2) !important;
+}
+
+footer a span {
+  margin: 6px;
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+}
+
+footer div.navbar-nav label.nav-link {
+  background: var(--bg0);
+  color: var(--but2) !important
 }
 
 div.navbar, div#navbar-collapse {
@@ -1124,8 +1191,9 @@ tr {
   }
 }
 
-.logo-main {
+img.logo-main {
   padding: 0 15px;
+  margin-right: 14px !important;
 }
 
 .decimal {
@@ -1144,24 +1212,25 @@ tr {
   max-width: 600px;
 }
 
-.card-body, .card-default.border-0 > .card-header {
-  border-width: 1px;
-  border-style: solid;
-  @include table-border-color;
-}
-
 .card-body {
   border-width: 1px;
   border-style: solid;
   @include table-border-color;
 }
 
-.card-default.border-0 > .card-header {
+.card-body, .card-default.border-0 > .card-header {
   border-width: 1px;
   border-style: solid;
   border-bottom-width: 0;
   @include table-border-color;
 }
+
+/*.card-default.border-0 > .card-header {
+  border-width: 1px;
+  border-style: solid;
+  
+  @include table-border-color;
+}*/
 
 .right-border-0 {
   border-right: 0;
@@ -1197,13 +1266,17 @@ tr {
   margin-right: 6px;
 }
 
+.navbar-light .navbar-toggler-icon {
+  background-image: var(--navbar-icon) !important;
+}
+
 .navbar-toggler-icon {
   display: inline-block;
   vertical-align: middle;
   content: "";
   background: no-repeat center center;
   background-size: 100% 100%;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  background-image: var(--navbar-icon);
 }
 
 .navbar-toggler {
@@ -1230,6 +1303,7 @@ tr {
     max-width: none;
     padding-left: 0;
     padding-right: 0;
+    margin-top: 6px
   }
 }
 
@@ -1357,10 +1431,6 @@ div.offcanvas-body {
   font-size: 1.25rem;
   width: 36px;
   text-align: center;
-}
-
-#footer-container {
-  z-index: 100;
 }
 
 .navbar-light #side-header-toggle > span {
@@ -1548,12 +1618,16 @@ div.navbar-expand-lg {
 }
 
 #header-img-container {
-  margin-right: 5px;
+  margin-right: 3px;
+  margin-left: 3px;
 }
 
 #header-img {
   width: 60px;
   height: 60px;
+  margin-top: 6px;
+  margin-right: 5px;
+}
 
 #page-title-container {
   background: transparent !important;
@@ -1570,6 +1644,8 @@ div.navbar-expand-lg {
 .sub-page-header {
   font-size: 90%;
   font-weight: 700;
+  margin-left: 4px;
+  margin-bottom: 0px;
 }
 
 #buy-orders_wrapper, #sell-orders_wrapper {
@@ -1627,6 +1703,40 @@ div.navbar-expand-lg {
   }
 }
 
+.btn, .form-control, select {
+  border: solid 1px var(--fgt2); border-radius: 0.25rem;
+}
+
+p, a, b, small, span, strong, #mainnav a, div#cr p small {
+  color: var(--fgt2) !important;
+}
+
+p, a {
+  text-decoration: none;
+}
+
+a[target="_blank"]::after {
+  content: '';
+  background: var(--icon-external-link) no-repeat;
+  padding-right: 0.8rem;
+}
+
+span.pos, td.pos {
+  color: var(--pos) !important;
+}
+
+span.neg, td.neg {
+  color: var(--neg) !important;
+}
+
+span.rdate {
+  visibility: visible !important
+}
+
+code, .text-success {
+  color: var(--but2);
+}
+
 /* Images and icons */
 :root {
   --image-discord: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><g style="stroke:rgb(136,153,136);stroke-width:2"><path d="M41.626,10.768C37.644,7.567,31.347,7.025,31.08,7.003c-0.42-0.036-0.819,0.202-0.992,0.587c-0.012,0.025-0.15,0.34-0.303,0.833c2.633,0.443,5.867,1.339,8.794,3.155c0.469,0.291,0.613,0.907,0.322,1.377c-0.189,0.305-0.516,0.473-0.851,0.473c-0.18,0-0.362-0.048-0.526-0.15C32.494,10.158,26.209,10,25,10s-7.495,0.158-12.523,3.278c-0.47,0.292-1.086,0.147-1.377-0.322c-0.292-0.47-0.147-1.086,0.322-1.377c2.927-1.815,6.16-2.712,8.794-3.155c-0.154-0.493-0.292-0.808-0.303-0.833c-0.173-0.386-0.571-0.629-0.993-0.587c-0.266,0.021-6.563,0.563-10.598,3.809C6.213,12.76,2,24.152,2,34c0,0.174,0.045,0.344,0.131,0.495c2.909,5.109,10.842,6.447,12.649,6.504C14.791,41,14.801,41,14.812,41c0.319,0,0.62-0.152,0.809-0.411l1.829-2.513c-4.933-1.276-7.453-3.439-7.598-3.568c-0.414-0.365-0.453-0.997-0.087-1.411c0.365-0.414,0.995-0.453,1.41-0.089C11.236,33.062,15.875,37,25,37c9.141,0,13.782-3.953,13.828-3.993c0.414-0.359,1.045-0.323,1.409,0.094c0.364,0.414,0.325,1.043-0.088,1.407c-0.146,0.129-2.666,2.292-7.599,3.568l1.829,2.513C34.568,40.848,34.869,41,35.188,41c0.011,0,0.021,0,0.031-0.001c1.809-0.057,9.741-1.395,12.649-6.504C47.955,34.344,48,34.174,48,34C48,24.152,43.787,12.76,41.626,10.768z M18.5,30c-1.933,0-3.5-1.791-3.5-4c0-2.209,1.567-4,3.5-4s3.5,1.791,3.5,4C22,28.209,20.433,30,18.5,30z M31.5,30c-1.933,0-3.5-1.791-3.5-4c0-2.209,1.567-4,3.5-4s3.5,1.791,3.5,4C35,28.209,33.433,30,31.5,30z"/></g></svg>');
@@ -1645,6 +1755,13 @@ span.github { background: var(--image-github) no-repeat top left }
 span.instagram { background: var(--image-instagram) no-repeat top left }
 span.twitter { background: var(--image-twitter) no-repeat top left }
 span.youtube { background: var(--image-youtube) no-repeat top left }
+
+
+.alert, .alert A {
+  color: var(--alert-color) !important;
+  animation: blink-animation 3s steps(10, start) infinite;
+  -webkit-animation: blink-animation 3s steps(10, start) infinite;
+}
 
 .entity, .entitybig {
   font-size: 24px !important;
@@ -1679,6 +1796,9 @@ span.position { width: 17.52px; height: 14.52px; background-image: url("data:ima
 /** Fix datatables.min.css */
 table.dataTable { border-collapse: collapse !important }
 
+/* body-container > main-container > main-child-container */
+div#main-child-container div.col-lg-12 { margin-top: 30px !important; }
+
 div#body-container {
   margin: 50px auto !important
 }
@@ -1686,9 +1806,43 @@ div#body-container {
 div.container {
   display: block;
   background: transparent;
+  max-width: 1180px !important;
+  padding: 4px 7px 4px 4px !important;
+} /* transform-style: preserve-3d; */
+
+/* cockpit / panels */
+
+div#pnlOne, div#pnlTwo, div#pnlThree, div#pnlFour, div#pnlFive, div#pnlSix {
+  border: var(--panel-border) !important
+}
+
+div#cockpit div.card-header, div#cockpit div.card-body {
+  padding: 1px
+}
+
+div#cockpit div.card-body label strong {
+  font-size: 22px !important
+}
+
+div.align-items-start {
+  margin-bottom: 10px !important;
+}
+
+div.border-0 {
+  border: solid 2px var(--bg0) !important;
+  border-radius: 0.5rem !important;
+}
+
+div.card, div.card-header {
+  background: transparent !important
+}
+
+div.card-header, div.card-body {
+  border: none !important
 }
 
 /* hashps and diff chart */
+
 div#nethashChartParent, div#difficultyChartParent {
   padding: 0.25rem !important;
   text-align: center;
@@ -1703,8 +1857,10 @@ div#difficultyChartFooter, div#hashChartFooter {
 
 div#difficultyChartFooter > button, div#hashChartFooter > button {
   background-color: transparent;
+  color: var(--but2);
   width: 28%;
   margin: 2px 10px 2px 10px;
+  border: solid 2px var(--fgt2);
 }
 
 div#links span.vertical-align-middle, div#links img {
@@ -1714,8 +1870,21 @@ div#links span.vertical-align-middle, div#links img {
   margin: 4px !important;
 }
 
+tbody tr td a, div.card-body a, input, select, option, .btn, .form-control {
+  background-color: transparent !important;
+  color: var(--but2) !important;
+}
+
 table tbody, table tbody tr:first-child {
   border-color: var(--bg0);
+}
+
+table tbody tr.active {
+  border: solid 2px var(--but2) !important;
+}
+
+table tbody td {
+  padding: 4px 6px !important;
 }
 
 table tr.sub td span {
