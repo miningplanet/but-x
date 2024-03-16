@@ -328,6 +328,8 @@ if (mode == null || mode == 'index' || mode == 'update') {
     case 'chain':
     case 'update':
       mode = 'update'
+      if (!isNaN(process.argv[4]) && Number.isInteger(parseFloat(process.argv[4])))
+        block_start = Math.max(0, parseInt(process.argv[4]))
       break
     case 'check':
       mode = 'check'
@@ -397,6 +399,9 @@ if (db.lib.is_locked([database], net) == false) {
       console.log('Syncing %s.. Please wait..', (database == 'index' ? 'blocks' : database))
 
     mongoose.set('strictQuery', true)
+
+    /* update chain */
+    
     if (database == 'index') {
       console.log('Syncing index..')
       db.check_stats(coin.name, function(exists) {
@@ -609,7 +614,7 @@ if (db.lib.is_locked([database], net) == false) {
                                         case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE').toString(): extra = datautil.protxUpdateRevokeTxToArray(rtx); break
                                         case tx_types.indexOf('TRANSACTION_COINBASE').toString(): break // COINBASE, Array.from(rtx.extraPayload).reverse().join("")
                                         case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT').toString(): extra = datautil.protxQuorumCommitmentTxToArray(rtx); break
-                                        case tx_types.indexOf('TRANSACTION_FUTURE').toString(): break // FUTURE
+                                        case tx_types.indexOf('TRANSACTION_FUTURE').toString(): extra = rtx.extraPayload; break
                                         default: console.warn('*** Unknown TX type %s.', tx.tx_type)
                                       }
                                     }
@@ -671,6 +676,9 @@ if (db.lib.is_locked([database], net) == false) {
                 // Get the total number of blocks
                 var count = (stats.count ? stats.count : 0)
                 check_show_sync_message(count - last)
+
+                if (block_start > 0)
+                  last = block_start
 
                 update_tx_db(net, coin.name, last, count, stats.txes, settings.sync.update_timeout, false, function() {
                   // check if the script stopped prematurely
@@ -916,8 +924,8 @@ if (db.lib.is_locked([database], net) == false) {
                 node.payee = items[2]
                 node.uptime = items[3]
                 node.lastseen = items[4]
-                node.lastpaidtime = items[5]
-                node.lastpaidblock = items[6]
+                node.lastpaidtime = items[5] // lastpaid
+                node.lastpaidblock = items[6] // last_paid_block
                 node.address = items[7]
                 node.ip_address = items[7]
               } else {

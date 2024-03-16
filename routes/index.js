@@ -357,9 +357,9 @@ router.get('/apidocs/:net?', function(req, res) {
     p.markets_page = markets_page
     p.api_page = api_page
     p.api_cmds = settings.get(net, 'api_cmds')
-    p.isButkoin = settings.isButkoin(net)
     p.isMainnet = net == 'mainnet'
     p.isApiEndpointEnabled = isApiEndpointEnabled
+    p.algos = settings.get(net, 'algos')
     res.render('apidocs', p)
   } else {
     route_get_index(res, null, net)
