@@ -84,12 +84,14 @@ block content
               td.text-start #{settings.locale.info_count_transactions}
               td.text-end #{settings.formatInt(stats.txes)}
             if info.show_txstats == true
-              each tx_type in tx_by_type 
+              each tx_type, index in tx_types
                 tr.sub
                   td.text-start 
-                    span #{tx_type._id + ' · ' + tx_type.type.replace('TRANSACTION_', '')}
+                    span #{index + ' · ' + tx_type.replace('TRANSACTION_', '')}
                   td.text-end
-                    span #{settings.formatInt(tx_type.count)}
+                    each txtype in tx_by_type
+                      if index == txtype._id
+                        span #{settings.formatInt(txtype.count)}
             if info.show_masternode_info == true
               tr
                 td.text-start #{settings.locale.info_count_masternodes}

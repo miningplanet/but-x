@@ -234,6 +234,7 @@ function route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx
   // shared_pages.page_header.network_charts.algos.size
   p.info_page = info_page
   p.blocks_by_algorithm = blocks_by_algorithm
+  p.tx_types = settings.get(net, 'tx_types')
   p.tx_by_type = tx_by_type
   p.latest_coinbase_tx = latest_coinbase_tx
   p.markets = markets
