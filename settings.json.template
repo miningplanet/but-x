@@ -132,6 +132,7 @@
     "balances": 60,
     "distribution": 60,
     "peers": 120,
+    "info": 120,
     "masternodes": 120
   },
 

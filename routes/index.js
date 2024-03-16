@@ -1,3 +1,4 @@
+const debug = require('debug')('debug')
 const express = require('express')
 const router = express.Router()
 const settings = require('../lib/settings')
@@ -5,7 +6,11 @@ const locale = require('../lib/locale')
 const db = require('../lib/database')
 const lib = require('../lib/x')
 const qr = require('qr-image')
+const TTLCache = require('@isaacs/ttlcache')
 const networks = settings.getAllNet()
+
+const wlength = settings.wallets.length
+const infoCache = new TTLCache({ max: wlength, ttl: settings.cache.info * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
 function route_get_block(res, blockhash, coin, net) {
   db.find_block_by_hash(blockhash, function (block) {
@@ -256,19 +261,34 @@ function route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx
 router.get('/info/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
-  db.count_blocks_by_algorithm(0, function (blocks_by_algorithm) {
-    db.count_tx_by_type(0, function (tx_by_type) {
-      db.get_latest_coinbase_tx("5", function (latest_coinbase_tx) {
-        db.get_markets(function(markets) {
-          db.get_order_aggregation(coin.symbol, 0, function (sells) {
-            db.get_order_aggregation(coin.symbol, 1, function (buys) {
-              route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net)
+  const r = infoCache.get(net);
+  if (r == undefined) {
+    db.count_blocks_by_algorithm(0, function (blocks_by_algorithm) {
+      db.count_tx_by_type(0, function (tx_by_type) {
+        db.get_latest_coinbase_tx("5", function (latest_coinbase_tx) {
+          db.get_markets(function(markets) {
+            db.get_order_aggregation(coin.symbol, 0, function (sells) {
+              db.get_order_aggregation(coin.symbol, 1, function (buys) {
+                const c = {}
+                c.blocks_by_algorithm = blocks_by_algorithm
+                c.tx_by_type = tx_by_type
+                c.latest_coinbase_tx = latest_coinbase_tx
+                c.markets = markets
+                c.sells = sells
+                c.buys = buys
+                infoCache.set(net, c)
+                debug("Cached info for '%s' %o - mem: %o", net, c, process.memoryUsage())
+                route_get_info(res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net)
+              }, net)
             }, net)
           }, net)
         }, net)
       }, net)
     }, net)
-  }, net)
+  } else {
+    debug("Get info by cache '%s' %o ...", net, r)
+    route_get_info(res, r.blocks_by_algorithm, r.tx_by_type, r.latest_coinbase_tx, r.markets, r.sells, r.buys, net)
+  }
 })
 
 function route_get_address(res, hash, coin, net=settings.getDefaultNet()) {
