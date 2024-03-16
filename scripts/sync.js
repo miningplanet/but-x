@@ -584,6 +584,7 @@ if (db.lib.is_locked([database], net) == false) {
                 const isButkoin = settings.isButkoin(net)
                 const isBitoreum = settings.isBitoreum(net)
                 const isRaptoreum = settings.isRaptoreum(net)
+                const isYerbas = settings.isYerbas(net)
 
                 async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
                   db.lib.get_blockhash(block_height, function(blockhash) {
@@ -616,6 +617,20 @@ if (db.lib.is_locked([database], net) == false) {
                                         case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT').toString(): extra = datautil.protxQuorumCommitmentTxToArray(rtx); break
                                         case tx_types.indexOf('TRANSACTION_FUTURE').toString(): extra = rtx.extraPayload; break
                                         default: console.warn('*** Unknown TX type %s.', tx.tx_type)
+                                      }
+                                    } else if (isYerbas) {
+                                      switch (tx.tx_type) {
+                                        case tx_types.indexOf('TRANSACTION_NORMAL').toString(): break // -> NORMAL
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER').toString(): extra = datautil.protxRegisterServiceTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE').toString(): extra = datautil.protxUpdateServiceTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR').toString(): extra = datautil.protxUpdateRegistrarTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE').toString(): extra = datautil.protxUpdateRevokeTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_COINBASE').toString(): break // COINBASE, Array.from(rtx.extraPayload).reverse().join("")
+                                        case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT').toString(): extra = datautil.protxQuorumCommitmentTxToArray(rtx); break
+                                        case tx_types.indexOf('TRANSACTION_FUTURE').toString(): extra = rtx.extraPayload; break
+                                        case tx_types.indexOf('TRANSACTION_ASSET_REGISTER').toString(): extra = rtx.extraPayload; break
+                                        case tx_types.indexOf('TRANSACTION_ASSET_REISUE').toString(): extra = rtx.extraPayload; break
+                                        default: console.warn('*** Unknown TX type %s.', tx.tx_type); console.log(JSON.stringify.tx); exit(0);
                                       }
                                     }
                                     TxDb[net].updateOne({txid: txid}, {
