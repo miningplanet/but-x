@@ -360,6 +360,7 @@ router.get('/apidocs/:net?', function(req, res) {
     p.isMainnet = net == 'mainnet'
     p.isApiEndpointEnabled = isApiEndpointEnabled
     p.algos = settings.get(net, 'algos')
+    p.tx_types = settings.get(net, 'tx_types')
     res.render('apidocs', p)
   } else {
     route_get_index(res, null, net)

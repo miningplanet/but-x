@@ -607,30 +607,33 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
-    var min = req.params.min, start, length, internal = false;
+    var min = req.params.min, start, length, internal = isInternalRequest(req)
     // split url suffix by forward slash and remove blank entries
-    var split = req.url.split('/').filter(function(v) { return v; });
+    var type = req.params['type'] ? req.params['type'] : -1
+    var split = req.url.split('/').filter(function(v) { return v; })
     // determine how many parameters were passed
     switch (split.length) {
       case 2:
         // capture start and length
-        start = split[0];
-        length = split[1];
+        start = split[0]
+        length = split[1]
         break;
       default:
         if (split.length == 1) {
           // capture start
-          start = split[0];
+          start = split[0]
+        } else if (split.length >= 3) {
+          type = split[2]
         } else if (split.length >= 2) {
           // capture start and length
-          start = split[0];
-          length = split[1];
+          start = split[0]
+          length = split[1]
           // check if this is an internal request
+          // TODO: Should be dead here.
           if (split.length > 2 && split[2] == 'internal')
-            internal = true;
+            internal = true
         }
-
-        break;
+        break
     }
 
     if (typeof length === 'undefined' || isNaN(length) || length < 1 || length > api_page.public_apis.ext.getlasttxs.max_items_per_query)
@@ -642,19 +645,12 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
     else
       min  = (min * 100000000);
 
-    db.get_last_txs(start, length, min, internal, function(data, count) {
-      // check if this is an internal request
-      if (internal) {
-        // display data formatted for internal datatable
-        res.json({"data": data, "recordsTotal": count, "recordsFiltered": count});
-      } else {
-        // display data in more readable format for public api
-        res.json(data);
-      }
-    }, net);
+    db.get_last_txs(start, length, min, type, internal, function(data, count) {
+      res.json({"data": data, "recordsTotal": count, "recordsFiltered": count})
+    }, net)
   } else
     res.end('This method is disabled');
-});
+})
 
 app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
   const net = settings.getNet(req.params['net'])

@@ -49,7 +49,7 @@ block content
         ajax: {
           url: '/ext/getlasttxs/#{net}/#{movement_page.movement_table.min_amount}',
           beforeSend: function(jqXHR, settings) {
-            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal';
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url); // '/type'
             return true;
           }
         },

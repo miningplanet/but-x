@@ -340,9 +340,12 @@ block content
             if api_page.public_apis.ext.getlasttxs.enabled == true
               li
                 p
-                  div.fw-bold getlasttxs [net] [min] [length] [start]
+                  div.fw-bold getlasttxs [net] [min] [length] [start] [tx_type]
                   div
-                    em Returns last [length] transactions greater than [min] coins, starting from offset [start]
+                    em Returns the latest [length] transactions greater than [min] coins, starting from offset [start], optionally only the given transaction type, either by its index (starting with 0) or type.
+                    ul 
+                      each tx_type, index in tx_types
+                            li #{index} - #{tx_type}
                   div
                     em Note: [length] is limited to returning #{api_page.public_apis.ext.getlasttxs.max_items_per_query} records per query
                   div
