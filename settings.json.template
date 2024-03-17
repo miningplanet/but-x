@@ -662,10 +662,6 @@
         "enabled": false,
         "trading_pairs": [ "LTC/BTC", "LTC/ETH" ]
       },
-      "bittrex": {
-        "enabled": false,
-        "trading_pairs": [ "LTC/BTC" ]
-      },
       "crex": {
         "enabled": false,
         "trading_pairs": [ "LTC/BTC" ]

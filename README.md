@@ -171,7 +171,6 @@ but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=
 but-eiquidus supports the following crypto currency exchanges.
 
 - [AltMarkets](https://altmarkets.io)
-- [Bittrex](https://bittrex.com)
 - [BitxOnex](https://www.bitxonex.comrefid=ID1906858745)
 - [Bitoreum Exchange](https://www.bitoreum.exchange?refid=ID19CBFFCE97)
 - [CoinEx](https://www.coinex.com/)
