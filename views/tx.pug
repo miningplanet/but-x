@@ -201,7 +201,7 @@ block content
                       - var ramount = Number(address.amount / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                       - var ramountParts = ramount.split('.');
                       tr
-                        td.addressCol
+                        td.addresscol
                           if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
                             a.breakWord(href='/address/' + address.addresses + '/' + net)
                               if address.claim_name == null || address.claim_name == ''
@@ -242,7 +242,7 @@ block content
                     - var ramountParts = ramount.split('.');
                     tr
                       if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
-                        td.addressCol
+                        td.addresscol
                           a.breakWord(href='/address/' + address.addresses + '/' + net)
                             if address.claim_name == null || address.claim_name == ''
                               =address.addresses
@@ -252,7 +252,7 @@ block content
                         td.text-end #{ramountParts[0]}.
                           span.decimal #{ramountParts[1]}
                       else if address.amount > 0
-                        td.addressCol
+                        td.addresscol
                           if address.addresses == 'hidden_address'
                             if address_page.enable_hidden_address_view == true
                               a.breakWord(href='/address/hidden_address/' + net)
@@ -285,7 +285,7 @@ block content
                     - var ramount = Number(address.amount / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                     - var ramountParts = ramount.split('.');
                     tr
-                      td.addressCol
+                      td.addresscol
                         a.breakWord(href='/address/' + address.addresses+ '/' + net)
                           if address.claim_name == null || address.claim_name == ''
                             =address.addresses

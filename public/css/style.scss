@@ -1870,6 +1870,25 @@ div#links span.vertical-align-middle, div#links img {
   margin: 4px !important;
 }
 
+table {
+  margin: 0px !important;
+}
+
+table#rich td, table#rich th, table#rreceive td, table#rreceive th, table#recent-table td, table#recent-table th, table#movement-table td, table#movement-table th, table#masternodes-table td, table#masternodes-table th, table#connections-table td, table#connections-table th {
+  white-space: nowrap;
+}
+
+table#address-summary td:nth-child(1), table#tx-table td:nth-child(1), table#block-summary td:nth-child(1), table#market-summary td:nth-child(1) {
+  width: var(--xs-2-col-label-width) !important;
+  min-width: var(--xs-2-col-label-width-min) !important;
+  text-align: left !important;
+}
+
+table#address-summary td:nth-child(2), table#tx-table td:nth-child(2), table#block-summary td:nth-child(2), table#market-summary td:nth-child(2) {
+  width: auto;
+  text-align: left !important;
+}
+
 tbody tr td a, div.card-body a, input, select, option, .btn, .form-control {
   background-color: transparent !important;
   color: var(--but2) !important;
@@ -1911,17 +1930,170 @@ table th.hashps, table td.hashps {
   min-width: 104px;
 }
 
+table td.addresscol, table th.addresscol {
+  width: 270px !important;
+}
+
+table td.addresscol {
+  text-align: center;
+}
+
+table td.addresscol a {
+  width: 98%; 
+  min-width: 50px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table td.countrywithnamecol, table th.countrywithnamecol {
+  min-width: 140px !important;
+  width: auto;
+  word-wrap: normal !important;
+  text-align: right !important;
+}
+
+table td.flagcol, table th.flagcol {
+  width: 25px !important;
+  text-align: center;
+}
+
+table td.ipcol, table th.ipcol {
+  width: 90px !important;
+}
+
+table td.ipcol {
+  text-align: right;
+}
+
+table td.ipandportcol, table th.ipandportcol {
+  width: 164px !important;
+}
+
+table td.ipandportcol {
+  text-align: right;
+}
+
+table td.lastpaidcol, table th.lastpaidcol {
+  width: 170px !important;
+}
+
+table td.lastpaidcol {
+  text-align: center;
+}
+
+table td.lastpaidblockcol, table th.lastpaidblockcol {
+  width: 46px !important;
+}
+
+table td.lastpaidblockcol {
+  text-align: center;
+}
+
+table td.posecol, table th.posecol {
+  width: 32px !important;
+}
+
+table td.posecol {
+  text-align: center;
+}
+
+table td.statuscol, table th.statuscol {
+  width: 50px !important;
+}
+
+table td.statuscol {
+  text-align: center;
+}
+
+/* display: inline-block; */
+table td.txcol a {
+  width: 98%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left !important;
+}
+
 /* Responsivnes */
 @media only screen and (max-width: 575px) {
-  div#body-container { min-height: 700px }
+  div#body-container {
+    min-height: 700px;
+  }
+  td.full, th.full, td.half, th.half, span.half {
+    width: 0px !important;
+    overflow: hidden !important;
+    display: none !important;
+    visibility: hidden !important;
+  }
+  table#block-txs td.txcol A {
+    width: 110px !important;
+  }
+  div#block-txs-wrapper table th:nth-child(1) {
+    width: 130px !important;
+  }
 }
+
 @media only screen and (min-width: 605px) {
 }
+
 @media only screen and (min-width: 695px) {
 }
+
 @media only screen and (min-width: 576px) and (max-width: 991px) {
-  div#body-container { min-height: 800px }
+  div#body-container {
+    min-height: 800px;
+  }
 }
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (max-width: 768px) {
+  span.rdate {
+    height: 0;
+    display: none;
+    visibility: hidden !important;
+    overflow: hidden !important;
+  }
+  td.full, th.full {
+    width: 0px !important;
+    overflow: hidden !important;
+    display: none !important;
+    visibility: hidden !important;
+  }
+  td.countrycol {
+    width: var(--xs-width-col-country) !important;
+  }
+  td.countrycol span {
+    display: none !important;
+    width: 0 !important;
+  }
+  /* display: inline-block; */
+  table#block-txs td.txcol a {
+    width: 140px !important;
+  }
+  div#block-txs-wrapper table th:nth-child(1) {
+    width: 155px !important;
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  td.small, th.small {
+    display: table-cell !important;
+    visibility: visible !important;
+  }
+  td.wide, th.wide {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+/* Large devices (desktop, 992px and up) */
 @media only screen and (min-width: 992px) {
-  div#body-container { min-height: 900px }
+  div#body-container {
+    min-height: 900px;
+  }
+  td.small, th.small {
+    display: none !important;
+    visibility: hidden !important;
+  }
 }

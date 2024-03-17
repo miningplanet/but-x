@@ -113,22 +113,22 @@ block content
         columns: [
           // { name: 'rank', data: 'rank', className: "rankCol" },
           // { name: 'network', data: 'network', className: "networkCol" },
-          { name: 'ip_address_port', data: 'ip_address', className: "ipAddressAndPortCol wide" },
-          { name: 'ip_address', data: 'ip_address_without_port', className: "ipAddressCol small" },
-          { name: 'addr', data: 'addr', className: "addressCol full" },
+          { name: 'ip_address_port', data: 'ip_address', className: "ipandportcol wide" },
+          { name: 'ip_address', data: 'ip_address_without_port', className: "ipcol small" },
+          { name: 'addr', data: 'addr', className: "addresscol full" },
           // { name: 'version', data: 'version', className: "versionCol" },
           // { name: 'lastseen', data: 'lastseen', className: "lastSeenCol" },
-          { name: 'lastpaid', data: 'lastpaid', className: "lastPaidCol full" },
-          { name: 'last_paid_block', data: 'last_paid_block', className: "lastPaidBlockCol" },
+          { name: 'lastpaid', data: 'lastpaid', className: "lastpaidcol full" },
+          { name: 'last_paid_block', data: 'last_paid_block', className: "lastpaidblockcol" },
           // { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
-          { name: 'status', data: 'status', className: "statusCol" },
-          { name: 'pose', data: 'pose_score', className: "poseCol" },
-          { name: 'country', data: 'countryWithFlag', className: "countryWithNameCol wide" },
-          { name: 'flag', data: 'flag', className: "flagCol small" }
+          { name: 'status', data: 'status', className: "statuscol" },
+          { name: 'pose', data: 'pose_score', className: "posecol" },
+          { name: 'country', data: 'countryWithFlag', className: "countrywithnamecol wide" },
+          { name: 'flag', data: 'flag', className: "flagcol small" }
         ],
         rowCallback: function(row, data, index) {
-          // $("td.addressCol", row).addClass("breakWord");
-          // $("td.ipAddressCol", row).addClass("breakWord");
+          // $("td.addresscol", row).addClass("breakWord");
+          // $("td.ipcol", row).addClass("breakWord");
         },
         fnDrawCallback: function(settings) {
           enableTooltips();

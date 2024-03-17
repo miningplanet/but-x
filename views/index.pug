@@ -72,7 +72,7 @@ block content
 
           $("td:eq(0)", row).html('<a href="/tx/' + txhash + '/#{net}"><span class="entity" data-bs-toggle="tooltip" data-bs-placement="top" title="#{settings.locale.view_tx}">&#8627</span></a>').addClass('text-center d-table-cell d-md-none');
           $("td:eq(1)", row).html('<a href="/block/' + blockhash + '/#{net}">' + blockindex + '</a>');
-          $("td:eq(2)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass("txCol text-center breakWord d-none d-md-table-cell");
+          $("td:eq(2)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass("txcol text-center breakWord d-none d-md-table-cell");
           $("td:eq(3)", row).html(outputs).addClass("text-center d-none d-sm-table-cell");
           $("td:eq(4)", row).html(amount).addClass("text-end");
           $("td:eq(5)", row).html(format_unixtime(timestamp)).addClass('text-center');

@@ -70,7 +70,7 @@ block content
           var balance = data[4].toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
           var balanceParts = balance.split('.');
           $("td:eq(0)", row).html('<a href="/tx/' + txhash + '/#{net}"><span class="entity" data-bs-toggle="tooltip" data-bs-placement="top" title="#{settings.locale.view_tx}">&#8627</span></a>').addClass('text-center d-table-cell d-md-none');
-          $("td:eq(1)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass('txCol breakWord d-none d-md-table-cell');
+          $("td:eq(1)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass('txcol breakWord d-none d-md-table-cell');
           var amount = 0;
           var updown = '';
 
@@ -160,7 +160,8 @@ block content
         tbody
           tr
             td.text-center.addr-summary
-              img.qrcode(src='/qr/' + address.a_id)
+              div.text-center
+                img.qrcode(src='/qr/' + address.a_id)
             td
           tr
             td #{settings.locale.rl_balance}
