@@ -41,28 +41,51 @@ block content
             td.d-md-table-cell #{settings.locale.tx_block_hash}
             td.d-md-table-cell
               a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockhash}
-          tr
-            td.d-md-table-cell #{settings.locale.tx_type}
-            td.breakWord #{tx.tx_type} #{tx_types[tx.tx_type]}
-          tr
-            td.d-md-table-cell #{settings.locale.tx_version}
-            td.breakWord #{tx.version}
-          tr
-            if transaction_page.show_op_return == true
-              td='OP_RETURN'
+          if tx.tx_type != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_type}
+              td.breakWord #{tx.tx_type} #{tx_types[tx.tx_type]}
+          if tx.version != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_version}
+              td.breakWord #{tx.version}
+          if !isNaN(tx.total)
+            tr
+              td.d-md-table-cell #{settings.locale.tx_amount}
+              td.breakWord #{tx.total / 100000000 }
+          if !isNaN(tx.size)
+            tr
+              td.d-md-table-cell #{settings.locale.tx_size}
+              td.breakWord #{tx.size}
+          if transaction_page.show_op_return == true
+            tr
+              td.d-md-table-cell='OP_RETURN'
               td.breakWord #{tx.op_return}
           tr
-            td #{settings.locale.confirmations}
+            td.d-md-table-cell #{settings.locale.confirmations}
             if confirms >= confirmations
               td #{confirms}
             else if confirms < (confirmations / 2)
               td #{confirms}
             else
               td #{confirms}
-          tr
-            td #{settings.locale.timestamp}
-            td
-              span#timestampCol
+          if !isNaN(tx.timestamp)
+            tr
+              td.d-md-table-cell #{settings.locale.timestamp}
+              td
+                span#timestampCol
+          if !isNaN(tx.locktime)
+            tr
+              td.d-md-table-cell #{settings.locale.tx_locktime}
+              td.breakWord #{tx.locktime}
+          if tx.instantlock != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_instantlock}
+              td.breakWord #{tx.instantlock}
+          if tx.chainlock != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_chainlock}
+              td.breakWord #{tx.chainlock}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER')
       .card.card-default.border-0.cardSpacer
         .card-header
@@ -174,7 +197,79 @@ block content
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_pk}
               td.breakWord #{tx.extra ? tx.extra[7] == '0' ? '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' : tx.extra[7] : 'N/A'}
-    else if tx.vout.length < 1
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_ASSET_REGISTER')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_assert_register_version} #{tx.version ? tx.version : 'N/A'}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            if tokens.length > 0
+              each token in tokens
+                tr
+                  td.d-md-table-cell #{token.name}
+                  td
+                    table.blank
+                      tbody
+                      if token.type
+                        tr 
+                          td #{settings.locale.tx_token_type}
+                          td #{token.type}
+                      if !isNaN(token.amount)
+                        tr
+                          td #{settings.locale.tx_token_amount}
+                          td #{token.amount}
+                      if token.ipfs_hash
+                        tr
+                          td #{settings.locale.tx_token_ipfs_hash}
+                          td #{token.ipfs_hash}
+                      if !isNaN(token.expire_time)
+                        tr
+                          td #{settings.locale.tx_token_expire_time}
+                          td #{token.expire_time}
+                      if token.token
+                        tr
+                          td #{settings.locale.tx_token_properties}
+                          td #{token.token}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_extra}
+              td.breakWord #{tx.extra ? tx.extra : 'N/A'}
+    if tx.tx_type == tx_types.indexOf('TRANSACTION_ASSET_REISUE')
+      .card.card-default.border-0.cardSpacer
+        .card-header
+          strong #{settings.locale.tx_assert_reissue_version} #{tx.version ? tx.version : 'N/A'}
+        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+          tbody
+            if tokens.length > 0
+              each token in tokens
+                tr
+                  td.d-md-table-cell #{token.name}
+                  td
+                    table.blank
+                      tbody
+                      if token.type
+                        tr 
+                          td #{settings.locale.tx_token_type}
+                          td #{token.type}
+                      if !isNaN(token.amount)
+                        tr
+                          td #{settings.locale.tx_token_amount}
+                          td #{token.amount}
+                      if token.ipfs_hash
+                        tr
+                          td #{settings.locale.tx_token_ipfs_hash}
+                          td #{token.ipfs_hash}
+                      if !isNaN(token.expire_time)
+                        tr
+                          td #{settings.locale.tx_token_expire_time}
+                          td #{token.expire_time}
+                      if token.token
+                        tr
+                          td #{settings.locale.tx_token_properties}
+                          td #{token.token}
+            tr
+              td.d-md-table-cell #{settings.locale.tx_extra}
+              td.breakWord #{tx.extra ? tx.extra : 'N/A'}
+    if tx.vout.length < 1
       .text-center(role='alert', style='margin-bottom:0;')
         strong #{settings.locale.tx_nonstandard} #{tx.tx_type}
     else

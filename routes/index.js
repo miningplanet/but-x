@@ -87,17 +87,33 @@ function route_get_tx(res, txid, coin, net) {
   } else {
     db.get_tx(txid, function(tx) {
       if (tx) {
-        db.get_tip_by_blocks(function(blockcount) {
+        // TODO: yerbas tx type
+        if (tx.tx_type == 8 || tx.tx_type == 9) {
+          db.get_token({ "height": tx.blockindex, "txid": tx.txid }, function(tokens) {
+            debug("Got tokens %o with TX %s at index %d for chain '%s'.", tokens, tx.txid, tx.blockindex, net)
+            if (settings.get(net, 'claim_address_page').enabled == true) {
+              db.populate_claim_address_names(tx, function(tx) {
+                const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
+                p.tokens = tokens
+                res.render('tx', p)
+              }, net)
+            } else {
+              const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
+              p.tokens = tokens
+              res.render('tx', p)
+            }
+          }, net)
+        } else {
           if (settings.get(net, 'claim_address_page').enabled == true) {
             db.populate_claim_address_names(tx, function(tx) {
-              const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
+              const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
               res.render('tx', p)
             }, net)
           } else {
-            const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (blockcount ? blockcount : 0), coin.name + ' Transaction ' + tx.txid)
+            const p = txParam('tx', transaction_page, coin, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
             res.render('tx', p)
           }
-        }, net)
+        }
       } else {
         lib.get_rawtransaction(txid, function(rtx) {
           if (rtx && rtx.txid) {

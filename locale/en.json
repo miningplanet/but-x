@@ -36,7 +36,13 @@
   "tx_contributors": "Input Addresses",
   "tx_hash": "Tx Hash",
   "tx_address": "Address",
+  "tx_amount": "Amount",
+  "tx_locktime": "Lock time",
+  "tx_instantlock": "Instant lock",
+  "tx_chainlock": "Chain lock",
+  "tx_extra": "Extra Data",
   "tx_nonstandard": "NONSTANDARD TX",
+  "tx_size": "Size",
   "view_raw_tx_data": "View Raw Transaction Data",
   "view_block": "View Block",
 
@@ -82,6 +88,19 @@
   "tx_qc_commitment_signers": "Signers",
   "tx_qc_commitment_valid_members": "Valid Members",
   "tx_qc_commitment_pk": "Quorum PK",
+
+  /* Yerbas tx_type 8 JSON to array. See validation.h -> TRANSACTION_ASSET_REGISTER. */
+  "tx_assert_register_version": "Asset Register Version",
+
+  /* Yerbas tx_type 9 JSON to array. See validation.h -> TRANSACTION_ASSET_REISUE. */
+  "tx_assert_reissue_version": "Asset Reissue Version",
+
+  /* Generic token */
+  "tx_token_type": "Type",
+  "tx_token_amount": "Amount",
+  "tx_token_ipfs_hash": "IPFS Hash",
+  "tx_token_expire_time": "Expires",
+  "tx_token_properties": "Properties",
 
   // block view
   "block_title": "{1} Block Details",

@@ -39,6 +39,7 @@ function usage() {
   console.log('                 Enriches TXs with further fields like version, type, locktime and more.')
   console.log('                 Optional parameters: block number start and end inclusive')
   console.log('reindex          Clears index then resyncs from genesis to current block')
+  console.log('reindex-asset    Re-index asset creation, reissuance and transfer.')
   console.log('reindex-rich     Clears and recreates the richlist data')
   console.log('reindex-txcount  Rescan and flatten the tx count value for faster access')
   console.log('reindex-last     Rescan and flatten the last blockindex value for faster access')
@@ -361,6 +362,9 @@ if (mode == null || mode == 'index' || mode == 'update') {
         console.log('Process aborted. Nothing was deleted')
         exit(2)
       }
+      break
+    case 'reindex-asset':
+      mode = 'reindex-asset'
       break
     case 'reindex-rich':
       mode = 'reindex-rich'
@@ -685,6 +689,47 @@ if (db.lib.is_locked([database], net) == false) {
                   console.log( "Finished.")
                   exit(0)
                 })
+              } else if (mode == 'reindex-asset') {
+
+                const tx_type = !isNaN(process.argv[4]) ? parseInt(process.argv[4]) : 8
+                block_start = !isNaN(process.argv[5]) ? Math.max(1, parseInt(process.argv[5])) : 0
+                end = !isNaN(process.argv[6]) ? Math.max(1, parseInt(process.argv[6])) : -1
+              
+                console.log('Run reindex assets for net %s tx_type %s from block %d to %d', net, tx_type, block_start, end)
+
+                db.get_tx_by_type(tx_type, block_start, end, function(txes) {
+                  console.log("Found %d txes of type %d.", txes.length, tx_type)
+                  if (Array.isArray(txes)) {
+                    async.eachLimit(txes, 1, function(tx, next_tx) {
+                      db.lib.get_rawtransaction(tx.txid, function(rtx) {
+                        if (rtx) {
+                          for (i in rtx.vout) {
+                            if (rtx.vout[i].scriptPubKey && rtx.vout[i].scriptPubKey.asset) {
+                              const asset = rtx.vout[i].scriptPubKey.asset
+                              const type = rtx.vout[i].scriptPubKey.type
+                              debug("Found asset: %o of type %s", asset, type)
+                              db.create_or_update_token(asset.name, rtx.height, rtx.txid, rtx.vout, type, asset, function(token) {
+                                console.log("Created or updated token %s", asset.name)
+                              }, net)
+                            }
+                          }
+                        } else {
+                          console.log("Fail to get TX with id '%s' from daemon.", txid)
+                        }
+                        next_tx()
+                      }, net)
+                    }, function() {
+                      setTimeout( function() {
+                        exit(0)
+                        // blockhash = null
+                        // block = null
+                        // stopSync ? exit(0) : next_tx() // stop or next
+                      }, settings.sync.update_timeout)
+                    })
+                  } else {
+                    console.log('No data found to reindex.')  
+                  }
+                }, net)
               } else if (mode == 'update') {
                 // Get the last synced block index value
                 var last = (stats.last ? stats.last : 0)
@@ -694,6 +739,8 @@ if (db.lib.is_locked([database], net) == false) {
 
                 if (block_start > 0)
                   last = block_start
+
+                console.log('Update chain %s from block %d to %d', net, block_start, last)
 
                 update_tx_db(net, coin.name, last, count, stats.txes, settings.sync.update_timeout, false, function() {
                   // check if the script stopped prematurely

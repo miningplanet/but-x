@@ -878,6 +878,17 @@ table.table {
   }
 }
 
+table.blank {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: smaller;
+}
+
+table.blank td {
+  width: auto;
+}
+
 table {
   width: 100% !important;
   border-top-width: 1px;
