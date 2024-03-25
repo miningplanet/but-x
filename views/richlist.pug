@@ -181,6 +181,7 @@ block content
                       th.text-center #{settings.locale.rl_tx_timestamp}
                       th.text-center #{settings.locale.rl_tx_size}
                       th.text-center #{settings.locale.rl_total_out}
+                        span.small.fw-normal  (#{coin.symbol})
                   tbody
                     - var count = 0;
                     each tx in toptx
