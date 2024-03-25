@@ -134,7 +134,6 @@ app.use('/', routes);
 // post method to claim an address using verifymessage functionality
 app.post('/claim/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   // check if the bad-words filter is enabled
   if (settings.get(net, 'claim_address_page').enable_bad_word_filter == true) {
     // initialize the bad-words filter
@@ -557,7 +556,6 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
 
 app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getmarkets.enabled == true) {
     if (req.params.mode == 'summary') {
@@ -604,7 +602,6 @@ function isInternalRequest(req) {
 app.use('/ext/getlasttxs/:net/:min', function(req, res) {
   // TODO: Add cache.
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
     var min = req.params.min, start, length, internal = isInternalRequest(req)
@@ -654,7 +651,6 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
 
 app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getaddresstxs.enabled == true) || isInternalRequest(req)) {
     var internal = false;
@@ -795,7 +791,6 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || isInternalRequest(req)) {
-    const coin = settings.getCoin(net)  
     const r = peersCache.get(net);
     if (r == undefined) {
       db.get_peers(function(peers) {
@@ -867,7 +862,6 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
 // returns a list of masternode reward txs for a single masternode address from a specific block height
 app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   // check if the getmasternoderewards api is enabled
   if (api_page.enabled == true && api_page.public_apis.ext.getmasternoderewards.enabled == true) {
@@ -912,7 +906,6 @@ app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) 
 
 app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const coin = settings.getCoin(net)
   const r = networkChartCache.get(net);
   if (r == undefined) {
     db.get_network_chart_data(function(data) {
