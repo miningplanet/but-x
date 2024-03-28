@@ -107,9 +107,9 @@ block content
                   div
                     em #{settings.locale.api_getblockhash}
                   if !isMainnet
-                    a(href='/api/getblockhash/' + net + '?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash/#{net}?index=#{api_page.sample_data.blockindex}
+                    a(href='/api/getblockhash/' + api_page.sample_data.blockindex + '/' + net) #{address}/api/getblockhash/#{api_page.sample_data.blockindex}/#{net}
                   else
-                    a(href='/api/getblockhash?index=' + api_page.sample_data.blockindex) #{address}/api/getblockhash?index=#{api_page.sample_data.blockindex}
+                    a(href='/api/getblockhash/' + api_page.sample_data.blockindex) #{address}/api/getblockhash/#{api_page.sample_data.blockindex}
             if getblock
               li
                 p
@@ -117,9 +117,9 @@ block content
                   div
                     em #{settings.locale.api_getblock}
                   if !isMainnet
-                    a(href='/api/getblock/' + net + '?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock/#{net}?hash=#{api_page.sample_data.blockhash}
+                    a(href='/api/getblock/' + api_page.sample_data.blockhash + '/' + net) #{address}/api/getblock/#{api_page.sample_data.blockhash}/#{net}
                   else
-                    a(href='/api/getblock?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock?hash=#{api_page.sample_data.blockhash}
+                    a(href='/api/getblock?hash=' + api_page.sample_data.blockhash) #{address}/api/getblock/#{api_page.sample_data.blockhash}
             if getrawtransaction
               li
                 p

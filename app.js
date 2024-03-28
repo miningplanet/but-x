@@ -100,31 +100,151 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// // RPC API by DB.
-// // -> get_difficulty  // only sync.js
-// app.use('/api/getblockchaininfo/:net?', function(req, res) {
+/* RPC APIs by DB / cache */
+
+// TODO: API getblockchaininfo
+// TODO: API getmininginfo
+
+app.use('/api/getdifficulty/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getdifficulty.enabled, function (stats) {
+    const algos = settings.get(net, 'algos')
+    const r = {}
+    r.height = stats && !isNaN(stats.count) ? stats.count : -1
+    r.difficulty = stats && !isNaN(stats.difficulty) ? stats.difficulty : -1
+    algos.forEach((algo) => {
+      if (!isNaN(stats['difficulty_' + algo.algo]))
+        r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
+    })
+    return r
+  })
+})
+
+app.use('/api/getconnectioncount/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getconnectioncount.enabled, function (stats) {
+    return stats && stats.connections ? stats.connections.toString() : '0'
+  })
+})
+
+app.use('/api/getblockcount/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getblockcount.enabled, function (stats) {
+    return stats && stats.count ? stats.count.toString() : '0'
+  })
+})
+
+app.use('/api/getblockhash/:height/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const height = req.params['height']
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.rpc.getblockhash.enabled == true) {
+    db.find_block_by_height(height, function(block) {
+      if (block) {
+        res.send(block.hash)
+      } else {
+        res.end("Block not found")
+      }
+    }, net)
+  } else {
+    res.end('This method is disabled')
+  }
+})
+
+app.use('/api/getblock/:hash/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const hash = req.params['hash']
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.rpc.getblock.enabled == true) {
+    db.find_block_by_hash(hash, function(block) {
+      if (block) {
+        res.send(block)
+      } else {
+        res.end("Block not found")
+      }
+    }, net)
+  } else {
+    res.end('This method is disabled')
+  }
+})
+
+// TODO: API fix getrawtransaction
+
+// app.use('/api/getrawtransaction/:hash/:net?', function(req, res) {
 //   const net = settings.getNet(req.params['net'])
-//   const coin = settings.getCoin(net)
-//   db.get_stats(coin.name, function(stats) {
-//     if (stats)
-//       return res.end("HOHO1")
-//     else
-//       return res.end("ERROR")
-//   })
+//   const hash = req.params['hash']
+//   const api_page = settings.get(net, 'api_page')
+//   if (api_page.enabled == true && api_page.public_apis.rpc.getrawtransaction.enabled == true) {
+//     db.find_tx(hash, function(tx) {
+//       if (tx) {
+//         console.log('Tx %s is in DB.', hash)
+//         res.send(tx)
+//       } else {
+//         res.end("Tx not found")
+//       }
+//     }, net)
+//   } else {
+//     res.end('This method is disabled')
+//   }
 // })
 
-// // RPC API by DB.
-// only API
-// app.use('/api/getmininginfo/:net?', function(req, res) {
-//   const net = settings.getNet(req.params['net'])
-//   const coin = settings.getCoin(net)
-//   db.get_stats(coin.name, function(stats) {
-//     if (stats)
-//       return res.end("HOHO2")
-//     else
-//       return res.end("ERROR")
-//   })
-// })
+app.use('/api/getnetworkhashps/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getnetworkhashps.enabled, function (stats) {
+    const algos = settings.get(net, 'algos')
+    if (algos.length == 1) {
+      return stats && !isNaN(stats.nethash) ? stats.nethash.toString() : '-1'
+    } else {
+      const r = {}
+      algos.forEach((algo) => {
+        if (!isNaN(stats['nethash_' + algo.algo]))
+          r[algo.algo] = stats['nethash_' + algo.algo]
+      })
+      return r
+    }
+  })
+})
+
+app.use('/api/getmasternodecount/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getmasternodecount.enabled, function (stats) {
+    const total = !isNaN(stats.smartnodes_total) ? stats.smartnodes_total : -1
+    const enabled = !isNaN(stats.smartnodes_enabled) ? stats.smartnodes_enabled : -1
+    const r = {}
+    r.total = total
+    r.enabled = enabled
+    res.send(r)
+  })
+})
+
+// TODO: API verifymessage
+// TODO: API validateaddress
+// TODO: API getgovernanceinfo
+
+function stats(res, net, api_page, fenabled, cb) {
+  if (api_page.enabled == true && fenabled == true) {
+    const coin = settings.getCoin(net)
+    const r = statsCache.get(net)
+    if (r == undefined) {
+      db.get_stats(coin.name, function (stats) {
+        statsCache.set(net, stats)
+        debug("Cached stats '%s' %o - mem: %o", net, stats, process.memoryUsage())
+        // res.setHeader('content-type', 'text/plain')
+        res.send(cb(stats))
+      }, net)
+    } else {
+      debug("Get stats by cache '%s' %o ...", net, r)
+      // res.setHeader('content-type', 'text/plain')
+      res.send(cb(r))
+    }
+  } else
+    res.end('This method is disabled')
+}
 
 // routes
 app.use('/api', nodeapi.app);
@@ -172,28 +292,15 @@ app.post('/claim/:net?', function(req, res) {
   }
 });
 
-// extended apis
+/* Extended APIs by DB / cache */
+
 app.use('/ext/getmoneysupply/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
-  if (api_page.enabled == true && api_page.public_apis.ext.getmoneysupply.enabled == true) {
-    const coin = settings.getCoin(net)
-    const r = supplyCache.get(net);
-    if (r == undefined) {
-      db.get_stats(coin.name, function (stats) {
-        supplyCache.set(net, stats.supply);
-        debug("Cached supply '%s' %o - mem: %o", net, stats, process.memoryUsage());
-        res.setHeader('content-type', 'text/plain');
-        res.end((stats && stats.supply ? stats.supply.toString() : '0'));
-      }, net);
-    } else {
-      debug("Get supply by cache '%s' %o ...", net, r.supply);
-      res.setHeader('content-type', 'text/plain');
-      res.end((r ? r.toString() : '0'));
-    }
-  } else
-    res.end('This method is disabled');
-});
+  stats(res, net, api_page, api_page.public_apis.ext.getmoneysupply.enabled, function (stats) {
+    return stats && stats.supply ? stats.supply.toString() : '0'
+  })
+})
 
 app.use('/ext/getaddress/:hash/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
