@@ -49,6 +49,7 @@
   "wallets": [
     {
       "id": "mainnet",
+      "chain": "main",
       "host": "localhost",
       "port": 15998,
       "username": "rrr59AKrh3hdfgfgf",
@@ -56,6 +57,7 @@
     },
     {
       "id": "testnet",
+      "chain": "testnet",
       "host": "localhost",
       "port": 34340,
       "username": "admin1",
