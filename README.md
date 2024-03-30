@@ -1,4 +1,4 @@
- # but-eiquidus
+ # but-x
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/team-exor/eiquidus?color=ffbd11&label=version)
 ![GitHub Release Date](https://img.shields.io/github/release-date/team-exor/eiquidus)
@@ -7,21 +7,23 @@
 ![GitHub](https://img.shields.io/github/license/team-exor/eiquidus?color=ffbd11)
 
 
-Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-eiquidus' features first or see our [Installation Guide](#installation) to get started.
+Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-x' features first or see our [Installation Guide](#installation) to get started.
 
-
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10"/>
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
-<img src="public/img/screenshots/homepage-1-101-0.png" data-canonical-src="public/img/screenshots/homepage-1-101-0.png" width="200" style="margin:10" />
+<div style="height: 320px">
+<img src="public/img/screenshots/butkoin-x-screenshot.png" data-canonical-src="public/img/screenshots/butkoin-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px"/>
+<img src="public/img/screenshots/raptoreum-x-screenshot.png" data-canonical-src="public/img/screenshots/raptoreum-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 25px; left: -100px" />
+<img src="public/img/screenshots/bitoreum-x-screenshot.png" data-canonical-src="public/img/screenshots/bitoreum-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 50px; left: -200px" />
+<img src="public/img/screenshots/vkax-x-screenshot.png" data-canonical-src="public/img/screenshots/vkax-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 75px; left: -300px" />
+<img src="public/img/screenshots/pepew-x-screenshot.png" data-canonical-src="public/img/screenshots/pepew-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 100px; left: -400px" />
+<br clear="all">
+</div>
+<br clear="all">
 
 ![Homepage](public/img/screenshots/homepage-1-101-0.png =250x250)
 
 ## Support
 
-**but-eiquidus is open-source** and comes without support. Contact us at Github or at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2).
+**but-x is open-source** and comes without support. Contact us at Github or at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2).
 
 ## Samples
 
@@ -87,7 +89,7 @@ Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node a
 
 ## System Overview
 
-but-eiquidus is a multicoin backend system and comes with several APIs and a web UI.
+but-x is a multicoin backend system and comes with several APIs and a web UI.
 
 ### Prerequisites
 
@@ -101,7 +103,7 @@ The hardware system requirements depend on the data processed and stored and the
 
 #### Software
 
-but-eiquidus is platform independent and requires:
+but-x is platform independent and requires:
 
 - Linux, MacOS or MS Windows
 - Node.js - min. v19.9.0, current dev and prod version is v20.9.0
@@ -127,7 +129,7 @@ but-eiquidus is platform independent and requires:
 
 ### API Functions
 
-but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [X API](https://x.butkoin.com/info/mainnet) for comprehensive information.
+but-x offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [X API](https://x.butkoin.com/apidocs/mainnet) for comprehensive information.
 
 #### Coin Daemon Related API
 
@@ -168,7 +170,7 @@ but-eiquidus offers a rich set of API functions per blockchain (parameter {net}=
 
 ### Exchange data
 
-but-eiquidus supports the following crypto currency exchanges.
+but-x supports the following crypto currency exchanges.
 
 - [AltMarkets](https://altmarkets.io)
 - [BitxOnex](https://www.bitxonex.comrefid=ID1906858745)
@@ -186,7 +188,7 @@ but-eiquidus supports the following crypto currency exchanges.
 
 ### Configurable Web UI
 
-The but-eiquidus web UI is highly configurable. Content and design can be defined individually for each blockchain.
+The but-x web UI is highly configurable. Content and design can be defined individually for each blockchain.
 
 #### Customizable pages
 
@@ -263,9 +265,9 @@ Instances or clusters can perform tasks for one or more coins in different roles
 
 The following prerequisites must be installed before using but-x:
 
-- [Node.js](https://nodejs.org/en/) (v17.9.1 or newer recommended)
+- [Node.js](https://nodejs.org/en/) (v19.9.0 or newer recommended)
 - [MongoDB](https://www.mongodb.com/) (v5.3.0 or newer recommended)
-- [Git](https://git-scm.com/downloads) (v2.36.0 or newer recommended) if you do not download but-eiquidus in another way
+- [Git](https://git-scm.com/downloads) (v2.36.0 or newer recommended) if you do not download but-x in another way
 - A fully indexed and synchronized *coind* wallet daemon that supports the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). **NOTE:** In most cases, the blockchain must be synchronized with the `addressindex`, `txindex`, `timestampindex`, `spentindex` and `futureindex` option enabled to have access to all features. See the [Wallet Settings](#wallet-settings) section for more details.
 
 ##### Database Setup
@@ -424,30 +426,16 @@ cd /path/to/but-x && /path/to/pm2 reload but-x
 ```
 ___
 
-### Syncing Databases with the Blockchain
+### Syncing the Database with the Blockchain (or other Data)
 
-sync.js (located in scripts/) is used for updating the local databases. This script must be called from the explorers root directory.
+sync_${database}.js (located in scripts/) is used to update the local or remote databases. This scripts must be called from the explorers root directory.
 
 ```
-Usage: /path/to/node scripts/sync.js [mode]
-
-Mode: (required)
-update           Updates index from last sync to current block
-check            Checks index for (and adds) any missing transactions/addresses
-                 Optional parameter: block number to start checking from
-reindex          Clears index then resyncs from genesis to current block
-reindex-rich     Clears and recreates the richlist data
-reindex-txcount  Rescan and flatten the tx count value for faster access
-reindex-last     Rescan and flatten the last blockindex value for faster access
-market           Updates market summaries, orderbooks, trade history + charts
-peers            Updates peer info based on local wallet connections
-masternodes      Updates the list of active masternodes on the network
+Usage: /path/to/node scripts/sync-_${database}.js [net] <other options..>
 
 Notes:
-- 'current block' is the latest created block when script is executed.
-- The market + peers databases only support (& defaults to) reindex mode.
-- If check mode finds missing data (other than new data since last sync),
-  this likely means that sync.update_timeout in settings.json is set too low.
+- All scripts lock its execution based the database to be updated int ./tmp.
+- Lockings are deactivated if the PIDs locked are obsolete.
 ```
 
 *It is recommended to do the initial syncing of your blockchain, markets, peers and masternodes using the manual commands below to ensure there are no sync issues. When you are sure that everything is syncing correctly, you should then install the necessary scripts to a crontab at 1+ minute intervals as indicated below*
@@ -478,19 +466,21 @@ Also see the [Useful Scripts](#useful-scripts) section for more helpful scripts.
 Easier crontab syntax using npm scripts, but may not work on some systems depending on permissions and how nodejs was installed:
 
 ```
-*/1 * * * * cd /path/to/but-x && npm run sync-blocks > /dev/null 2>&1
-*/2 * * * * cd /path/to/but-x && npm run sync-markets > /dev/null 2>&1
-*/5 * * * * cd /path/to/but-x && npm run sync-peers > /dev/null 2>&1
-*/5 * * * * cd /path/to/but-x && npm run sync-masternodes > /dev/null 2>&1
+*/1 * * * * cd /path/to/but-x && npm run sync-blocks [net] > /dev/null 2>&1
+*/2 * * * * cd /path/to/but-x && npm run sync-markets [net] > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && npm run sync-peers [net] > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && npm run sync-masternodes [net] > /dev/null 2>&1
+*/9 * * * * cd /path/to/but-x && npm run sync-richlist [net] > /dev/null 2>&1
 ```
 
 Or, run the crontab by calling the sync script directly, which should work better in the event you have problems running the npm scripts from a crontab:
 
 ```
-*/1 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js update > /dev/null 2>&1
-*/2 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js market > /dev/null 2>&1
-*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js peers > /dev/null 2>&1
-*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync.js masternodes > /dev/null 2>&1
+*/1 * * * * cd /path/to/but-x && /path/to/node scripts/sync_chain.js [net] > /dev/null 2>&1
+*/2 * * * * cd /path/to/but-x && /path/to/node scripts/sync_markets.js [net] > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync_peers.js [net] > /dev/null 2>&1
+*/5 * * * * cd /path/to/but-x && /path/to/node scripts/sync_masternodes.js [net] > /dev/null 2>&1
+*/9 * * * * cd /path/to/but-x && /path/to/node scripts/sync_richlist.js [net] > /dev/null 2>&1
 ```
 ___
 
@@ -896,7 +886,7 @@ We also encourage submitting quality pull requests from developers to further im
 
 ### License
 
-Copyright (c) 2023, butkoin.com by miningplanet (mining@planet.ms)<br />
+Copyright (c) 2023-2024, https://butkoin.com by miningplanet (mining@planet.ms)<br />
 Copyright (c) 2019-2022, The Exor Community<br />
 Copyright (c) 2017, The Chaincoin Community<br />
 Copyright (c) 2015, Iquidus Technology<br />
