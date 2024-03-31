@@ -11,24 +11,22 @@ Stable, secure and customizable multicoin open-source blockchain explorer with s
 <div style="text-align: center; align: center;">
 <img src="public/img/screenshots/screenshots.png" width="720"/>
 </div>
-
 <br>
-
-![Homepage](public/img/screenshots/homepage-1-101-0.png =250x250)
 
 ## Support
 
-**but-x is open-source** and comes without support. Contact us at Github or at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2).
+but-x is open-source and comes without support. However. Contact us at Github or at the [butkoin.com discord channel](https://discord.com/invite/ggVkvBKZE2).
 
 ## Samples
 
 but-x is tested with these coins.
 
 -  https://x.butkoin.com/mainnet
--  https://x.butkoin.com/testnet
--  https://x.butkoin.com/bitoreum
 -  https://x.butkoin.com/raptoreum
+-  https://x.butkoin.com/bitoreum
+-  https://x.butkoin.com/vkax
 -  https://x.butkoin.com/pepew
+-  https://x.butkoin.com/yerbas
 
 Contact <a href="mailto:mining@planet.ms">us</a> if you have a blockchain node and need an explorer. Or you just run a blockchain node and want to provide us with data for an explorer.
 
@@ -90,11 +88,11 @@ but-x is a multicoin backend system and comes with several APIs and a web UI.
 
 #### Hardware
 
-The hardware system requirements depend on the data processed and stored and the type of deployment(s). For a single chain deployment with a small blockchain or testnet with tip up to 100.000 blocks, the following is considered as minimum requirements.
+The hardware system requirements depend on the data processed and stored and the type of deployment(s). For a single chain deployment, the following is considered as minimum requirements.
 
 - 2 CPU core or more
-- 2 GB or more of RAM
-- 10 GB disk space
+- 4 GB or more of RAM
+- 20 GB disk space
 
 #### Software
 
@@ -126,21 +124,24 @@ but-x is platform independent and requires:
 
 but-x offers a rich set of API functions per blockchain (parameter {net}=chain), enriched with external data, such as coin or market data. See [X API](https://x.butkoin.com/apidocs/mainnet) for comprehensive information.
 
-#### Coin Daemon Related API
+#### Coin data by DB / cache API
 
 - **api/getblockchaininfo/{net}:** Returns coin stats incl. circulating supply or USD price.
 - **api/getmininginfo/{net}:** Returns mining related information and stats.
 - **api/getdifficulty/{net}:** Returns the current difficulty.
 - **api/getconnectioncount/{net}:** Returns the number of peers.
 - **api/getblockcount/{net}:** Returns the current tip.
-- **api/getblockhash/{net}?index={height}:** Returns block hash for the height.
+- **api/getblockhash/{height}/{net}:** Returns block hash for the height.
 - **api/getblock/{net}:** Returns information about the block with the given hash.
-- **api/getrawtransaction/{net}?txid={txid}&decrypt={0|1}:** Returns raw or decoded TX information for ID.
+- **api/getrawtransaction/{txid}/{net}** Returns TX information for the TX ID.
 - **api/getnetworkhashps/{net}:** Returns the current network hashrate(s).
-- **api/getvotelist/{net}:** Returns the current vote list.
 - **api/getmasternodecount/{net}:** Returns the number of masternodes.
+- **api/verifymessage/{net}:** Verifies the message signed with an address private key.
+- **api/validateaddress/{address}/{net}:** Validates the address.
+- **api/getvotelist/{net}:** Returns the current vote list.
+- **api/getgovernanceinfo/{net}:** Returns the current governance info including proposal fees, quorum sizes and more.
 
-#### Extended API
+#### Extended data by DB / cache API
 
 - **ext/getmoneysupply/{net}:** Returns current money supply.
 - **ext/getdistribution/{net}:** Returns the wealth distribution and some stats.
@@ -148,20 +149,20 @@ but-x offers a rich set of API functions per blockchain (parameter {net}=chain),
 - **ext/getaddresstxs/{address}/{net}/{start}/{length}:** Returns TXs for a wallet address starting with an offset.
 - **ext/gettx/{hash}/{net}:** Returns information for given TX hash.
 - **ext/getbalance/{address}/{net}:** Returns current balance of the given address.
-- **ext/getlasttxs/{net}/{min}/{length}/{start}:** Returns a number TXs with min. a amount and offset.
+- **ext/getlasttxs/{net}/{min}/{length}/{start}/{type}:** Returns a list of length of TXs with minimum amount and offset, optional by TX type.
 - **ext/getcurrentprice/{net}:** Returns last known exchange prices.
+- **ext/getnetworkpeers/{net}:** Returns the list of current network peers.
 - **ext/getbasicstats/{net}:** Returns basic coin stats including: block count, circulating supply, USD price, etc.
 - **ext/getticker/{mode}/{net}:** Returns various ticker data.
 - **ext/getmarkets/{net}:** Returns various market data.
 - **ext/getsummary/{net}:** Returns a summary including: (hybrid) difficulty, supply, hash rate, market prices, other coin and masternode stats.
-- **ext/getnetworkpeers/{net}:** Returns the list of current network peers.
 - **ext/getmasternodelist/{net}:** Returns the list of current masternodes in the network.
 - **ext/getmasternoderewards/{net}:** Returns a list of masternode reward TX after a block height for an address.
 - **ext/getmasternoderewardstotal/{net}:** Returns the total reward of a masternode after a block height for an address.
 
 #### Net API
 
-- **getallnet:** Returns a list of the current chains the API supports.
+- **getallnet:** Returns a list of the current chains this API instance supports.
 
 ### Exchange data
 
@@ -183,7 +184,7 @@ but-x supports the following crypto currency exchanges.
 
 ### Configurable Web UI
 
-The but-x web UI is highly configurable. Content and design can be defined individually for each blockchain.
+The web UI of but-x is highly configurable. Content and design can be defined individually for each blockchain.
 
 #### Customizable pages
 
@@ -200,7 +201,7 @@ The but-x web UI is highly configurable. Content and design can be defined indiv
   - **Address Info:** Wallet address summary (balance, total sent, total received, QR code) and latest TX.
 
 
-- Custom social links like twitter, facebook, instgram github, or others like coingecko, coinmarketcapm paprika or any other external links.
+- Custom social links like twitter, facebook, instgram github, or others like coingecko, coinmarketcap or coinpaprika or any other external links.
 
 #### Customizable panels
 
