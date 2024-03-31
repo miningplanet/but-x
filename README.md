@@ -6,18 +6,13 @@
 <img src="public/img/screenshots/platform-windows macos linux-lightgrey.svg" />
 ![GitHub](https://img.shields.io/github/license/team-exor/eiquidus?color=ffbd11)
 
-
 Stable, secure and customizable multicoin open-source blockchain explorer with support for virtually any coin that implements the [Bitcoin RPC API protocol](https://developer.bitcoin.org/reference/rpc/index.html). Take a look at the but-x' features first or see our [Installation Guide](#installation) to get started.
 
-<div style="height: 320px">
-<img src="public/img/screenshots/butkoin-x-screenshot.png" data-canonical-src="public/img/screenshots/butkoin-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px"/>
-<img src="public/img/screenshots/raptoreum-x-screenshot.png" data-canonical-src="public/img/screenshots/raptoreum-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 25px; left: -100px" />
-<img src="public/img/screenshots/bitoreum-x-screenshot.png" data-canonical-src="public/img/screenshots/bitoreum-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 50px; left: -200px" />
-<img src="public/img/screenshots/vkax-x-screenshot.png" data-canonical-src="public/img/screenshots/vkax-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 75px; left: -300px" />
-<img src="public/img/screenshots/pepew-x-screenshot.png" data-canonical-src="public/img/screenshots/pepew-x-screenshot.png" width="200" style="margin:10; border: solid 1px #555; border-radius: 6px; position: relative; top: 100px; left: -400px" />
-<br clear="all">
+<div style="text-align: center; align: center;">
+<img src="public/img/screenshots/screenshots.png" width="720"/>
 </div>
-<br clear="all">
+
+<br>
 
 ![Homepage](public/img/screenshots/homepage-1-101-0.png =250x250)
 

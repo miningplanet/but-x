@@ -1,0 +1,26 @@
+<svg height="420px" width="740px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1214.09 751.97">
+  <defs>
+    <style>
+      image.img { 
+          filter: drop-shadow(0px 0px 5px #dddddd);
+      }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="100%" height="100%" fill="#dddddd" rx="15" />
+  <rect x="0.5%" y="0.5%" width="99%" height="99%" fill="#223040" rx="15"/>
+  <a href="https://github.com/miningplanet/but-x/blob/master/public/img/screenshots/butkoin-x-screenshot.png">
+    <image class="img" href="butkoin-x-screenshot.png" x="100" y="70" width="400"/>
+  </a>
+  <a href="https://github.com/miningplanet/but-x/blob/master/public/img/screenshots/raptoreum-x-screenshot.png">
+    <image class="img" href="raptoreum-x-screenshot.png" x="250" y="120" width="400" />
+  </a>
+  <a href="https://github.com/miningplanet/but-x/blob/master/public/img/screenshots/bitoreum-x-screenshot.png">
+    <image class="img" href="bitoreum-x-screenshot.png" x="400" y="170" width="400" />
+  </a>
+  <a href="https://github.com/miningplanet/but-x/blob/master/public/img/screenshots/vkax-x-screenshot.png">
+    <image class="img" href="vkax-x-screenshot.png" x="550" y="220" width="400" />
+  </a>
+  <a href="https://github.com/miningplanet/but-x/blob/master/public/img/screenshots/pepew-x-screenshot.png">
+    <image class="img" href="pepew-x-screenshot.png" x="700" y="270" width="400" />
+  </a>
+</svg>
