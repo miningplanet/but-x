@@ -16,7 +16,7 @@
     "sync-markets": "node ./scripts/sync_markets.js mainnet",
     "sync-peers": "node ./scripts/sync_peers.js mainnet",
     "sync-masternodes": "node ./scripts/sync_masternodes.js mainnet",
-    "sync-richlist": "node ./scripts/sync_richlist.js mainnet",
+    "sync-richlist": "node ./scripts/sync_richlist.js mainnet"
   },
   "dependencies": {
     "@isaacs/ttlcache": "^1.4.1",
