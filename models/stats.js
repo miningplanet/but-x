@@ -1,15 +1,18 @@
 module.exports = new require('mongoose').Schema({
-  coin: { type: String },
-  count: { type: Number, default: 1 },
-  last: { type: Number, default: 1 },
+  coin: { type: String, required : true },
+  chain: { type: String, required : true },
+  count: { type: Number, default: 1 }, // headers
+  last: { type: Number, default: 1 }, // blocks
   supply: { type: Number, default: 0 },
   addresses: { type: Number, default: 0 },
   txes: { type: Number, default: 0 },
   utxos: { type: Number, default: 0 },
+  bestblockhash: { type: String, lowercase: true, default: 'n/a'},
+  pow_algo_id: { type: Number },
+  pow_algo: { type: String },
   connections: { type: Number, default: 0 },
   smartnodes_total: { type: Number, default: 0 },
   smartnodes_enabled: { type: Number, default: 0 },
-  connections: { type: Number, default: 0 },
   last_price: { type: Number, default: 0 },
   last_usd_price: { type: Number, default: 0 },
   blockchain_last_updated: { type: Number, default: 0 },
@@ -33,5 +36,11 @@ module.exports = new require('mongoose').Schema({
   difficulty_lyra2: { type: Number, default: 0 },
   difficulty_sha256d: { type: Number, default: 0 },
   difficulty_scrypt: { type: Number, default: 0 },
-  difficulty_butkscrypt: { type: Number, default: 0 }
+  difficulty_butkscrypt: { type: Number, default: 0 },
+  mediantime: { type: Number, required: false },
+  initialblockdownload: { type: Boolean },
+  verificationprogress: { type: Number },
+  chainwork: { type: String, lowercase: true, default: 'n/a' },
+  size_on_disk: { type: Number, required : false },
+  pruned: { type: Boolean, required : false },
 })

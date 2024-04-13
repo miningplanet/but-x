@@ -102,8 +102,102 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* RPC APIs by DB / cache */
 
-// TODO: API getblockchaininfo
-// TODO: API getmininginfo
+app.use('/api/getblockchaininfo/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getblockchaininfo.enabled, function (stats) {
+    const isButkoin = settings.isButkoin(net)
+    const chain = settings.getWallet(net).chain
+    const algos = settings.get(net, 'algos')
+    const r = {}
+
+    if (stats.coin)
+      r.coin = stats.coin
+
+    r.chain = chain ? chain : 'n/a'
+    r.blocks = !isNaN(stats.last) ? stats.last : 'n/a'
+    r.headers = !isNaN(stats.count) ? stats.count : 'n/a'
+    r.addresses = !isNaN(stats.addresses) ? stats.addresses : 'n/a'
+    r.txes = !isNaN(stats.txes) ? stats.txes : 'n/a'
+    r.utxos = !isNaN(stats.utxos) ? stats.utxos : 'n/a'
+
+    r.bestblockhash = stats.bestblockhash
+
+    if (algos.length > 1)
+      r.pow_algo_id = !isNaN(stats.pow_algo_id) ? stats.pow_algo_id : 'n/a'
+
+    r.pow_algo = stats.pow_algo ? stats.pow_algo : 'n/a'
+
+    r.difficulty = stats && !isNaN(stats.difficulty) ? stats.difficulty : -1
+    if (algos.length > 1)
+      algos.forEach((algo) => {
+        if (!isNaN(stats['difficulty_' + algo.algo]))
+          r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
+      })
+
+    r.hashps = stats && !isNaN(stats.nethash) ? stats.nethash : -1
+    if (algos.length > 1)
+      algos.forEach((algo) => {
+        if (!isNaN(stats['nethash_' + algo.algo]))
+          r['nethash_' + algo.algo] = stats['nethash_' + algo.algo]
+      })
+
+    r.mediantime = !isNaN(stats.mediantime) ? stats.mediantime : 'n/a'
+    r.verificationprogress = !isNaN(stats.verificationprogress) ? stats.verificationprogress : 'n/a'
+    r.initialblockdownload = stats.initialblockdownload ? stats.initialblockdownload : 'n/a'
+    r.chainwork = stats.chainwork ? stats.chainwork : 'n/a'
+    r.size_on_disk = !isNaN(stats.size_on_disk) ? stats.size_on_disk : 'n/a'
+    r.pruned = stats.pruned !== null ? stats.pruned : 'n/a'
+    r.supply = !isNaN(stats.supply) ? stats.supply : 'n/a'
+    if (!isNaN(stats.smartnodes_total))
+      r.smartnodes_total = stats.smartnodes_total
+    if (!isNaN(stats.smartnodes_enabled))
+      r.smartnodes_enabled = stats.smartnodes_enabled
+    return r
+  })
+})
+
+app.use('/api/getmininginfo/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getmininginfo.enabled, function (stats) {
+    const isButkoin = settings.isButkoin(net)
+    const chain = settings.getWallet(net).chain
+    const algos = settings.get(net, 'algos')
+    const r = {}
+
+    if (stats.coin)
+      r.coin = stats.coin
+    r.chain = chain ? chain : 'n/a'
+    r.blocks = !isNaN(stats.last) ? stats.last : 'n/a'
+    r.headers = !isNaN(stats.count) ? stats.count : 'n/a'
+    
+    if (isButkoin) {
+      r.pow_algo_id = !isNaN(stats.pow_algo_id) ? stats.pow_algo_id : 'n/a'
+      r.pow_algo = stats.pow_algo ? stats.pow_algo : 'n/a'
+    }
+    
+    r.difficulty = stats && !isNaN(stats.difficulty) ? stats.difficulty : -1
+    algos.forEach((algo) => {
+      if (!isNaN(stats['difficulty_' + algo.algo]))
+        r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
+    })
+
+    r.errors = ''
+
+    r.hashps = stats && !isNaN(stats.nethash) ? stats.nethash : -1
+    algos.forEach((algo) => {
+      if (!isNaN(stats['nethash_' + algo.algo]))
+        r['nethash_' + algo.algo] = stats['nethash_' + algo.algo]
+    })
+
+    r.hashespersec = stats && !isNaN(stats.hashespersec) ? stats.hashespersec : 'n/a'
+
+    r.algos = settings.get(net, 'algos')
+    r.pooledtx = !isNaN(stats.pooledtx) ? stats.pooledtx : 'n/a'
+    return r
+  })
+})
 
 app.use('/api/getdifficulty/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
@@ -224,7 +318,27 @@ app.use('/api/getmasternodecount/:net?', function(req, res) {
 
 // TODO: API verifymessage
 // TODO: API validateaddress
-// TODO: API getgovernanceinfo
+
+app.use('/api/getgovernanceinfo/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  stats(res, net, api_page, api_page.public_apis.rpc.getgovernanceinfo.enabled, function (stats) {
+    const chain = settings.getWallet(net).chain
+    const r = {}
+
+    if (stats.coin)
+      r.coin = stats.coin
+    r.chain = chain ? chain : 'n/a'
+
+    r.governanceminquorum = !isNaN(stats.governanceminquorum) ? stats.governanceminquorum : 'n/a'
+    r.proposalfee = !isNaN(stats.proposalfee) ? stats.proposalfee : 'n/a'
+    r.superblockcycle = !isNaN(stats.superblockcycle) ? stats.superblockcycle : 'n/a'
+    r.lastsuperblock = !isNaN(stats.lastsuperblock) ? stats.lastsuperblock : 'n/a'
+    r.nextsuperblock = !isNaN(stats.nextsuperblock) ? stats.nextsuperblock : 'n/a'
+
+    return r
+  })
+})
 
 function stats(res, net, api_page, fenabled, cb) {
   if (api_page.enabled == true && fenabled == true) {
