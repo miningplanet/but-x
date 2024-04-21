@@ -276,16 +276,18 @@ mongo
 
 Select database:
 
-**NOTE:** `` is the name of the database where you will be storing local but-x data. You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbs[i].database` setting.
+**NOTE:** `{name}` is the name of the user and database where you will be storing local but-x data. 
+
+You can change this to any name you want, but you must make sure that you set the same name in the `settings.json` file for the `dbs[i].database` setting.
 
 ```
-use explorerdb
+use {name}
 ```
 
-Create a new user with read/write access. Collections and indexes are created or updated during startup or by the sync.js script update mode.
+Now create a new user with read/write access. Collections and indexes are created or updated during startup or by the sync_chain.js script. Set your secure `{password}`.
 
 ```
-db.createUser( { user: "eiquidus", pwd: "Nd^p2d77ceBX!L", roles: [ "readWrite" ] } )
+db.createUser( { user: "{name}", pwd: "{password}", roles: [ "readWrite" ] } )
 ```
 
 ##### Download Source Code
@@ -308,7 +310,7 @@ cp ./settings.json.template ./settings.json
 
 *Make required changes in settings.json*
 
-**NOTE:** You can further customize the site by adding your own javascript code to the `public/js/custom.js` file and css rules to the `public/css/custom.scss` file. Adding changes to `custom.js` and `custom.scss` is the preferred method of customizing your site, without affecting the ability to receive but-x code updates in the future.
+**NOTE:** You can further customize the site by adding your own javascript code to the `public/js/custom.js` file and css rules to the `public/css/{theme-name}.scss` file. Adding changes to `custom.js` and `{theme-name}.scss` is the preferred method of customizing your site, without affecting the ability to receive but-x code updates in the future.
 ___
 
 ### Start/Stop but-x
@@ -427,10 +429,10 @@ ___
 sync_${database}.js (located in scripts/) is used to update the local or remote databases. This scripts must be called from the explorers root directory.
 
 ```
-Usage: /path/to/node scripts/sync-_${database}.js [net] <other options..>
+Usage: /path/to/node scripts/sync-_${database}.js [net] {other options..}
 
 Notes:
-- All scripts lock its execution based the database to be updated int ./tmp.
+- All scripts lock its execution based the database to be updated in ./tmp.
 - Lockings are deactivated if the PIDs locked are obsolete.
 ```
 
@@ -482,10 +484,10 @@ ___
 
 ### Wallet Settings
 
-The wallet connected to eIquidus must be running with the following flags:
+The wallet connected to but-x must be running with the following flags:
 
 ```
--daemon -txindex
+-txindex
 ```
 
 You may either call your coins daemon using this syntax. Not all index options are available for all chains.
@@ -529,7 +531,7 @@ You should now be able to browse to but-x by IP address or domain name without t
 
 **NOTE:** The following instructions are for Linux users only, but installing and configuring another webserver should be possible on any OS
 
-A few steps are involved in setting up another webserver that can bind to port 80 and forward all incoming traffic to the eIquidus node.js app. Any commercial webserver can be used to create the reverse proxy, but in this case, Nginx will be used as an example:
+A few steps are involved in setting up another webserver that can bind to port 80 and 443 and forward all incoming traffic to but-x. Any commercial webserver can be used to create the reverse proxy, but in this case, Nginx will be used as an example:
 
 1. Install Nginx with the following terminal cmd:
 
@@ -680,7 +682,7 @@ ___
 
 ### CORS Support
 
-eIquidus has basic CORS support which is useful to prevent other sites from consuming public APIs while still allowing specific websites whitelisted access.
+but-x has basic CORS support which is useful to prevent other sites from consuming public APIs while still allowing specific websites whitelisted access.
 
 #### What is CORS?
 
@@ -692,7 +694,7 @@ eIquidus has basic CORS support which is useful to prevent other sites from cons
 
 #### How to Benefit From Using CORS?
 
-You must first set up CORS in eIquidus by editing the settings.json file and setting the value for `webserver.cors.enabled` to true.
+You must first set up CORS in but-x by editing the settings.json file and setting the value for `webserver.cors.enabled` to true.
 
 ```
   "webserver": {
@@ -709,15 +711,15 @@ The `webserver.cors.corsorigin` setting defaults to "\*" which allows all reques
       "corsorigin": "http://example.com"
 ```
 
-The above example would allow sharing of resources from eIquidus for all data requests coming from the example.com domain, while all requests coming from any other domain would be rejected as per normal.
+The above example would allow sharing of resources from but-x for all data requests coming from the example.com domain, while all requests coming from any other domain would be rejected as per normal.
 
-Below is an example of a simple javascript call using [jQuery](https://jquery.com) that could be used on your example.com website to return the current block count from eIquidus:
+Below is an example of a simple javascript call using [jQuery](https://jquery.com) that could be used on your example.com website to return the current block count from but-x:
 
 ```
 jQuery(document).ready(function($) {
   $.ajax({
     type: "GET",
-    url: "http://your-eiquidus-url/api/getblockcount",
+    url: "http://your-but-x-url/api/getblockcount",
     cache: false
   }).done(function (data) {
     alert(data);
@@ -774,7 +776,7 @@ cd /path/to/but-x && /path/to/node ./scripts/update_explorer.js "dependencies-on
 
 #### Backup Database Script
 
-Make a complete backup of an eIquidus mongo database and save to compressed file. A built-in locking mechanism prevents data from being updated or changed while a backup is in process. Backups can be safely created while but-x is actively running and/or while but-x is turned off. The following backup scenarios are supported:
+Make a complete backup of a but-x mongo database and save to compressed file. A built-in locking mechanism prevents data from being updated or changed while a backup is in process. Backups can be safely created while but-x is actively running and/or while but-x is turned off. The following backup scenarios are supported:
 
 **Backup Database (No filename specified)**
 
@@ -798,9 +800,9 @@ Make a complete backup of an eIquidus mongo database and save to compressed file
 
 #### Restore Database Script
 
-Restore a previously saved eIquidus mongo database backup. :warning: **WARNING:** This will completely overwrite your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while a backup is being restored. Backups can be safely restored while but-x is actively running and/or while but-x is turned off.
+Restore a previously saved but-x mongo database backup. :warning: **WARNING:** This will completely overwrite your existing but-x mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while a backup is being restored. Backups can be safely restored while but-x is actively running and/or while but-x is turned off.
 
-**NOTE:** Older v1.x eIquidus database backups were compressed into tar.gz files. These older tar.gz backups can still be restored, but you must specifically add the .tar.gz suffix. Example: `npm run restore-backup /path/to/old_backup.tar.gz`
+**NOTE:** Older v1.x but-x database backups were compressed into tar.gz files. These older tar.gz backups can still be restored, but you must specifically add the .tar.gz suffix. Example: `npm run restore-backup /path/to/old_backup.tar.gz`
 
 The following restore scenarios are supported:
 
@@ -822,7 +824,7 @@ The following restore scenarios are supported:
 
 #### Delete Database Script
 
-Wipe the eIquidus mongo database clean to start again from scratch. :warning: **WARNING:** This will completely destroy all data in your existing eIquidus mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while the database is being deleted. The process to delete the database can be executed while but-x is actively running and/or while but-x is turned off.
+Wipe the but-x mongo database clean to start again from scratch. :warning: **WARNING:** This will completely destroy all data in your existing but-x mongo database, so be sure to make a full backup before proceeding. A built-in locking mechanism prevents data from being updated or changed while the database is being deleted. The process to delete the database can be executed while but-x is actively running and/or while but-x is turned off.
 
 Delete the mongo database with the following command:
 
