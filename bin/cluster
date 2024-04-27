@@ -6,9 +6,9 @@ if (cluster.isMaster) {
   const instances = (process.argv[2] != null && process.argv[2] != '' && !isNaN(process.argv[2]) && Number.isInteger(parseFloat(process.argv[2])) ? parseInt(process.argv[2]) : numCpu)
   const pid = process.pid
   if (instances > 1)
-    console.log('Starting single instance with PID %s.', pid)
+    console.log('\nStarting single instance with PID %s.', pid)
   else
-    console.log('Starting cluster with %d instances and PID %s.', instances, pid)
+    console.log('\nStarting cluster with %d instances and PID %s.', instances, pid)
   
   function startWorkers() {
     // create worker instances
