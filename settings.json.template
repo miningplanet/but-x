@@ -904,17 +904,7 @@
     // Save coinstats every n blocks during index sync.
     "save_stats_after_sync_blocks": 100,
     // Show the sync msg at the top of all pages during index sync if there are more than this many blocks to process.
-    "show_sync_msg_when_syncing_more_than_blocks": 1000,
-    // supply: Determine how to calculate current coin supply
-    //         NOTE: The supply is always retrieved right before doing a normal index sync, reindex or check
-    //         Valid options:
-    //         COINBASE : retrieve the total coins sent from the coinbase (Often used for PoW coins)
-    //         GETINFO : retrieved from getinfo rpc cmd (Often used for PoS coins)
-    //         GETBLOCKCHAININFO : retrieved from getblockchaininfo RPC command
-    //         HEAVY: retrieved from getsupply RPC command
-    //         BALANCES : query the addresses and sum up all positive balances
-    //         TXOUTSET : retrieved from gettxoutsetinfo RPC command
-    "supply": "GETINFO"
+    "show_sync_msg_when_syncing_more_than_blocks": 1000
   },
 
   // Adding entries to this section will display a custom label beside each affected wallet address.

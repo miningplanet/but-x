@@ -125,6 +125,9 @@ util.init_db(net, function(status) {
                 if (!isNaN(txout.txouts)) {
                   stats.utxos = txout.txouts
                 }
+                if (!isNaN(txout.total_amount)) {
+                  stats.supply = txout.total_amount
+                }
                 if (!isNaN(txout.disk_size)) {
                   stats.size_on_disk = txout.disk_size
                 }
