@@ -70,7 +70,7 @@ block content
             tr
               td.text-start #{settings.locale.info_current_supply}
               td.text-end #{settings.formatDecimal(stats.supply, 2, 2)}
-            if info.show_coinbase == true && latest_coinbase_tx[0] && latest_coinbase_tx[0].vin[0] /* Does not exist for pepew. */
+            if info.show_coinbase == true && Array.isArray(latest_coinbase_tx) && latest_coinbase_tx[0] && latest_coinbase_tx[0].vin[0] /* Does not exist for pepew. */
               tr 
                 td.text-start #{settings.locale.info_latest_coinbase}
                 td.text-end #{settings.formatCurrency(latest_coinbase_tx[0].vin[0].amount / 100000000, coin.symbol)}
@@ -83,15 +83,16 @@ block content
             tr
               td.text-start #{settings.locale.info_count_transactions}
               td.text-end #{settings.formatInt(stats.txes)}
-            if info.show_txstats == true
+            if info.show_txstats == true && tx_types
               each tx_type, index in tx_types
                 tr.sub
                   td.text-start 
                     span #{index + ' · ' + tx_type.replace('TRANSACTION_', '')}
                   td.text-end
-                    each txtype in tx_by_type
-                      if index == txtype._id
-                        span #{settings.formatInt(txtype.count)}
+                    if (tx_by_type)
+                      each txtype in tx_by_type
+                        if index == txtype._id
+                          span #{settings.formatInt(txtype.count)}
             if info.show_masternode_info == true
               tr
                 td.text-start #{settings.locale.info_count_masternodes}
@@ -121,21 +122,23 @@ block content
             tr
               td.text-start Buys (total)
               td.text-end
-            each buy in buys 
-              tr.sub
-                td.text-start 
-                  span #{buy._id.trade}
+            if (buys)
+              each buy in buys 
+                tr.sub
+                  td.text-start 
+                    span #{buy._id.trade}
+                  td.text-end
+                    span #{settings.formatDecimal(buy.sum_val, 2, 2)}
+              tr
+                td.text-start Sells (total)
                 td.text-end
-                  span #{settings.formatDecimal(buy.sum_val, 2, 2)}
-            tr
-              td.text-start Sells (total)
-              td.text-end
-            each sell in sells 
-              tr.sub
-                td.text-start 
-                  span #{sell._id.trade}
-                td.text-end
-                  span #{settings.formatDecimal(sell.sum_val, 2, 2)}
+            if (sells)
+              each sell in sells 
+                tr.sub
+                  td.text-start 
+                    span #{sell._id.trade}
+                  td.text-end
+                    span #{settings.formatDecimal(sell.sum_val, 2, 2)}
           br
         if info.show_miningstats == true && algos.length > 1
           h4 #{settings.locale.info_title_mining}
@@ -150,16 +153,17 @@ block content
                 th.text-center #{settings.locale.info_mining_th_blocks}
                 th.text-center.percent #{settings.locale.info_mining_th_percent}
             tbody 
-              each algo in algos 
-                tr
-                  - const obj = blocks_by_algorithm.find((e) => e._id === algo.algo)
-                  - const blocks = obj ? obj.count : -1
-                  td.text-start #{algo.label}
-                  td.text-center #{algo.type.toUpperCase()}
-                  td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], 0, 0)}
-                  td.text-end #{settings.formatDecimal(stats['difficulty_' + algo.algo], 5, 5)}
-                  td.text-end #{settings.formatInt(blocks)}
-                  td.text-end #{settings.formatDecimal(blocks / stats.count * 100, 2, 2)}
+              if (algos && blocks_by_algorithm)
+                each algo in algos 
+                  tr
+                    - const obj = blocks_by_algorithm.find((e) => e._id === algo.algo)
+                    - const blocks = obj ? obj.count : -1
+                    td.text-start #{algo.label}
+                    td.text-center #{algo.type.toUpperCase()}
+                    td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], 0, 0)}
+                    td.text-end #{settings.formatDecimal(stats['difficulty_' + algo.algo], 5, 5)}
+                    td.text-end #{settings.formatInt(blocks)}
+                    td.text-end #{settings.formatDecimal(blocks / stats.count * 100, 2, 2)}
         //- if info.show_sporks == true
         //-   h4 Sporks
         //-   hr

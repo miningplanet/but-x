@@ -244,9 +244,11 @@ function route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinba
 
   const tx_types = settings.get(net, 'tx_types')
   let i = 0
-  while (i < tx_by_type.length) {
-      tx_by_type[i].type = tx_types[i]
-      i++
+  if (Array.isArray(tx_by_type)) {
+    while (i < tx_by_type.length) {
+        tx_by_type[i].type = tx_types[i]
+        i++
+    }
   }
 
   const trading_pairs = []
@@ -284,27 +286,27 @@ function route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinba
 router.get('/info/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
-  const r = infoCache.get(net);
+  const r = infoCache.get(net)
   if (r == undefined) {
-    db.count_blocks_by_algorithm(0, function (blocks_by_algorithm) {
-      db.count_tx_by_type(0, function (tx_by_type) {
-        db.get_latest_coinbase_tx("5", function (latest_coinbase_tx) {
-          db.get_markets(function(markets) {
-            db.get_order_aggregation(coin.symbol, 0, function (sells) {
-              db.get_order_aggregation(coin.symbol, 1, function (buys) {
-                const c = {}
-                c.blocks_by_algorithm = blocks_by_algorithm
-                c.tx_by_type = tx_by_type
-                c.latest_coinbase_tx = latest_coinbase_tx
-                c.markets = markets
-                c.sells = sells
-                c.buys = buys
-                infoCache.set(net, c)
-                debug("Cached info for '%s' %o - mem: %o", net, c, process.memoryUsage())
-                route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net)
-              }, net)
-            }, net)
-          }, net)
+    db.get_stats(coin.name, function (stats) {
+      db.get_dbindex(coin.name, function (dbindex) {
+        db.get_markets(function(markets) {
+          const c = {}
+          if (dbindex) {
+            c.markets = markets
+            c.blocks_by_algorithm = dbindex.count_blocks_by_algorithm
+            c.tx_by_type = dbindex.count_tx_by_type
+            c.latest_coinbase_tx = dbindex.latest_coinbase_tx
+            c.sells = dbindex.sell_order_aggregation
+            c.buys = dbindex.buy_order_aggregation
+          }
+          infoCache.set(net, c)
+          debug("Cached info for '%s' %o - mem: %o", net, c, process.memoryUsage())
+          if (dbindex) {
+            route_get_info(req, res, dbindex.count_blocks_by_algorithm, dbindex.count_tx_by_type, dbindex.latest_coinbase_tx, markets, dbindex.sell_order_aggregation, dbindex.buy_order_aggregation, net)
+          } else {
+            route_get_info(req, res, null, null, null, markets, null, null, net)
+          }
         }, net)
       }, net)
     }, net)
