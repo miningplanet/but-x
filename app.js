@@ -1020,12 +1020,6 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
           delete peers[i]['_doc']['_id'];
           delete peers[i]['_doc']['__v'];
         }
-        // var newPeers = [];
-        // for (i = 0; i < peers.length; i++) {
-        //   if (peers[i].version != 'ButKoin Core Green:1.2.17.3') {
-        //     newPeers.push(peers[i]);
-        //   }
-        // }
 
         // sort ip6 addresses to the bottom
         newPeers.sort(function(a, b) {
