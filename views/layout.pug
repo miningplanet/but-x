@@ -1127,7 +1127,7 @@ html(lang='en')
             .navbar-header
               span#navbar-toggler-span(alt='Toggle Menu', title='Toggle Menu', data-bs-toggle='tooltip', data-bs-placement='left')
                 button.navbar-light.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
-                  span.navbar-toggler-icon
+                  span#navbar-toggler-txt &#x2261;
             if shared_pages.page_header.home_link == 'title'
               a.navbar-brand(href=home_url, style='order:-1;') #{shared_pages.page_title}
             else if shared_pages.page_header.home_link == 'coin'
@@ -1207,7 +1207,7 @@ html(lang='en')
             if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
-                  span.search
+                  span &#9740;
         if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
           div#search-navbar-collapse.collapse
             div.navbar-nav.align-items-lg-center.search-box-custom(style='width:100%;')
