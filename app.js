@@ -1022,7 +1022,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
         }
 
         // sort ip6 addresses to the bottom
-        newPeers.sort(function(a, b) {
+        peers.sort(function(a, b) {
           var address1 = a.address.indexOf(':') > -1;
           var address2 = b.address.indexOf(':') > -1;
 
@@ -1035,9 +1035,9 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
         });
 
         // return peer data
-        peersCache.set (net, newPeers);
-        debug("Cached peers '%s' %o - mem: %o", net, newPeers, process.memoryUsage());
-        res.json(newPeers);
+        peersCache.set (net, peers);
+        debug("Cached peers '%s' %o - mem: %o", net, peers, process.memoryUsage());
+        res.json(peers);
       }, net);
     } else {
       debug("Get peers by cache '%s' ...", net);
