@@ -727,149 +727,47 @@
       "hide_ext_api_section": false,
       "hide_net_api_section": false,
       "hide_electrum_api_section": false,
-      // Data by RPC daemon. Might have been stored in DB or is cached.
+      // Data by RPC daemon. Might also have been stored in DB or is cached.
+      // #{address}/api/#{name}/#{net}
       "rpc": {
-        // /api/getdifficulty
-        // Returns the proof-of-work difficulty as a multiple of the minimum difficulty.
-        "getdifficulty": {
-          "enabled": true
-        },
-        // /api/getconnectioncount
-        // Returns the number of connections to other nodes.
-        "getconnectioncount": {
-          "enabled": true
-        },
-        // /api/getblockcount
-        // Returns the current block height.
-        "getblockcount": {
-          "enabled": true
-        },
-        // /api/getblockhash
-        // Returns the block hash of block at the given height.
-        "getblockhash": {
-          "enabled": true
-        },
-        // /api/getblock
-        // Returns information about the block with the given hash.
-        "getblock": {
-          "enabled": true
-        },
-        // /api/getrawtransaction
-        // Returns raw TX data.
-        "getrawtransaction": {
-          "enabled": true
-        },
-        // /api/getnetworkhashps
-        // Returns the estimated network hashes per second.
-        "getnetworkhashps": {
-          "enabled": true
-        },
-        // /api/getvotelist
-        // Returns details about the current vote list.
-        "getvotelist": {
-          "enabled": true
-        },
-        // /api/getmasternodecount
-        // Returns the total number of masternodes.
-        "getmasternodecount": {
-          "enabled": true
-        },
-        // Verifies a message.
-        "verifymessage": {
-          "enabled": true
-        },
-        // Validates the wallet address.
-        "validateaddress": {
-          "enabled": true
-        },
-        "getgovernanceinfo": {
-          "enabled": true
-        }
+        "getdifficulty": { "enabled": true },
+        "getconnectioncount": { "enabled": true },
+        "getblockcount": { "enabled": true },
+        "getblockhash": { "enabled": true },
+        "getblock": { "enabled": true },
+        "getrawtransaction": { "enabled": true },
+        "getnetworkhashps": { "enabled": true },
+        "getvotelist": { "enabled": true },
+        "getmasternodecount": { "enabled": true },
+        "verifymessage": { "enabled": true },
+        "validateaddress": { "enabled": true },
+        "getgovernanceinfo": { "enabled": true }
       },
       // Extended API.
+      // #{address}/ext/#{name}/#{net}
       "ext": {
-        "getblockchaininfo": {
-          "enabled": true
-        },
-        // /ext/getmoneysupply
-        // Returns current money supply.
-        "getmoneysupply": {
-          "enabled": true
-        },
-        // /ext/getdistribution
-        // Returns wealth distribution stats,
-        "getdistribution": {
-          "enabled": true
-        },
-        // /ext/getaddress
-        // Returns information for given address.
-        "getaddress": {
-          "enabled": true
-        },
-        // /ext/getaddresstxs
-        // Returns transactions for a wallet address starting from a particular offset.
-        "getaddresstxs": {
-          "enabled": true,
-          "max_items_per_query": 100
-        },
-        // /ext/gettx api endpoint
-        // Returns information for given tx hash.
-        "gettx": {
-          "enabled": true
-        },
-        // /ext/getbalance
-        // Returns current balance of given address.
-        "getbalance": {
-          "enabled": true
-        },
-        // /ext/getlasttxs
-        // Returns transactions greater than a specific number of coins, starting from a particular offset.
-        "getlasttxs": {
-          "enabled": true,
-          "max_items_per_query": 100
-        },
-        // /ext/getcurrentprice
-        // Returns last known exchange price.
-        "getcurrentprice": {
-          "enabled": true
-        },
-        // /ext/getnetworkpeers
-        // Returns the list of network peers that have connected to but-x in the last 24 hours.
-        "getnetworkpeers": {
-          "enabled": true
-        },
-        // /ext/getbasicstats
-        // Returns basic statistics about the coin including: block count, circulating supply, USD price, default market price and # of masternodes.
-        "getbasicstats": {
-          "enabled": true
-        },
-        "getticker": {
-          "enabled": true
-        },
-        "getmarkets": {
-          "enabled": true
-        },
-        // /ext/getsummary
-        // Returns a summary of coin data including: difficulty, hybrid difficulty, circulating supply, hash rate, default market price, 
-        // network connection count, block count, count of online masternodes and count of offline masternodes.
-        "getsummary": {
-          "enabled": true
-        },
-        // /ext/getmasternodelist
-        // Returns the complete list of masternodes on the network.
-        "getmasternodelist": {
-          "enabled": true
-        },
-        // /ext/getmasternoderewards
-        // Returns a list of masternode reward transactions for a specific address that arrived after a specific block height.
-        "getmasternoderewards": {
-          "enabled": true
-        },
-        // /ext/getmasternoderewardstotal
-        // Returns the total number of coins earned in masternode rewards for a specific address that arrived after a specific block height.
-        "getmasternoderewardstotal": {
-          "enabled": true
-        }
+        "getblockchaininfo": { "enabled": true },
+        "getmoneysupply": { "enabled": true },
+        "getdistribution": { "enabled": true },
+        "getaddress": { "enabled": true },
+        "getaddresstxs": { "enabled": true, "max_items_per_query": 100 },
+        "gettx": { "enabled": true },
+        "getbalance": { "enabled": true },
+        "getlasttxs": { "enabled": true, "max_items_per_query": 100 },
+        "getcurrentprice": { "enabled": true },
+        "getnetworkpeers": { "enabled": true },
+        "getbasicstats": { "enabled": true },
+        "getticker": { "enabled": true },
+        "getmarkets": { "enabled": true },
+        "getsummary": { "enabled": true },
+        "getmasternodelist": { "enabled": true },
+        "getmasternoderewards": { "enabled": true },
+        "getmasternoderewardstotal": { "enabled": true }
+      },
+      // All Net API.
+      "net": {
+        "getallnet": { "enabled": true }
+      },
       }
     }
   },
