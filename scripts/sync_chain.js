@@ -2,8 +2,9 @@ const debug = require('debug')('sync')
 const mongoose = require('mongoose')
 const settings = require('../lib/settings')
 const async = require('async')
+const datautil = require('../lib/datautil')
 const db = require('../lib/database')
-const { StatsDb, TxDb } = require('../lib/database')
+const { StatsDb, AddressDb, AddressTxDb, TxDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -187,7 +188,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                         stopSync ? next_tx({}) : next_tx() // stop or next
                       }, timeout)
                     } else {
-                      db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
+                      save_tx(net, txid, block_height, function(err, tx_has_vout) {
                         debug("Saved block tx: %s", txid)
                         if (err)
                           console.log(err)
@@ -227,7 +228,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                             stopSync ? next_tx({}) : next_tx() // stop or next
                           }, timeout)
                         } else {
-                          db.save_tx(net, txid, block_height, function(err, tx_has_vout) {
+                          save_tx(net, txid, block_height, function(err, tx_has_vout) {
                             debug("Saved block tx: %s", txid)
                             if (err)
                               console.log(err)
@@ -291,5 +292,170 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
       }, net)
     } else
       return cb()
+  })
+}
+
+function save_tx(net, txid, blockheight, cb) {
+  db.lib.get_rawtransaction(txid, function(tx) {
+    if (tx && tx != 'There was an error. Check your console.') {
+      db.lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
+        db.lib.prepare_vout(net, tx.vout, txid, vin, ((!settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null) ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
+          db.lib.syncLoop(vin.length, function (loop) {
+            var i = loop.iteration()
+
+            // check if address is inside an array
+            if (Array.isArray(nvin[i].addresses)) {
+              // extract the address
+              nvin[i].addresses = nvin[i].addresses[0]
+            }
+
+            update_address(nvin[i].addresses, blockheight, txid, nvin[i].amount, 'vin', function() {
+              loop.next()
+            }, net)
+          }, function() {
+            const tx_types = settings.get(net, 'tx_types')
+            const isButkoin = settings.isButkoin(net)
+            const isBitoreum = settings.isBitoreum(net)
+            const isRaptoreum = settings.isRaptoreum(net)
+            const isVkax = settings.isVkax(net)
+            const isYerbas = settings.isYerbas(net)
+
+            db.lib.syncLoop(vout.length, function (subloop) {
+              var t = subloop.iteration()
+
+              // check if address is inside an array
+              if (Array.isArray(vout[t].addresses)) {
+                // extract the address
+                vout[t].addresses = vout[t].addresses[0]
+              }
+
+              if (vout[t].addresses) {
+                update_address(vout[t].addresses, blockheight, txid, vout[t].amount, 'vout', function() {
+                  subloop.next()
+                }, net)
+              } else
+                subloop.next()
+            }, function() {
+              db.lib.calculate_total(vout, function(total) {
+                var op_return = null
+                // check if the op_return value should be decoded and saved
+                const transaction_page = settings.get(net, 'transaction_page')
+                if (transaction_page.show_op_return) {
+                  // loop through vout to find the op_return value
+                  tx.vout.forEach(function (vout_data) {
+                    // check if the op_return value exists
+                    if (vout_data.scriptPubKey != null && vout_data.scriptPubKey.asm != null && vout_data.scriptPubKey.asm.indexOf('OP_RETURN') > -1) {
+                      // decode the op_return value
+                      op_return = hex_to_ascii(vout_data.scriptPubKey.asm.replace('OP_RETURN', '').trim())
+                    }
+                  })
+                }
+                var extra = null
+                if (isButkoin || isBitoreum || isRaptoreum || isVkax) {
+                  switch (tx.type) {
+                    case tx_types.indexOf('TRANSACTION_NORMAL'): break // -> NORMAL
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER'): extra = datautil.protxRegisterServiceTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE'): extra = datautil.protxUpdateServiceTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR'): extra = datautil.protxUpdateRegistrarTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE'): extra = datautil.protxUpdateRevokeTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_COINBASE'): break // COINBASE, Array.from(rtx.extraPayload).reverse().join("")
+                    case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT'): extra = datautil.protxQuorumCommitmentTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_FUTURE'): extra = tx.extraPayload; break // FUTURE
+                    default: console.warn('*** Unknown TX type %s.', tx.type)
+                  }
+                } else if (isYerbas) {
+                  switch (tx.type) {
+                    case tx_types.indexOf('TRANSACTION_NORMAL'): break // -> NORMAL
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER'): extra = datautil.protxRegisterServiceTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE'): extra = datautil.protxUpdateServiceTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR'): extra = datautil.protxUpdateRegistrarTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE'): extra = datautil.protxUpdateRevokeTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_COINBASE'): break // COINBASE, Array.from(rtx.extraPayload).reverse().join("")
+                    case tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT'): extra = datautil.protxQuorumCommitmentTxToArray(tx); break
+                    case tx_types.indexOf('TRANSACTION_FUTURE'): extra = tx.extraPayload; break
+                    case tx_types.indexOf('TRANSACTION_ASSET_REGISTER'): extra = tx.extraPayload; break
+                    case tx_types.indexOf('TRANSACTION_ASSET_REISUE'): extra = tx.extraPayload; break
+                    default: console.warn('*** Unknown TX type %s.', tx.type); console.log(JSON.stringify.tx); exit(0)
+                  }
+                }
+                const dto = TxDb[net].create({
+                  version: tx.version,
+                  txid: tx.txid,
+                  tx_type: tx.type,
+                  size: tx.size,
+                  locktime: tx.locktime,
+                  instantlock: tx.instantlock,
+                  chainlock: tx.chainlock,
+                  vin: nvin,
+                  vout: vout,
+                  total: total.toFixed(8),
+                  timestamp: tx.time,
+                  blockhash: tx.blockhash,
+                  blockindex: blockheight,
+                  op_return: op_return,
+                  extra: extra
+                })
+                if (dto) {
+                  return cb(null, vout.length > 0)
+                } else {
+                  return cb("Failed to store TX.", false)
+                }
+              })
+            })
+          })
+        })
+      })
+    } else
+      return cb('tx not found: ' + txid, false)
+  }, net)
+}
+
+function update_address(hash, blockheight, txid, amount, type, cb, net=settings.getDefaultNet()) {
+  var to_sent = false
+  var to_received = false
+  var addr_inc = {}
+
+  if (hash == 'coinbase')
+    addr_inc.sent = amount
+  else {
+    if (type == 'vin') {
+      addr_inc.sent = amount
+      addr_inc.balance = -amount
+    } else {
+      addr_inc.received = amount
+      addr_inc.balance = amount
+    }
+  }
+
+  AddressDb[net].findOneAndUpdate({a_id: hash}, {
+    $inc: addr_inc
+  }, {
+    new: true,
+    upsert: true
+  }).then((address) => {
+    if (hash != 'coinbase') {
+      AddressTxDb[net].findOneAndUpdate({a_id: hash, txid: txid}, {
+        $inc: {
+          amount: addr_inc.balance
+        },
+        $set: {
+          a_id: hash,
+          blockindex: blockheight,
+          txid: txid
+        }
+      }, {
+        new: true,
+        upsert: true
+      }).then(() => {
+        return cb()
+      }).catch((err) => {
+        console.error("Failed to find address tx '%s' for chain '%s': %s", hash, net, err)
+        return cb(err)
+      })
+    } else
+      return cb()
+  }).catch((err) => {
+    console.error("Failed to find address '%s' for chain '%s': %s", hash, net, err)
+    return cb(err)
   })
 }
