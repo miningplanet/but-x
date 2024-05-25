@@ -278,8 +278,8 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   }, function() {
     // check if the script stopped prematurely
     if (!stopSync) {
-      db.count_addresses(function(addresses) {
-        db.count_utxos(function(utxos) {
+      count_addresses(function(addresses) {
+        count_utxos(function(utxos) {
           StatsDb[net].updateOne({coin: coin}, {
             last: end,
             txes: txes,
@@ -456,6 +456,24 @@ function update_address(hash, blockheight, txid, amount, type, cb, net=settings.
       return cb()
   }).catch((err) => {
     console.error("Failed to find address '%s' for chain '%s': %s", hash, net, err)
+    return cb(err)
+  })
+}
+
+function count_utxos(cb, net=settings.getDefaultNet()) {
+  AddressTxDb[net].countDocuments({amount:{"$gt":0}}).then(count => {
+    return cb(count)
+  }).catch((err) => {
+    console.error("Failed to count utxos for chain '%s': %s", net, err)
+    return cb(err)
+  })
+}
+
+function count_addresses(cb, net=settings.getDefaultNet()) {
+  AddressDb[net].countDocuments({}).then(count => {
+    return cb(count)
+  }).catch((err) => {
+    console.error("Failed to count addresses for chain '%s': %s", net, err)
     return cb(err)
   })
 }
