@@ -217,7 +217,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                   }, timeout)
                 })
               } else {
-                db.create_block(block, function(blockr) {
+                create_block(block, function(blockr) {
                   if (blockr) {
                     async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
                       TxDb[net].findOne({txid: txid}).then((tx) => {
@@ -294,6 +294,43 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
     } else
       return cb()
   })
+}
+
+function create_block(block, cb, net=settings.getDefaultNet()) {
+  var cbtx = null
+  const d = block.cbTx
+  if (d) {
+    cbtx = []
+    cbtx[0] = d.version
+    cbtx[1] = d.height
+    cbtx[2] = d.version
+    cbtx[3] = d.merkleRootMNList == '0000000000000000000000000000000000000000000000000000000000000000' ? '0' : d.merkleRootMNList
+    cbtx[4] = d.merkleRootQuorums == '0000000000000000000000000000000000000000000000000000000000000000' ? '0' : d.merkleRootQuorums
+  }
+  const algo = settings.getAlgoFromBlock(block, net)
+  const dto = BlockDb[net].create({
+    hash: block.hash,
+    pow_hash: block.pow_hash,
+    algo: algo,
+    size: block.size,
+    height: block.height,
+    version: block.version,
+    merkle_root: block.merkleroot,
+    numtx: block.tx ? block.tx.length : 0,
+    time: block.time,
+    mediantime: block.mediantime,
+    nonce: block.nonce,
+    bits: block.bits,
+    difficulty: block.difficulty,
+    chainwork: block.chainwork,
+    prev_hash: block.previousblockhash,
+    next_hash: block.nextblockhash,
+    cbtx: cbtx
+  })
+  if (dto) {
+      console.log("Block created for chain %s height %d", net, block.height)
+  }
+  return cb(block)
 }
 
 function save_tx(net, txid, blockheight, cb) {
