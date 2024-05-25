@@ -1,7 +1,7 @@
 const debug = require('debug')('sync')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
-const { StatsDb } = require('../lib/database')
+const { StatsDb, MasternodeDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -90,7 +90,7 @@ if (!db.lib.is_locked([lock], net)) {
             if (name.length > 0 && code.length > 0) {
               node.country = name
               node.country_code = code
-              db.save_masternode(node, function(success) {
+              save_masternode(node, function(success) {
                 if (success) {
                   // check if the script is stopping
                   if (stopSync) {
@@ -117,7 +117,7 @@ if (!db.lib.is_locked([lock], net)) {
                   }
                   node.country = name
                   node.country_code = code
-                  db.save_masternode(node, function(success) {
+                  save_masternode(node, function(success) {
                     if (success) {
                       // check if the script is stopping
                       if (stopSync) {
@@ -152,5 +152,107 @@ if (!db.lib.is_locked([lock], net)) {
         util.exit_remove_lock(2, lock, net)
       }
     })
+  })
+}
+
+function save_masternode(raw_masternode, cb, net=settings.getDefaultNet()) {
+  // lookup masternode in local collection
+  find_masternode((raw_masternode.proTxHash != null ? raw_masternode.proTxHash : raw_masternode.txhash), function (masternode) {
+    // determine if the claim address feature is enabled
+    if (settings.get(net, 'claim_address_page').enabled == true) {
+      // claim address is enabled so lookup the address claim name
+      db.get_address((raw_masternode.proTxHash != null ? raw_masternode.payee : raw_masternode.addr), function(address) {
+        if (address) {
+          // save claim name to masternode obejct
+          raw_masternode.claim_name = address.name
+        } else {
+          // save blank claim name to masternode obejct
+          raw_masternode.claim_name = ''
+        }
+
+        // add/update the masternode
+        add_update_masternode(raw_masternode, (masternode == null), function(success) {
+          return cb(success)
+        }, net)
+      }, net)
+    } else {
+      // claim address is disabled so add/update the masternode
+      add_update_masternode(raw_masternode, (masternode == null), function(success) {
+        return cb(success)
+      }, net)
+    }
+  }, net)
+}
+
+function add_update_masternode(masternode, add, cb, net=settings.getDefaultNet()) {
+  if (masternode.proTxHash == null && masternode.txhash == null) {
+    console.log('Masternode update error: Tx Hash is missing')
+    return cb(false)
+  }
+  if (add) {
+    // Check if this older or newer Dash masternode format
+    var dto = null
+    if (masternode.proTxHash != null) {
+      // This is the newer Dash format
+      dto = MasternodeDb[net].create({
+        txhash: masternode.proTxHash,
+        status: masternode.status,
+        addr: masternode.payee,
+        lastpaid: masternode.lastpaidtime,
+        ip_address: masternode.address,
+        last_paid_block: masternode.lastpaidblock,
+        lastseen: Math.floor(Date.now() / 1000),
+        claim_name: (masternode.claim_name == null ? '' : masternode.claim_name),
+        country: masternode.country,
+        country_code: masternode.country_code
+      }).then(() => {
+        return cb(true)
+      }).catch((err) => {
+        console.error("Failed to insert masternode address '%s' for chain '%s': %s", masternode.address, net, err)
+        return cb(false)
+      })
+    } else {
+      // This is the older Dash format, or an unknown format
+      dto = MasternodeDb[net].create({
+        rank: masternode.rank,
+        network: masternode.network,
+        txhash: masternode.txhash,
+        outidx: masternode.outidx,
+        status: masternode.status,
+        addr: masternode.addr,
+        version: masternode.version,
+        lastseen: masternode.lastseen,
+        activetime: masternode.activetime,
+        lastpaid: masternode.lastpaid,
+        claim_name: (masternode.claim_name == null ? '' : masternode.claim_name),
+        country: masternode.country,
+        country_code: masternode.country_code
+      }).then(() => {
+        return cb(true)
+      }).catch((err) => {
+        console.error("Failed to insert masternode address '%s' for chain '%s': %s", masternode.address, net, err)
+        return cb(false)
+      })
+    }
+  } else {
+    // update existing masternode in local collection
+    MasternodeDb[net].updateOne({ txhash: (masternode.proTxHash != null ? masternode.proTxHash : masternode.txhash) }, masternode).then(() => {
+      return cb(true)
+    }).catch((err) => {
+      console.error("Failed to update masternode address '%s' for chain '%s': %s", masternode.address, net, err)
+      return cb(false)
+    })
+  }
+}
+
+function find_masternode(txhash, cb, net=settings.getDefaultNet()) {
+  db.MasternodeDb[net].findOne({ txhash: txhash }).then((dto) => {
+    if (dto)
+      return cb(dto)
+    else
+      return cb(null)
+  }).catch((err) => {
+    console.error("Failed to find masternode hash '%s' for chain '%s': %s", txhash, net, err)
+    return cb(null)
   })
 }
