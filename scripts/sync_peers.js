@@ -1,6 +1,7 @@
 const debug = require('debug')('sync')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
+const { PeersDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -40,8 +41,8 @@ if (!db.lib.is_locked([lock], net)) {
             address = address.replace("[", "").replace("]", "")
           }
 
-          console.log("Check peer update: %s, version %s", address, body[i].version)
-          db.find_peer(address, port, function(peer) {
+          console.log("Check peer update: %s:%d, version %s", address, port, body[i].version)
+          find_peer(address, port, function(peer) {
             if (peer) {
               // if (peer['port'] != null && (isNaN(peer['port']) || peer['port'].length < 2)) {
               //   db.drop_peers(function() {
@@ -52,14 +53,14 @@ if (!db.lib.is_locked([lock], net)) {
 
               // peer already exists and should be refreshed
               // drop peer
-              db.drop_peer(address, port, function() {
+              drop_peer(address, port, function() {
                 // re-add the peer to refresh the data and extend the expiry date
                 console.log('Dropped peer %s port %d', address, port)
                 var subver = body[i].subver
                 if (subver) {
                   subver = subver.replace('/', '').replace('/', '').replace('\n', '')
                 }
-                db.create_peer({
+                create_peer({
                   address: address,
                   port: port,
                   protocol: body[i].version,
@@ -89,7 +90,7 @@ if (!db.lib.is_locked([lock], net)) {
                     util.exit_remove_lock(1, lock, net)
                   } else {
                     // add peer to collection
-                    db.create_peer({
+                    create_peer({
                       address: address,
                       port: port,
                       protocol: body[i].version,
@@ -124,5 +125,55 @@ if (!db.lib.is_locked([lock], net)) {
         util.exit_remove_lock(2, lock, net)
       }
     })
+  })
+}
+
+function find_peer(address, port, cb, net) {
+  const network_page = settings.get(net, 'network_page')
+  if (network_page.enabled == true) {
+    // TODO: Fix PeersDb is undefined.
+    db.PeersDb[net].findOne({address: address, port: port}).then((peer) => {
+      if (peer)
+        return cb(peer)
+      else
+        return cb (null)
+    }).catch((err) => {
+      console.error("Failed to find peer address '%s' for chain '%s': %s", address, net, err)
+      return cb(null)
+    })
+  } else {
+    return cb(null)
+  }
+}
+
+function create_peer(params, cb, net) {
+  const network_page = settings.get(net, 'network_page')
+  if (network_page.enabled == true) {
+    PeersDb[net].create(params).then((peer) => {
+      return cb()
+    }).catch((err) => {
+      console.error("Failed to insert peer for chain '%s': %s", net, err)
+      return cb()
+    })
+  } else {
+    return cb()
+  }
+}
+
+function drop_peer(address, port, cb, net=settings.getDefaultNet()) {
+  PeersDb[net].deleteOne({address: address, port: port}).then(() => {
+    return cb()
+  }).catch((err) => {
+    console.error("Failed to drop peer address '%s' for chain '%s': %s", address, net, err)
+    return cb()
+  })
+}
+
+function drop_peers(cb, net=settings.getDefaultNet()) {
+  PeersDb[net].deleteMany({}).then(() => {
+    return cb()
+  }).catch((err) => {
+    console.error("Failed to drop peers for chain '%s': %s", net, err)
+    return cb()
   })
 }
