@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
 const { StatsDb } = require('../lib/database')
+const coingecko = require('../lib/apis/coingecko')
 
 function check_net_missing(argv) {
   if (argv.length < 3) {
@@ -85,7 +86,7 @@ function gracefully_shut_down(process, stopSync) {
 }
 
 function get_last_usd_price(stopSync, net=settings.getDefaultNet()) {
-  db.get_last_usd_price(function(err) {
+  get_last_usd_price_by_coingecko(function(err) {
     if (err == null) {
       const coin = settings.getCoin(net)
       update_last_updated_stats(coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
@@ -103,6 +104,52 @@ function get_last_usd_price(stopSync, net=settings.getDefaultNet()) {
       exit(1)      
     }
   }, net)
+}
+
+function get_last_usd_price_by_coingecko(cb, net=settings.getDefaultNet()) {
+  const coin = settings.getCoin(net)
+  const markets_page = settings.get(net, 'markets_page')
+  if (markets_page.exchanges[markets_page.default_exchange.exchange_name].enabled == true) {
+    // get the list of coins from coingecko
+    coingecko.get_coin_data(function (err, coin_list) {
+      // check for errors
+      if (err == null) {
+        var symbol = markets_page.default_exchange.trading_pair.split('/')[1]
+        var index = coin_list.findIndex(p => p.symbol.toLowerCase() == symbol.toLowerCase())
+
+        // check if the default market pair is found in the coin list
+        if (index > -1) {
+          // get the usd value of the default market pair from coingecko
+          coingecko.get_data(coin_list[index].id,  function (err, last_usd) {
+            // check for errors
+            if (err == null) {
+              // get current stats
+              StatsDb[net].findOne({coin: coin.name}).then((stats) => {
+                StatsDb[net].updateOne({coin: coin.name}, {
+                  last_usd_price: (last_usd * stats.last_price)
+                }).then(() => {
+                  // last usd price updated successfully
+                  return cb(null)
+                })
+              })
+            } else {
+              // return error msg
+              return cb(err)
+            }
+          })
+        } else {
+          // return error msg
+          return cb('cannot find symbol ' + symbol + ' in the coingecko api')
+        }
+      } else {
+        // return error msg
+        return cb(err)
+      }
+    })
+  } else {
+    // default exchange is not enabled so just exit without updating last price for now
+    return cb(null)
+  }
 }
 
 function update_last_updated_stats(coin, param, cb, net=settings.getDefaultNet()) {

@@ -129,7 +129,7 @@ function get_latest_coinbase_tx(tx_type, cb, net=settings.getDefaultNet()) {
 function get_order_aggregation(coin_symbol, type, cb, net) {
   const markets_page = settings.get(net, 'markets_page')
   if (markets_page.enabled == true) {
-    MarketOrderDb[net].aggregate([{$match: {type:type}}, {$group: {_id: {type:"$type", trade:"$trade"}, sum_val:{$sum: { $multiply: ["$price", "$quantity"]}} }}]).then((data) => {
+    db.MarketOrderDb[net].aggregate([{$match: {type:type}}, {$group: {_id: {type:"$type", trade:"$trade"}, sum_val:{$sum: { $multiply: ["$price", "$quantity"]}} }}]).then((data) => {
       return cb(data ? data : null)
     }).catch((err) => {
       console.error("Failed to get orders aggregation with sum '%s' - '%s' tx for chain '%s': %s", type, coin_symbol, net, err)
