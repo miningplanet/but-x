@@ -324,7 +324,7 @@ function route_get_address(req, res, hash) {
   // check if trying to load a special address
   if (hash != null && hash.toLowerCase() != 'coinbase' && ((hash.toLowerCase() == 'hidden_address' && address_page.enable_hidden_address_view == true) || (hash.toLowerCase() == 'unknown_address' && address_page.enable_unknown_address_view == true) || (hash.toLowerCase() != 'hidden_address' && hash.toLowerCase() != 'unknown_address'))) {
     // lookup address in local collection
-    db.get_address(hash, false, function(address) {
+    db.get_address(hash, function(address) {
       const api_page = settings.get( net, 'api_page')
       if (address) {
         const p = param('address', address_page, req, db, settings, coin.name + ' Address ' + (address['name'] == null || address['name'] == '' ? address.a_id : address['name']))
@@ -358,7 +358,7 @@ function route_get_claim_form(req, res, hash) {
       p.claim_address_page = claim_address_page
       res.render('claim_address', p)
     } else {
-      db.get_address(hash, false, function(address) {
+      db.get_address(hash, function(address) {
         // load the claim page regardless of whether the address exists or not
         const p = param('claim-address', claim_address_page, req, db, settings, coin.name + ' Claim Wallet Address ' + hash)
         p.hash = hash,
@@ -707,7 +707,7 @@ router.post('/search/:net?', function(req, res) {
         }, net)
       }
     } else {
-      db.get_address(query, false, function(address) {
+      db.get_address(query, function(address) {
         if (address)
           res.redirect('/address/' + address.a_id + '/' + net)
         else {

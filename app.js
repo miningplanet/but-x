@@ -421,7 +421,7 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getaddress.enabled == true) {
-    db.get_address(req.params.hash, false, function(address) {
+    db.get_address(req.params.hash, function(address) {
       db.get_address_txs_ajax(req.params.hash, 0, api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(txs, count) {
         if (address) {
           var last_txs = [];
@@ -538,7 +538,7 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
     const coin = settings.getCoin(net)
     const r = balancesCache.get(net + '_' + hash);
     if (r == undefined) {
-      db.get_address(hash, false, function(address) {
+      db.get_address(hash, function(address) {
         if (address) {
           balancesCache.set(net + '_' + hash, address.balance)
           debug("Cached balance '%s' '%s' %o - mem: %o", net, hash, address.balance, process.memoryUsage());
