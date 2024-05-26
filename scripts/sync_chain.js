@@ -5,7 +5,7 @@ const fs = require('fs')
 const async = require('async')
 const datautil = require('../lib/datautil')
 const db = require('../lib/database')
-const { StatsDb, AddressDb, AddressTxDb, BlockDb, TxDb, RichlistDb } = require('../lib/database')
+const { StatsDb, NetworkHistoryDb, AddressDb, AddressTxDb, BlockDb, TxDb, RichlistDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -127,11 +127,165 @@ function update_heavy(coin, height, count, heavycoin_enabled, cb) {
 
 function update_network_history(coin, height, network_history_enabled, cb, net) {
   if (network_history_enabled == true) {
-    db.update_network_history(coin, height, function() {
+    update_network_history_db(coin, height, function() {
       return cb(true)
     }, net)
   } else
     return cb(false)
+}
+
+function update_network_history_db(coin, height, cb, net=settings.getDefaultNet()) {
+  console.log("Update network history: %d", height)
+  NetworkHistoryDb[net].findOne({blockindex: height}).then((network_hist) => {
+    if (!network_hist) {
+      db.lib.get_hashrate(function(hashps) {
+        db.lib.get_difficulty(net, function(difficulties) {
+          const isBut = settings.isButkoin(net)
+          const isPepew = settings.isPepew(net)
+          const isVkax = settings.isVkax(net)
+          const difficulty = difficulties.difficulty
+          var difficultyPOW = 0
+          var difficultyPOS = 0
+          const shared_pages = settings.get(net, 'shared_pages')
+          if (difficulty && difficulty['proof-of-work']) {
+            if (shared_pages.difficulty == 'Hybrid') {
+              difficultyPOS = difficulty['proof-of-stake']
+              difficultyPOW = difficulty['proof-of-work']
+            } else if (shared_pages.difficulty == 'POW')
+              difficultyPOW = difficulty['proof-of-work']
+            else
+              difficultyPOS = difficulty['proof-of-stake']
+          } else if (shared_pages.difficulty == 'POW')
+            difficultyPOW = difficulty
+          else
+            difficultyPOS = difficulty
+
+          // create a new network history record
+          var dto = null
+          if (isBut) {
+            const hashrate = hashps.butkscrypt
+            dto = NetworkHistoryDb[net].create({
+              blockindex: height,
+              nethash: (hashrate == null || hashrate == '-' ? 0 : hashrate),
+              difficulty_pow: difficultyPOW,
+              difficulty_pos: difficultyPOS,
+              difficulty_ghostrider: difficulties.difficulty_ghostrider,
+              difficulty_yespower: difficulties.difficulty_yespower,
+              difficulty_lyra2: difficulties.difficulty_lyra2,
+              difficulty_sha256d: difficulties.difficulty_sha256d,
+              difficulty_scrypt: difficulties.difficulty_scrypt,
+              difficulty_butkscrypt: difficulties.difficulty_butkscrypt,
+              nethash_ghostrider: hashps.ghostrider,
+              nethash_yespower: hashps.yespower,
+              nethash_lyra2: hashps.lyra2,
+              nethash_sha256d: hashps.sha256d,
+              nethash_scrypt: hashps.scrypt,
+              nethash_butkscrypt: hashps.butkscrypt
+            })
+          } else if (isPepew) {
+            dto = NetworkHistoryDb[net].create({
+              blockindex: height,
+              nethash: hashps,
+              difficulty_pow: hashps,
+              difficulty_pos: difficultyPOS,
+              difficulty_pepew: difficulty,
+              nethash_pepew: hashps
+            })
+          } else if (isVkax) {
+            dto = NetworkHistoryDb[net].create({
+              blockindex: height,
+              nethash: hashps,
+              difficulty_pow: hashps,
+              difficulty_pos: difficultyPOS,
+              difficulty_mike: difficulty,
+              nethash_mike: hashps
+            })
+          } else {
+            dto = NetworkHistoryDb[net].create({
+              blockindex: height,
+              nethash: hashps,
+              difficulty_pow: hashps,
+              difficulty_pos: difficultyPOS,
+              difficulty_ghostrider: difficulty,
+              nethash_ghostrider: hashps
+            })
+          }
+
+          if (dto) {
+            var rr = {}
+            if (isBut) {
+              const hashrate = hashps.butkscrypt
+              rr.last = height,
+              rr.nethash = (hashrate == null || hashrate == '-' ? 0 : hashrate),
+              rr.difficulty_pow = difficultyPOW,
+              rr.difficulty_pos = difficultyPOS,
+              rr.difficulty_ghostrider = difficulties.difficulty_ghostrider,
+              rr.difficulty_yespower = difficulties.difficulty_yespower,
+              rr.difficulty_lyra2 = difficulties.difficulty_lyra2,
+              rr.difficulty_sha256d = difficulties.difficulty_sha256d,
+              rr.difficulty_scrypt = difficulties.difficulty_scrypt,
+              rr.difficulty_butkscrypt = difficulties.difficulty_butkscrypt,
+              rr.nethash_ghostrider = hashps.ghostrider,
+              rr.nethash_yespower = hashps.yespower,
+              rr.nethash_lyra2 = hashps.lyra2,
+              rr.nethash_sha256d = hashps.sha256d,
+              rr.nethash_scrypt = hashps.scrypt,
+              rr.nethash_butkscrypt = hashps.butkscrypt
+            } else {
+              rr.last = height,
+              rr.nethash = hashps,
+              rr.nethash_ghostrider = hashps,
+              rr.difficulty_pow = hashps,
+              rr.difficulty_pos = difficultyPOS,
+              rr.difficulty = difficulties.difficulty,
+              rr.difficulty_ghostrider = difficulty
+            }
+            StatsDb[net].updateOne({coin: coin}, rr).then(() => {
+              console.log("Done update stats: %d", height)
+              // get the count of network history records
+              NetworkHistoryDb[net].find({}).countDocuments().then((count) => {
+                // read maximum allowed records from settings
+                const network_history = settings.get(net, 'network_history')
+                let max_records = network_history.max_saved_records
+
+                // check if the current count of records is greater than the maximum allowed
+                if (count > max_records) {
+                  // prune network history records to keep collection small and quick to access
+                  NetworkHistoryDb[net].find().select('blockindex').sort({blockindex: 1}).limit(count - max_records).exec().then((records) => {
+                    // create a list of the oldest network history ids that will be deleted
+                    const ids = records.map((doc) => doc.blockindex)
+
+                    // delete old network history records
+                    NetworkHistoryDb[net].deleteMany({blockindex: {$in: ids}}).then(() => {
+                      console.log('Network history update complete')
+                      return cb()
+                    })
+                  })
+                } else {
+                  console.log('Network history update complete')
+                  return cb()
+                }
+              }).catch((err) => {
+                console.error("Failed to network history for chain '%s': %s", net, err)
+                return cb(err)
+              })
+            }).catch((err) => {
+              console.error("Failed to update stats database: %s", err)
+            })
+          } else {
+            console.error("Failed to update network history for chain '%s': %s", net, err)
+            return cb()
+          }
+        }, net)
+      }, net)
+    } else {
+      // block hasn't moved. skip.
+      return cb()
+    }
+  }).catch((err) => {
+    console.error(err)
+    return cb(err)
+  })
 }
 
 function update_db(net=settings.getDefaultNet(), coin, cb) {
@@ -155,7 +309,7 @@ function update_db(net=settings.getDefaultNet(), coin, cb) {
           })
         }).catch((err) => {
           console.error("Failed to update coin stats for chain '%s': %s", net, err)
-          // return cb(false);
+          // return cb(false)
         })
       } else {
         console.log("Error during stats update: %s", (err ? err : 'Cannot find stats collection'))
