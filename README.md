@@ -164,6 +164,14 @@ but-x offers a rich set of API functions per blockchain (parameter {net}=chain),
 
 - **getallnet:** Returns a list of the current chains this API instance supports.
 
+#### Peer Connector API (alpha)
+
+- **peers/getpeers:** Returns a list of all upstream and downstream peers connected to this but-x instance.
+- **peers/subscribe/upstream:** Upstream peer subscription.
+- **peers/subscribe/downstream:** Downstream peer subscription.
+- **peers/unsubscribe/upstream:** Upstream peer unsubscription.
+- **peers/unsubscribe/downstream:** Downstream peer unsubscription.
+
 ### Exchange data
 
 but-x supports the following crypto currency exchanges.

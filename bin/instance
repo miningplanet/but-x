@@ -10,7 +10,7 @@ const networks = settings.getAllNet()
 app.set('port', process.env.PORT || settings.webserver.port)
 
 // init db for default chain (must be present and cannot be disabled)
-db.connection_factory(networks[0], settings.getDbConnectionString(networks[0]), function(conn) {
+db.connection_factory(networks[0], true, settings.getDbConnectionString(networks[0]), function(conn) {
   db.initialize_data_startup(function() {
     const port = app.get('port')
     // launch server if only one chain available.
@@ -22,7 +22,7 @@ db.connection_factory(networks[0], settings.getDbConnectionString(networks[0]), 
       if (index > 0) {
         const enabled = settings.getDbOrNull(item).enabled
         if (enabled) {
-          db.connection_factory(item, settings.getDbConnectionString(networks[index]), function(conn) {
+          db.connection_factory(item, true, settings.getDbConnectionString(networks[index]), function(conn) {
             db.initialize_data_startup(function() {
               if (index == networks.length -1) {
                 detectPortAndLaunchServer(port)

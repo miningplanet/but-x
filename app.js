@@ -9,6 +9,7 @@ const logger = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const settings = require('./lib/settings')
+const { Peers } = require('./lib/peers')
 const routes = require('./routes/index')
 const lib = require('./lib/x')
 const db = require('./lib/database')
@@ -16,6 +17,7 @@ const package_metadata = require('./package.json')
 const locale = require('./lib/locale')
 const TTLCache = require('@isaacs/ttlcache')
 const app = express()
+const wsInstance = require('express-ws') (app)
 const apiAccessList = []
 const { exec } = require('child_process')
 const networks = settings.getAllNet()
@@ -23,20 +25,19 @@ const request = require('postman-request')
 const base_server = 'http://127.0.0.1:' + settings.webserver.port + "/"
 const base_url = base_server + '' // api/
 
+
 // application cache
 const wlength = settings.wallets.length
 const foreverCache = new TTLCache({ max: 10, ttl: Infinity, updateAgeOnGet: false, noUpdateTTL: false })
 const summaryCache = new TTLCache({ max: wlength, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const networkChartCache = new TTLCache({ max: wlength, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const statsCache = new TTLCache({ max: wlength, ttl: settings.cache.stats * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const supplyCache = new TTLCache({ max: wlength, ttl: settings.cache.supply * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const pricesCache = new TTLCache({ max: wlength * 2, ttl: settings.cache.prices * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const tickerCache = new TTLCache({ max: wlength, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const balancesCache = new TTLCache({ max: 100, ttl: settings.cache.balances * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const distributionCache = new TTLCache({ max: wlength, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const peersCache = new TTLCache({ max: wlength, ttl: settings.cache.peers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const masternodesCache = new TTLCache({ max: wlength, ttl: settings.cache.masternodes * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 const allnetCache = new TTLCache({ max: 10, ttl: settings.cache.allnet, updateAgeOnGet: false, noUpdateTTL: false })
+const xpeersCache = new TTLCache({ max: wlength, ttl: settings.cache.xpeers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
 // pass wallet rpc connections info to nodeapi
 nodeapi.setWalletDetails(settings.wallets)
@@ -47,8 +48,19 @@ networks.forEach( function(item, index) {
   Object.keys(api_cmds).forEach(function(key, index, map) {
     if (key != 'use_rpc' && api_cmds[key] != null && api_cmds[key] != '')
       apiAccessList.push(item + "@" + key);
-  });
-});
+  })
+})
+
+wsInstance.getWss().on('connection', (obj) => {
+  const clientsSet = wsInstance.getWss().clients
+  const clientsValues = clientsSet.values()
+  for(let i=0; i < clientsSet.size; i++) {
+    debug("*** " + (i + 1) + "/" + clientsSet.size + " ***")
+    const client = clientsValues.next().value
+    debug("Connected upstream peer %o.", client._sender._socket._peername)
+    db.upstreamPeers.push(client)
+  }
+})
 
 // dynamically find and add additional blockchain_specific api cmds
 Object.keys(settings.blockchain_specific).forEach(function(key, index, map) {
@@ -343,10 +355,10 @@ app.use('/api/getgovernanceinfo/:net?', function(req, res) {
 function stats(res, net, api_page, fenabled, cb) {
   if (api_page.enabled == true && fenabled == true) {
     const coin = settings.getCoin(net)
-    const r = statsCache.get(net)
+    const r = db.statsCache.get(net)
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
-        statsCache.set(net, stats)
+        db.statsCache.set(net, stats)
         debug("Cached stats '%s' %o - mem: %o", net, stats, process.memoryUsage())
         // res.setHeader('content-type', 'text/plain')
         res.send(cb(stats))
@@ -661,7 +673,7 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
     const coin = settings.getCoin(net)
-    const r = statsCache.get(net);
+    const r = db.statsCache.get(net)
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
         if (stats) {
@@ -680,7 +692,7 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
             s.last_price_usd = stats.last_usd_price,
 
           // eval('var p_ext = {  "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '":   }');
-          statsCache.set(net, s);
+          db.statsCache.set(net, s)
           debug("Cached coin stats '%s' %o - mem: %o", net, s, process.memoryUsage());
           res.send(s);
         } else 
@@ -1012,20 +1024,14 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || isInternalRequest(req)) {
-    const r = peersCache.get(net);
+    const r = db.peersCache.get(net)
     if (r == undefined) {
       db.get_peers(function(peers) {
-        // loop through peers list and remove the mongo _id and __v keys
-        for (i = 0; i < peers.length; i++) {
-          delete peers[i]['_doc']['_id'];
-          delete peers[i]['_doc']['__v'];
-        }
-
+       
         // sort ip6 addresses to the bottom
         peers.sort(function(a, b) {
-          var address1 = a.address.indexOf(':') > -1;
-          var address2 = b.address.indexOf(':') > -1;
-
+          const address1 = a.address.indexOf(':') > -1
+          const address2 = b.address.indexOf(':') > -1
           if (address1 < address2)
             return -1;
           else if (address1 > address2)
@@ -1035,13 +1041,13 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
         });
 
         // return peer data
-        peersCache.set (net, peers);
-        debug("Cached peers '%s' %o - mem: %o", net, peers, process.memoryUsage());
-        res.json(peers);
+        db.peersCache.set (net, peers)
+        debug("Cached peers '%s' %o - mem: %o", net, peers, process.memoryUsage())
+        res.json(peers)
       }, net);
     } else {
-      debug("Get peers by cache '%s' ...", net);
-      res.send(r);
+      debug("Get peers by cache '%s' ...", net)
+      res.send(r)
     }
   } else
     res.end('This method is disabled');
@@ -1053,15 +1059,15 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getmasternodelist.enabled == true) || isInternalRequest(req)) {
-    const r = masternodesCache.get(net);
+    const r = db.masternodesCache.get(net)
     if (r == undefined) {
       db.get_masternodes(function(masternodes) {
         // loop through masternode list and remove the mongo _id and __v keys
-        for (i = 0; i < masternodes.length; i++) {
-          delete masternodes[i]['_doc']['_id'];
-          delete masternodes[i]['_doc']['__v'];
-        }
-        masternodesCache.set(net, masternodes);
+        // for (i = 0; i < masternodes.length; i++) {
+        //   delete masternodes[i]['_doc']['_id'];
+        //   delete masternodes[i]['_doc']['__v'];
+        // }
+        db.masternodesCache.set(net, masternodes)
         debug("Cached masternodes '%s' %o - mem: %o", net, masternodes, process.memoryUsage());
         res.send(masternodes);
       }, net);
@@ -1163,6 +1169,100 @@ app.use('/net/getallnet/:mode?', function(req, res) {
   } else
     res.end('This method is disabled');
 });
+
+// peer connector API
+app.use('/peers/getpeers/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.peers.getpeers.enabled == true) {
+    const allowed_ips = api_page.public_apis.peers.allowed_ips
+    const ip = settings.getRemoteIp(req)
+    if (!allowed_ips.includes(ip)) {
+      res.end('403: Access with IP ' + ip + ' is denied.')
+      return
+    }
+    const r = xpeersCache.get(net)
+    if (r == undefined) {
+      // db.get_xpeers(function(peers) {
+      //   xpeersCache.set (net, peers)
+      //   debug("Cached xpeers '%s' %o - mem: %o", net, peers, process.memoryUsage())
+      //   res.json(peers)
+      // }, net)
+      const clientsSet = wsInstance.getWss().clients
+      const clientsValues = clientsSet.values()
+      const json = []
+      for (let i=0; i < clientsSet.size; i++) {
+        const client = clientsValues.next().value
+        // console.log(client._sender._socket._peername)
+        json[i] = client._sender._socket._peername
+      }
+      xpeersCache.get(net,  json)
+      res.json(json)
+    } else {
+      debug("Get xpeers by cache %o for net '%s' ...", r, net)
+      res.json(r)
+    }
+  } else
+    res.end('This method is disabled')
+})
+
+function isPeerUpstreamAllowed(net) {
+  const db =  settings.getDbOrNull(net)
+  const api_page = settings.get(net, 'api_page')
+  return api_page.enabled == true && api_page.public_apis.peers.subscribe_upstream.enabled == true && db && db.peers.enabled == true && db.peers.mode == 'upstream'
+}
+
+app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
+  const net = settings.getNet(req.params['net'])  
+  const ip = settings.getRemoteIp(req)
+
+  // TODO: Check peer IP allowed.
+  if (isPeerUpstreamAllowed(net)) {
+    console.log("Upstream peer '%s' for net '%s' requested.", ip, net)
+
+    ws.on('message', function(msg) {
+      const obj = JSON.parse(msg)
+
+      if (obj && obj.event && obj.event == Peers.UPSTREAM_HANDSHAKE) {
+        const version = obj.data
+        console.log("Received upstream handshake for net '%s', peer version %d.", obj.net, obj.data)
+        if (version != Peers.PEER_VERSION) {
+          console.log("Upstream peer version for net '%s' mismatch: received %d != %d", net, version, Peers.PEER_VERSION)
+          // TODO: Disconnect peer.
+          // https://stackoverflow.com/questions/19304157/getting-the-reason-why-websockets-closed-with-close-code-1006/19305172#19305172
+          // ws.close(1006, 'Abnormal Closure')
+        }
+        ws.send(JSON.stringify({ 'type': 'handshake', 'message': 'Completed' }))
+      } else {
+        debug("Got upstream response: %o", obj)
+        if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_PEERS + net) {
+          db.peersCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS + net)) {
+          db.addressCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_MASTERNODES + net) {
+          db.masternodesCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_COINSTATS + net) {
+          db.statsCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_DBINDEX + net) {
+          db.dbindexCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_RICHLIST + net) {
+          db.richlistCache.set(net, obj.data)
+        }
+        ws.send(JSON.stringify({ 'type': 'Cache', 'message': 'Cached results.' }))
+      }
+    })
+
+    ws.on('error', msg => {
+      console.error('ERROR: %s', msg)
+    })
+    // ws.on('connection', msg => {
+    //   console.info('Connected: %s', msg)
+    // })
+    ws.on('close', (obj) => {
+      console.log('Upstream peer connection closed %o.', obj)
+    })
+  }
+})
 
 app.use('/system/restartexplorer', function(req, res, next) {
   // check to ensure this special cmd is only executed by the local server
@@ -1301,6 +1401,7 @@ app.set('labels', settings.labels)
 app.set('blockchain_specific', settings.blockchain_specific)
 app.set('market_data', market_data)
 app.set('market_count', market_count)
+app.set('hasUpstream', settings.hasUpstream)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

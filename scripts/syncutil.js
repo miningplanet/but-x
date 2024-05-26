@@ -22,7 +22,7 @@ function check_net_unknown(net) {
 function init_db_if_enabled(net) {
   const enabled = settings.getDbOrNull(net).enabled
   if (enabled) {
-    db.connection_factory(net, settings.getDbConnectionString(net), function(conn) {
+    db.connection_factory(net, false, settings.getDbConnectionString(net), function(conn) {
       db.initialize_data_startup(function() {
         // NOOP
       }, net)
@@ -33,7 +33,7 @@ function init_db_if_enabled(net) {
 }
 
 function init_db(net, cb) {
-  db.connection_factory(net, settings.getDbConnectionString(net), function(conn) {
+  db.connection_factory(net, false, settings.getDbConnectionString(net), function(conn) {
     db.initialize_data_startup(function() {
       cb('initialized')
     }, net)

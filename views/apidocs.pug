@@ -474,6 +474,51 @@ block content
                     em Returns a list and data about all nets available.
                   a(href='/net/getallnet') #{address}/net/getallnet
           hr
+        if !api_page.public_apis.hide_peers_api_section
+          h3 Peers API (restricted)
+          p
+            em X P2P layer.
+          ul
+            if api_page.public_apis.peers.getpeers.enabled == true
+              li
+                p
+                  div.fw-bold getpeers
+                  div
+                    em Returns a list of all upstream and downstream peers connected to this but-x instance.
+                  a(href='/peers/getpeers') #{address}/peers/getpeers
+          ul
+            if api_page.public_apis.peers.subscribe_upstream.enabled == true
+              li
+                p
+                  div.fw-bold subscribe/upstream
+                  div
+                    em Subscribe to an X peer as an upstream peer.
+                  a(href='/peers/subscribe/upstream') #{address}/peers/subscribe/upstream
+          ul
+            if api_page.public_apis.peers.subscribe_downstream.enabled == true
+              li
+                p
+                  div.fw-bold subscribe/downstream
+                  div
+                    em Subscribe to an X peer as a downstream peer.
+                  a(href='/peers/subscribe/downstream') #{address}/peers/subscribe/downstream
+          ul
+            if api_page.public_apis.peers.unsubscribe_upstream.enabled == true
+              li
+                p
+                  div.fw-bold unsubscribe/upstream
+                  div
+                    em Unsubscribe to an X peer as an upstream peer.
+                  a(href='/peers/unsubscribe/upstream') #{address}/peers/unsubscribe/upstream
+          ul
+            if api_page.public_apis.peers.unsubscribe_downstream.enabled == true
+              li
+                p
+                  div.fw-bold unsubscribe/downstream
+                  div
+                    em Unsubscribe to an X peer as a downstream peer.
+                  a(href='/peers/unsubscribe/downstream') #{address}/peers/unsubscribe/downstream
+          hr
         h3 Linking (GET)
         p
           em Linking to X
