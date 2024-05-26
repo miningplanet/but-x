@@ -38,7 +38,7 @@ util.init_db(net, function(status) {
           console.log('Run \'npm start\' to create database structures before running this script.')
           util.exit_remove_lock(1, lock, net)
         } else {
-          db.update_db(net, coin.name, function(stats) {
+          update_db(net, coin.name, function(stats) {
             if (stats !== false) {
               // Get the last synced block index value
               var last = (stats.last ? stats.last : 0)
@@ -132,6 +132,40 @@ function update_network_history(coin, height, network_history_enabled, cb, net) 
     }, net)
   } else
     return cb(false)
+}
+
+function update_db(net=settings.getDefaultNet(), coin, cb) {
+  db.lib.get_blockcount(function (count) {
+    // Update DB needs access to the daemon.
+    if (!count || (count != null && typeof count === 'number' && count < 0)) {
+      console.log('Error: Unable to connect to the X API.')
+      return cb(false)
+    }
+    StatsDb[net].findOne({coin: coin}).then((stats) => {
+      if (stats) {
+        StatsDb[net].updateOne({coin: coin}, {
+          coin: coin,
+          count : count,
+        }).then(() => {
+          return cb({
+            coin: coin,
+            count : count,
+            last: (stats.last ? stats.last : 0),
+            txes: (stats.txes ? stats.txes : 0)
+          })
+        }).catch((err) => {
+          console.error("Failed to update coin stats for chain '%s': %s", net, err)
+          // return cb(false);
+        })
+      } else {
+        console.log("Error during stats update: %s", (err ? err : 'Cannot find stats collection'))
+        return cb(false)
+      }
+    }).catch((err) => {
+      console.error("Failed to find coin stats for chain '%s': %s", net, err)
+      return cb(false)
+    })
+  }, net)
 }
 
 // updates tx, address & richlist db's
