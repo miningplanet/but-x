@@ -8,9 +8,23 @@ const lib = require('../lib/x')
 const qr = require('qr-image')
 const TTLCache = require('@isaacs/ttlcache')
 const networks = settings.getAllNet()
+const fs = require('fs')
 
 const wlength = settings.wallets.length
 const infoCache = new TTLCache({ max: wlength, ttl: settings.cache.info * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+
+const styleHash = get_file_timestamp('./public/css/style.scss')
+const themeHash = get_file_timestamp('./public/css/themes/darkly/bootstrap.min.css')
+
+const customHash = {}
+networks.forEach( function(net, index) {
+  const file = './public/css/' + net + '.scss'
+  if (fs.existsSync(file)) {
+    customHash[net] = get_file_timestamp(file)
+  } else {
+    console.warn("Custom CSS for net '%s' not found.", net)
+  }
+})
 
 function route_get_block(req, res, blockhash) {
   const net = req.params['net']
@@ -747,9 +761,9 @@ function param(pageKey, page, req, db, settings, prefix) {
   const r = {
     active: pageKey,
     showSync: db.check_show_sync_message(net),
-    customHash: get_file_timestamp('./public/css/custom.scss'),
-    styleHash: get_file_timestamp('./public/css/style.scss'),
-    themeHash: get_file_timestamp('./public/css/themes/' + shared_pages.theme.toLowerCase() + '/bootstrap.min.css'),
+    customHash: customHash[net],
+    styleHash: styleHash,
+    themeHash: themeHash,
     logo: settings.getLogo(net),
     page_title_logo: settings.getTitleLogo(net),
     page_title_prefix: prefix,
