@@ -35,7 +35,7 @@ if (!db.lib.is_locked([lock], net)) {
             console.log('Richlist updated received')
             update_richlist('balance', function() {
               update_richlist('toptx', function() {
-                db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                util.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
                   util.exit_remove_lock_completed(lock, coin, net)
                 }, net)
               }, net)

@@ -110,7 +110,7 @@ if (!db.lib.is_locked([lock], net)) {
             }
           }, net)
         }, function() {
-          db.update_last_updated_stats(coin.name, { network_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+          util.update_last_updated_stats(coin.name, { network_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
             // check if the script stopped prematurely
             if (stopSync) {
               console.log('Peer sync was stopped prematurely')

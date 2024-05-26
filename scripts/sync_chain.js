@@ -5,7 +5,7 @@ const fs = require('fs')
 const async = require('async')
 const datautil = require('../lib/datautil')
 const db = require('../lib/database')
-const { StatsDb, AddressDb, AddressTxDb, TxDb, RichlistDb } = require('../lib/database')
+const { StatsDb, AddressDb, AddressTxDb, BlockDb, TxDb, RichlistDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -59,14 +59,14 @@ util.init_db(net, function(status) {
                   console.log('Block sync was stopped prematurely')
                   util.exit_remove_lock(1, lock, net)
                 } else {
-                  db.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                  util.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
                     update_richlist('received', function() {
                       update_richlist('balance', function() {
                         update_richlist('toptx', function() {
-                          db.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {                              
-                            db.get_stats(coin.name, function(nstats) {
+                          util.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {                              
+                            util.get_stats(coin.name, function(nstats) {
                               // check for and update heavycoin data if applicable
-                              update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
+                              // update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
                                 // check for and update network history data if applicable
                                 const network_history = settings.get(net, 'network_history')
                                 update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
@@ -75,7 +75,7 @@ util.init_db(net, function(status) {
                                   console.log('Block sync complete (block: %s)', nstats.last)
                                   util.exit_remove_lock_completed(lock, coin, net)
                                 }, net)
-                              }, net)
+                              // }, net)
                             }, net)
                           }, net)
                         }, net)
@@ -517,14 +517,14 @@ function count_addresses(cb, net=settings.getDefaultNet()) {
 }
 
 function remove_sync_message(net=settings.getDefaultNet()) {
-  const filePath = './tmp/show_sync_message-' + net + '.tmp';
+  const filePath = './tmp/show_sync_message-' + net + '.tmp'
   // Check if the show sync stub file exists
   if (fs.existsSync(filePath)) {
     // File exists, so delete it now
     try {
-      fs.unlinkSync(filePath);
+      fs.unlinkSync(filePath)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 }
@@ -616,4 +616,52 @@ function update_richlist(list, cb, net=settings.getDefaultNet()) {
       console.error("Failed to find richlist top tx for chain '%s': %s", net, err)
     })
   }
+}
+
+function update_heavy(coin, height, count, cb, net) {
+  var newVotes = []
+
+  db.lib.get_maxmoney(function (maxmoney) {
+    db.lib.get_maxvote(function (maxvote) {
+      db.lib.get_vote(function (vote) {
+        db.lib.get_phase(function (phase) {
+          db.lib.get_reward(function (reward) {
+            util.get_stats(coin.name, function (stats) {
+              db.lib.get_estnext(function (estnext) {
+                db.lib.get_nextin(function (nextin) {
+                  db.lib.syncLoop(count, function (loop) {
+                    var i = loop.iteration()
+                    db.lib.get_blockhash(height - i, function (hash) {
+                      db.lib.get_block(hash, function (block) {
+                        newVotes.push({ count: height - i, reward: block.reward, vote: (block && block.vote ? block.vote : 0) })
+                        loop.next()
+                      }, net)
+                    }, net)
+                  }, function() {
+                    HeavyDb[net].updateOne({coin: coin}, {
+                      lvote: (vote ? vote : 0),
+                      reward: (reward ? reward : 0),
+                      supply: (stats && stats.supply ? stats.supply : 0),
+                      cap: (maxmoney ? maxmoney : 0),
+                      estnext: (estnext ? estnext : 0),
+                      phase: (phase ? phase : 'N/A'),
+                      maxvote: (maxvote ? maxvote : 0),
+                      nextin: (nextin ? nextin : 'N/A'),
+                      votes: newVotes
+                    }, function() {
+                      // update reward_last_updated value
+                      util.update_last_updated_stats(coin.name, { reward_last_updated: Math.floor(new Date() / 1000) }, function (new_cb) {
+                        console.log('Heavycoin update complete')
+                        return cb()
+                      }, net)
+                    })
+                  })
+                }, net)
+              }, net)
+            }, net)
+          }, net)
+        }, net)
+      }, net)
+    }, net)
+  }, net)
 }

@@ -2,6 +2,7 @@ const debug = require('debug')('debug')
 const mongoose = require('mongoose')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
+const { StatsDb } = require('../lib/database')
 
 function check_net_missing(argv) {
   if (argv.length < 3) {
@@ -87,7 +88,7 @@ function get_last_usd_price(stopSync, net=settings.getDefaultNet()) {
   db.get_last_usd_price(function(err) {
     if (err == null) {
       const coin = settings.getCoin(net)
-      db.update_last_updated_stats(coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+      update_last_updated_stats(coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
         // check if the script stopped prematurely
         if (stopSync) {
           console.log('Market sync was stopped prematurely')
@@ -102,6 +103,41 @@ function get_last_usd_price(stopSync, net=settings.getDefaultNet()) {
       exit(1)      
     }
   }, net)
+}
+
+function update_last_updated_stats(coin, param, cb, net=settings.getDefaultNet()) {
+  const dto = {}
+  if (param.blockchain_last_updated) {
+    dto.blockchain_last_updated = param.blockchain_last_updated
+  } else if (param.reward_last_updated) {
+    dto.reward_last_updated = param.reward_last_updated
+  } else if (param.masternodes_last_updated) {
+    dto.masternodes_last_updated = param.masternodes_last_updated
+  } else if (param.network_last_updated) {
+    dto.network_last_updated = param.network_last_updated
+  } else if (param.richlist_last_updated) {
+    dto.richlist_last_updated = param.richlist_last_updated
+  } else if (param.markets_last_updated) {
+    dto.markets_last_updated = param.markets_last_updated
+  } else {
+    // invalid option
+    return cb(false)
+  }
+  db.StatsDb[net].updateOne({ coin: coin }, dto).then(() => {
+    return cb(true)
+  }).catch((err) => {
+    console.error("Failed to update stats for chain '%s': %s", net, err)
+    // return cb([])
+  })
+}
+
+function get_stats(coinName, cb, net) {
+  db.StatsDb[net].findOne({coin: coinName}).then((data) => {
+    return cb(data)
+  }).catch((err) => {
+    console.error("Failed to find stats for chain '%s': %s", net, err)
+    return cb(null)
+  })
 }
 
 function log_start(objname, net, coin) {
@@ -122,6 +158,8 @@ module.exports = {
   exit_remove_lock_completed: exit_remove_lock_completed,
   gracefully_shut_down: gracefully_shut_down,
   get_last_usd_price: get_last_usd_price,
+  update_last_updated_stats: update_last_updated_stats,
+  get_stats: get_stats,
   log_start: log_start,
   log_completed: log_completed
 }
