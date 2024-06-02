@@ -67,7 +67,8 @@ block content
           var txhash = data[1];
           var out = data[2];
           var vin = data[3];
-          var balance = data[4].toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+          // TODO: Balance is undefined from upstream peer
+          var balance = data[4] && !isNaN(data[4]) ? data[4].toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : '0.0';
           var balanceParts = balance.split('.');
           $("td:eq(0)", row).html('<a href="/tx/' + txhash + '/#{net}"><span class="entity" data-bs-toggle="tooltip" data-bs-placement="top" title="#{settings.locale.view_tx}">&#8627</span></a>').addClass('text-center d-table-cell d-md-none');
           $("td:eq(1)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass('txcol breakWord d-none d-md-table-cell');

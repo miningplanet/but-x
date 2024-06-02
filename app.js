@@ -1,5 +1,6 @@
 const debug = require('debug')('debug')
 const debugChart = require('debug')('chart')
+const debugPeers = require('debug')('peers')
 const express = require('express')
 const path = require('path')
 const nodeapi = require('./lib/nodeapi')
@@ -51,14 +52,15 @@ networks.forEach( function(item, index) {
   })
 })
 
+// an upstream peer (client) connects to us (we are the server) - 1
 wsInstance.getWss().on('connection', (obj) => {
   const clientsSet = wsInstance.getWss().clients
   const clientsValues = clientsSet.values()
   for(let i=0; i < clientsSet.size; i++) {
-    debug("*** " + (i + 1) + "/" + clientsSet.size + " ***")
-    const client = clientsValues.next().value
-    debug("Connected upstream peer %o.", client._sender._socket._peername)
-    db.upstreamPeers.push(client)
+    debugPeers("*** " + (i + 1) + "/" + clientsSet.size + " ***")
+    const peer = clientsValues.next().value
+    debugPeers("Connected upstream peer %o.", peer._sender._socket._peername)
+    db.push_upstream_peer_server(peer)
   }
 })
 
@@ -434,8 +436,9 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getaddress.enabled == true) {
     db.get_address(req.params.hash, function(address) {
-      db.get_address_txs_ajax(req.params.hash, 0, api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(txs, count) {
+      db.get_address_txs(req.params.hash, 0, api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(obj) {
         if (address) {
+          const txs = obj.data
           var last_txs = [];
 
           for (i = 0; i < txs.length; i++) {
@@ -909,58 +912,41 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
 
     debug("getaddresstx for chain '%s': min=%d, start=%d, length=%d", net, min, start, length)
 
-    db.get_address_txs_ajax(req.params.address, start, length, function(txs, count) {
+    db.get_address_txs(req.params.address, start, length, function(obj) {
+      // TODO: Fix balance is null with upstream peer.
+      const txs = obj.data
       var data = [];
 
       for (i = 0; i < txs.length; i++) {
         if (typeof txs[i].txid !== "undefined") {
-          var out = 0;
-          var vin = 0;
+          var out = 0
+          var vin = 0
 
           txs[i].vout.forEach(function(r) {
             if (r.addresses == req.params.address)
-              out += r.amount;
-          });
+              out += r.amount
+          })
 
           txs[i].vin.forEach(function(s) {
             if (s.addresses == req.params.address)
-              vin += s.amount;
-          });
+              vin += s.amount
+          })
 
-          if (internal) {
-            var row = [];
-
-            row.push(txs[i].timestamp);
-            row.push(txs[i].txid);
-            row.push(Number(out / 100000000));
-            row.push(Number(vin / 100000000));
-            row.push(Number(txs[i].balance / 100000000));
-
-            data.push(row);
-          } else {
-            data.push({
-              timestamp: txs[i].timestamp,
-              txid: txs[i].txid,
-              sent: Number(out / 100000000),
-              received: Number(vin / 100000000),
-              balance: Number(txs[i].balance / 100000000)
-            });
-          }
+          const row = []
+          row.push(txs[i].timestamp)
+          row.push(txs[i].txid)
+          row.push(Number(out / 100000000))
+          row.push(Number(vin / 100000000))
+          row.push(Number(txs[i].balance / 100000000))
+          data.push(row)
         }
       }
 
-      // check if this is an internal request
-      if (internal) {
-        // display data formatted for internal datatable
-        res.json({"data": data, "recordsTotal": count, "recordsFiltered": count});
-      } else {
-        // display data in more readable format for public api
-        res.json(data);
-      }
-    }, net);
+      res.json({"data": data, "recordsTotal": obj.recordsTotal, "recordsFiltered": obj.recordsFiltered })
+    }, net)
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 app.use('/ext/getsummary/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
@@ -1028,6 +1014,12 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
     if (r == undefined) {
       db.get_peers(function(peers) {
        
+        if (peers.msg) {
+          debugPeers("Waiting for upstream peers.")
+          res.json(peers)
+          return  
+        }
+
         // sort ip6 addresses to the bottom
         peers.sort(function(a, b) {
           const address1 = a.address.indexOf(':') > -1
@@ -1217,28 +1209,41 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
   const ip = settings.getRemoteIp(req)
 
   // TODO: Check peer IP allowed.
+  // an upstream peer (client) connects to us (we are the server) - 0
   if (isPeerUpstreamAllowed(net)) {
     console.log("Upstream peer '%s' for net '%s' requested.", ip, net)
 
     ws.on('message', function(msg) {
+      // TODO: Fix balance is null with upstream peer.
+
       const obj = JSON.parse(msg)
 
       if (obj && obj.event && obj.event == Peers.UPSTREAM_HANDSHAKE) {
         const version = obj.data
-        console.log("Received upstream handshake for net '%s', peer version %d.", obj.net, obj.data)
+        const clientsSet = wsInstance.getWss().clients
+
+        console.log("Received upstream handshake for net '%s', peer version %d, number of peers %d.", obj.net, obj.data, clientsSet.size)
         if (version != Peers.PEER_VERSION) {
           console.log("Upstream peer version for net '%s' mismatch: received %d != %d", net, version, Peers.PEER_VERSION)
           // TODO: Disconnect peer.
           // https://stackoverflow.com/questions/19304157/getting-the-reason-why-websockets-closed-with-close-code-1006/19305172#19305172
           // ws.close(1006, 'Abnormal Closure')
         }
+
+        const clientsValues = clientsSet.values()
+        for(let i=0; i < clientsSet.size; i++) {
+          debugPeers("Available peers(%d): %o", i + 1, clientsValues.next().value._sender._socket._peername)
+        }
+
         ws.send(JSON.stringify({ 'type': 'handshake', 'message': 'Completed' }))
       } else {
-        debug("Got upstream response: %o", obj)
+        debugPeers("Got upstream response: %o", obj)
         if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_PEERS + net) {
           db.peersCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS + net)) {
           db.addressCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS_TXES + net)) {
+          db.addressTxCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_MASTERNODES + net) {
           db.masternodesCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_COINSTATS + net) {
@@ -1259,7 +1264,9 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
     //   console.info('Connected: %s', msg)
     // })
     ws.on('close', (obj) => {
-      console.log('Upstream peer connection closed %o.', obj)
+      const clientsSet = wsInstance.getWss().clients
+      console.log('Upstream peer connection closed %o, number of peers %d.', obj, clientsSet.size)
+      db.update_upstream_peer_servers(wsInstance)
     })
   }
 })
@@ -1402,6 +1409,7 @@ app.set('blockchain_specific', settings.blockchain_specific)
 app.set('market_data', market_data)
 app.set('market_count', market_count)
 app.set('hasUpstream', settings.hasUpstream)
+app.set('needsUpstream', settings.needsUpstream)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
