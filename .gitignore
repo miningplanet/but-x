@@ -31,12 +31,17 @@ build/Release
 node_modules
 
 settings.json
+settings-frontend-upstream-yerbas.json
 .idea
 *~
 
 .DS_Store
 
 package-lock.json
+public/css/mainnet.min.css
+public/css/mainnet.scss
+public/css/bitoreum.min.css
+public/css/bitoreum.scss
 public/css/raptoreum.min.css
 public/css/raptoreum.scss
 public/css/vkax.min.css
