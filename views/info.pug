@@ -82,7 +82,7 @@ block content
               td.text-end #{settings.formatInt(stats.utxos)}
             tr
               td.text-start #{settings.locale.info_count_transactions}
-              td.text-end #{settings.formatInt(stats.txes)}
+              td.text-end #{settings.formatInt(txes)}
             if info.show_txstats == true && tx_types
               each tx_type, index in tx_types
                 tr.sub

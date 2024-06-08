@@ -278,7 +278,15 @@ function route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinba
   p.info_page = info_page
   p.blocks_by_algorithm = blocks_by_algorithm
   p.tx_types = settings.get(net, 'tx_types')
+  var txes = 0
   p.tx_by_type = tx_by_type
+  if (tx_by_type) {
+    for (i = 0; i < tx_by_type.length; i++) {
+      if (!isNaN(tx_by_type[i].count))
+        txes += tx_by_type[i].count
+    }
+  }
+  p.txes = txes
   p.latest_coinbase_tx = latest_coinbase_tx
   p.markets = markets
   p.trading_pairs = trading_pairs
