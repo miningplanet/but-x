@@ -840,7 +840,7 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
-    var min = req.params.min, start, length, internal = isInternalRequest(req)
+    var min = req.params.min, start, length
     // split url suffix by forward slash and remove blank entries
     var type = req.params['type'] ? req.params['type'] : -1
     var split = req.url.split('/').filter(function(v) { return v; })
@@ -861,10 +861,6 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
           // capture start and length
           start = split[0]
           length = split[1]
-          // check if this is an internal request
-          // TODO: Should be dead here.
-          if (split.length > 2 && split[2] == 'internal')
-            internal = true
         }
         break
     }
@@ -878,8 +874,19 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
     else
       min  = (min * 100000000);
 
-    db.get_last_txs(start, length, min, type, internal, function(data, count) {
-      res.json({"data": data, "recordsTotal": count, "recordsFiltered": count})
+    db.get_last_txs(start, length, min, type, function(data, count) {
+      const rows = []
+      for (i = 0; i < data.length; i++) {
+        const row = []
+        row.push(data[i].blockindex)
+        row.push(data[i].blockhash)
+        row.push(data[i].txid)
+        row.push(data[i].recipients)
+        row.push(data[i].amount)
+        row.push(data[i].timestamp)
+        rows.push(row)
+      }
+      res.json({"data": rows, "recordsTotal": count, "recordsFiltered": count})
     }, net)
   } else
     res.end('This method is disabled');
@@ -1244,16 +1251,20 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           db.addressCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS_TXES + net)) {
           db.addressTxCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_TXES_BY_BLOCKHASH + net)) {
+          db.txsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_LAST_TXES + net)) {
+          db.txsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_MASTERNODES + net) {
           db.masternodesCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_COINSTATS + net) {
-          db.statsCache.set(net, obj.data)
+          db.statsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_DBINDEX + net) {
           db.dbindexCache.set(net, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_RICHLIST + net) {
           db.richlistCache.set(net, obj.data)
         }
-        ws.send(JSON.stringify({ 'type': 'Cache', 'message': 'Cached results.' }))
+        ws.send(JSON.stringify({ 'type': 'Cache', 'message': 'Cached ' + obj.event }))
       }
     })
 

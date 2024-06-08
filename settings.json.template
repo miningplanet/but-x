@@ -133,6 +133,7 @@
     "ticker": 60,
     "addresses": 120,
     "addresstxes": 120,
+    "txs": 120,
     "balances": 60,
     "distribution": 60,
     "peers": 120,
