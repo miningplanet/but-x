@@ -10,8 +10,7 @@ const TTLCache = require('@isaacs/ttlcache')
 const networks = settings.getAllNet()
 const fs = require('fs')
 
-const wlength = settings.wallets.length
-const infoCache = new TTLCache({ max: wlength, ttl: settings.cache.info * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const infoCache = new TTLCache({ max: settings.cache.info.size, ttl: settings.cache.info.ttl * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
 const styleHash = get_file_timestamp('./public/css/style.scss')
 const themeHash = get_file_timestamp('./public/css/themes/darkly/bootstrap.min.css')

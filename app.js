@@ -16,7 +16,6 @@ const lib = require('./lib/x')
 const db = require('./lib/database')
 const package_metadata = require('./package.json')
 const locale = require('./lib/locale')
-const TTLCache = require('@isaacs/ttlcache')
 const app = express()
 const wsInstance = require('express-ws') (app)
 const apiAccessList = []
@@ -26,19 +25,18 @@ const request = require('postman-request')
 const base_server = 'http://127.0.0.1:' + settings.webserver.port + "/"
 const base_url = base_server + '' // api/
 
+const TTLCache = require('@isaacs/ttlcache')
+const cache = settings.cache
 
 // application cache
-const wlength = settings.wallets.length
-const foreverCache = new TTLCache({ max: 10, ttl: Infinity, updateAgeOnGet: false, noUpdateTTL: false })
-const summaryCache = new TTLCache({ max: wlength, ttl: settings.cache.summary * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const networkChartCache = new TTLCache({ max: wlength, ttl: settings.cache.network_chart * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const supplyCache = new TTLCache({ max: wlength, ttl: settings.cache.supply * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const pricesCache = new TTLCache({ max: wlength * 2, ttl: settings.cache.prices * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const tickerCache = new TTLCache({ max: wlength, ttl: settings.cache.ticker * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const balancesCache = new TTLCache({ max: 100, ttl: settings.cache.balances * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const distributionCache = new TTLCache({ max: wlength, ttl: settings.cache.distribution * 1000, updateAgeOnGet: false, noUpdateTTL: false })
-const allnetCache = new TTLCache({ max: 10, ttl: settings.cache.allnet, updateAgeOnGet: false, noUpdateTTL: false })
-const xpeersCache = new TTLCache({ max: wlength, ttl: settings.cache.xpeers * 1000, updateAgeOnGet: false, noUpdateTTL: false })
+const foreverCache        = new TTLCache({ max: 10,                       ttl: Infinity,                        updateAgeOnGet: false, noUpdateTTL: false })
+const summaryCache        = new TTLCache({ max: cache.summary.size,       ttl: 1000 * cache.summary.ttl,        updateAgeOnGet: false, noUpdateTTL: false })
+const networkChartCache   = new TTLCache({ max: cache.network_chart.size, ttl: 1000 * cache.network_chart.ttl,  updateAgeOnGet: false, noUpdateTTL: false })
+const pricesCache         = new TTLCache({ max: cache.prices.size,        ttl: 1000 * cache.prices.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
+const tickerCache         = new TTLCache({ max: cache.ticker.size,        ttl: 1000 * cache.ticker.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
+const balancesCache       = new TTLCache({ max: cache.balances.size,      ttl: 1000 * cache.balances.ttl,       updateAgeOnGet: false, noUpdateTTL: false })
+const distributionCache   = new TTLCache({ max: cache.distribution.size,  ttl: 1000 * cache.distribution.ttl,   updateAgeOnGet: false, noUpdateTTL: false })
+const xpeersCache         = new TTLCache({ max: cache.xpeers.size,        ttl: 1000 * cache.xpeers.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 
 // pass wallet rpc connections info to nodeapi
 nodeapi.setWalletDetails(settings.wallets)
