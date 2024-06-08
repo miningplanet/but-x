@@ -248,7 +248,7 @@ app.use('/api/getblockhash/:height/:net?', function(req, res) {
   const height = req.params['height']
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.rpc.getblockhash.enabled == true) {
-    db.find_block_by_height(height, function(block) {
+    db.get_block_by_height(height, function(block) {
       if (block) {
         res.send(block.hash)
       } else {
@@ -265,7 +265,7 @@ app.use('/api/getblock/:hash/:net?', function(req, res) {
   const hash = req.params['hash']
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.rpc.getblock.enabled == true) {
-    db.find_block_by_hash(hash, function(block) {
+    db.get_block_by_hash(hash, function(block) {
       if (block) {
         res.send(block)
       } else {
@@ -1245,10 +1245,14 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
         debugPeers("Got upstream response: %o", obj)
         if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_PEERS + net) {
           db.peersCache.set(net, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BLOCK_BY_HASH + net)) {
+          db.blocksCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BLOCK_BY_HEIGHT + net)) {
+          db.blocksCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS + net)) {
-          db.addressCache.set(net, obj.data)
+          db.addressCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_ADDRESS_TXES + net)) {
-          db.addressTxCache.set(net, obj.data)
+          db.addressTxCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_TXES_BY_BLOCKHASH + net)) {
           db.txsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_LAST_TXES + net)) {

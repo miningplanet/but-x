@@ -28,7 +28,7 @@ networks.forEach( function(net, index) {
 function route_get_block(req, res, blockhash) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
-  db.find_block_by_hash(blockhash, function (block) {
+  db.get_block_by_hash(blockhash, function (block) {
     const block_page = settings.get(net, 'block_page')
     if (block && block != 'There was an error. Check your console.') {
       db.get_stats(coin.name, function(stats) {
@@ -412,6 +412,7 @@ function isApiEndpointEnabled(api_page, api_cmds, key) {
 router.get('/apidocs/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+  // TODO: Fix API page sample data.
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true) {  
     const markets_page = settings.get(net, 'markets_page')

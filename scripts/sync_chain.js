@@ -364,7 +364,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
         db.lib.get_block(blockhash, function(block) {
           debug("Got block: %s", blockhash)
           if (block) {
-            db.find_block_by_height(block_height, function(blockc) {
+            db.get_block_by_height(block_height, function(blockc) {
               if (blockc) {
                 console.log('Block %d is in DB.', block_height)
                 async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
