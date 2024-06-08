@@ -58,7 +58,6 @@ wsInstance.getWss().on('connection', (obj) => {
     debugPeers("*** " + (i + 1) + "/" + clientsSet.size + " ***")
     const peer = clientsValues.next().value
     debugPeers("Connected upstream peer %o.", peer._sender._socket._peername)
-    db.push_upstream_peer_server(peer)
   }
 })
 
@@ -1210,7 +1209,7 @@ function isPeerUpstreamAllowed(net) {
 }
 
 app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
-  const net = settings.getNet(req.params['net'])  
+  const net = req.params['net']
   const ip = settings.getRemoteIp(req)
 
   // TODO: Check peer IP allowed.
@@ -1234,17 +1233,21 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           // https://stackoverflow.com/questions/19304157/getting-the-reason-why-websockets-closed-with-close-code-1006/19305172#19305172
           // ws.close(1006, 'Abnormal Closure')
         }
-
+        
         const clientsValues = clientsSet.values()
         for(let i=0; i < clientsSet.size; i++) {
-          debugPeers("Available peers(%d): %o", i + 1, clientsValues.next().value._sender._socket._peername)
+          const peer = clientsValues.next().value
+          debugPeers("Available peers(%d): %o", i + 1, peer._sender._socket._peername)
+          if (i == clientsSet.size - 1) {
+            db.push_upstream_peer_server(peer, net)
+          }
         }
 
         ws.send(JSON.stringify({ 'type': 'handshake', 'message': 'Completed' }))
       } else {
         debugPeers("Got upstream response: %o", obj)
         if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_PEERS + net) {
-          db.peersCache.set(net, obj.data)
+          db.peersCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BLOCK_BY_HASH + net)) {
           db.blocksCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BLOCK_BY_HEIGHT + net)) {
@@ -1258,13 +1261,13 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_LAST_TXES + net)) {
           db.txsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_MASTERNODES + net) {
-          db.masternodesCache.set(net, obj.data)
+          db.masternodesCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_COINSTATS + net) {
           db.statsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_DBINDEX + net) {
-          db.dbindexCache.set(net, obj.data)
+          db.dbindexCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_RICHLIST + net) {
-          db.richlistCache.set(net, obj.data)
+          db.richlistCache.set(obj.event, obj.data)
         }
         ws.send(JSON.stringify({ 'type': 'Cache', 'message': 'Cached ' + obj.event }))
       }
