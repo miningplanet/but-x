@@ -14,6 +14,7 @@ const { Peers } = require('./lib/peers')
 const routes = require('./routes/index')
 const lib = require('./lib/x')
 const db = require('./lib/database')
+const datautil = require('./lib/datautil')
 const package_metadata = require('./package.json')
 const locale = require('./lib/locale')
 const app = express()
@@ -577,7 +578,7 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
     if (r == undefined) {
       db.get_richlist(coin.name, function(richlist) {
         db.get_stats(coin.name, function(stats) {
-          db.get_distribution(richlist, stats, function(dist) {
+          datautil.get_distribution(settings, lib, richlist, stats, function(dist) {
             debug("Cached distribution '%s' %o - mem: %o", net, dist, process.memoryUsage());
             distributionCache.set(net, dist);
             res.send(dist);
@@ -713,79 +714,76 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
   const algos = settings.algos
   if (api_page.enabled == true && api_page.public_apis.ext.getticker.enabled == true) {
     if (settings.cache.enabled == true) {
-      var r = tickerCache.get(net);
+      var r = tickerCache.get(net)
       if (r == undefined) {
         db.get_stats(coin.name, function (stats) {
-          db.count_masternodes(function(mn) {
-            db.get_markets_summary(function(marketdata) {
-              var markets = marketdata;
-              if (typeof markets === 'string') {
-                console.warn(markets);
-                markets = [];
+          db.get_markets_summary(function(marketdata) {
+            var markets = marketdata;
+            if (typeof markets === 'string') {
+              console.warn(markets)
+              markets = []
+            }
+            request({uri: base_url + 'ext/getcurrentprice/' + net, json: true}, function (error, response, ratesdata) {
+              var rates = ratesdata;
+              if (typeof rates === 'string') {
+                console.warn(rates)
+                rates = []
               }
-              request({uri: base_url + 'ext/getcurrentprice/' + net, json: true}, function (error, response, ratesdata) {
-                var rates = ratesdata;
-                if (typeof rates === 'string') {
-                  console.warn(rates);
-                  rates = [];
+              request({uri: base_url + 'ext/getdistribution/' + net, json: true}, function (error, response, ddata) {
+                var distribution = ddata;
+                if (typeof distribution === 'string') {
+                  console.warn(distribution)
+                  distribution = {}
                 }
-                request({uri: base_url + 'ext/getdistribution/' + net, json: true}, function (error, response, ddata) {
-                  var distribution = ddata;
-                  if (typeof distribution === 'string') {
-                    console.warn(distribution);
-                    distribution = {};
-                  }
-                  
-                  db.get_latest_networkhistory(stats.count, function(networkhist) {
-                    if (networkhist) {
-                      for (i = 0; i < algos.length; i++) {
-                        if ((!isNaN(networkhist['nethash_' + algos[i].algo.toLowerCase()]))) {
-                          const algo = algos[i].algo.toLowerCase()
-                          algos[i].hashps = networkhist['nethash_' + algo]
-                          algos[i].diff = networkhist['difficulty_' + algo]
-                        }
+                
+                db.get_latest_networkhistory(stats.count, function(networkhist) {
+                  if (networkhist) {
+                    for (i = 0; i < algos.length; i++) {
+                      if ((!isNaN(networkhist['nethash_' + algos[i].algo.toLowerCase()]))) {
+                        const algo = algos[i].algo.toLowerCase()
+                        algos[i].hashps = networkhist['nethash_' + algo]
+                        algos[i].diff = networkhist['difficulty_' + algo]
                       }
                     }
+                  }
 
-                    const r = {}
-                    // r.rank = 1234
-                    r.coin = coin.name
-                    r.code = coin.symbol
-                    r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
-                    r.tip = stats.count
-                    r.supply = stats.supply
-                    r.supply_max = 21000000000
-                    r.price = stats.last_price
-                    r.price_usd = stats.last_usd_price
-                    r.txes = stats.txes
-                    r.markets = markets
-                    r.rates = rates;
-                    r.node_collateral = 15000000
-                    r.node_count = mn.count;
-                    r.node_active = mn.active;
-                    r.distribution = distribution
-                    r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
-                    r.algos = algos
-                    tickerCache.set (net, r);
-                    debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage());
-                    res.send(r);
-                   }, net);
-                });
-              });
-            }, net);
-          }, net);
-        }, net);
+                  const r = {}
+                  // r.rank = 1234
+                  r.coin = coin.name
+                  r.code = coin.symbol
+                  r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
+                  r.tip = stats.count
+                  r.supply = stats.supply
+                  r.supply_max = 21000000000
+                  r.price = stats.last_price
+                  r.price_usd = stats.last_usd_price
+                  r.txes = stats.txes
+                  r.markets = markets
+                  r.rates = rates;
+                  r.node_collateral = 15000000
+                  r.node_count = stats.smartnodes_total
+                  r.node_active = stats.smartnodes_enabled
+                  r.distribution = distribution
+                  r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
+                  r.algos = algos
+                  tickerCache.set (net, r)
+                  debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage())
+                  res.send(r)
+                  }, net)
+              })
+            })
+          }, net)
+        }, net)
       } else {
-        debug("Get ticker by ćache '%s' '%s' % ...", r.coin, net, r.last_updated);
-
-        res.send(r);
+        debug("Get ticker by ćache '%s' '%s' % ...", r.coin, net, r.last_updated)
+        res.send(r)
       }
     } else {
-      res.end('This method is available only with caching enabled');
+      res.end('This method is available only with caching enabled')
     }
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])

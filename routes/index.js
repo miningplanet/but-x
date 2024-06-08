@@ -4,6 +4,7 @@ const router = express.Router()
 const settings = require('../lib/settings')
 const locale = require('../lib/locale')
 const db = require('../lib/database')
+const datautil = require('../lib/datautil')
 const lib = require('../lib/x')
 const qr = require('qr-image')
 const TTLCache = require('@isaacs/ttlcache')
@@ -538,7 +539,7 @@ router.get('/richlist/:net?', function(req, res) {
     db.get_stats(coin.name, function (stats) {
       db.get_richlist(coin.name, function(richlist) {
         if (richlist) {
-          db.get_distribution(richlist, stats, function(distribution) {
+          datautil.get_distribution(settings, lib, richlist, stats, function(distribution) {
             const p = param('richlist', richlist_page, req, db, settings, 'Top ' + coin.name + ' Holders, Received and Transactions.')
             p.balance = richlist.balance
             p.received = richlist.received
