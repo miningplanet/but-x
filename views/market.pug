@@ -179,9 +179,9 @@ block content
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.bid) && mkt.summary.bid > 0 ? settings.formatCurrency(mkt.summary.bid, marketdata.exchange) : '-'} 
                         td.full.text-end #{mkt.summary && !isNaN(mkt.summary.ask) && mkt.summary.ask > 0 ? settings.formatCurrency(mkt.summary.ask, marketdata.exchange) : '-'} 
                         td.text-end #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
-                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
-                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
-                        td.text-end #{mkt.summary && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : mkt.summary.change}
+                        td.full.text-end #{mkt.summary && mkt.summary.low && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
+                        td.full.text-end #{mkt.summary && mkt.summary.high && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
+                        td.text-end #{mkt.summary && mkt.summary.change && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : '-'}
                         td.half.text-end #{tradeVolume}  
                         td.text-end #{marketVolume} 
                   td 

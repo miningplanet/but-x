@@ -1260,6 +1260,8 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           db.txsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_LAST_TXES + net)) {
           db.txsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_TX + net)) {
+          db.txsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_MASTERNODES + net) {
           db.masternodesCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_COINSTATS + net) {
@@ -1268,7 +1270,20 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           db.dbindexCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_RICHLIST + net) {
           db.richlistCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET + net)) {
+          db.marketsCache.set(obj.event, obj.data)
+        }  else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKETS + net)) {
+          db.marketsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET_SUMMARY + net)) {
+          db.marketsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET_HISTORY + net)) {
+          db.marketsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BUY_ORDER_AGGR + net)) {
+          db.marketsCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_SELL_ORDER_AGGR + net)) {
+          db.marketsCache.set(obj.event, obj.data)
         }
+
         ws.send(JSON.stringify({ 'type': 'Cache', 'message': 'Cached ' + obj.event }))
       }
     })
