@@ -57,11 +57,16 @@ block content
               json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
               json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
 
-              json[i]['ip_address'] = '<span>' + ipAddr + '</span>'
-              if (ipAddr && ipAddr.includes(':')) {
-                json[i]['ip_address_without_port'] = '<span>' + ipAddr.substring(0, ipAddr.indexOf(':')) + '</span>'
-              } else {
-                json[i]['ip_address_without_port'] = '<span>' + ipAddr + '</span>'
+              // strip port from IPv4
+              if (!ipAddr.startsWith('[') && ipAddr.indexOf(":") > -1) {
+                json[i]['ip_address'] = '<span>' + ipAddr + '</span>'
+                json[i]['ip_address_without_port'] = '<span>' + ipAddr.substring(0, ipAddr.indexOf(":")) + '</span>'
+              }
+
+              // strip brackets and port from IPv6, and shorten it.
+              if (ipAddr.startsWith('[')) {
+                json[i]['ip_address'] = '<span>[' + ipAddr.substring(1, ipAddr.indexOf(']')).substring(0, 16) + '..]</span>'
+                json[i]['ip_address_without_port'] = json[i]['ip_address']
               }
 
               const lastPaid = json[i]['lastpaid']
