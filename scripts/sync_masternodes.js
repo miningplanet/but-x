@@ -85,7 +85,16 @@ if (!db.lib.is_locked([lock], net)) {
                 }
               }
             }
-            address = address.indexOf(":") > -1 ? address.substring(0, address.indexOf(":")) : address
+
+            // strip port from IPv4
+            if (!address.startsWith('[') && address.indexOf(":") > -1) {
+              address = address.substring(0, address.indexOf(":"))
+            }
+
+            // strip brackets and port from IPv6
+            if (address.startsWith('[')) {
+              address = address.substring(1, address.indexOf(']'))
+            }
             
             if (name.length > 0 && code.length > 0) {
               node.country = name
