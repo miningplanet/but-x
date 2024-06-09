@@ -28,7 +28,7 @@ block content
     .card.card-default.border-0
       .card-header
         strong #{settings.locale.info_documentation}
-      .card-body
+      div#info-table_wrapper.card-body
         if info_page.show_logo == true
           img(src=settings.getWallet(net).logo_title, style='margin:0;height:128px;')
           hr

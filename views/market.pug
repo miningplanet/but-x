@@ -98,11 +98,11 @@ block content
             if markets_page.page_header.show_title != true && markets_page.page_header.show_description != true && (markets_page.page_header.show_exchange_url != true && marketdata.url != null && marketdata.url != '')
               #page-title-container
                 .sub-page-header
-                  span.fw-bold=settings.locale.last_updated + ':'
+                  span=settings.locale.last_updated + ':'
                   span.text-muted#lastUpdatedDate
             else
               .sub-page-header(style='margin-bottom:' + (markets_page.page_header.show_description == true || (markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != '') ? '5' : '0') + 'px')
-                span.fw-bold=settings.locale.last_updated + ':'
+                span=settings.locale.last_updated + ':'
                 span.text-muted#lastUpdatedDate
           if markets_page.page_header.show_exchange_url == true && marketdata.url != null && marketdata.url != ''
             if markets_page.page_header.show_title != true && markets_page.page_header.show_last_updated != true && markets_page.page_header.show_description != true

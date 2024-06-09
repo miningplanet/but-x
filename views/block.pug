@@ -38,7 +38,7 @@ block content
             else
               .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', block.height)
       .cardSpacer.clearfix
-    .card.card-default.border-0.cardSpacer
+    div#block_info_wrapper.card.card-default.border-0.cardSpacer
       .card-header
         div(style='display: flex;flex-wrap: wrap;')
           if block.prev_hash != null

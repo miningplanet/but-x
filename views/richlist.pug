@@ -81,11 +81,11 @@ block content
                 if richlist_page.page_header.show_title != true && richlist_page.page_header.show_description != true
                   #page-title-container
                     .sub-page-header
-                      span.fw-bold=settings.locale.last_updated + ':'
+                      span=settings.locale.last_updated + ':'
                       span.text-muted#lastUpdatedDate
                 else
                   .sub-page-header(style='margin-bottom:' + (richlist_page.page_header.show_description == true ? '5' : '0') + 'px')
-                    span.fw-bold=settings.locale.last_updated + ':'
+                    span=settings.locale.last_updated + ':'
                     span.text-muted#lastUpdatedDate
               if richlist_page.page_header.show_description == true
                 if richlist_page.page_header.show_title != true && richlist_page.page_header.show_last_updated != true

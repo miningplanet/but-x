@@ -169,11 +169,11 @@ block content
             if masternodes_page.page_header.show_title != true && masternodes_page.page_header.show_description != true
               #page-title-container
                 .sub-page-header
-                  span.fw-bold=settings.locale.last_updated + ':'
+                  span=settings.locale.last_updated + ':'
                   span.text-muted#lastUpdatedDate
             else
               .sub-page-header(style='margin-bottom:' + (masternodes_page.page_header.show_description == true ? '5' : '0') + 'px')
-                span.fw-bold=settings.locale.last_updated + ':'
+                span=settings.locale.last_updated + ':'
                 span.text-muted#lastUpdatedDate
           if masternodes_page.page_header.show_description == true
             if masternodes_page.page_header.show_title != true && masternodes_page.page_header.show_last_updated != true
