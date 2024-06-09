@@ -266,10 +266,12 @@ function route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinba
   }
 
   const trading_pairs = []
-  markets.forEach((e) => {
-    if (!trading_pairs.includes(e.pair_symbol))
-      trading_pairs.push(e.pair_symbol)
-  })
+  if (markets && markets.forEach) {
+    markets.forEach((e) => {
+      if (!trading_pairs.includes(e.pair_symbol))
+        trading_pairs.push(e.pair_symbol)
+    })
+  }
 
   const p = param('info', info_page, req, db, settings, coin.name + ' X')
   p.last_updated = null
