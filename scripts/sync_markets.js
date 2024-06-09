@@ -201,6 +201,15 @@ function update_markets_db(market, coin_symbol, pair_symbol, reverse, cb, net=se
   }
 }
 
+function copyHistoryParam(data, market, coin_symbol, pair_symbol, now) {
+  data['ex'] = market
+  data['market'] = coin_symbol
+  data['trade'] = pair_symbol
+  data['type'] = (("SELL".toString() === data.ordertype || "sell".toString() === data.ordertype) ? 1 : 0)
+  delete data.orderType
+  data['date'] = now
+}
+
 function copyOrderParam(data, market, coin_symbol, pair_symbol, type, now) {
   data['ex'] = market
   data['market'] = coin_symbol
