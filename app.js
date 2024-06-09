@@ -31,12 +31,7 @@ const cache = settings.cache
 
 // application cache
 const foreverCache        = new TTLCache({ max: 10,                       ttl: Infinity,                        updateAgeOnGet: false, noUpdateTTL: false })
-const summaryCache        = new TTLCache({ max: cache.summary.size,       ttl: 1000 * cache.summary.ttl,        updateAgeOnGet: false, noUpdateTTL: false })
-const networkChartCache   = new TTLCache({ max: cache.network_chart.size, ttl: 1000 * cache.network_chart.ttl,  updateAgeOnGet: false, noUpdateTTL: false })
-const pricesCache         = new TTLCache({ max: cache.prices.size,        ttl: 1000 * cache.prices.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 const tickerCache         = new TTLCache({ max: cache.ticker.size,        ttl: 1000 * cache.ticker.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
-const balancesCache       = new TTLCache({ max: cache.balances.size,      ttl: 1000 * cache.balances.ttl,       updateAgeOnGet: false, noUpdateTTL: false })
-const distributionCache   = new TTLCache({ max: cache.distribution.size,  ttl: 1000 * cache.distribution.ttl,   updateAgeOnGet: false, noUpdateTTL: false })
 const xpeersCache         = new TTLCache({ max: cache.xpeers.size,        ttl: 1000 * cache.xpeers.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 
 // pass wallet rpc connections info to nodeapi
@@ -549,116 +544,67 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
   if (api_page.enabled == true && api_page.public_apis.ext.getbalance.enabled == true) {
     const hash = req.params.hash
     const coin = settings.getCoin(net)
-    const r = balancesCache.get(net + '_' + hash);
-    if (r == undefined) {
-      db.get_address(hash, function(address) {
-        if (address) {
-          balancesCache.set(net + '_' + hash, address.balance)
-          debug("Cached balance '%s' '%s' %o - mem: %o", net, hash, address.balance, process.memoryUsage());
-          res.setHeader('content-type', 'text/plain');
-          res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''));
-        } else
-          res.send({ error: 'address not found.', hash: hash, coin: coin, net: net });
-      }, net);
-    } else {
-      debug("Get balance by cache '%s' '%s' %o", net, hash, r);
-      res.setHeader('content-type', 'text/plain');
-      res.end((r / 100000000).toString().replace(/(^-+)/mg, ''));
-    }
+    db.get_address(hash, function(address) {
+      if (address) {
+        debug("Got balance '%s' '%s' %o - mem: %o", net, hash, address.balance, process.memoryUsage())
+        res.setHeader('content-type', 'text/plain')
+        res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''))
+      } else
+        res.send({ error: 'address not found.', hash: hash, coin: coin, net: net })
+    }, net)
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 app.use('/ext/getdistribution/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getdistribution.enabled == true) {
     const coin = settings.getCoin(net)
-    const r = distributionCache.get(net);
-    if (r == undefined) {
-      db.get_richlist(coin.name, function(richlist) {
-        db.get_stats(coin.name, function(stats) {
-          datautil.get_distribution(settings, lib, richlist, stats, function(dist) {
-            debug("Cached distribution '%s' %o - mem: %o", net, dist, process.memoryUsage());
-            distributionCache.set(net, dist);
-            res.send(dist);
-          }, net);
-        }, net);
-      }, net);
-    } else {
-      debug("Get distribution by cache '%s' %o ...", net, r.supply);
-      res.send(r);
-    }
-  } else
-    res.end('This method is disabled');
-});
+    db.get_richlist(coin.name, function(richlist) {
+      db.get_stats(coin.name, function(stats) {
+        datautil.get_distribution(settings, lib, richlist, stats, function(dist) {
+          debug("Got distribution '%s' %o - mem: %o", net, dist, process.memoryUsage());
+          res.send(dist)
+        }, net)
+      }, net)
+    }, net)
+  } else {
+    res.end('This method is disabled')
+  }
+})
 
 app.use('/ext/getcurrentprice/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getcurrentprice.enabled == true) {
     const defaultExchangeCurrencyPrefix = settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toLowerCase();
-    if (settings.cache.enabled == true) {
-      const coin = settings.getCoin(net)
-      var r = pricesCache.get(net);
-      if (r == undefined) {
-        db.get_stats(coin.name, function (stats) {
-          r = {}
-          r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
-          r.rates = [];
-          ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
-          ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
-          lib.get_exchange_rates(function(error, data) {
-            if (error) {
-              console.log(error);
-            } else if (data == null || typeof data != 'object') {
-              console.log('Error: exchange rates API did not return a valid object');
-            } else {
-              // Cache all exchange rates and add by config
-              pricesCache.set(net + '_data', data);
-              for (var item in settings.currencies) {
-                if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
-                  ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
-                }
-              };
-              pricesCache.set (net, r);
-              debug("Cached prices '%s' %o - mem: %o", net, r, process.memoryUsage());
-              res.send(r);
+    db.get_stats(coin.name, function (stats) {
+      r = {}
+      r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
+      r.rates = []
+      ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
+      ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
+      lib.get_exchange_rates(function(error, data) {
+        if (error) {
+          console.log(error)
+        } else if (data == null || typeof data != 'object') {
+          console.log('Error: exchange rates api did not return a valid object')
+        } else {
+          for (var item in settings.currencies) {
+            if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
+              ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
             }
-          });
-        }, net);
-      } else {
-        debug("Get prices by cache '%s' %o ...", net, r.last_updated);
-        res.send(r);
-      }
-    } else {
-      db.get_stats(coin.name, function (stats) {
-        r = {}
-        r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
-        r.rates = [];
-        ratesPush(r.rates, settings.currencies, 'USD', stats.last_usd_price)
-        ratesPush(r.rates, settings.currencies, 'USDT', stats.last_price)
-        lib.get_exchange_rates(function(error, data) {
-          if (error) {
-            console.log(error);
-          } else if (data == null || typeof data != 'object') {
-            console.log('Error: exchange rates api did not return a valid object');
-          } else {
-            for (var item in settings.currencies) {
-              if (data.rates && data.rates[item] && item.toLowerCase() != defaultExchangeCurrencyPrefix && item.toLowerCase() != 'usd') {
-                ratesPush(r.rates, settings.currencies, item, Number.parseFloat(stats.last_usd_price) * Number.parseFloat(data.rates[item]))
-              }
-            };
-            debug("Get prices by cache '%s' %o ...", net, r.last_updated);
-            res.send(r);
           }
-        });
-      }, net);
-    }
+          debug("Get prices by cache '%s' %o ...", net, r.last_updated)
+          res.send(r)
+        }
+      })
+    }, net)
   } else {
-    res.end('This method is disabled');
+    res.end('This method is disabled')
   }
-});
+})
 
 function ratesPush(rates, currencies, item, price) {
   rates.push({
@@ -736,40 +682,39 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                   distribution = {}
                 }
                 
-                db.get_latest_networkhistory(stats.count, function(networkhist) {
-                  if (networkhist) {
-                    for (i = 0; i < algos.length; i++) {
-                      if ((!isNaN(networkhist['nethash_' + algos[i].algo.toLowerCase()]))) {
-                        const algo = algos[i].algo.toLowerCase()
-                        algos[i].hashps = networkhist['nethash_' + algo]
-                        algos[i].diff = networkhist['difficulty_' + algo]
-                      }
+                if (stats) {
+                  for (i = 0; i < algos.length; i++) {
+                    const algo = algos[i].algo.toLowerCase()
+                    if ((!isNaN(stats['nethash_' + algo]))) {
+                      algos[i].hashps = stats['nethash_' + algo]
+                      algos[i].diff = stats['difficulty_' + algo]
                     }
                   }
+                }
 
-                  const r = {}
-                  // r.rank = 1234
-                  r.coin = coin.name
-                  r.code = coin.symbol
-                  r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
-                  r.tip = stats.count
-                  r.supply = stats.supply
-                  r.supply_max = 21000000000
-                  r.price = stats.last_price
-                  r.price_usd = stats.last_usd_price
-                  r.txes = stats.txes
-                  r.markets = markets
-                  r.rates = rates;
-                  r.node_collateral = 15000000
-                  r.node_count = stats.smartnodes_total
-                  r.node_active = stats.smartnodes_enabled
-                  r.distribution = distribution
-                  r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
-                  r.algos = algos
-                  tickerCache.set (net, r)
-                  debug("Cached ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage())
-                  res.send(r)
-                  }, net)
+                const r = {}
+                // r.rank = 1234
+                r.coin = coin.name
+                r.code = coin.symbol
+                r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
+                r.tip = stats.count
+                r.supply = stats.supply
+                r.supply_max = 21000000000
+                r.price = stats.last_price
+                r.price_usd = stats.last_usd_price
+                r.txes = stats.txes
+                r.markets = markets
+                r.rates = rates;
+                r.node_collateral = 25000000
+                r.node_count = stats.smartnodes_total
+                r.node_active = stats.smartnodes_enabled
+                r.distribution = distribution
+                r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
+                r.algos = algos
+                tickerCache.set (net, r)
+                debug("Got ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage())
+                res.send(r)
+                  
               })
             })
           }, net)
@@ -955,55 +900,48 @@ app.use('/ext/getsummary/:net?', function(req, res) {
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || isInternalRequest(req)) {
     const coin = settings.getCoin(net)
-    const summary = summaryCache.get(net)
-    if (summary == undefined) {
-      const r = {}
-      db.get_stats(coin.name, function (stats) {
-        const algos = settings.get(net, 'algos')
-        if (!isNaN(stats.count)) 
-          r.blockcount = stats.count
-        if (!isNaN(stats.connections)) 
-          r.connections = stats.connections
-        if (!isNaN(stats.smartnodes_enabled)) 
-          r.masternodeCountOnline = stats.smartnodes_enabled
-        if (!isNaN(stats.smartnodes_total) && !isNaN(stats.smartnodes_enabled)) 
-          r.masternodeCountOffline = stats.smartnodes_total - stats.smartnodes_enabled
-        if (!isNaN(stats.supply)) 
-          r.supply = stats.supply
-        else 
-          r.supply = 0
-        if (!isNaN(stats.last_price))
-          r.lastPrice = stats.last_price
-        else {
-          r.lastPrice = 0
-        }
+    const r = {}
+    db.get_stats(coin.name, function (stats) {
+      const algos = settings.get(net, 'algos')
+      if (!isNaN(stats.count)) 
+        r.blockcount = stats.count
+      if (!isNaN(stats.connections)) 
+        r.connections = stats.connections
+      if (!isNaN(stats.smartnodes_enabled)) 
+        r.masternodeCountOnline = stats.smartnodes_enabled
+      if (!isNaN(stats.smartnodes_total) && !isNaN(stats.smartnodes_enabled)) 
+        r.masternodeCountOffline = stats.smartnodes_total - stats.smartnodes_enabled
+      if (!isNaN(stats.supply)) 
+        r.supply = stats.supply
+      else 
+        r.supply = 0
+      if (!isNaN(stats.last_price))
+        r.lastPrice = stats.last_price
+      else {
+        r.lastPrice = 0
+      }
 
-        if (!isNaN(stats.nethash))
-          r.hashrate = stats.nethash
+      if (!isNaN(stats.nethash))
+        r.hashrate = stats.nethash
 
-        algos.forEach((algo) => {
-          if (!isNaN(stats['nethash_' + algo.algo]))
-            r['hashrate_' + algo.algo] = stats['nethash_' + algo.algo]
-        })
+      algos.forEach((algo) => {
+        if (!isNaN(stats['nethash_' + algo.algo]))
+          r['hashrate_' + algo.algo] = stats['nethash_' + algo.algo]
+      })
 
-        if (!isNaN(stats.difficulty))
-          r.difficulty = stats.difficulty
-        else
-          r.difficulty = stats.difficulty_ghostrider
+      if (!isNaN(stats.difficulty))
+        r.difficulty = stats.difficulty
+      else
+        r.difficulty = stats.difficulty_ghostrider
 
-        algos.forEach((algo) => {
-          if (!isNaN(stats['difficulty_' + algo.algo]))
-            r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
-        })
+      algos.forEach((algo) => {
+        if (!isNaN(stats['difficulty_' + algo.algo]))
+          r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
+      })
 
-        summaryCache.set (net, r)
-        debug("Cached summary '%s' %o - mem: %o", net, r, process.memoryUsage())
-        res.send(r)
-      }, net)
-    } else {
-      debug("Get summary by cache '%s' %o ...", net, summary)
-      res.send(summary)
-    }
+      debug("Got summary '%s' %o - mem: %o", net, r, process.memoryUsage())
+      res.send(r)
+    }, net)
   } else
     res.end('This method is disabled')
 })
@@ -1120,22 +1058,15 @@ app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) 
 
 app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  const r = networkChartCache.get(net);
-  if (r == undefined) {
-    db.get_network_chart_data(function(data) {
-      if (data) {
-        networkChartCache.set(net, data);
-        debugChart("Cached network chart '%s' %o - mem: %o", net, data, process.memoryUsage());
-        res.send(data);
-      } else {
-        res.send();
-      }
-    }, net);
-  } else {
-    debug("Get network chart by cache '%s' ...", net);
-    res.send(r);
-  }
-});
+  db.get_network_chart_data(function(data) {
+    if (data) {
+      debugChart("Got network chart '%s' %o - mem: %o", net, data, process.memoryUsage())
+      res.send(data)
+    } else {
+      res.send()
+    }
+  }, net)
+})
 
 const allnet_modes = ['markets']
 
@@ -1268,6 +1199,8 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           db.dbindexCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_RICHLIST + net) {
           db.richlistCache.set(obj.event, obj.data)
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_NETWORK_CHART + net)) {
+          db.networkChartCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET + net)) {
           db.marketsCache.set(obj.event, obj.data)
         }  else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKETS + net)) {
