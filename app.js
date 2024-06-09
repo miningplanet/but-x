@@ -991,25 +991,19 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getmasternodelist.enabled == true) || isInternalRequest(req)) {
-    const r = db.masternodesCache.get(net)
-    if (r == undefined) {
-      db.get_masternodes(function(masternodes) {
-        // loop through masternode list and remove the mongo _id and __v keys
-        // for (i = 0; i < masternodes.length; i++) {
-        //   delete masternodes[i]['_doc']['_id'];
-        //   delete masternodes[i]['_doc']['__v'];
-        // }
-        db.masternodesCache.set(net, masternodes)
-        debug("Cached masternodes '%s' %o - mem: %o", net, masternodes, process.memoryUsage());
-        res.send(masternodes);
-      }, net);
-    } else {
-      debug("Get masternodes by cache '%s' ...", net);
-      res.send(r)
-    }
+    db.get_masternodes(function(masternodes) {
+      // loop through masternode list and remove the mongo _id and __v keys
+      // for (i = 0; i < masternodes.length; i++) {
+      //   delete masternodes[i]['_doc']['_id'];
+      //   delete masternodes[i]['_doc']['__v'];
+      // }
+      // db.masternodesCache.set(net, masternodes)
+      debug("Got masternodes '%s' %o - mem: %o", net, masternodes, process.memoryUsage())
+      res.send(masternodes)
+    }, net)
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 // returns a list of masternode reward txs for a single masternode address from a specific block height
 app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
