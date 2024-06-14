@@ -33,29 +33,33 @@ db.lib.create_lock(lock, net)
 lockCreated = true
 
 util.init_db(net, function(status) {
-  create_or_get_dbindex(coin.name, function (dbindex) {
+  util.create_or_get_dbindex(net, coin.name, function (dbindex) {
     if (!dbindex)
       util.exit_remove_lock_completed(lock, coin, net)
 
     update_block_stats_from_db(algos, dbindex, function() {
-      update_tx_by_type(dbindex, function () {
-        const tx_type_index  = settings.get(net, 'tx_types').indexOf('TRANSACTION_COINBASE')
-        update_latest_coinbase_tx(tx_type_index, dbindex, function () {
-          update_masternodes_by_country_code(dbindex, function(mn) {
-            
-            db.get_markets_local(function(markets) {
-              if (Array.isArray(markets) && markets.length > 0) {
-                debug("Got markets size %d for net '%s'.", markets.length, net)
+      update_count_utxos(dbindex, function () {
+        update_count_addresses(dbindex, function () {
+          update_tx_by_type(dbindex, function () {
+            const tx_type_index  = settings.get(net, 'tx_types').indexOf('TRANSACTION_COINBASE')
+            update_latest_coinbase_tx(tx_type_index, dbindex, function () {
+              update_masternodes_by_country_code(dbindex, function(mn) {
+                
+                db.get_markets_local(function(markets) {
+                  if (Array.isArray(markets) && markets.length > 0) {
+                    debug("Got markets size %d for net '%s'.", markets.length, net)
 
-                update_sell_order_aggregation(coin.symbol, dbindex, function () {
-                  update_buy_order_aggregation(coin.symbol, dbindex, function () {
+                    update_sell_order_aggregation(coin.symbol, dbindex, function () {
+                      update_buy_order_aggregation(coin.symbol, dbindex, function () {
+                        update_dbindex_and_exit(coin, dbindex)
+                      })
+                    })
+                  } else {
                     update_dbindex_and_exit(coin, dbindex)
-                  })
-                })
-              } else {
-                update_dbindex_and_exit(coin, dbindex)
-              }
-            }, net)
+                  }
+                }, net)
+              })
+            })
           })
         })
       })
@@ -63,32 +67,14 @@ util.init_db(net, function(status) {
   })
 })
 
-function update_dbindex_and_exit(coin, stats) {
-  db.DbIndexDb[net].updateOne({coin: coin.name}, stats).then(() => {
+function update_dbindex_and_exit(coin, dbindex) {
+  db.DbIndexDb[net].updateOne({coin: coin.name}, dbindex).then(() => {
     console.log("Updated dbindex for coin '%s' and chain '%s'.", coin.name, net)
     util.exit_remove_lock_completed(lock, coin, net)
   }).catch((err) => {
     console.error("Failed to update dbindex database: %s", err)
     util.exit_remove_lock(2, lock, net)
   })
-}
-
-function create_or_get_dbindex(coinName, cb) {
-  db.get_dbindex_local(coinName, function(dbindex) {
-    if (dbindex) {
-      return cb(dbindex)
-    }
-
-    const dto = db.DbIndexDb[net].create({
-      coin: coinName,
-      chain: net
-    }).then((dbindex) => {
-      console.log("Initial dbindex entry created for %s value %o.", coinName, dto)
-      cb(dbindex)
-    }).catch((err) => {
-      console.error("Failed to create initial dbindex for chain '%s': %s.", net, err)
-    })
-  }, net)
 }
 
 function update_tx_by_type(dbindex, cb) {
@@ -202,6 +188,28 @@ function count_blocks(cb) {
   }).catch((err) => {
     console.error("Failed to count blocks for chain '%s': %s", net, err)
     cb(err)
+  })
+}
+
+function update_count_utxos(dbindex, cb) {
+  db.AddressTxDb[net].countDocuments({amount:{"$gt":0}}).then(count => {
+    dbindex.count_utxos = count
+    debug("Got utxos count %d for net '%s'.", count, net)
+    return cb(count)
+  }).catch((err) => {
+    console.error("Failed to count utxos for chain '%s': %s", net, err)
+    return cb(err)
+  })
+}
+
+function update_count_addresses(dbindex, cb) {
+  db.AddressDb[net].countDocuments({}).then(count => {
+    dbindex.count_addresses = count
+    debug("Got addresses count %d for net '%s'.", count, net)
+    return cb(count)
+  }).catch((err) => {
+    console.error("Failed to count addresses for chain '%s': %s", net, err)
+    return cb(err)
   })
 }
 

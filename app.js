@@ -125,8 +125,8 @@ app.use('/api/getblockchaininfo/:net?', function(req, res) {
     r.blocks = !isNaN(stats.last) ? stats.last : 'n/a'
     r.headers = !isNaN(stats.count) ? stats.count : 'n/a'
     r.addresses = !isNaN(stats.addresses) ? stats.addresses : 'n/a'
-    r.txes = !isNaN(stats.txes) ? stats.txes : 'n/a'
-    r.utxos = !isNaN(stats.utxos) ? stats.utxos : 'n/a'
+    r.txes = !isNaN(stats.count_txes) ? stats.count_txes : 'n/a'
+    r.utxos = !isNaN(stats.count_utxos) ? stats.count_utxos : 'n/a'
 
     r.bestblockhash = stats.bestblockhash
 
@@ -702,7 +702,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                 r.supply_max = 21000000000
                 r.price = stats.last_price
                 r.price_usd = stats.last_usd_price
-                r.txes = stats.txes
+                r.txes = stats.count_txes
                 r.markets = markets
                 r.rates = rates;
                 r.node_collateral = 25000000

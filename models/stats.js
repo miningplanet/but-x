@@ -5,8 +5,8 @@ module.exports = new require('mongoose').Schema({
   last: { type: Number, default: 1 }, // blocks
   supply: { type: Number, default: 0 },
   addresses: { type: Number, default: 0 },
-  txes: { type: Number, default: 0 },
-  utxos: { type: Number, default: 0 },
+  count_txes: { type: Number, default: 0 },
+  count_utxos: { type: Number, default: 0 },
   bestblockhash: { type: String, lowercase: true, default: 'n/a'},
   pow_algo_id: { type: Number },
   pow_algo: { type: String },

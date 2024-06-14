@@ -5,7 +5,6 @@ const fs = require('fs')
 const async = require('async')
 const datautil = require('../lib/datautil')
 const db = require('../lib/database')
-const { StatsDb, NetworkHistoryDb, AddressDb, AddressTxDb, BlockDb, TxDb, RichlistDb } = require('../lib/database')
 const util = require('./syncutil')
 
 util.check_net_missing(process.argv)
@@ -33,64 +32,55 @@ util.init_db(net, function(status) {
 
       mongoose.set('strictQuery', true)
 
-      db.check_stats(coin.name, function(exists) {
-        if (exists == false) {
-          console.log('Run \'npm start\' to create database structures before running this script.')
-          util.exit_remove_lock(1, lock, net)
-        } else {
-          update_db(net, coin.name, function(stats) {
-            if (stats !== false) {
-              // Get the last synced block index value
-              var last = (stats.last ? stats.last : 0)
-              // Get the total number of blocks
-              var count = (stats.count ? stats.count : 0)
-              check_show_sync_message(count - last)
+      util.create_or_get_dbindex(net, coin.name, function (dbindex) {
+        if (!dbindex)
+          util.exit_remove_lock_completed(lock, coin, net)
 
-              var block_start = 0
+        util.create_or_get_stats(net, coin.name, function(stats) {
+          if (!stats)
+            util.exit_remove_lock_completed(lock, coin, net)
 
-              if (block_start > 0)
-                last = block_start
+          update_stats_db(net, coin.name, function(stats) {
+            if (!stats)
+              util.exit_remove_lock_completed(lock, coin, net)
 
-              console.log('Update chain %s from block %d to %d', net, block_start, last)
+            const block_start = get_block_start(process, dbindex)
+            const block_end = get_block_end(process, stats)
 
-              update_tx_db(net, coin.name, last, count, stats.txes, settings.sync.update_timeout, false, function() {
-                // check if the script stopped prematurely
-                if (stopSync) {
-                  console.log('Block sync was stopped prematurely')
-                  util.exit_remove_lock(1, lock, net)
-                } else {
-                  util.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
-                    update_richlist('received', function() {
-                      update_richlist('balance', function() {
-                        update_richlist('toptx', function() {
-                          util.update_last_updated_stats(coin.name, { richlist_last_updated: Math.floor(new Date() / 1000) }, function(cb) {                              
-                            util.get_stats(coin.name, function(nstats) {
-                              // check for and update heavycoin data if applicable
-                              // update_heavy(coin.name, stats.count, 20, settings.blockchain_specific.heavycoin.enabled, function(heavy) {
-                                // check for and update network history data if applicable
-                                const network_history = settings.get(net, 'network_history')
-                                update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
-                                  // always check for and remove the sync msg if exists
-                                  remove_sync_message(net)
-                                  console.log('Block sync complete (block: %s)', nstats.last)
-                                  util.exit_remove_lock_completed(lock, coin, net)
-                                }, net)
-                              // }, net)
-                            }, net)
-                          }, net)
-                        }, net)
-                      }, net)
+            if (block_start == block_end) {
+              console.log("Update chain '%s' from block %d to %d. Nothing to do.", net, block_start, block_end)
+              util.exit_remove_lock_completed(lock, coin, net)
+            } else if (block_start > block_end) {
+              console.error("Update chain '%s' error. Start %d is greater as end %d. Stop.", net, block_start, block_end)
+              util.exit_remove_lock(2, lock, net)
+            } else {
+              console.log("Update chain '%s' from block %d to %d.", net, block_start, block_end)
+            }
+
+            check_show_sync_message(block_end - block_start)
+            
+            update_tx_db(net, coin.name, block_start, block_end, stats.count_txes, settings.sync.update_timeout, false, function() {
+              // check if the script stopped prematurely
+              if (stopSync) {
+                console.log('Block sync was stopped prematurely')
+                util.exit_remove_lock(1, lock, net)
+              } else {
+                util.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
+                  util.get_stats(coin.name, function(nstats) {
+                    const network_history = settings.get(net, 'network_history')
+                    update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
+                      // always check for and remove the sync msg if exists
+                      remove_sync_message(net)
+                      console.log('Block sync complete (block: %s)', nstats.last)
+                      util.exit_remove_lock_completed(lock, coin, net)
                     }, net)
                   }, net)
-                }
-              })
-            } else {
-              // update_db threw an error so exit
-              util.exit_remove_lock(1, lock, net)
-            }
+                }, net)
+              }
+            })
           })
-        }
-      }, net)
+        })
+      })
     } else {
       // another script process is currently running
       console.log("Sync aborted")
@@ -103,7 +93,27 @@ util.init_db(net, function(status) {
   }
 })
 
-function check_show_sync_message(blocks_to_sync, net=settings.getDefaultNet()) {
+function get_block_start(process, dbindex) {
+  var r = dbindex.count_blocks
+  if (process.argv.length > 3) {
+    const new_start = util.get_int_param(process.argv, 3)
+    if (new_start > -1)
+      r = new_start
+  }
+  return r
+}
+
+function get_block_end(process, stats) {
+  var r = stats.last
+  if (process.argv.length > 4) {
+    const new_end = util.get_int_param(process.argv, 4)
+    if (new_end > -1)
+      r = new_end
+  }
+  return r
+}
+
+function check_show_sync_message(blocks_to_sync, net) {
   var retVal = false
   const filePath = './tmp/show_sync_message-' + net + '.tmp'
   const showSyncBlocksNum = settings.sync.show_sync_msg_when_syncing_more_than_blocks
@@ -134,9 +144,9 @@ function update_network_history(coin, height, network_history_enabled, cb, net) 
     return cb(false)
 }
 
-function update_network_history_db(coin, height, cb, net=settings.getDefaultNet()) {
+function update_network_history_db(coin, height, cb, net) {
   console.log("Update network history: %d", height)
-  NetworkHistoryDb[net].findOne({blockindex: height}).then((network_hist) => {
+  db.NetworkHistoryDb[net].findOne({blockindex: height}).then((network_hist) => {
     if (!network_hist) {
       db.lib.get_hashrate(function(hashps) {
         db.lib.get_difficulty(net, function(difficulties) {
@@ -164,7 +174,7 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
           var dto = null
           if (isBut) {
             const hashrate = hashps.butkscrypt
-            dto = NetworkHistoryDb[net].create({
+            dto = db.NetworkHistoryDb[net].create({
               blockindex: height,
               nethash: (hashrate == null || hashrate == '-' ? 0 : hashrate),
               difficulty_pow: difficultyPOW,
@@ -183,7 +193,7 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
               nethash_butkscrypt: hashps.butkscrypt
             })
           } else if (isPepew) {
-            dto = NetworkHistoryDb[net].create({
+            dto = db.NetworkHistoryDb[net].create({
               blockindex: height,
               nethash: hashps,
               difficulty_pow: hashps,
@@ -192,7 +202,7 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
               nethash_pepew: hashps
             })
           } else if (isVkax) {
-            dto = NetworkHistoryDb[net].create({
+            dto = db.NetworkHistoryDb[net].create({
               blockindex: height,
               nethash: hashps,
               difficulty_pow: hashps,
@@ -201,7 +211,7 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
               nethash_mike: hashps
             })
           } else {
-            dto = NetworkHistoryDb[net].create({
+            dto = db.NetworkHistoryDb[net].create({
               blockindex: height,
               nethash: hashps,
               difficulty_pow: hashps,
@@ -240,10 +250,10 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
               rr.difficulty = difficulties.difficulty,
               rr.difficulty_ghostrider = difficulty
             }
-            StatsDb[net].updateOne({coin: coin}, rr).then(() => {
+            db.StatsDb[net].updateOne({coin: coin}, rr).then(() => {
               console.log("Done update stats: %d", height)
               // get the count of network history records
-              NetworkHistoryDb[net].find({}).countDocuments().then((count) => {
+              db.NetworkHistoryDb[net].find({}).countDocuments().then((count) => {
                 // read maximum allowed records from settings
                 const network_history = settings.get(net, 'network_history')
                 let max_records = network_history.max_saved_records
@@ -251,12 +261,12 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
                 // check if the current count of records is greater than the maximum allowed
                 if (count > max_records) {
                   // prune network history records to keep collection small and quick to access
-                  NetworkHistoryDb[net].find().select('blockindex').sort({blockindex: 1}).limit(count - max_records).exec().then((records) => {
+                  db.NetworkHistoryDb[net].find().select('blockindex').sort({blockindex: 1}).limit(count - max_records).exec().then((records) => {
                     // create a list of the oldest network history ids that will be deleted
                     const ids = records.map((doc) => doc.blockindex)
 
                     // delete old network history records
-                    NetworkHistoryDb[net].deleteMany({blockindex: {$in: ids}}).then(() => {
+                    db.NetworkHistoryDb[net].deleteMany({blockindex: {$in: ids}}).then(() => {
                       console.log('Network history update complete')
                       return cb()
                     })
@@ -288,24 +298,24 @@ function update_network_history_db(coin, height, cb, net=settings.getDefaultNet(
   })
 }
 
-function update_db(net=settings.getDefaultNet(), coin, cb) {
+function update_stats_db(net, coin, cb) {
   db.lib.get_blockcount(function (count) {
-    // Update DB needs access to the daemon.
     if (!count || (count != null && typeof count === 'number' && count < 0)) {
       console.log('Error: Unable to connect to the X API.')
       return cb(false)
     }
-    StatsDb[net].findOne({coin: coin}).then((stats) => {
+    db.StatsDb[net].findOne({coin: coin}).then((stats) => {
       if (stats) {
-        StatsDb[net].updateOne({coin: coin}, {
+        db.StatsDb[net].updateOne({coin: coin}, {
           coin: coin,
           count : count,
+          last : !isNaN(count) ? count : -1
         }).then(() => {
           return cb({
             coin: coin,
             count : count,
             last: (stats.last ? stats.last : 0),
-            txes: (stats.txes ? stats.txes : 0)
+            txes: (stats.count_txes ? stats.count_txes : 0)
           })
         }).catch((err) => {
           console.error("Failed to update coin stats for chain '%s': %s", net, err)
@@ -343,15 +353,26 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   }
 
   async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
-    if (!check_only && block_height % settings.sync.save_stats_after_sync_blocks === 0) {
+    const sync_after = settings.sync.save_stats_after_sync_blocks
+    if (!check_only && sync_after > -1 && block_height % sync_after === 0) {
       debug("Scan block update stats: %d", block_height)
-      StatsDb[net].updateOne({coin: coin}, {
-        last: block_height - 1,
-        txes: txes
-      }).then(() => {
-        debug("Done update stats: %d", block_height)
-      }).catch((err) => {
-        console.error("Failed to update stats database: %s", err)
+
+      db.lib.get_txoutsetinfo(net, function(info) {
+        const dto = {}
+        dto.last = block_height
+
+        if (info && !isNaN(info.transactions))
+          dto.txes = info.transactions
+        if (info && !isNaN(info.transactions))
+          dto.utxos = info.txouts
+        if (info && !isNaN(info.total_amount))
+          dto.supply = info.total_amount
+
+        db.StatsDb[net].updateOne({coin: coin}, dto).then(() => {
+          debug("Done update stats: %d", block_height)
+        }).catch((err) => {
+          console.error("Failed to update stats database: %s", err)
+        })
       })
     } else if (check_only) {
       console.log('Checking block %d...', block_height)
@@ -368,7 +389,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
               if (blockc) {
                 console.log('Block %d is in DB.', block_height)
                 async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-                  TxDb[net].findOne({txid: txid}).then((tx) => {
+                  db.TxDb[net].findOne({txid: txid}).then((tx) => {
                     debug("Got block tx: %s", txid)
                     if (tx) {
                       debug('TX %s is in DB.', txid)
@@ -408,7 +429,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
                 create_block(block, function(blockr) {
                   if (blockr) {
                     async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-                      TxDb[net].findOne({txid: txid}).then((tx) => {
+                      db.TxDb[net].findOne({txid: txid}).then((tx) => {
                         debug("Got block tx: %s", txid)
                         if (tx) {
                           debug('TX %s is in DB.', txid)
@@ -467,24 +488,25 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   }, function() {
     // check if the script stopped prematurely
     if (!stopSync) {
-      count_addresses(function(addresses) {
-        count_utxos(function(utxos) {
-          StatsDb[net].updateOne({coin: coin}, {
-            last: end,
-            txes: txes,
-            addresses: addresses,
-            utxos: utxos
-          }).then(() => {
-            return cb()
-          })
-        }, net)
-      }, net)
+      // count_addresses(function(addresses) {
+      //   count_utxos(function(utxos) {
+      //     StatsDb[net].updateOne({coin: coin}, {
+      //       last: end,
+      //       txes: txes,
+      //       addresses: addresses,
+      //       utxos: utxos
+      //     }).then(() => {
+      //       return cb()
+      //     })
+      //   }, net)
+      // }, net)
+      return cb()
     } else
       return cb()
   })
 }
 
-function create_block(block, cb, net=settings.getDefaultNet()) {
+function create_block(block, cb, net) {
   var cbtx = null
   const d = block.cbTx
   if (d) {
@@ -496,7 +518,7 @@ function create_block(block, cb, net=settings.getDefaultNet()) {
     cbtx[4] = d.merkleRootQuorums == '0000000000000000000000000000000000000000000000000000000000000000' ? '0' : d.merkleRootQuorums
   }
   const algo = settings.getAlgoFromBlock(block, net)
-  const dto = BlockDb[net].create({
+  const dto = db.BlockDb[net].create({
     hash: block.hash,
     pow_hash: block.pow_hash,
     algo: algo,
@@ -525,7 +547,8 @@ function save_tx(net, txid, blockheight, cb) {
   db.lib.get_rawtransaction(txid, function(tx) {
     if (tx && tx != 'There was an error. Check your console.') {
       db.lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
-        db.lib.prepare_vout(net, tx.vout, txid, vin, ((!settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null) ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
+        const vhidden = !settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null
+        db.lib.prepare_vout(net, tx.vout, txid, vin, (vhidden ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
           db.lib.syncLoop(vin.length, function (loop) {
             var i = loop.iteration()
 
@@ -604,7 +627,7 @@ function save_tx(net, txid, blockheight, cb) {
                     default: console.warn('*** Unknown TX type %s.', tx.type); console.log(JSON.stringify.tx); exit(0)
                   }
                 }
-                const dto = TxDb[net].create({
+                const dto = db.TxDb[net].create({
                   version: tx.version,
                   txid: tx.txid,
                   tx_type: tx.type,
@@ -660,14 +683,14 @@ function update_address(hash, blockheight, txid, amount, type, cb, net=settings.
     }
   }
 
-  AddressDb[net].findOneAndUpdate({a_id: hash}, {
+  db.AddressDb[net].findOneAndUpdate({a_id: hash}, {
     $inc: addr_inc
   }, {
     new: true,
     upsert: true
   }).then((address) => {
     if (hash != 'coinbase') {
-      AddressTxDb[net].findOneAndUpdate({a_id: hash, txid: txid}, {
+      db.AddressTxDb[net].findOneAndUpdate({a_id: hash, txid: txid}, {
         $inc: {
           amount: addr_inc.balance
         },
@@ -693,25 +716,7 @@ function update_address(hash, blockheight, txid, amount, type, cb, net=settings.
   })
 }
 
-function count_utxos(cb, net=settings.getDefaultNet()) {
-  AddressTxDb[net].countDocuments({amount:{"$gt":0}}).then(count => {
-    return cb(count)
-  }).catch((err) => {
-    console.error("Failed to count utxos for chain '%s': %s", net, err)
-    return cb(err)
-  })
-}
-
-function count_addresses(cb, net=settings.getDefaultNet()) {
-  AddressDb[net].countDocuments({}).then(count => {
-    return cb(count)
-  }).catch((err) => {
-    console.error("Failed to count addresses for chain '%s': %s", net, err)
-    return cb(err)
-  })
-}
-
-function remove_sync_message(net=settings.getDefaultNet()) {
+function remove_sync_message(net) {
   const filePath = './tmp/show_sync_message-' + net + '.tmp'
   // Check if the show sync stub file exists
   if (fs.existsSync(filePath)) {
@@ -721,95 +726,6 @@ function remove_sync_message(net=settings.getDefaultNet()) {
     } catch (err) {
       console.log(err)
     }
-  }
-}
-
-// TODO: Remove code duplication
-
-function update_richlist(list, cb, net=settings.getDefaultNet()) {
-  const coin = settings.getCoin(net)
-  const cnt = 100
-  // create the burn address array so that we omit burned coins from the rich list
-  const richlist_page = settings.get(net, 'richlist_page')
-  var burn_addresses = richlist_page.burned_coins.addresses
-
-  // always omit special addresses used by but-x from the richlist (coinbase, hidden address and unknown address)
-  burn_addresses.push('coinbase')
-  burn_addresses.push('hidden_address')
-  burn_addresses.push('unknown_address')
-
-  if (list == 'received') {
-    // update 'received' richlist data
-    AddressDb[net].find({a_id: { $nin: burn_addresses }}, 'a_id name balance received').sort({received: 'desc'}).limit(cnt).exec().then((addresses) => {
-      RichlistDb[net].updateOne({coin: coin.name}, {
-        received: addresses
-      }).then(() => {
-        return cb()
-      }).catch((err) => {
-        console.error("Failed to update richlist address for chain '%s': %s", net, err)
-        // return cb(null)
-      })
-    }).catch((err) => {
-      console.error("Failed to find richlist address for chain '%s': %s", net, err)
-      // return cb(null)
-    })
-  } else if (list == 'balance') {
-    // update 'balance' richlist data
-    // check if burned addresses are in use and if it is necessary to track burned balances
-    if (richlist_page.burned_coins.addresses == null || richlist_page.burned_coins.addresses.length == 0 || !richlist_page.burned_coins.include_burned_coins_in_distribution) {
-      // update 'balance' richlist data by filtering burned coin addresses immidiately
-      AddressDb[net].find({a_id: { $nin: burn_addresses }}, 'a_id name balance received').sort({balance: 'desc'}).limit(cnt).exec().then((addresses) => {
-        RichlistDb[net].updateOne({coin: coin.name}, {
-          balance: addresses
-        }).then(() => {
-          return cb()
-        })
-      }).catch((err) => {
-        console.error("Failed to find richlist address for chain '%s': %s", net, err)
-        // return cb(null)
-      })
-    } else {
-      // do not omit burned addresses from database query. instead, increase the limit of returned addresses and manually remove each burned address that made it into the rich list after recording the burned balance
-      AddressDb[net].find({}, 'a_id name balance received').sort({balance: 'desc'}).limit(cnt + burn_addresses.length).exec().then((addresses) => {
-        var return_addresses = []
-        var burned_balance = 0.0
-
-        // loop through all richlist addresses
-        addresses.forEach(function (address) {
-          // check if this is a burned coin address
-          if (burn_addresses.findIndex(p => p.toLowerCase() == address.a_id.toLowerCase()) > -1) {
-            // this is a burned coin address so save the balance, not the address
-            burned_balance += address.balance
-          } else if (return_addresses.length < cnt) {
-            // this is not a burned address so add it to the return list
-            return_addresses.push(address)
-          }
-        })
-
-        // update the rich list collection
-        RichlistDb[net].updateOne({coin: coin.name}, {
-          balance: return_addresses,
-          burned: burned_balance
-        }).then(() => {
-          return cb()
-        }).catch((err) => {
-          console.error("Failed to update richlist address for chain '%s': %s", net, err)
-        })
-      }).catch((err) => {
-        console.error("Failed to find richlist address for chain '%s': %s", net, err)
-      })
-    }
-  } else if (list == 'toptx') {
-    // db.txes.find({total: { $gte: 2500000000000000 }}, {total: 1, blockindex: 1}).sort({blockindex:-1})
-    TxDb[net].find({}, 'txid total blockindex blockhash size timestamp tx_type').sort({total: 'desc'}).limit(cnt).exec().then((txes) => {
-      RichlistDb[net].updateOne({coin: coin.name}, {
-        toptx: txes
-      }).then(() => {
-        return cb()
-      })
-    }).catch((err) => {
-      console.error("Failed to find richlist top tx for chain '%s': %s", net, err)
-    })
   }
 }
 

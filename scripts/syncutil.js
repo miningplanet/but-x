@@ -19,6 +19,15 @@ function check_net_unknown(net) {
   }
 }
 
+function get_int_param(args, index) {
+  if (!isNaN(args[index]))
+    return Number(args[index])
+  else {
+    console.warn("Failed get int parameter at index %d: %o", index, args)
+    return -1
+  }
+}
+
 function init_db_if_enabled(net) {
   const enabled = settings.getDbOrNull(net).enabled
   if (enabled) {
@@ -152,6 +161,47 @@ function get_last_usd_price_by_coingecko(cb, net=settings.getDefaultNet()) {
   }
 }
 
+function create_or_get_dbindex(net, coinName, cb) {
+  db.get_dbindex_local(coinName, function(dbindex) {
+    if (dbindex) {
+      if (!isNaN(dbindex.count_blocks) && !isNaN(dbindex.latest_block_height) && dbindex.count_blocks != dbindex.latest_block_height)
+        console.warn("!!! Block index in db for net '%s' is invalid. !!!")
+      return cb(dbindex)
+    }
+
+    const dto = db.DbIndexDb[net].create({
+      coin: coinName,
+      chain: net
+    }).then((dbindex) => {
+      console.log("Initial dbindex entry created for %s value %o.", coinName, dbindex)
+      cb(dbindex)
+    }).catch((err) => {
+      console.error("Failed to create initial dbindex for chain '%s': %s.", net, err)
+    })
+  }, net)
+}
+
+
+function create_or_get_stats(net, coinName, cb) {
+  db.get_stats_local(coinName, function(stats) {
+    if (stats) {
+      return cb(stats)
+    }
+
+    const dto = db.StatsDb[net].create({
+      coin: coinName,
+      chain: net,
+      last: 0
+    }).then((stats) => {
+      console.log("Initial stats entry created for %s value %o.", coinName, stats)
+      cb(stats)
+    }).catch((err) => {
+      console.error("Failed to create initial stats for chain '%s': %s.", net, err)
+      cb(null)
+    })
+  }, net)
+}
+
 function update_last_updated_stats(coin, param, cb, net=settings.getDefaultNet()) {
   const dto = {}
   if (param.blockchain_last_updated) {
@@ -198,6 +248,7 @@ function log_completed(objname, net, coin) {
 module.exports = {
   check_net_missing: check_net_missing,
   check_net_unknown: check_net_unknown,
+  get_int_param: get_int_param,
   init_db_if_enabled: init_db_if_enabled,
   init_db: init_db,
   exit: exit,
@@ -205,6 +256,8 @@ module.exports = {
   exit_remove_lock_completed: exit_remove_lock_completed,
   gracefully_shut_down: gracefully_shut_down,
   get_last_usd_price: get_last_usd_price,
+  create_or_get_dbindex: create_or_get_dbindex,
+  create_or_get_stats: create_or_get_stats,
   update_last_updated_stats: update_last_updated_stats,
   get_stats: get_stats,
   log_start: log_start,

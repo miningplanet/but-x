@@ -120,10 +120,10 @@ util.init_db(net, function(status) {
                 debug("Got txoutsetinfo with for height %d for net '%s': %o", block.height, net, txout)
 
                 if (!isNaN(txout.transactions)) {
-                  stats.txes = txout.transactions
+                  stats.count_txes = txout.transactions
                 }
                 if (!isNaN(txout.txouts)) {
-                  stats.utxos = txout.txouts
+                  stats.count_utxos = txout.txouts
                 }
                 if (!isNaN(txout.total_amount)) {
                   stats.supply = txout.total_amount
