@@ -810,7 +810,7 @@
     // If not. Historical balance data for a wallet addresses might be stored without order.
     "block_parallel_tasks": 1,
     // Time to wait in ms before moving to the next block or TX during sync or reindex.
-    "update_timeout": 10,
+    "update_timeout": 5,
     // Time to wait in ms before moving to the next block or TX during a check sync.
     "check_timeout": 250,
     // Save coinstats every n blocks during index sync.
