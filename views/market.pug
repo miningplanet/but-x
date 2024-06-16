@@ -129,7 +129,7 @@ block content
           .card.card-default.border-0
             .card-header
               strong #{settings.locale.mkt_select} (#{settings.market_count[net]})
-            .card-body
+            div#exchange_overview.card-body
               table#markets-table.table.table-striped.table-bordered.bottom-border-0.market-table(style='border-top:0;margin:0 !important;')
                 thead
                   tr
@@ -261,7 +261,7 @@ block content
           });
         .row
           .col-md-12.cardSpacer
-            .card.card-default.border-0
+            div#exchange-table-wrapper.card.card-default.border-0
               .card-header
                 if marketdata.market_logo != null && marketdata.market_logo != ''
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
@@ -377,7 +377,7 @@ block content
                   strong #{marketdata.market_name} - #{marketdata.coin}/#{marketdata.exchange} - #{settings.locale.mkt_hours}
                 .card-body
                   div#chart(style='height:300px;')
-        .row
+        div#market_offers_wrapper.row
           .col-md-6.col-xs-12.cardSpacer
             .card.card-default.border-0.wrapper-border-0
               .card-header(style='border-bottom-width:1px;')
@@ -472,7 +472,7 @@ block content
                         span.decimal #{splitQuantity[1]}
                       td.text-end #{splitTotal[0]}.
                         span.decimal #{splitTotal[1]}
-        .row
+        div#market_history_wrapper.row
           .col-md-12
             .card.card-default.border-0
               .card-header
