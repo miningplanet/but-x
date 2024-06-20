@@ -24,6 +24,7 @@
     "bad-words": "^3.0.4",
     "body-parser": "^1.20.2",
     "bufferutil": "^4.0.8",
+    "cluster": "^0.7.7",
     "cookie-parser": "^1.4.6",
     "debug": "^4.3.5",
     "detect-port": "^1.6.1",
@@ -33,16 +34,16 @@
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.7.0",
-    "mongoose": "^8.4.1",
+    "mongoose": "^8.4.3",
     "morgan": ">=1.10.0",
-    "postman-request": "^2.88.1-postman.33",
+    "postman-request": "^2.88.1-postman.34",
     "pug": "^3.0.3",
     "qr-image": "^3.2.0",
     "readline-sync": "^1.4.10",
-    "sass": "^1.77.4",
+    "sass": "^1.77.6",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.15.0",
-    "ws": "^8.17.0"
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "jasmine": "^5.1.0",
