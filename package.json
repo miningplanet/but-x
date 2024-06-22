@@ -6,17 +6,17 @@
     "start": "node --stack-size=20000 ./bin/cluster",
     "stop": "node ./scripts/stop_but-x.js",
     "start-instance": "npm run prestart && node --stack-size=20000 ./bin/cluster 1",
-    "start-pm2": "npm run prestart \"pm2\" && pm2 start ./bin/instance -i 0 -n but-x -p \"./tmp/pm2.pid\" --node-args=\"--stack-size=20000\"",
-    "start-pm2-debug": "npm run prestart \"pm2\" && pm2 start ./bin/instance -i 0 -n but-x -p \"./tmp/pm2.pid\" --node-args=\"--stack-size=20000\" && pm2 logs",
-    "stop-pm2": "pm2 stop but-x",
-    "reload-pm2": "pm2 reload but-x",
     "test": "node ./node_modules/jasmine/bin/jasmine.js test/*Spec.js",
     "prestart": "node ./scripts/prestart.js",
-    "sync-blocks": "node ./scripts/sync_chain.js mainnet",
-    "sync-markets": "node ./scripts/sync_markets.js mainnet",
-    "sync-peers": "node ./scripts/sync_peers.js mainnet",
-    "sync-masternodes": "node ./scripts/sync_masternodes.js mainnet",
-    "sync-richlist": "node ./scripts/sync_richlist.js mainnet"
+    "sync-address-balances": "node ./scripts/sync_address_balances.js",
+    "sync-chain": "node ./scripts/sync_chain.js",
+    "sync-dbindex": "node ./scripts/sync_dbindex.js",
+    "sync-markets": "node ./scripts/sync_markets.js",
+    "sync-masternodes": "node ./scripts/sync_masternodes.js",
+    "sync-peers": "node ./scripts/sync_peers.js",
+    "sync-richlist": "node ./scripts/sync_richlist.js",
+    "sync-stats": "node ./scripts/sync_stats.js",
+    "sync-tokens": "node ./scripts/sync_tokens.js"
   },
   "dependencies": {
     "@isaacs/ttlcache": "^1.4.1",
@@ -30,7 +30,6 @@
     "detect-port": "^1.6.1",
     "express": "^4.19.2",
     "express-ws": "^5.0.2",
-    "intl": "^1.2.5",
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.7.0",
@@ -39,14 +38,9 @@
     "postman-request": "^2.88.1-postman.34",
     "pug": "^3.0.3",
     "qr-image": "^3.2.0",
-    "readline-sync": "^1.4.10",
     "sass": "^1.77.6",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.15.0",
     "ws": "^8.17.1"
-  },
-  "devDependencies": {
-    "jasmine": "^5.1.0",
-    "pm2": "^5.3.1"
   }
 }
