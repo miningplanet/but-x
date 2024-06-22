@@ -89,8 +89,8 @@ block content
                   td.text-start 
                     span #{index + ' · ' + tx_type.replace('TRANSACTION_', '')}
                   td.text-end
-                    if (tx_by_type)
-                      each txtype in tx_by_type
+                    if (count_tx_by_type)
+                      each txtype in count_tx_by_type
                         if index == txtype._id
                           span #{settings.formatInt(txtype.count)}
             if info.show_masternode_info == true
@@ -122,8 +122,8 @@ block content
             tr
               td.text-start Buys (total)
               td.text-end
-            if (buys)
-              each buy in buys 
+            if (buy_order_aggregation)
+              each buy in buy_order_aggregation 
                 tr.sub
                   td.text-start 
                     span #{buy._id.trade}
@@ -132,13 +132,33 @@ block content
               tr
                 td.text-start Sells (total)
                 td.text-end
-            if (sells)
-              each sell in sells 
+            if (sell_order_aggregation)
+              each sell in sell_order_aggregation 
                 tr.sub
                   td.text-start 
                     span #{sell._id.trade}
                   td.text-end
                     span #{settings.formatDecimal(sell.sum_val, 2, 2)}
+          br
+        if info.show_masternode_info == true
+          h4 #{settings.locale.info_title_masternodes}
+          hr
+          table#masternodestats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            thead
+              tr
+                th.text-center.fill #{settings.locale.info_masternodes_th_country}
+                th.text-center #{settings.locale.info_masternodes_th_count}
+                th.text-center #{settings.locale.info_masternodes_th_percent}
+            tbody 
+              if (count_masternodes_by_country)
+                each mn in count_masternodes_by_country 
+                  tr
+                    td.text-start.fill
+                      span #{mn._id ? mn._id : 'Unknown'}
+                    td.text-end
+                      span #{mn.count}
+                    td.text-end
+                      span #{settings.formatDecimal(mn.percent, 2, 2)}
           br
         if info.show_miningstats == true && algos.length > 1
           h4 #{settings.locale.info_title_mining}
@@ -153,10 +173,10 @@ block content
                 th.text-center #{settings.locale.info_mining_th_blocks}
                 th.text-center.percent #{settings.locale.info_mining_th_percent}
             tbody 
-              if (algos && blocks_by_algorithm)
+              if (algos && count_blocks_by_algorithm)
                 each algo in algos 
                   tr
-                    - const obj = blocks_by_algorithm.find((e) => e._id === algo.algo)
+                    - const obj = count_blocks_by_algorithm.find((e) => e._id === algo.algo)
                     - const blocks = obj ? obj.count : -1
                     td.text-start #{algo.label}
                     td.text-center #{algo.type.toUpperCase()}

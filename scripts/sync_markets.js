@@ -123,6 +123,16 @@ if (!db.lib.is_locked([lock], net)) {
   })
 }
 
+function get_market_data(market, coin_symbol, pair_symbol, reverse, cb, net=settings.getDefaultNet()) {
+  if (fs.existsSync('./lib/markets/' + market + '.js')) {
+    const market_tpl = require('../lib/markets/' + market)
+    market_tpl.get_data({net: net, coin: coin_symbol, exchange: pair_symbol, reverse: reverse}, function(err, obj) {
+      cb(err, obj)
+    })
+  } else
+    cb(null)
+}
+
 function create_market(coin_symbol, pair_symbol, reverse, market, ext_market_url, referal, logo, cb, net=settings.getDefaultNet()) {
   const dto = db.MarketsDb[net].create({
     market: market,
@@ -151,7 +161,7 @@ function check_market(market, coin_symbol, pair_symbol, reverse, cb, net=setting
 function update_markets_db(market, coin_symbol, pair_symbol, reverse, cb, net=settings.getDefaultNet()) {
   const coin = settings.getCoin(net)
   if (fs.existsSync('./lib/markets/' + market + '.js')) {
-    db.get_market_data(market, coin_symbol, pair_symbol, reverse, function (err, obj) {
+    get_market_data(market, coin_symbol, pair_symbol, reverse, function (err, obj) {
       if (err == null) {
         MarketsDb[net].updateOne({ market: market, coin_symbol: coin_symbol, pair_symbol: pair_symbol, reverse: reverse }, {
           chartdata: JSON.stringify(obj.chartdata),

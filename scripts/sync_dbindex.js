@@ -15,8 +15,10 @@ if (process.argv[3])
   mode = process.argv[3]
 
 const coin = settings.getCoin(net)
-// const wallet = settings.getWallet(net)
 const algos = settings.get(net, 'algos')
+const has_masternodes = settings.get(net, 'masternodes_page').enabled
+const has_info_masternodes_by_country = settings.get(net, 'info_page').info.show_masternode_info
+
 const lock = 'dbindex'
 var stopSync = false
 
@@ -158,7 +160,7 @@ function update_block_stats_from_db(algos, dbindex, cb) {
     }
 
     if (algos.length > 1) {
-        count_blocks_by_algorithm(dbindex, function (blocks_by_algorithm) {
+        update_count_blocks_by_algorithm(dbindex, function (count_blocks_by_algorithm) {
         cb()
       })
     } else {
@@ -213,7 +215,7 @@ function update_count_addresses(dbindex, cb) {
   })
 }
 
-function count_blocks_by_algorithm(dbindex, cb) {
+function update_count_blocks_by_algorithm(dbindex, cb) {
   db.BlockDb[net].aggregate([{"$group" : {_id: "$algo", "count": {"$sum":1}}}, {"$sort": {"_id": 1}}]).then(algos => {
     if (Array.isArray(algos)) {
       var blocks = 0
@@ -238,26 +240,32 @@ function count_blocks_by_algorithm(dbindex, cb) {
 }
 
 function update_masternodes_by_country_code(dbindex, cb) {
-  db.MasternodeDb[net].aggregate([{"$match": {"status": "ENABLED" }}, { "$group" : {_id: "$country_code", "count": {"$sum":1}}}, {"$sort": {"_id": 1}}]).then(nodes => {
-    if (Array.isArray(nodes)) {
-      var count = 0
-      for (var i = 0; i < nodes.length; i++)
-        if (!isNaN(nodes[i].count))
-          count += nodes[i].count
+  if (has_masternodes && has_info_masternodes_by_country) {
+    db.MasternodeDb[net].aggregate([{"$match": {"status": "ENABLED" }}, { "$group" : {_id: "$country", "count": {"$sum":1}}}, {"$sort": {"_id": 1}}]).then(nodes => {
+      if (Array.isArray(nodes)) {
+        var count = 0
+        for (var i = 0; i < nodes.length; i++)
+          if (!isNaN(nodes[i].count))
+            count += nodes[i].count
 
-      for (var i = 0; i < nodes.length; i++) {
-        if (!isNaN(nodes[i].count))
-          nodes[i].percent = 100 / count * nodes[i].count
+        for (var i = 0; i < nodes.length; i++) {
+          if (!isNaN(nodes[i].count))
+            nodes[i].percent = 100 / count * nodes[i].count
+        }
+        
+        nodes = nodes.sort(function(a, b) { return b.count - a.count })
+
+        dbindex.count_masternodes_enabled = count
+        dbindex.count_masternodes_by_country = nodes
+        debug("Got masternodes by country code size %d for net '%s'.", nodes.length, net)
       }
-      
-      dbindex.count_masternodes_enabled = count
-      dbindex.count_masternodes_by_country = nodes
-      debug("Got masternodes by country code size %d for net '%s'.", nodes.length, net)
-    }
 
-    cb(nodes)
-  }).catch((err) => {
-    console.error("Failed to count masternodes by country code for chain '%s': %s", net, err)
-    cb(err)
-  })
+      cb(nodes)
+    }).catch((err) => {
+      console.error("Failed to count masternodes by country code for chain '%s': %s", net, err)
+      cb(err)
+    })
+  } else {
+    cb(null)
+  }
 }

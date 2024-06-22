@@ -250,94 +250,69 @@ function route_get_index(req, res, error) {
   }
 }
 
-function route_get_info(req, res, blocks_by_algorithm, tx_by_type, latest_coinbase_tx, markets, sells, buys, net=settings.getDefaultNet()) {
-  const coin = settings.getCoin(net)
-  const shared_pages = settings.get(net, 'shared_pages')
-  const info_page = settings.get(net, 'info_page')
-  const algos = settings.get(net, 'algos')
-
-  const tx_types = settings.get(net, 'tx_types')
-  let i = 0
-  if (Array.isArray(tx_by_type)) {
-    while (i < tx_by_type.length) {
-        tx_by_type[i].type = tx_types[i]
-        i++
-    }
-  }
-
-  const trading_pairs = []
-  if (markets && markets.forEach) {
-    markets.forEach((e) => {
-      if (!trading_pairs.includes(e.pair_symbol))
-        trading_pairs.push(e.pair_symbol)
-    })
-  }
-
-  const p = param('info', info_page, req, db, settings, coin.name + ' X')
-  p.last_updated = null
-  p.shared_pages = shared_pages
-  p.algos = algos
-  // shared_pages.page_header.network_charts.algos.size
-  p.info_page = info_page
-  p.blocks_by_algorithm = blocks_by_algorithm
-  p.tx_types = settings.get(net, 'tx_types')
-  var txes = 0
-  p.tx_by_type = tx_by_type
-  if (tx_by_type) {
-    for (i = 0; i < tx_by_type.length; i++) {
-      if (!isNaN(tx_by_type[i].count))
-        txes += tx_by_type[i].count
-    }
-  }
-  p.txes = txes
-  p.latest_coinbase_tx = latest_coinbase_tx
-  p.markets = markets
-  p.trading_pairs = trading_pairs
-  p.sells = sells
-  p.buys = buys
-
-  if (info_page.page_header.show_last_updated == true) {
-    db.get_stats(coin.name, function (stats) {
-      p.stats = stats
-      p.last_updated = stats.network_last_updated
-      res.render('info', p)
-    }, net)
-  } else {
-    res.render('info', p)
-  }
-}
-
 router.get('/info/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
-  const r = infoCache.get(net)
-  if (r == undefined) {
-    db.get_stats(coin.name, function (stats) {
-      db.get_dbindex(coin.name, function (dbindex) {
-        db.get_markets(function(markets) {
-          const c = {}
-          if (dbindex) {
-            c.markets = markets
-            c.blocks_by_algorithm = dbindex.count_blocks_by_algorithm
-            c.tx_by_type = dbindex.count_tx_by_type
-            c.latest_coinbase_tx = dbindex.latest_coinbase_tx
-            c.sells = dbindex.sell_order_aggregation
-            c.buys = dbindex.buy_order_aggregation
+  
+  db.get_stats(coin.name, function (stats) {
+    db.get_dbindex(coin.name, function (dbindex) {
+      db.get_markets(function(markets) {
+
+        const shared_pages = settings.get(net, 'shared_pages')
+        const info_page = settings.get(net, 'info_page')
+        const algos = settings.get(net, 'algos')
+
+        const count_tx_by_type = dbindex.count_tx_by_type
+
+        const tx_types = settings.get(net, 'tx_types')
+        let i = 0
+        if (Array.isArray(count_tx_by_type)) {
+          while (i < count_tx_by_type.length) {
+              count_tx_by_type[i].type = tx_types[i]
+              i++
           }
-          infoCache.set(net, c)
-          debug("Cached info for '%s' %o - mem: %o", net, c, process.memoryUsage())
-          if (dbindex) {
-            route_get_info(req, res, dbindex.count_blocks_by_algorithm, dbindex.count_tx_by_type, dbindex.latest_coinbase_tx, markets, dbindex.sell_order_aggregation, dbindex.buy_order_aggregation, net)
-          } else {
-            route_get_info(req, res, null, null, null, markets, null, null, net)
+        }
+
+        const trading_pairs = []
+        if (markets && markets.forEach) {
+          markets.forEach((e) => {
+            if (!trading_pairs.includes(e.pair_symbol))
+              trading_pairs.push(e.pair_symbol)
+          })
+        }
+
+        const p = param('info', info_page, req, db, settings, coin.name + ' X')
+        p.last_updated = null
+        p.shared_pages = shared_pages
+        p.algos = algos
+        // shared_pages.page_header.network_charts.algos.size
+        p.info_page = info_page
+        p.count_blocks_by_algorithm = dbindex.count_blocks_by_algorithm
+        p.tx_types = settings.get(net, 'tx_types')
+        var txes = 0
+        p.count_tx_by_type = count_tx_by_type
+        if (count_tx_by_type) {
+          for (i = 0; i < count_tx_by_type.length; i++) {
+            if (!isNaN(count_tx_by_type[i].count))
+              txes += count_tx_by_type[i].count
           }
-        }, net)
+        }
+        p.txes = txes
+        p.latest_coinbase_tx = dbindex.latest_coinbase_tx
+        p.markets = markets
+        p.trading_pairs = trading_pairs
+        p.sell_order_aggregation = dbindex.sell_order_aggregation
+        p.buy_order_aggregation = dbindex.buy_order_aggregation
+        p.count_masternodes_by_country = dbindex.count_masternodes_by_country
+        
+        if (stats) {
+          p.stats = stats
+          p.last_updated = stats.network_last_updated
+        }
+        res.render('info', p)
       }, net)
     }, net)
-  } else {
-    debug("Get info by cache '%s' %o ...", net, r)
-    route_get_info(req, res, r.blocks_by_algorithm, r.tx_by_type, r.latest_coinbase_tx, r.markets, r.sells, r.buys, net)
-  }
+  }, net)
 })
 
 function route_get_address(req, res, hash) {

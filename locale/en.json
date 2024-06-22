@@ -213,6 +213,7 @@
   "info_title_chain": "Blockchain Overview",
   "info_title_token": "Token Overview",
   "info_title_markets": "Market Stats",
+  "info_title_masternodes": "Masternode Stats",
   "info_title_mining": "Mining Stats",
   "info_name": "Name",
   "info_symbol": "Symbol",
@@ -229,6 +230,10 @@
   "info_count_masternodes": "Masternodes (enabled / total)",
   "info_hash_ps": "Hash / s.",
   "info_difficulty": "Difficulty",
+
+  "info_masternodes_th_country": "Nodes per Country",
+  "info_masternodes_th_count": "Count",
+  "info_masternodes_th_percent": "Percent",
 
   "info_mining_th_algorithm": "Algorithm",
   "info_mining_th_type": "Type",
