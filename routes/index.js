@@ -744,6 +744,9 @@ function param(pageKey, page, req, db, settings, prefix) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   const shared_pages = settings.get(net, 'shared_pages')
+  var ip = '-'
+  if (shared_pages.page_header.menu_show_user_ip == true)
+    ip = settings.getRemoteIp(req)
   const r = {
     active: pageKey,
     showSync: db.check_show_sync_message(net),
@@ -760,7 +763,8 @@ function param(pageKey, page, req, db, settings, prefix) {
     showDifficultyChart: page.show_difficulty_chart,
     coin: coin,
     net: net,
-    remoteAddress: req._remoteAddress
+    remoteAddress: req._remoteAddress,
+    remoteIp: ip
   }
   return r
 }

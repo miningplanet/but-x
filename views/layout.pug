@@ -1204,6 +1204,10 @@ html(lang='en')
                     a.nav-link(href='/claim/' + net)
                       span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
+                if shared_pages.page_header.menu_show_user_ip == true 
+                  li.nav-item 
+                    span.nav-link
+                      small [Your IP #{remoteIp}]
             if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
@@ -1466,6 +1470,8 @@ html(lang='en')
                 img(class='vertical-align-middle', src=link.image_path)
               span #{link.text}
     footer
+      div 
+        span Your IP: #{remoteIp}
       div#social
         each social in shared_pages.page_footer.social_links
           if social.enabled

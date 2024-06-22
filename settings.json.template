@@ -186,6 +186,7 @@
       //       top: display menu items horizontally across the top of the page
       //       side: display menu items vertically across the left-hand side of the page
       "menu": "side",
+      "menu_show_user_ip": true,
       // sticky_header: Determine whether page header "sticks" to top of page or not (true/false)
       "sticky_header": true,
       // Home link settings (top-left corner of the header menu).
