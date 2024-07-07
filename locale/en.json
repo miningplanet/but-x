@@ -31,6 +31,7 @@
   "tx_description": "Viewing tx data from {1} block # {2}",
   "tx_block_hash": "Block Hash",
   "tx_type": "Type",
+  "tx_txout": "Txout",
   "tx_version": "Version",
   "tx_recipients": "Recipients",
   "tx_contributors": "Input Addresses",

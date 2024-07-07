@@ -821,6 +821,7 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
         row.push(data[i].blockindex)
         row.push(data[i].blockhash)
         row.push(data[i].txid)
+        row.push(data[i].type)
         row.push(data[i].recipients)
         row.push(data[i].amount)
         row.push(data[i].timestamp)
@@ -861,6 +862,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
 
     db.get_address_txs(req.params.address, start, length, function(obj) {
       // TODO: Fix balance is null with upstream peer.
+      const tx_types = settings.get(net, 'tx_types')
       const txs = obj.data
       var data = [];
 
@@ -882,6 +884,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
           const row = []
           row.push(txs[i].timestamp)
           row.push(txs[i].txid)
+          row.push(tx_types[txs[i].tx_type])
           row.push(Number(out / 100000000))
           row.push(Number(vin / 100000000))
           row.push(Number(txs[i].balance / 100000000))

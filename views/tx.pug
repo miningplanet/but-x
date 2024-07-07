@@ -87,7 +87,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_chainlock}
               td.breakWord #{tx.chainlock}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -120,7 +120,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
               td.breakWord #{tx.extra ? tx.extra[9] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_SERVICE')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -135,7 +135,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_protx_reg_inputs_hash}
               td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REGISTRAR')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -156,7 +156,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
               td.breakWord #{tx.extra ? tx.extra[5] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_PROVIDER_UPDATE_REVOKE')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_revoke_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -171,7 +171,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_protx_update_req_inputs_hash}
               td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_QUORUM_COMMITMENT')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_qc_version} #{tx.extra ? tx.extra[0] : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -198,7 +198,7 @@ block content
               td.d-md-table-cell #{settings.locale.tx_qc_commitment_pk}
               td.breakWord #{tx.extra ? tx.extra[7] == '0' ? '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000' : tx.extra[7] : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_ASSET_REGISTER')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_assert_register_version} #{tx.version ? tx.version : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
@@ -232,9 +232,10 @@ block content
                           td #{token.token}
             tr
               td.d-md-table-cell #{settings.locale.tx_extra}
-              td.breakWord #{tx.extra ? tx.extra : 'N/A'}
+              td.breakWord
+                small #{tx.extra ? tx.extra : 'N/A'}
     if tx.tx_type == tx_types.indexOf('TRANSACTION_ASSET_REISUE')
-      .card.card-default.border-0.cardSpacer
+      div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_assert_reissue_version} #{tx.version ? tx.version : 'N/A'}
         table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
