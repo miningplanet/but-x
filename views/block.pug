@@ -137,7 +137,8 @@ block content
             tr
               // th.text-center.d-table-cell.d-md-none
               th.d-md-table-cell #{settings.locale.tx_hash}
-              th.text-center Txout
+              th.text-center #{settings.locale.tx_type}
+              th.text-center #{settings.locale.tx_txout}
               th.text-center #{coin.symbol}
           tbody
             each txn in txs
@@ -147,6 +148,7 @@ block content
                     span.entity(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_tx) &#8627
                 td.text-start.txcol.d-md-table-cell
                   a.breakWord(href='/tx/' + txn.txid + '/' + net) #{txn.txid}
+                td.text-begin #{settings.get(net, 'tx_types')[txn.tx_type].replace('TRANSACTION_', 'TX_')}
                 td.text-center #{txn.vout.length}
                 if txn.vout.length > 0
                   - var total = Number(txn.total / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
