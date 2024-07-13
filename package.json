@@ -32,15 +32,15 @@
     "express-ws": "^5.0.2",
     "jsonminify": "^0.4.2",
     "lodash": "^4.17.21",
-    "mongodb": "^6.7.0",
-    "mongoose": "^8.4.3",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.5.1",
     "morgan": ">=1.10.0",
     "postman-request": "^2.88.1-postman.34",
     "pug": "^3.0.3",
     "qr-image": "^3.2.0",
-    "sass": "^1.77.6",
+    "sass": "^1.77.8",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.15.0",
-    "ws": "^8.17.1"
+    "ws": "^8.18.0"
   }
 }
