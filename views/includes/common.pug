@@ -20,3 +20,20 @@ script.
       r = mdate.toUTCString()
     return r
   }
+  function generateAlertHTML(alertClass, headerText, msgText) {
+    return '<div class="alert alert-' + alertClass + '" role="alert">' +
+      '<div' + (msgText == null || msgText == '' ? '' : ' class="cardSpacer"') + '>' +
+      '<span class="fas ' + (alertClass == 'success' ? 'fa-check-circle' : (alertClass == 'danger' ? 'fa-exclamation-circle' : (alertClass == 'info' ? 'fa-info-circle' : 'fa-exclamation-triangle'))) + '"></span>' +
+      '<strong>' + headerText + '</strong>' +
+      '</div>' +
+      (msgText == null || msgText == '' ? '' : '<span>' + msgText + '</span>') +
+      '</div>'
+  }
+  function displayAsText(str) {
+    return str.replace(/</g, '&#60;').replace(/>/g, '&#62;')
+  }
+  function showUserMessage(id, insertBefore, cssClass, title, msg) {
+    if ($('#' + id).length == 0)
+      $('<div id="' + id + '"></div>').insertBefore('#' + insertBefore)
+    $('#' + id).html(generateAlertHTML(cssClass, title, msg))
+  }

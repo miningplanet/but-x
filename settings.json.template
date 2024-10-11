@@ -787,6 +787,52 @@
     }
   },
 
+  "registration_page": {
+    "enabled": true,
+    "show_panels": true,
+    "show_panels_position": "top",
+    "show_nethash_chart": false,
+    "show_difficulty_chart": false,
+    "page_header": {
+      "show_img": true,
+      "show_title": true,
+      "show_description": true
+    },
+    "show_header_menu": true,
+    "enable_bad_word_filter": true,
+    "min_balance_for_registration": 100
+  },
+
+  "login_page": {
+    "enabled": true,
+    "show_panels": true,
+    "show_panels_position": "top",
+    "show_nethash_chart": false,
+    "show_difficulty_chart": false,
+    "page_header": {
+      "show_img": true,
+      "show_title": true,
+      "show_description": true
+    },
+    "show_header_menu": true,
+    "enable_bad_word_filter": true,
+    "min_balance_for_login": 100
+  },
+
+  "user_page": {
+    "enabled": true,
+    "show_panels": true,
+    "show_panels_position": "top",
+    "show_nethash_chart": false,
+    "show_difficulty_chart": false,
+    "page_header": {
+      "show_img": true,
+      "show_title": true,
+      "show_description": true
+    },
+    "show_header_menu": true
+  },
+
   "claim_address_page": {
     "enabled": true,
     "show_panels": false,

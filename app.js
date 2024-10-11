@@ -2,6 +2,7 @@ const debug = require('debug')('debug')
 const debugChart = require('debug')('chart')
 const debugPeers = require('debug')('peers')
 const express = require('express')
+const session = require('express-session')
 const path = require('path')
 const nodeapi = require('./lib/nodeapi')
 const favicon = require('serve-favicon')
@@ -25,6 +26,8 @@ const networks = settings.getAllNet()
 const request = require('postman-request')
 const base_server = 'http://127.0.0.1:' + settings.webserver.port + "/"
 const base_url = base_server + '' // api/
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const TTLCache = require('@isaacs/ttlcache')
 const cache = settings.cache
@@ -45,6 +48,21 @@ networks.forEach( function(item, index) {
       apiAccessList.push(item + "@" + key);
   })
 })
+
+var loginEnabled = false
+networks.forEach( function(net, index) {
+  if (settings.get(net, 'login_page').enabled) {
+    loginEnabled = true
+  }
+})
+
+if (loginEnabled == true) {
+  app.use(session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: false
+  }))
+}
 
 // an upstream peer (client) connects to us (we are the server) - 1
 wsInstance.getWss().on('connection', (obj) => {
@@ -372,20 +390,146 @@ app.use('/api', nodeapi.app);
 // app.use('/:net?', routes);
 app.use('/', routes);
 
+app.post('/register/:net?', async (req, res) => {
+  const net = settings.getNet(req.params['net'])
+  try {
+    const { uuid, address, signature, pwd, repeatpwd } = req.body
+    
+    if (address == null || address.trim().length == 0) {
+      res.json({ error: true, message: 'Address is missing.' })
+      return
+    }
+    if (net == null || net.trim().length == 0) {
+      res.json({ error: true, message: 'Net is missing.' })
+      return
+    }
+    if (signature == null || signature.trim().length == 0) {
+      res.json({ error: true, message: 'Signature is missing.' })
+      return
+    }
+    if (pwd == null || pwd.trim().length == 0) {
+      res.json({ error: true, message: 'Password is missing.' })
+      return
+    }
+    if (repeatpwd == null || repeatpwd.trim().length == 0) {
+      res.json({ error: true, message: 'Repeat Password is missing.' })
+      return
+    }
+    if (pwd != repeatpwd) {
+      res.json({ error: true, message: 'Repeat Password does not match.1' })
+      return 
+    }
+
+    debug("Try to register user '%s', uuid '%s', signature '%s', pwd '%s', repeat '%s'.", uuid, address, signature, pwd, repeatpwd)
+    
+    const existingUser = await db.UsersDb[net].findOne({ address })
+    if (existingUser) {
+      res.json({ error: true, message: "User '" + address + "' already registered." })
+      return
+    }
+
+    lib.validate_address(net, address, function(address_validation) {
+      if (address_validation && address_validation.isvalid && address_validation.isvalid == true) {
+        
+        db.get_address(address, function(addressobj) {
+          if (addressobj) {
+            const min_balance = settings.get(net, 'registration_page').min_balance_for_registration
+            const balance = addressobj.balance / 100000000
+            debug("Got balance %d (min %d) for address '%s' and net '%s' - mem: %o", balance, min_balance, address, net, process.memoryUsage())
+            
+            if (balance == null || isNaN(balance) || (min_balance > 0 && balance < min_balance)) {
+              res.json({ status: 'failed', error: true, message: 'Insufficient funds.' })
+              return
+            }
+            lib.verify_message(net, address, signature, uuid, function(body) {
+              if (body == true) {
+                const salt = bcrypt.genSaltSync(10)
+                const hashedPassword = bcrypt.hashSync(pwd, salt)
+                db.create_user_local(uuid, address, hashedPassword, salt, balance, function(user) {
+                  if (user) {
+                    res.status(201).json({ status: 'success', message: 'User registered successfully.' })
+                  } else {
+                    res.json({ status: 'failed', error: true, message: 'Internal Server Error' })
+                  }
+                }, net)
+              } else {
+                return res.json({ status: 'failed', error: true, message: 'Signature verification failed.' })
+              }
+            })
+            // res.setHeader('content-type', 'text/plain')
+            // res.end((addressobj.balance / 100000000).toString().replace(/(^-+)/mg, ''))
+          } else
+            res.json({ status: 'failed', error: true, message: 'address not found.', hash: address, coin: coin, net: net })
+        }, net)
+      } else {
+        res.json({ status: 'failed', error: true, message: 'Address is not valid.' })
+      }
+    })
+  } catch (error) {
+    console.error('Error registering user:', error)
+    res.json({ status: 'failed', error: true, message: 'An error occurred while registering the user' + error })
+  }
+})
+
+app.post('/login/:net?', async (req, res) => {
+  const net = settings.getNet(req.params['net'])
+  try {
+    const { address, pwd } = req.body
+
+    if (address == null || address.trim().length == 0) {
+      res.json({ error: true, message: 'Address is missing.' })
+      return
+    }
+    if (net == null || net.trim().length == 0) {
+      res.json({ error: true, message: 'Net is missing.' })
+      return
+    }
+    if (pwd == null || pwd.trim().length == 0) {
+      res.json({ error: true, message: 'Password is missing.' })
+      return
+    }
+
+    const user = await db.UsersDb[net].findOne({ address })
+    if (!user) {
+      res.json({ error: true, message: 'Invalid address or password.' })
+      return
+    }
+    
+    const hashedPassword = bcrypt.hashSync(pwd, user.salt)
+    if (user.pwd === hashedPassword) {
+      const token = jwt.sign({ userId: user._id }, 'secretKey')
+
+      req.session.isLoggedIn = true
+      req.session.username = address
+      req.session.apiKey = user.apiKey
+
+      debug("Logged in user '%s' for net '%s', session ID '%s'.", address, net, req.session.id)
+
+      // TODO: Fix redirect
+      // res.redirect('/user/' + net + '/' + address)
+
+      res.status(200).json({ error: false, status: 'success', token: token, message: 'User ' + address + ' logged in.'})
+    } else {
+      res.json({ error: true, message: 'Invalid address or password.' })
+    }
+  } catch (error) {
+    console.error('Error logging in:', error)
+    res.json({ error: true, message: 'An error occurred while logging in.' })
+  }
+})
+
 // post method to claim an address using verifymessage functionality
 app.post('/claim/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
-  // check if the bad-words filter is enabled
-  if (settings.get(net, 'claim_address_page').enable_bad_word_filter == true) {
-    // initialize the bad-words filter
-    var bad_word_lib = require('bad-words');
-    var bad_word_filter = new bad_word_lib();
 
+  var message = null
+  if (settings.get(net, 'claim_address_page').enable_bad_word_filter == true) {
+    const bad_word_lib = require('bad-words')
+    const bad_word_filter = new bad_word_lib()
     // clean the message (Display name) of bad words
-    var message = (req.body.message == null || req.body.message == '' ? '' : bad_word_filter.clean(req.body.message));
+    message = (req.body.message == null || req.body.message == '' ? '' : bad_word_filter.clean(req.body.message))
   } else {
-    // Do not use the bad word filter
-    var message = (req.body.message == null || req.body.message == '' ? '' : req.body.message);
+    message = (req.body.message == null || req.body.message == '' ? '' : req.body.message);
   }
 
   // check if the message was filtered
@@ -393,25 +537,25 @@ app.post('/claim/:net?', function(req, res) {
     // call the verifymessage api
     lib.verify_message(net, req.body.address, req.body.signature, req.body.message, function(body) {
       if (body == false)
-        res.json({'status': 'failed', 'error': true, 'message': 'Invalid signature'});
+        res.json({status: 'failed', error: true, message: 'Invalid signature'})
       else if (body == true) {
         db.update_label(req.body.address, req.body.message, function(val) {
           // check if the update was successful
           if (val == '')
-            res.json({'status': 'success'});
+            res.json({status: 'success'})
           else if (val == 'no_address')
-            res.json({'status': 'failed', 'error': true, 'message': 'Wallet address ' + req.body.address + ' is not valid or does not have any transactions'});
+            res.json({status: 'failed', error: true, message: 'Wallet address ' + req.body.address + ' is not valid or does not have any transactions'})
           else
-            res.json({'status': 'failed', 'error': true, 'message': 'Wallet address or signature is invalid'});
-        }, net);
+            res.json({status: 'failed', error: true, message: 'Wallet address or signature is invalid'})
+        }, net)
       } else
-        res.json({'status': 'failed', 'error': true, 'message': 'Wallet address or signature is invalid'});
-    });
+        res.json({status: 'failed', error: true, message: 'Wallet address or signature is invalid'})
+    })
   } else {
     // message was filtered which would change the signature
-    res.json({'status': 'failed', 'error': true, 'message': 'Display name contains bad words and cannot be saved: ' + message});
+    res.json({status: 'failed', error: true, message: 'Display name contains bad words and cannot be saved: ' + message})
   }
-});
+})
 
 /* Extended APIs by DB / cache */
 
@@ -492,7 +636,7 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
         db.get_stats(coin.name, function (stats) {
           res.send({ active: 'tx', tx: tx, confirmations: shared_pages.confirmations, blockcount: (stats && !isNaN(stats.count) ? stats.count : 0), coin: coin, net: net})
         }, net)
-          } else
+      } else
         res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net})
     }, net)
   } else

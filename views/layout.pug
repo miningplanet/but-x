@@ -12,6 +12,9 @@ html(lang='en')
   - const richlist_page = settings.get(net, 'richlist_page')
   - const api_page = settings.get(net, 'api_page')
   - const claim_address_page = settings.get(net, 'claim_address_page')
+  - const registration_page = settings.get(net, 'registration_page')
+  - const login_page = settings.get(net, 'login_page')
+  - const user_page = settings.get(net, 'user_page')
   - const error_page = settings.get(net, 'error_page')
   - const network_history = settings.get(net, 'network_history')
   - const isButkoin = settings.isButkoin(net)
@@ -1204,6 +1207,21 @@ html(lang='en')
                     a.nav-link(href='/claim/' + net)
                       span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
+                if registration_page.enabled == true
+                  li#register.nav-item
+                    a.nav-link(href='/register/' + net)
+                      span.register
+                      span.margin-left-5 #{settings.locale.menu_register}
+                if login_page.enabled == true
+                  li#register.nav-item
+                    a.nav-link(href='/login/' + net)
+                      span.register
+                      span.margin-left-5 #{settings.locale.menu_login}
+                if user_page.enabled == true
+                  li#user.nav-item
+                    a.nav-link(href='/user/' + net)
+                      span.user
+                      span.margin-left-5 #{settings.locale.menu_user}
                 if shared_pages.page_header.menu_show_user_ip == true 
                   li.nav-item 
                     span.nav-link

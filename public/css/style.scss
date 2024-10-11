@@ -1778,7 +1778,7 @@ span.youtube { background: var(--image-youtube) no-repeat top left }
 .alert, .alert A {
   color: var(--alert-color) !important;
   animation: blink-animation 3s steps(10, start) infinite;
-  -webkit-animation: blink-animation 3s steps(10, start) infinite;
+  -webkit-animation: var(--alert-animation);
 }
 
 .entity, .entitybig {

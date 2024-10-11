@@ -5317,7 +5317,7 @@ fieldset:disabled .btn {
 
 .alert {
   position: relative;
-  padding: 1rem 1rem;
+  padding: 0 0;
   margin-bottom: 1rem;
   border: 1px solid transparent;
   border-radius: 0.25rem;
@@ -5365,7 +5365,7 @@ fieldset:disabled .btn {
 
 .alert-success {
   color: #007154;
-  background-color: #ccf2e8;
+  background-color: var(--alert-success-bg);
   border-color: #b3ebdd;
 }
 
@@ -5385,7 +5385,7 @@ fieldset:disabled .btn {
 
 .alert-warning {
   color: #925e0b;
-  background-color: #fdebd0;
+  background-color: var(--alert-warning-bg);
   border-color: #fbe1b8;
 }
 
@@ -5395,7 +5395,7 @@ fieldset:disabled .btn {
 
 .alert-danger {
   color: #8b2e24;
-  background-color: #fadbd8;
+  background-color: var(--alert-danger) !important;
   border-color: #f8c9c5;
 }
 
@@ -11459,7 +11459,7 @@ fieldset:disabled .btn {
 }
 
 .alert-success {
-  background-color: #00bc8c;
+  background-color: var(--alert-success-bg);
 }
 
 .alert-info {
@@ -11467,11 +11467,11 @@ fieldset:disabled .btn {
 }
 
 .alert-warning {
-  background-color: #f39c12;
+  background-color: var(--alert-warning-bg);
 }
 
 .alert-danger {
-  background-color: #e74c3c;
+  background-color: var(--alert-danger) !important;
 }
 
 .alert-light {

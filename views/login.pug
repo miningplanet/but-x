@@ -1,0 +1,67 @@
+extends layout
+
+block content
+  include ./includes/common.pug
+  script.
+    $(document).ready(function () {
+        $('#loginForm').on('submit', function (e) {
+          e.preventDefault()
+          const address = $('input#address').val()
+          const pwd = $('input#pwd').val()
+          if (address == null || address.trim().length == 0) {
+            showUserMessage('userMessage', 'loginForm', 'warning', 'Required field missing', 'Please enter the wallet address you wish to register')
+            $('input#address').focus()
+          } else if (pwd == null || pwd.trim().length == 0) {
+            showUserMessage('userMessage', 'loginForm', 'warning', 'Required field missing', 'Please enter your password')
+            $('input#pwd').focus()
+          } else {
+            $.ajax({
+              type: 'post',
+              url: '/login/#{net}',
+              data: {
+                'address': address,
+                'pwd': pwd
+              },
+              success: function (data) {
+                const status = data.status == 'success' ? 'success' : 'danger'
+                showUserMessage('userMessage', 'loginForm', status, status == 'success' ? 'Logged in' : 'Failed to login', data.message)
+              }
+            })
+          }
+        })
+        $('<div id="userMessage"></div>').insertBefore('#loginForm')
+      })
+  .col-xs-12.col-md-12
+    if settings.anyHeader(login_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(login_page, net) ? 'flex-start' : 'center'))
+        if login_page.page_header.show_img == true
+          #header-img-container
+            img#header-img(src=page_title_logo)
+        #page-title-container
+          if login_page.page_header.show_title == true
+            h3#page-title #{settings.locale.login_title.replace('{1}', coin.name)}
+          //- if login_page.page_header.show_description == true
+          //-   if login_page.page_header.show_title != true
+          //-     #page-title-container
+          //-       .sub-page-header.text-muted=settings.locale.registration_description.replace('{1}', uuid).replace('{2}', login_page.min_balance_for_login)
+          //-   else
+          //-     .sub-page-header.text-muted=settings.locale.registration_description.replace('{1}', uuid).replace('{2}', login_page.min_balance_for_login)
+      .cardSpacer.clearfix
+    .card.card-default.border-0.cardSpacer
+      .card-header
+        strong Login with Your Wallet Address and Password
+      .card-body
+        form#loginForm
+          .form-group
+            fieldset.entryField
+              label.form-label(for='address') Wallet Address
+              if hash == null || hash == ''
+                input#address.form-control(type='text', placeholder='Wallewt Address', maxlength='70')
+              else
+                input#address.form-control(type='text', value=hash, readonly='readonly', maxlength='70')
+          .form-group
+            fieldset.entryField
+              label.form-label.mt-3(for='pwd') Password
+              input#pwd.form-control(type='password', placeholder='Password', maxlength='50')
+          br
+          button.btn(type='submit') Login

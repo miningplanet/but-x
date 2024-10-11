@@ -10,6 +10,7 @@ const qr = require('qr-image')
 const TTLCache = require('@isaacs/ttlcache')
 const networks = settings.getAllNet()
 const fs = require('fs')
+const bcrypt = require('bcrypt')
 
 const infoCache = new TTLCache({ max: settings.cache.info.size, ttl: settings.cache.info.ttl * 1000, updateAgeOnGet: false, noUpdateTTL: false })
 
@@ -41,7 +42,7 @@ function route_get_block(req, res, blockhash) {
             if (txs.length > 0) {
               const p = blockParam(req, stats, 'block', block_page, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
               res.render('block', p)
-                  } else
+            } else
               res.send({ error: 'txes for block not found.', hash: txid, coin: coin, net: net})
           }, net)
         }
@@ -544,6 +545,74 @@ router.get('/tx/:txid/:net?', function(req, res) {
 router.get('/block/:hash/:net?', function(req, res) {
   route_get_block(req, res, req.params.hash)
 })
+
+router.get('/register/:net?', function(req, res) {
+  const net = req.params['net']
+  const coin = settings.getCoin(net)
+  const address_page = settings.get(net, 'address_page')
+  const registration_page = settings.get(net, 'registration_page')
+  
+  if (registration_page.enabled == true) {
+    const uuid = crypto.randomUUID()
+    const p = param('register', registration_page, req, db, settings, coin.name + ' Register')
+    p.registration_address = ''
+    p.address_page = address_page
+    p.registration_page = registration_page
+    p.uuid = uuid
+    res.render('register', p)
+  } else
+  route_get_index(req, res, 'Registration is disabled.')
+})
+
+router.get('/login/:net?', function(req, res) {
+  const net = req.params['net']
+  const coin = settings.getCoin(net)
+  const login_page = settings.get(net, 'login_page')
+  
+  if (login_page.enabled == true) {
+    const p = param('login', login_page, req, db, settings, coin.name + ' Login')
+    p.registration_address = ''
+    p.login_page = login_page
+    res.render('login', p)
+  } else
+  route_get_index(req, res, 'Login is disabled.')
+})
+
+router.get('/user/:net/:address', function(req, res) {
+  const net = req.params['net']
+  const address = req.params['address']
+  const coin = settings.getCoin(net)
+  const user_page = settings.get(net, 'user_page')
+  
+  if (user_page.enabled == true) {
+    if (req.session.isLoggedIn == true && req.session.username) {
+      // TODO: User
+      const p = param('user', user_page, req, db, settings, coin.name + ' User')
+      p.address = address
+      p.apiKey = req.session.apiKey
+      p.user_page = user_page
+      res.render('user', p)
+    } else {
+      res.redirect('/login/' + net)
+    }
+  } else
+  route_get_index(req, res, 'User login is disabled.')
+})
+
+function route_to_user_page(req, res, address) {
+  const net = req.params['net']
+  const coin = settings.getCoin(net)
+  const user_page = settings.get(net, 'user_page')
+  
+  if (user_page.enabled == true) {
+    const p = param('user', user_page, req, db, settings, coin.name + ' User')
+    p.address = address
+    p.user_page = user_page
+    res.render('user', p)
+  } else
+  route_get_index(req, res, 'User login is disabled.')
+}
+
 
 router.get('/claim/:net?', function(req, res) {
   route_get_claim_form(req, res, '')

@@ -1,0 +1,91 @@
+extends layout
+
+block content
+  include ./includes/common.pug
+  script.
+    $(document).ready(function () {
+        $('#registerForm').on('submit', function (e) {
+          e.preventDefault()
+          const uuid = "#{uuid}"
+          const address = $('input#address').val()
+          const signature = $('input#signature').val()
+          const pwd = $('input#pwd').val()
+          const repeatpwd = $('input#repeatpwd').val()
+          if (address == null || address.trim().length == 0) {
+            showUserMessage('userMessage', 'registerForm', 'warning', 'Required field missing', 'Please enter the wallet address you wish to register')
+            $('input#address').focus()
+          } else if (signature == null || signature.trim().length == 0) {
+            showUserMessage('userMessage', 'registerForm', 'warning', 'Required field missing', 'Please enter the signature value from your wallet software')
+            $('input#signature').focus()
+          } else if (pwd == null || pwd.trim().length == 0) {
+            showUserMessage('userMessage', 'registerForm', 'warning', 'Required field missing', 'Please enter your password')
+            $('input#pwd').focus()
+          } else if (repeatpwd == null || repeatpwd.trim().length == 0) {
+            showUserMessage('userMessage', 'registerForm', 'warning', 'Required field missing', 'Please repeat your password')
+            $('input#repeatpwd').focus()
+          } else if (pwd != repeatpwd) {
+            showUserMessage('userMessage', 'registerForm', 'warning', 'Password mismatch', 'Password and Repeat Password do not match')
+            $('input#repeatpwd').focus()
+          } else {
+            $.ajax({
+              type: 'post',
+              url: '/register/#{net}',
+              data: {
+                'uuid': uuid,
+                'address': address,
+                'pwd': pwd,
+                'repeatpwd': repeatpwd,
+                'signature': signature
+              },
+              success: function (data) {
+                const status = data.status == 'success' ? 'success' : 'danger'
+                showUserMessage('userMessage', 'registerForm', status, status == 'success' ? 'Registered successfully' : 'Failed to register user', data.message)
+              }
+            })
+          }
+        })
+        $('<div id="userMessage"></div>').insertBefore('#registerForm')
+      })
+  .col-xs-12.col-md-12
+    if settings.anyHeader(registration_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(registration_page, net) ? 'flex-start' : 'center'))
+        if registration_page.page_header.show_img == true
+          #header-img-container
+            img#header-img(src=page_title_logo)
+        #page-title-container
+          if registration_page.page_header.show_title == true
+            h3#page-title #{settings.locale.registration_title.replace('{1}', coin.name)}
+          if registration_page.page_header.show_description == true
+            if registration_page.page_header.show_title != true
+              #page-title-container
+                .sub-page-header.text-muted=settings.locale.registration_description.replace('{1}', uuid).replace('{2}', registration_page.min_balance_for_registration)
+            else
+              .sub-page-header.text-muted=settings.locale.registration_description.replace('{1}', uuid).replace('{2}', registration_page.min_balance_for_registration)
+      .cardSpacer.clearfix
+    .card.card-default.border-0.cardSpacer
+      .card-header
+        strong Register with Your Waller Address
+      .card-body
+        form#registerForm
+          .form-group
+            fieldset.entryField
+              label.form-label(for='address') Wallet Address
+              if hash == null || hash == ''
+                input#address.form-control(type='text', placeholder='Wallewt Address', maxlength='70')
+              else
+                input#address.form-control(type='text', value=hash, readonly='readonly', maxlength='70')
+          .form-group
+            fieldset.entryField
+              label.form-label.mt-3(for='signature') Signature
+              input#signature.form-control.mb-3(type='text', placeholder='Signature', maxlength='100')
+          .form-group
+            fieldset.entryField
+              label.form-label.mt-3(for='pwd') Password
+              input#pwd.form-control(type='password', placeholder='Password', maxlength='50')
+          .form-group
+            fieldset.entryField
+              label.form-label.mt-3(for='repeatpwd') Repeat Password
+              input#repeatpwd.form-control(type='password', placeholder='Repeat Password', maxlength='50')
+          input#uuid.form-control(type='hidden', maxlength='70')
+          br
+          button.btn(type='submit') Register

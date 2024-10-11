@@ -12,6 +12,9 @@
   "menu_node": "Nodes",
   "menu_network": "Network",
   "menu_claim_address": "Claim Address",
+  "menu_register": "Register",
+  "menu_login": "Login",
+  "menu_user": "User",
 
   // x view
   "ex_title": "{1} X",
@@ -302,6 +305,17 @@
   "mkt_time_stamp": "Time",
   "mkt_select": "Market Selection",
   "mkt_sum": "Sum ->",
+
+  // Registration page
+  "registration_title": "User Registration",
+  "registration_description": "Register an account with an address from your wallet. Sign the UUID {1} with the wallet address and paste it into the form below. You can then log in with this address and your password. Registration is free. But the address to be registrated needs at least {2} coins.",
+
+  // Login page
+  "login_title": "User Login",
+  "login_description": "Sign in with your address and password.",
+
+  // User page
+  "login_user": "Welcome {1}",
 
   // claim address view
   "claim_title": "{1} Wallet Address Claim",
