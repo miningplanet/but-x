@@ -31,7 +31,9 @@ build/Release
 node_modules
 
 settings.json
-settings-frontend-upstream-yerbas.json
+*-dev.json
+*-prod.json
+
 .idea
 *~
 
