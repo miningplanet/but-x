@@ -167,7 +167,7 @@ function update_block_stats_from_db(algos, dbindex, cb) {
       count_blocks(function(count) {
         if (!isNaN(count)) {
           dbindex.count_blocks = count
-          debug("Got block count %d from db for net '%s'.", dbindex.count, net)
+          debug("Got block count %d from db for net '%s'.", count, net)
         }
         cb()
       })

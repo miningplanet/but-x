@@ -165,7 +165,7 @@ function create_or_get_dbindex(net, coinName, cb) {
   db.get_dbindex_local(coinName, function(dbindex) {
     if (dbindex) {
       if (!isNaN(dbindex.count_blocks) && !isNaN(dbindex.latest_block_height) && dbindex.count_blocks != dbindex.latest_block_height)
-        console.warn("!!! Block index in db for net '%s' is invalid. !!!")
+        console.warn("!!! Block index in db for net '%s' is invalid. !!!", net)
       return cb(dbindex)
     }
 

@@ -62,7 +62,7 @@ util.init_db(net, function(status) {
             update_tx_db(net, coin.name, block_start, block_end, stats.count_txes, settings.sync.update_timeout, false, function() {
               // check if the script stopped prematurely
               if (stopSync) {
-                console.log('Block sync was stopped prematurely')
+                console.log('Block sync was stopped prematurely.')
                 util.exit_remove_lock(1, lock, net)
               } else {
                 util.update_last_updated_stats(coin.name, { blockchain_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
@@ -71,7 +71,7 @@ util.init_db(net, function(status) {
                     update_network_history(coin.name, nstats.last, network_history.enabled, function(network_hist) {
                       // always check for and remove the sync msg if exists
                       remove_sync_message(net)
-                      console.log('Block sync complete (block: %s)', nstats.last)
+                      console.log('Block sync complete (DB height %d, chain height %d)', dbindex.latest_block_height, nstats.last)
                       util.exit_remove_lock_completed(lock, coin, net)
                     }, net)
                   }, net)
@@ -538,7 +538,7 @@ function create_block(block, cb, net) {
     cbtx: cbtx
   })
   if (dto) {
-      console.log("Block created for chain %s height %d", net, block.height)
+      console.log("Stored block for chain %s height %d", net, block.height)
   }
   return cb(block)
 }
