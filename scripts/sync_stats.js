@@ -48,7 +48,7 @@ util.init_db(net, function(status) {
         debug("No stats from DB for net '%s', re-creating..", net)
         util.exit_remove_lock(2, lock, net)
       }
-      debug("Got stats from DB for net '%s': %o", net, info)
+      debug("Got stats from DB for net '%s': %O", net, info)
 
       if (!isNaN(info.blocks)) {
         stats.last = info.blocks
