@@ -492,51 +492,12 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
         db.get_stats(coin.name, function (stats) {
           res.send({ active: 'tx', tx: tx, confirmations: shared_pages.confirmations, blockcount: (stats && !isNaN(stats.count) ? stats.count : 0), coin: coin, net: net})
         }, net)
-      } else {
-        // TODO: Only get by DB.
-        lib.get_rawtransaction(txid, function(rtx) {
-          if (rtx && rtx != null && rtx.txid) {
-            lib.prepare_vin(net, rtx, function(vin, tx_type_vin) {
-              lib.prepare_vout(rtx.vout, rtx.txid, vin, ((typeof rtx.vjoinsplit === 'undefined' || rtx.vjoinsplit == null) ? [] : rtx.vjoinsplit), function(rvout, rvin, tx_type_vout) {
-                lib.calculate_total(rvout, function(total) {
-                  if (!rtx.confirmations > 0) {
-                    var utx = {
-                      txid: rtx.txid,
-                      vin: rvin,
-                      vout: rvout,
-                      total: total.toFixed(8),
-                      timestamp: rtx.time,
-                      blockhash: '-',
-                      blockindex: -1
-                    };
-
-                    res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount:-1, coin: coin, net: net});
-                  } else {
-                    var utx = {
-                      txid: rtx.txid,
-                      vin: rvin,
-                      vout: rvout,
-                      total: total.toFixed(8),
-                      timestamp: rtx.time,
-                      blockhash: rtx.blockhash,
-                      blockindex: rtx.blockheight
-                    };
-
-                    db.get_stats(coin.name, function (stats) {
-                      res.send({ active: 'tx', tx: utx, confirmations: shared_pages.confirmations, blockcount: (stats && !isNaN(stats.count) ? stats.count : 0), coin: coin, net: net});
-                    }, net);
-                  }
-                });
-              });
-            });
           } else
-            res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net});
-        }, net);
-      }
-    }, net);
+        res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net})
+    }, net)
   } else
-    res.end('This method is disabled');
-});
+    res.end('This method is disabled')
+})
 
 app.use('/ext/getbalance/:hash/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
