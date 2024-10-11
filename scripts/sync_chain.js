@@ -547,8 +547,7 @@ function save_tx(net, txid, blockheight, cb) {
   db.lib.get_rawtransaction(txid, function(tx) {
     if (tx && tx != 'There was an error. Check your console.') {
       db.lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
-        const vhidden = !settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null
-        db.lib.prepare_vout(net, tx.vout, txid, vin, (vhidden ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
+        db.lib.prepare_vout(net, tx.vout, txid, vin, false, function(vout, nvin, tx_type_vout) {
           db.lib.syncLoop(vin.length, function (loop) {
             var i = loop.iteration()
 
