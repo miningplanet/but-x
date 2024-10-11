@@ -41,34 +41,8 @@ function route_get_block(req, res, blockhash) {
             if (txs.length > 0) {
               const p = blockParam(req, stats, 'block', block_page, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
               res.render('block', p)
-            } else {
-              // cannot find block in local database so get the data from the wallet directly
-              var ntxs = []
-              lib.syncLoop(block.tx.length, function (loop) {
-                var i = loop.iteration()
-
-                lib.get_rawtransaction(block.tx[i], function(tx) {
-                  if (tx && tx != 'There was an error. Check your console.') {
-                    lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
-                      lib.prepare_vout(net, tx.vout, block.tx[i], vin, ((!settings.blockchain_specific.zksnarks.enabled || typeof tx.vjoinsplit === 'undefined' || tx.vjoinsplit == null) ? [] : tx.vjoinsplit), function(vout, nvin, tx_type_vout) {
-                        lib.calculate_total(vout, function(total) {
-                          ntxs.push({
-                            txid: block.tx[i],
-                            vout: vout,
-                            total: total.toFixed(8)
-                          })
-                          loop.next()
-                        })
-                      })
-                    })
                   } else
-                    loop.next()
-                }, net)
-              }, function() {
-                const p = blockParam(req, stats, 'block', block_page, net, db, settings, block, ntxs, coin.name + ' Block ' + block.height)
-                res.render('block', p)
-              })
-            }
+              res.send({ error: 'txes for block not found.', hash: txid, coin: coin, net: net})
           }, net)
         }
       }, net)
