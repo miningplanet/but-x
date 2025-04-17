@@ -1,5 +1,7 @@
 module.exports = new require('mongoose').Schema({
   coin: { type: String, required : true },
+  genesishash: { type: String, default: '' },
+  starttime: { type: Number, default: -1 },
   chain: { type: String, required : true },
   count: { type: Number, default: 1 }, // headers
   last: { type: Number, default: 1 }, // blocks
@@ -27,7 +29,6 @@ module.exports = new require('mongoose').Schema({
   nethash_lyra2: { type: Number, default: 0 },
   nethash_sha256d: { type: Number, default: 0 },
   nethash_scrypt: { type: Number, default: 0 },
-  nethash_butkscrypt: { type: Number, default: 0 },
   difficulty: { type: Number, default: 0 },
   difficulty_pow: { type: Number, default: 0 },
   difficulty_pos: { type: Number, default: 0 },
@@ -36,7 +37,6 @@ module.exports = new require('mongoose').Schema({
   difficulty_lyra2: { type: Number, default: 0 },
   difficulty_sha256d: { type: Number, default: 0 },
   difficulty_scrypt: { type: Number, default: 0 },
-  difficulty_butkscrypt: { type: Number, default: 0 },
   mediantime: { type: Number, required: false },
   initialblockdownload: { type: Boolean },
   verificationprogress: { type: Number },

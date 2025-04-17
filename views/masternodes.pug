@@ -3,31 +3,19 @@ extends layout
 block content
   include ./includes/common.pug
   script.
-    var setting_txPerPage = parseInt("#{masternodes_page.masternode_table.items_per_page}");
-    var lengthMenuOpts = !{JSON.stringify(masternodes_page.masternode_table.page_length_options)};
-    var addedLength = false;
-    for (i = 0; i < lengthMenuOpts.length; i++) {
-      if (!addedLength) {
-        if (lengthMenuOpts[i] > setting_txPerPage) {
-          lengthMenuOpts.splice(i, 0, setting_txPerPage);
-          addedLength = true;
-        } else if (lengthMenuOpts[i] == setting_txPerPage)
-          addedLength = true;
-      }
-    }
-    if (!addedLength && setting_txPerPage != lengthMenuOpts[lengthMenuOpts.length - 1])
-      lengthMenuOpts.push(setting_txPerPage);
+    const itemsPerPage = parseInt("#{masternodes_page.masternode_table.items_per_page}")
+    const lengthMenuOpts = !{JSON.stringify(masternodes_page.masternode_table.page_length_options)}
     function secondsToHms(d) {
-        d = Number(d);
-        var h = Math.floor(d / 3600);
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 % 60);
-        var dy = Math.floor(h / 24);
-        var h = h % 24;
-        return ('0' + dy).slice(-2) + " day" + (('0' + dy).slice(-2) == 1 ? "" : "s") + " " + ('0' + h).slice(-2) + "h " + ('0' + m).slice(-2) + "m " + ('0' + s).slice(-2) + "s";
+        d = Number(d)
+        var h = Math.floor(d / 3600)
+        var m = Math.floor(d % 3600 / 60)
+        var s = Math.floor(d % 3600 % 60)
+        var dy = Math.floor(h / 24)
+        var h = h % 24
+        return ('0' + dy).slice(-2) + " day" + (('0' + dy).slice(-2) == 1 ? "" : "s") + " " + ('0' + h).slice(-2) + "h " + ('0' + m).slice(-2) + "m " + ('0' + s).slice(-2) + "s"
     }
     $(document).ready(function() {
-      var labels = !{JSON.stringify(settings.labels)};
+      var labels = !{JSON.stringify(settings.labels)}
       var ctable = $('#masternodes-table').dataTable({
         autoWidth: true,
         searching: true,
@@ -36,7 +24,7 @@ block content
         responsive: true,
         lengthChange: true,
         processing: true,
-        iDisplayLength: setting_txPerPage,
+        iDisplayLength: itemsPerPage,
         lengthMenu: lengthMenuOpts,
         scrollX: true,
         language: {
@@ -54,8 +42,8 @@ block content
               const pose = json[i]['pose_score']
               const ipAddr = json[i]['ip_address']
 
-              json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>";
-              json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>';
+              json[i]['address'] = "<a href='/address/" + json[i]['address'] + ("#{net}" != null ? "/#{net}" : "") + "'>" + json[i]['address'] + "</a>"
+              json[i]['lastseen'] = '<span' + (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true ? ' data-bs-toggle="tooltip" data-bs-placement="auto" title="' + format_unixtime(json[i]['lastseen'], true) + '"' : '') + '>' + format_unixtime(json[i]['lastseen']) + '</span>'
 
               // strip port from IPv4
               if (!ipAddr.startsWith('[') && ipAddr.indexOf(":") > -1) {
@@ -73,24 +61,24 @@ block content
               const lastPaidBlock = json[i]['last_paid_block']
               if (!isNaN(lastPaid)) {
                 json[i]['lastpaid'] = format_unixtime(lastPaid)
-                json[i]['last_paid_block'] = '<span title="' + format_unixtime_blank(lastPaid) + '">' + lastPaidBlock + '</span>';
+                json[i]['last_paid_block'] = '<span title="' + format_unixtime_blank(lastPaid) + '">' + lastPaidBlock + '</span>'
               } else {
-                json[i]['lastpaid'] = '<em>N/A</em>';
-                json[i]['last_paid_block'] = '<span>' + lastPaidBlock + '</span>';
+                json[i]['lastpaid'] = '<em>N/A</em>'
+                json[i]['last_paid_block'] = '<span>' + lastPaidBlock + '</span>'
               }
               
               if (json[i]['activetime'])
-                json[i]['activetime'] = secondsToHms(json[i]['activetime']);
+                json[i]['activetime'] = secondsToHms(json[i]['activetime'])
               else
-                json[i]['activetime'] = '<em>N/A</em>';
+                json[i]['activetime'] = '<em>N/A</em>'
 
-              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>";
+              json[i]['addr'] = "<a href='/address/" + json[i]['addr'] + ("#{net}" != null ? "/#{net}" : "") + "' title='" + json[i]['addr'] + "'>" + json[i]['addr'] + ('#{claim_address_page.enabled}' == 'true' && json[i]['claim_name'] != null && json[i]['claim_name'] != '' ? ' <span class="small fw-normal">(' + json[i]['claim_name'] + ')</span>' : '') + "</a>"
 
               if (labels[addr] != null && labels[addr].enabled == true) {
                 if (labels[addr].type)
-                  json[i]['addr'] = '<div><label class="badge bg-' + labels[addr].type + '" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr'];
+                  json[i]['addr'] = '<div><label class="badge bg-' + labels[addr].type + '" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr']
                 else
-                  json[i]['addr'] = '<div><label class="badge bg-default" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr'];
+                  json[i]['addr'] = '<div><label class="badge bg-default" style="margin-bottom:10px;">' + labels[addr].label + (labels[addr].url ? '<a href="' + labels[addr].url + '" target="_blank", alt="Visit site", title="Visit site" data-bs-toggle="tooltip" data-bs-placement="top"><span class="fa fa-question-circle" style="margin-left:5px"></span></a>' : '') + '</label></div>' + json[i]['addr']
               }
 
               var entity="&#9888;"
@@ -102,7 +90,7 @@ block content
 
               json[i]['pose_score'] = '<span>' + pose + '</span>'
 
-              json[i]['status'] = '<span class="entitybig"><b>' + entity + '</b></span>';
+              json[i]['status'] = '<span class="entitybig"><b>' + entity + '</b></span>'
 
               const country = "<span>" + json[i]['country'] + "</span>"
               if (json[i]['country_code'] && json[i]['country_code'].length > 1) {
@@ -113,54 +101,47 @@ block content
                 json[i]['flag'] = '<div></div>'
               }
             } 
-            return json;
+            return json
           }
         },
         columns: [
-          // { name: 'rank', data: 'rank', className: "rankCol" },
-          // { name: 'network', data: 'network', className: "networkCol" },
           { name: 'ip_address_port', data: 'ip_address', className: "ipandportcol wide" },
           { name: 'ip_address', data: 'ip_address_without_port', className: "ipcol small" },
           { name: 'addr', data: 'addr', className: "addresscol full" },
-          // { name: 'version', data: 'version', className: "versionCol" },
-          // { name: 'lastseen', data: 'lastseen', className: "lastSeenCol" },
           { name: 'lastpaid', data: 'lastpaid', className: "lastpaidcol full" },
           { name: 'last_paid_block', data: 'last_paid_block', className: "lastpaidblockcol" },
-          // { name: 'activetime', data: 'activetime', className: "activeTimeCol" },
           { name: 'status', data: 'status', className: "statuscol" },
           { name: 'pose', data: 'pose_score', className: "posecol" },
           { name: 'country', data: 'countryWithFlag', className: "countrywithnamecol wide" },
           { name: 'flag', data: 'flag', className: "flagcol small" }
         ],
         rowCallback: function(row, data, index) {
-          // $("td.addresscol", row).addClass("breakWord");
-          // $("td.ipcol", row).addClass("breakWord");
         },
         fnDrawCallback: function(settings) {
-          enableTooltips();
+          enableTooltips()
         },
         fnInitComplete: function(settings, json) {
           setTimeout(function () {
             // Hide/show columns.
-            // ctable.api().column('rank:name').visible(<true|false>, false);
-          }, 0);
+            // ctable.api().column('rank:name').visible(<true|false>, false)
+          }, 0)
         }
-      });
+      })
 
       if ('#{masternodes_page.page_header.show_last_updated}' == 'true') {
-        var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)};
+        var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)}
 
         if (lastUpdatedDate != 0) {
-          $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate));
+          $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate))
 
           if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
-            $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true));
-            enableTooltips();
+            $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true))
+            enableTooltips()
           }
         } else
-          $('span#lastUpdatedDate').html(' N/A');
+          $('span#lastUpdatedDate').html(' N/A')
       }
-    });
+    })
   .col-md-12.cardSpacer
     if settings.anyHeader(masternodes_page, net)
       #page-header-container(style='align-items:' + (settings.allHeaders(masternodes_page, net) == true ? 'flex-start' : 'center'))

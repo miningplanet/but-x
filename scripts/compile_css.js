@@ -34,7 +34,7 @@ if (process.argv.length < 3) {
     })
   })
 } else {
-  if (settings.getNetOrNull(net)) {
+  // if (settings.getNetOrNull(net)) {
     console.log('Compiling CSS for net %s. Please wait..', net)  
     const custom_minified = sass.compile('./public/css/' + net + '.scss', { style: 'compressed' })
     const file = './public/css/' + net + '.min.css'
@@ -47,8 +47,8 @@ if (process.argv.length < 3) {
         process.exit(0)
       }
     })
-  } else {
-    console.log("Net '%s' not found.", net)
-    process.exit(1)
-  }
+  // } else {
+  //   console.log("Net '%s' not found.", net)
+  //   process.exit(1)
+  // }
 }

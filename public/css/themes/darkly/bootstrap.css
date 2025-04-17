@@ -1939,11 +1939,11 @@ progress {
 }
 
 .table-bordered > :not(caption) > * {
-  border-width: 1px 0;
+  /* border-width: 1px 0; */
 }
 
 .table-bordered > :not(caption) > * > * {
-  border-width: 0 1px;
+  /* border-width: 0 1px; */
 }
 
 .table-borderless > :not(caption) > * > * {
@@ -4302,7 +4302,6 @@ fieldset:disabled .btn {
 }
 
 .navbar-brand {
-  padding-top: 0.3125rem;
   padding-bottom: 0.3125rem;
   margin-right: 1rem;
   font-size: 1.25rem;
@@ -4902,7 +4901,7 @@ fieldset:disabled .btn {
 .card-body {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  padding: 1rem 1rem;
+  padding: 1rem 0.75vw;
 }
 
 .card-title {

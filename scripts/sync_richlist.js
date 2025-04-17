@@ -1,4 +1,4 @@
-const debug = require('debug')('sync')
+// const debug = require('debug')('sync')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
 const { AddressDb, TxDb, RichlistDb } = require('../lib/database')
@@ -108,7 +108,7 @@ function update_richlist(list, cb, net=settings.getDefaultNet()) {
   } else if (list == 'balance') {
     // update 'balance' richlist data
     // check if burned addresses are in use and if it is necessary to track burned balances
-    if (richlist_page.burned_coins.addresses == null || richlist_page.burned_coins.addresses.length == 0 || !richlist_page.burned_coins.include_burned_coins_in_distribution) {
+    if (richlist_page.burned_coins.addresses == null || richlist_page.burned_coins.addresses.length == 0 || !richlist_page.burned_coins.include_burned_coins_in_dist) {
       // update 'balance' richlist data by filtering burned coin addresses immidiately
       AddressDb[net].find({a_id: { $nin: burn_addresses }}, 'a_id name balance received').sort({balance: 'desc'}).limit(cnt).exec().then((addresses) => {
         RichlistDb[net].updateOne({coin: coin.name}, {

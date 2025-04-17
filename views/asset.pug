@@ -1,0 +1,154 @@
+extends layout
+
+block content
+  include ./includes/common.pug
+  .col-xs-12.col-md-12
+    if settings.anyHeader(asset_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(asset_page, net) ? 'flex-start' : 'center'))
+        if asset_page.page_header.show_img == true
+          #header-img-container
+            img#header-img(src=page_title_logo)
+        #page-title-container
+          if asset_page.page_header.show_title == true
+            h3#page-title #{settings.locale.asset_title.replace('{1}', coin.name).replace('{2}', asset.name)}
+          if asset_page.page_header.show_description == true
+            if asset_page.page_header.show_title != true
+              #page-title-container
+                .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', settings.formatDecimal(asset.height, 0, 0))
+            else
+              .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', settings.formatDecimal(asset.height, 0, 0))
+      .cardSpacer.clearfix
+    div#info-table_wrapper.card.card-default.border-0.cardSpacer
+      .card-header
+      h4 Asset Registration
+      hr
+      table#asset-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
+        thead(style='visibility: collapse !important;')
+          tr
+            th
+            th
+        tbody
+          //- - const difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
+          //- - const splitDifficulty = difficulty.split('.');
+          //- - const block_size = Number(block.size/1024).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+          //- - const splitBlockSize = block_size.split('.');
+          - var confirms = (blockcount - asset.blockindex + 1);
+          tr
+            td.d-md-table-cell Name
+            td.breakWord #{asset.name}
+          if asset.address 
+            tr 
+              td.d-md-table-cell Address
+              td.breakWord
+                a.breakWord(href='/address/' + asset.address + '/' + net) #{asset.address}
+          //- if asset.owner
+          //-   tr
+          //-     td.d-md-table-cell Owner
+          //-     td.breakWord #{asset.owner}
+          //- if asset.owner_address 
+          //-   tr 
+          //-     td.d-md-table-cell Owner Address
+          //-     td.breakWord
+          //-       a.breakWord(href='/address/' + asset.owner_address + '/' + net) #{asset.owner_address}
+          if asset.height
+            tr
+              td.d-md-table-cell Block height
+              td.breakWord #{settings.formatDecimal(asset.height, 0, 0)}
+          tr
+            td.d-md-table-cell Tx ID
+            td.breakWord #{asset.txid}
+          if asset.tx_type != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_type}
+              td.breakWord #{asset.tx_type} #{tx_types[asset.tx_type]}
+          if asset.version != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_version}
+              td.breakWord #{asset.version}
+          if !isNaN(asset.size)
+            tr
+              td.d-md-table-cell #{settings.locale.tx_size}
+              td.breakWord #{asset.size}
+          tr
+            td.d-md-table-cell #{settings.locale.confirmations}
+            td #{settings.formatDecimal(blockcount - asset.height + 1, 0, 0)}
+          if asset.amount && asset.units
+            tr
+              td.d-md-table-cell Amount
+              td.breakWord #{settings.formatDecimal(asset.amount, asset.units, asset.units)}
+          if asset.balance && asset.units
+            tr
+              td.d-md-table-cell Balance
+              td.breakWord #{settings.formatDecimal(asset.balance, asset.units, asset.units)}
+          if asset.units
+            tr
+              td.d-md-table-cell Units
+              td.breakWord #{settings.formatDecimal(asset.units, 0, 0)}
+          if asset.expire_time
+            tr
+              td.d-md-table-cell Expires
+              td.breakWord #{settings.formatUnixtime(asset.expire_time / 1000, net, true)}
+          if asset.tx_count
+            tr
+              td.d-md-table-cell Tx count
+              td.breakWord #{settings.formatDecimal(asset.tx_count, 0, 0)}
+          if !isNaN(asset.timestamp)
+            tr
+              td.d-md-table-cell #{settings.locale.timestamp}
+              td
+                span#timestampCol #{settings.formatUnixtime(asset.timestamp, net, true)}
+          if !isNaN(asset.locktime)
+            tr
+              td.d-md-table-cell #{settings.locale.tx_locktime}
+              td.breakWord #{settings.formatDecimal(asset.locktime, 0, 0)}
+          if asset.instantlock != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_instantlock}
+              td.breakWord #{asset.instantlock}
+          if asset.chainlock != null
+            tr
+              td.d-md-table-cell #{settings.locale.tx_chainlock}
+              td.breakWord #{asset.chainlock}
+          if asset.vout != null && Array.isArray(asset.vout) && asset.vout.length > 2
+            tr
+              td.d-md-table-cell Max supply
+              td.breakWord #{settings.formatDecimal(asset.vout[2].tamount, 2, 2)}
+          if asset.ipfs_hash
+            tr
+              td.d-md-table-cell IPFS Hash
+              td.breakWord 
+                span.ipfs
+                  a(href="https://ipfs.io/ipfs/"+asset.ipfs_hash target="_blank") #{asset.ipfs_hash}
+                hr
+                br
+                img(style="width: 50% !important; border: dashed 1px gray; border-radius: 5%;" src="https://ipfs.io/ipfs/"+asset.ipfs_hash)
+      h4 Asset Reissuance (s)
+      hr
+      p No asset reissuances found.
+      if (asset.latesttx && asset.latesttx.length > 0)
+        h4 Latest transactions
+        hr
+        table#asset-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
+          thead(style='visibility: collapse !important;')
+            tr
+              th
+              th
+          tbody
+          each tx in asset.latesttx
+            tr(style='height: 15px, line-height: 10px') 
+              td(colspan=2, style='background-image: linear-gradient(to right, #222, #000); height: 15px; border-bottom: 1px solid red') Transaction #{asset.name} #{settings.formatUnixtime(tx.timestamp, net, true)}: TxIn / TxOut
+            tr 
+              td
+                each v in tx.vin
+                  if (v.scriptPubKey && v.addresses && v.scriptPubKey.asset)
+                    a.breakWord(href='/address/' + v.addresses + '/' + net)
+                      span.address(style='display: inline-block; width: 74%; margin-left: 0px') #{v.addresses}
+                    span(style='text-align: right; display: inline-block; width: 26%; margin-left: auto; margin-right: 0px') #{settings.formatDecimal(v.scriptPubKey.asset.amount, 2, 2)}
+                    br
+              td
+                each v in tx.vout
+                  if (v.addresses && v.name && v.tamount)
+                    a.breakWord(href='/address/' + v.addresses + '/' + net)
+                      span.address(style='display: inline-block; width: 74%; margin-left: 0px') #{v.addresses}
+                    span(style='text-align: right; display: inline-block; width: 26%; margin-left: auto; margin-right: 0px') #{settings.formatDecimal(v.tamount, 2, 2)}
+                    br

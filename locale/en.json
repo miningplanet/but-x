@@ -2,6 +2,7 @@
 {
   // menu items
   "menu_explorer": "X",
+  "menu_assets": "Assets",
   "menu_info": "Info",
   "menu_api": "API",
   "menu_markets": "Markets",
@@ -108,7 +109,7 @@
 
   // block view
   "block_title": "{1} Block Details",
-  "block_description": "Viewing block data from {1} block # {2}",
+  "block_description": "Viewing block data from {1} block #{2}",
   "block_previous": "Previous Block",
   "block_next": "Next Block",
   "block_genesis": "GENESIS",
@@ -128,6 +129,12 @@
   "block_cbtx": "Coinbase transaction",
   "view_raw_block_data": "View Raw Block Data",
   "view_tx": "View Transaction",
+
+  // asset page
+  "assets_title": "{1} Assets",
+  "assets_description": "Viewing all assets",
+  "asset_title": "{1} Asset {2}",
+  "asset_description": "Viewing asset data {1} block #{2}",
 
   // error view
   "error_title": "{1} X Error",
@@ -223,21 +230,27 @@
   "info_symbol": "Symbol",
   "info_home": "Home",
   "info_whitepaper": "Whitepaper",
-  "info_block_height": "Block height",
+  "info_start_time": "Start time",
+  "info_block_height": "Blocks",
+  "info_blocks_per_hour": "Blocks / h",
   "info_last_price": "Last Price ({1} / USD)",
   "info_max_supply": "Max supply",
   "info_current_supply": "Current supply",
   "info_latest_coinbase": "Latest coinbase",
   "info_count_addresses": "Addresses",
+  "info_count_assets": "Assets",
   "info_count_utxos": "Utxos",
   "info_count_transactions": "Transactions",
   "info_count_masternodes": "Masternodes (enabled / total)",
   "info_hash_ps": "Hash / s.",
+  "info_kilohash_ps": "Kilohash / s.",
+  "info_megahash_ps": "Megahash / s.",
+  "info_gigahash_ps": "Gigahash / s.",
   "info_difficulty": "Difficulty",
 
-  "info_masternodes_th_country": "Nodes per Country",
-  "info_masternodes_th_count": "Count",
-  "info_masternodes_th_percent": "Percent",
+  "info_masternodes_th_country": "Active Nodes per Country",
+  "info_masternodes_th_count": "Num",
+  "info_masternodes_th_percent": "%",
 
   "info_mining_th_algorithm": "Algorithm",
   "info_mining_th_type": "Type",
@@ -247,11 +260,11 @@
   "info_mining_th_percent": "%",
 
   // api view
-  "api_title": "{1} Public API {2}",
-  "api_description": "A listing of public API endpoints for retrieving {1} coin data from the network without the need for a local wallet",
+  "api_title": "{1} API",
+  "api_description": "A listing of public API endpoints for retrieving {1} coin data and more.",
   "api_documentation": "API Documentation",
   "api_calls": "API Calls",
-  "api_getnetworkhashps": "Returns the current network hashrate. (hash/s)",
+  "api_getnetworkhashps": "Returns the current network hashrate. (Megahash/s)",
   "api_getblockchaininfo": "Returns the current block chain info including various stats.",
   "api_getmininginfo": "Returns the current block chain info including various stats.",
   "api_getdifficulty": "Returns the current Proof of work (PoW) difficulty for",
@@ -300,7 +313,7 @@
   "mkt_amount": "Amount",
   "mkt_total": "Total",
   "mkt_trade": "Trade",
-  "mkt_trade_history": "Trade History",
+  "mkt_trade_history": "Trade History ({1})",
   "mkt_type": "Type",
   "mkt_time_stamp": "Time",
   "mkt_select": "Market Selection",
@@ -315,7 +328,7 @@
   "login_description": "Sign in with your address and password.",
 
   // User page
-  "login_user": "Welcome {1}",
+  "user_title": "Welcome {1}",
 
   // claim address view
   "claim_title": "{1} Wallet Address Claim",

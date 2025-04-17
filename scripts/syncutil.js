@@ -1,9 +1,10 @@
-const debug = require('debug')('debug')
+const debug = require('debug')('market')
 const mongoose = require('mongoose')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
 const { StatsDb } = require('../lib/database')
 const coingecko = require('../lib/apis/coingecko')
+const request = require('postman-request')
 
 function check_net_missing(argv) {
   if (argv.length < 3) {
@@ -26,6 +27,19 @@ function get_int_param(args, index) {
     console.warn("Failed get int parameter at index %d: %o", index, args)
     return -1
   }
+}
+
+function get_int_list_param(args, index) {
+  const string = args[index]
+  const list = string.split(',')
+  var valid = true
+  for (l in list) {
+    if (!Number.isInteger(l)) //  | Number(l) < 0
+      valid = false
+  }
+  if (!valid)
+    console.warn("Failed get int list parameter at index %d: %o", index, args)
+  return list;
 }
 
 function init_db_if_enabled(net) {
@@ -95,7 +109,10 @@ function gracefully_shut_down(process, stopSync) {
 }
 
 function get_last_usd_price(stopSync, net=settings.getDefaultNet()) {
-  get_last_usd_price_by_coingecko(function(err) {
+  // get_last_usd_price_by_coingecko
+  // get_last_usd_price_by_xeggex
+  // get_last_usd_price_by_exbitron
+  get_last_usd_price_by_xeggex(function(err) {
     if (err == null) {
       const coin = settings.getCoin(net)
       update_last_updated_stats(coin.name, { markets_last_updated: Math.floor(new Date() / 1000) }, function(cb) {
@@ -121,6 +138,8 @@ function get_last_usd_price_by_coingecko(cb, net=settings.getDefaultNet()) {
   if (markets_page.exchanges[markets_page.default_exchange.exchange_name].enabled == true) {
     // get the list of coins from coingecko
     coingecko.get_coin_data(function (err, coin_list) {
+      if (debug.enabled)
+        debug('Got coin list from coingecko: %o.', coin_list)
       // check for errors
       if (err == null) {
         var symbol = markets_page.default_exchange.trading_pair.split('/')[1]
@@ -153,6 +172,75 @@ function get_last_usd_price_by_coingecko(cb, net=settings.getDefaultNet()) {
       } else {
         // return error msg
         return cb(err)
+      }
+    })
+  } else {
+    // default exchange is not enabled so just exit without updating last price for now
+    return cb(null)
+  }
+}
+
+function get_last_usd_price_by_xeggex(cb, net=settings.getDefaultNet()) {
+  const coin = settings.getCoin(net)
+  const markets_page = settings.get(net, 'markets_page')
+  const req_url = 'https://api.xeggex.com/api/v2/asset/info?id=' + coin.symbol + '&ticker=' + coin.symbol
+  if (markets_page.exchanges[markets_page.default_exchange.exchange_name].enabled == true) {
+    request({uri: req_url, json: true}, function (error, response, summary) {
+      if (error)
+        return cb(error)
+      else {
+        if (summary != null) {
+          if (!isNaN(summary.usdValue)) {
+            console.log("Got latest USD price for '%s' from xeggex: %d", net, summary.usdValue)
+            if (debug.enabled)
+              debug("Got %o summary data.", summary)
+            StatsDb[net].findOne({coin: coin.name}).then((stats) => {
+              StatsDb[net].updateOne({coin: coin.name}, {
+                last_usd_price: summary.usdValue
+              }).then(() => {
+                // last usd price updated successfully
+                return cb(null)
+              })
+            })
+          } else
+            return cb("Summary USD value is not a for '%s'.", coin.symbol)
+        } else
+          return cb("Summary not found for '%s'.", coin.symbol)
+      }
+    })
+  } else {
+    // default exchange is not enabled so just exit without updating last price for now
+    return cb(null)
+  }
+}
+
+function get_last_usd_price_by_exbitron(cb, net=settings.getDefaultNet()) {
+  const coin = settings.getCoin(net)
+  const markets_page = settings.get(net, 'markets_page')
+  const req_url = 'https://api.exbitron.digital/api/v1/trading/info/' + coin.symbol + '-USDT'
+  if (markets_page.exchanges[markets_page.default_exchange.exchange_name].enabled == true) {
+    request({uri: req_url, json: true}, function (error, response, summary) {
+      if (error)
+        return cb(error)
+      else {
+        if (summary != null && summary.data != null && summary.data.market != null && summary.data.market.marketDynamics != null) {
+          const lastPrice = summary.data.market.marketDynamics.lastPrice
+          if (!isNaN(lastPrice)) {
+            console.log("Got latest USDT price for '%s' from xeggex: %d", net, lastPrice)
+            if (debug.enabled)
+              debug("Got %o summary data.", summary)
+            StatsDb[net].findOne({coin: coin.name}).then((stats) => {
+              StatsDb[net].updateOne({coin: coin.name}, {
+                last_usd_price: lastPrice
+              }).then(() => {
+                // last usd price updated successfully
+                return cb(null)
+              })
+            })
+          } else
+            return cb("Summary USD value is not a for '%s'.", coin.symbol)
+        } else
+          return cb("Summary not found for '%s'.", coin.symbol)
       }
     })
   } else {
@@ -249,6 +337,7 @@ module.exports = {
   check_net_missing: check_net_missing,
   check_net_unknown: check_net_unknown,
   get_int_param: get_int_param,
+  get_int_list_param: get_int_list_param,
   init_db_if_enabled: init_db_if_enabled,
   init_db: init_db,
   exit: exit,

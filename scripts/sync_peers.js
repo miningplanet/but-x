@@ -1,4 +1,4 @@
-const debug = require('debug')('sync')
+// const debug = require('debug')('sync')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
 const { PeersDb } = require('../lib/database')
@@ -65,6 +65,14 @@ if (!db.lib.is_locked([lock], net)) {
                   port: port,
                   protocol: body[i].version,
                   version: subver,
+                  lastsend: body[i].lastsend,
+                  lastreceived: body[i].lastreceived,
+                  bytessend: body[i].bytessent,
+                  bytesreceived: body[i].bytesrecv,
+                  conntime: body[i].conntime,
+                  ping: body[i].pingtime,
+                  startingheight: body[i].startingheight,
+                  banscore: body[i].banscore,
                   country: peer.country,
                   country_code: peer.country_code
                 }, function() {

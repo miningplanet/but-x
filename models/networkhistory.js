@@ -6,7 +6,6 @@ module.exports = new require('mongoose').Schema({
   nethash_lyra2: { type: Number, default: 0 },
   nethash_sha256d: { type: Number, default: 0 },
   nethash_scrypt: { type: Number, default: 0 },
-  nethash_butkscrypt: { type: Number, default: 0 },
   nethash_memehash: { type: Number, default: 0 },
   nethash_mike: { type: Number, default: 0 },
   difficulty_pow: { type: Number, default: 0 },
@@ -16,7 +15,6 @@ module.exports = new require('mongoose').Schema({
   difficulty_lyra2: { type: Number, default: 0 },
   difficulty_sha256d: { type: Number, default: 0 },
   difficulty_scrypt: { type: Number, default: 0 },
-  difficulty_butkscrypt: { type: Number, default: 0 },
   difficulty_memehash: { type: Number, default: 0 },
   difficulty_mike: { type: Number, default: 0 }
 }, {id: false})

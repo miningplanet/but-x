@@ -67,7 +67,6 @@ NOTE: As of v1.100.0-bae4d50, it is no longer necessary to manually restart the 
 -Added a Hashrate chart to the page header
 -Added a Difficulty chart to the page header
 -Improved the Index/Update sync feature (Shifted some of the code around to be run in a better order)
--update_heavy has been moved into a proper callback function which is now only called for index and reindex syncs right near the end of the process instead of at the beginning
 -Added some tweaks and improvements to the Reindex sync feature (Added an "Are you sure" prompt before starting the reindex, All necessary coin stat data is cleared before starting, More and better messages about what is being done during the process, Shifted some of the code around to be run in a better order)
 -Added unique page titles for each individual page
 -Added code to prevent caching of local css files

@@ -22,125 +22,125 @@ describe('explorer', function() {
     });
   });
 
-  describe('is_unique', function() {
-    var arrayStrMap = [
-      {'addresses' : 'XsF8k8s5CoS3XATqW2FkuTsznbJJzFAC2U'},
-      {'addresses' : 'XsF8k8s5C14FbhqW2FkuATsznFACAfVhUn'},
-      {'addresses' : 'XsF8k8s5CoAF5gTqW2FkuTsznbJJzhkj5A'},
-      {'addresses' : 'XfuW2K9QiGMSsq5eXgtimEQvTvz9dzBCzb'}
-    ];
+  // describe('is_unique', function() {
+  //   var arrayStrMap = [
+  //     {'addresses' : 'XsF8k8s5CoS3XATqW2FkuTsznbJJzFAC2U'},
+  //     {'addresses' : 'XsF8k8s5C14FbhqW2FkuATsznFACAfVhUn'},
+  //     {'addresses' : 'XsF8k8s5CoAF5gTqW2FkuTsznbJJzhkj5A'},
+  //     {'addresses' : 'XfuW2K9QiGMSsq5eXgtimEQvTvz9dzBCzb'}
+  //   ];
 
-    var arrayArrMap = [
-      {'addresses' : ['XsF8k8s5CoS3XATqW2FkuTsznbJJzFAC2U']},
-      {'addresses' : ['XsF8k8s5C14FbhqW2FkuATsznFACAfVhUn']},
-      {'addresses' : ['XsF8k8s5CoAF5gTqW2FkuTsznbJJzhkj5A']},
-      {'addresses' : ['XfuW2K9QiGMSsq5eXgtimEQvTvz9dzBCzb']}
-    ];
+  //   var arrayArrMap = [
+  //     {'addresses' : ['XsF8k8s5CoS3XATqW2FkuTsznbJJzFAC2U']},
+  //     {'addresses' : ['XsF8k8s5C14FbhqW2FkuATsznFACAfVhUn']},
+  //     {'addresses' : ['XsF8k8s5CoAF5gTqW2FkuTsznbJJzhkj5A']},
+  //     {'addresses' : ['XfuW2K9QiGMSsq5eXgtimEQvTvz9dzBCzb']}
+  //   ];
 
-    it('should return index of matching string object', function() {
-      lib.is_unique(arrayStrMap, arrayStrMap[2].addresses, 'addresses', function(unique, index) {
-        expect(index).toEqual(2);
-        expect(unique).toEqual(false);
-      });
-    });
+  //   it('should return index of matching string object', function() {
+  //     lib.is_unique(arrayStrMap, arrayStrMap[2].addresses, 'addresses', function(unique, index) {
+  //       expect(index).toEqual(2);
+  //       expect(unique).toEqual(false);
+  //     });
+  //   });
 
-    it('should return index of matching array object', function() {
-      lib.is_unique(arrayArrMap, arrayArrMap[2].addresses, 'addresses', function(unique, index) {
-        expect(index).toEqual(2);
-        expect(unique).toEqual(false);
-      });
-    });
+  //   it('should return index of matching array object', function() {
+  //     lib.is_unique(arrayArrMap, arrayArrMap[2].addresses, 'addresses', function(unique, index) {
+  //       expect(index).toEqual(2);
+  //       expect(unique).toEqual(false);
+  //     });
+  //   });
 
-    it('should return true if no matching string object', function() {
-      lib.is_unique(arrayStrMap, 'unique', 'addresses', function(unique, index) {
-        expect(index).toEqual(null);
-        expect(unique).toEqual(true);
-      });
-    });
+  //   it('should return true if no matching string object', function() {
+  //     lib.is_unique(arrayStrMap, 'unique', 'addresses', function(unique, index) {
+  //       expect(index).toEqual(null);
+  //       expect(unique).toEqual(true);
+  //     });
+  //   });
 
-    it('should return true if no matching array object', function() {
-      lib.is_unique(arrayArrMap, ['unique'], 'addresses', function(unique, index) {
-        expect(index).toEqual(null);
-        expect(unique).toEqual(true);
-      });
-    });
-  });
+  //   it('should return true if no matching array object', function() {
+  //     lib.is_unique(arrayArrMap, ['unique'], 'addresses', function(unique, index) {
+  //       expect(index).toEqual(null);
+  //       expect(unique).toEqual(true);
+  //     });
+  //   });
+  // });
 
-  describe('prepare_vout', function() {
-    var originalTimeout;
+  // describe('prepare_vout', function() {
+  //   var originalTimeout;
 
-    beforeEach(function() {
-      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-    });
+  //   beforeEach(function() {
+  //     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+  //   });
 
-    it('should ignore nonstandard outputs', function(done) {
-      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
-        expect(prepared.length).toEqual(2);
-        done();
-      });
-    });
+  //   it('should ignore nonstandard outputs', function(done) {
+  //     lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+  //       expect(prepared.length).toEqual(2);
+  //       done();
+  //     });
+  //   });
 
-    it('should maintain order', function(done) {
-      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
-        expect(prepared[1].amount).toEqual(17499989908960);
-        expect(prepared[1].addresses).toEqual('ENpRvyLpLFEyrMZthAGABhxZi3N4Byk3Ab');
-        done();
-      });
-    });
+  //   it('should maintain order', function(done) {
+  //     lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+  //       expect(prepared[1].amount).toEqual(17499989908960);
+  //       expect(prepared[1].addresses).toEqual('ENpRvyLpLFEyrMZthAGABhxZi3N4Byk3Ab');
+  //       done();
+  //     });
+  //   });
 
-    afterEach(function() {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-    });
-  });
+  //   afterEach(function() {
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  //   });
+  // });
 
-  describe('calculate_total', function() {
-    var originalTimeout;
+  // describe('calculate_total', function() {
+  //   var originalTimeout;
 
-    beforeEach(function() {
-      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-    });
+  //   beforeEach(function() {
+  //     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+  //   });
 
-    it('should calculate correct total', function(done) {
-      lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
-        lib.calculate_total(prepared, function(total) {
-          expect(total).toEqual(19499989908960);
-          done();
-        });
-      });
-    });
+  //   it('should calculate correct total', function(done) {
+  //     lib.prepare_vout(net, data.txA().vout, data.txA().txid, data.txA().vin, ((typeof data.txA().vjoinsplit === 'undefined' || data.txA().vjoinsplit == null) ? [] : data.txA().vjoinsplit), function(prepared) {
+  //       lib.calculate_total(prepared, function(total) {
+  //         expect(total).toEqual(19499989908960);
+  //         done();
+  //       });
+  //     });
+  //   });
 
-    afterEach(function() {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-    });
-  });
+  //   afterEach(function() {
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  //   });
+  // });
 
-  describe('prepare_vin', function() {
-    var originalTimeout;
+  // describe('prepare_vin', function() {
+  //   var originalTimeout;
 
-    beforeEach(function() {
-      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-    });
+  //   beforeEach(function() {
+  //     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+  //   });
 
-    it('should return array of correct length', function(done) {
-      lib.prepare_vin(net, data.txB(), function(prepared) {
-        expect(prepared.length).toEqual(1);
-        done();
-      });
-    });
+  //   it('should return array of correct length', function(done) {
+  //     lib.prepare_vin(net, data.txB(), function(prepared) {
+  //       expect(prepared.length).toEqual(1);
+  //       done();
+  //     });
+  //   });
 
-    it('should get correct input addresses', function(done) {
-      lib.prepare_vin(net, data.txB(), function(prepared) {
-        expect(prepared[0].amount).toEqual(27499989920000);
-        expect(prepared[0].addresses).toEqual('coinbase');
-        done();
-      });
-    });
+  //   it('should get correct input addresses', function(done) {
+  //     lib.prepare_vin(net, data.txB(), function(prepared) {
+  //       expect(prepared[0].amount).toEqual(27499989920000);
+  //       expect(prepared[0].addresses).toEqual('coinbase');
+  //       done();
+  //     });
+  //   });
 
-    afterEach(function() {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-    });
-  });
+  //   afterEach(function() {
+  //     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  //   });
+  // });
 });

@@ -345,7 +345,7 @@ block content
                     em Returns the latest [length] transactions greater than [min] coins, starting from offset [start], optionally only the given transaction type, either by its index (starting with 0) or type.
                     ul 
                       each tx_type, index in tx_types
-                            li #{index} - #{tx_type}
+                            li #{index} - #{tx_type.replace('TRANSACTION_', '')}
                   div
                     em Note: [length] is limited to returning #{api_page.public_apis.ext.getlasttxs.max_items_per_query} records per query
                   div
@@ -461,6 +461,29 @@ block content
                   else
                     a(href='/ext/getmasternoderewardstotal/' + api_page.sample_data.address + '/' + api_page.sample_data.blockindex) #{address}/ext/getmasternoderewardstotal/#{api_page.sample_data.address}/#{api_page.sample_data.blockindex}
           hr
+        if !api_page.public_apis.hide_asset_api_section
+          h3 Asset API
+          if api_page.public_apis.db.asset.enabled == true
+            li
+              p
+                div.fw-bold asset [name] [net]
+                div
+                  em Returns all data about an asset.
+                if !isMainnet
+                  a(href='/api/asset/' + api_page.sample_data.asset + '/' + net) #{address}/api/asset/#{api_page.sample_data.asset}/#{net}
+                else
+                  a(href='/api/asset/' + api_page.sample_data.asset) #{address}/api/asset/#{api_page.sample_data.asset}
+          if api_page.public_apis.db.assets.enabled == true
+            li
+              p
+                div.fw-bold assets [net]
+                div
+                  em Returns a list of all assets on the blockchain.
+                if !isMainnet
+                  a(href='/api/assets/' + net) #{address}/api/assets/#{net}
+                else
+                  a(href='/api/assets') #{address}/api/assets
+          hr
         if !api_page.public_apis.hide_net_api_section
           h3 Net API
           p
@@ -519,42 +542,43 @@ block content
                     em Unsubscribe to an X peer as a downstream peer.
                   a(href='/peers/unsubscribe/downstream') #{address}/peers/unsubscribe/downstream
           hr
-        h3 Linking (GET)
-        p
-          em Linking to X
-        ul
-          li
-            p
-              div.fw-bold transaction (/tx/txid)
-              if !isMainnet
-                a(href='/tx/' + api_page.sample_data.txhash + '/' + net) #{address}/tx/#{api_page.sample_data.txhash}/#{net}
-              else
-                a(href='/tx/' + api_page.sample_data.txhash) #{address}/tx/#{api_page.sample_data.txhash}
-          li
-            p
-              div.fw-bold block (/block/hash)
-              if !isMainnet
-                a(href='/block/' + api_page.sample_data.blockhash + '/' + net) #{address}/block/#{api_page.sample_data.blockhash}/#{net}
-              else
-                a(href='/block/' + api_page.sample_data.blockhash) #{address}/block/#{api_page.sample_data.blockhash}
-          li
-            p
-              div.fw-bold address (/address/hash)
-              if !isMainnet
-                a(href='/address/' + api_page.sample_data.address + '/' + net) #{address}/address/#{api_page.sample_data.address}/#{net}
-              else
-                a(href='/address/' + api_page.sample_data.address) #{address}/address/#{api_page.sample_data.address}
-          li
-            p
-              div.fw-bold qrcode (/qr/hash)
-              if !isMainnet
-                a(href='/qr/' + api_page.sample_data.address + '/' + net) #{address}/qr/#{api_page.sample_data.address}/#{net}
-              else
-                a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
-          hr
+        if !api_page.public_apis.hide_linking_section
+          h3 Linking (GET)
+          p
+            em Linking to X
+          ul
+            li
+              p
+                div.fw-bold transaction (/tx/txid)
+                if !isMainnet
+                  a(href='/tx/' + api_page.sample_data.txhash + '/' + net) #{address}/tx/#{api_page.sample_data.txhash}/#{net}
+                else
+                  a(href='/tx/' + api_page.sample_data.txhash) #{address}/tx/#{api_page.sample_data.txhash}
+            li
+              p
+                div.fw-bold block (/block/hash)
+                if !isMainnet
+                  a(href='/block/' + api_page.sample_data.blockhash + '/' + net) #{address}/block/#{api_page.sample_data.blockhash}/#{net}
+                else
+                  a(href='/block/' + api_page.sample_data.blockhash) #{address}/block/#{api_page.sample_data.blockhash}
+            li
+              p
+                div.fw-bold address (/address/hash)
+                if !isMainnet
+                  a(href='/address/' + api_page.sample_data.address + '/' + net) #{address}/address/#{api_page.sample_data.address}/#{net}
+                else
+                  a(href='/address/' + api_page.sample_data.address) #{address}/address/#{api_page.sample_data.address}
+            li
+              p
+                div.fw-bold qrcode (/qr/hash)
+                if !isMainnet
+                  a(href='/qr/' + api_page.sample_data.address + '/' + net) #{address}/qr/#{api_page.sample_data.address}/#{net}
+                else
+                  a(href='/qr/' + api_page.sample_data.address) #{address}/qr/#{api_page.sample_data.address}
+            hr
         if !api_page.public_apis.hide_electrum_api_section
           h3 ElectrumX API (JSON-RPC 2.0)
-          p ElectrumX servers for Butkoin light wallets (former Bitcoin Lightning) are available at 
+          p ElectrumX servers for light wallets (former Bitcoin Lightning) are available at 
             ul 
               li 88.99.186.230
               li 95.216.204.251
@@ -652,7 +676,7 @@ block content
               p
                 div.fw-bold address balance
                 div
-                  em Returns the balance for the given script hash in BUTK .
+                  em Returns the balance for the given script hash in EGOD .
                   p 
                     b {"id": "clientID", "method": "blockchain.scripthash.get_balance", "params": ["b8b56d50373d2c9b57d623e5379dd7a10708a563372a18b6d7ddedf4f2400855"]}
                   code -> {"jsonrpc":"2.0","result":{"confirmed":11321996296013,"unconfirmed":0},"id":"clientID"}
@@ -660,7 +684,7 @@ block content
               p
                 div.fw-bold list unspent
                 div
-                  em Returns unspent transaction outputs for the given script hash in BUTK.
+                  em Returns unspent transaction outputs for the given script hash in EGOD.
                   p 
                     b {"id": "clientID", "method": "blockchain.scripthash.listunspent", "params": ["b8b56d50373d2c9b57d623e5379dd7a10708a563372a18b6d7ddedf4f2400855"]}
                   code -> {"jsonrpc":"2.0","result":[{"tx_hash":"d554ac7a95b0f363fa6fd691acec43afb2ccd7cb4c7d4383d97ca62e26413af5","tx_pos":1,"height":80666,"value":8796296296300},{"tx_hash":"2599c9ac54b86cf9d5e9fd0dac21d9ebd39ab73510f3b3a10a894c35f1b3f0e8","tx_pos":1,"height":83930,"value":2435800000000},{"tx_hash":"d73530da14f5075f9976d9a17f1722bb2a42bd0d9893995b4e6f76001837ecb2","tx_pos":0,"height":331057,"value":87899999713},{"tx_hash":"87bc2c0ceae472f8865055713f64ff49fcd93fd739d52ced85f9df2b2cb8ba50","tx_pos":0,"height":414048,"value":2000000000}],"id":"clientID"}

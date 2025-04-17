@@ -55,6 +55,9 @@ block content
             { data: 'address' },
             { data: 'protocol' },
             { data: 'version' },
+            { data: 'banscore'},
+            { data: 'ping'},
+            { data: 'startingheight'},
             { data: 'country' }
           ];
         } else {
@@ -62,6 +65,9 @@ block content
             { data: 'address'},
             { data: 'protocol'},
             { data: 'version'},
+            { data: 'banscore'},
+            { data: 'ping'},
+            { data: 'startingheight'},
             { data: 'country', class: 'text-end' }
           ];
         }
@@ -92,16 +98,19 @@ block content
               flagBlock = '<div class="margin-left-5 flag-icon flag-icon-'+data['country_code'].toLowerCase()+'"></div>';
             }
 
-            $("td:eq(0)", row).html(data['address'] + ':' + data['port']).addClass('breakWord');
+            $("td:eq(0)", row).html(data['address'] + (data['port'] ? (':' + data['port']) : '')).addClass('text-start');
 
             /*if (setting_con_port_filter != '-1') {
               $("td:eq(1)", row).html(data['port']);
               colIndex = 2;
             }*/
 
-            $(`td:eq(1)`, row).html(data['protocol']);
+            $(`td:eq(1)`, row).html(data['protocol']).addClass('text-center');
             $(`td:eq(2)`, row).html(data['version']).addClass('full');
-            $(`td:eq(3)`, row).html("<span>" + data['country'] + "</span>" + flagBlock).addClass('countrycol');
+            $(`td:eq(3)`, row).html(data['banscore']).addClass('text-end');
+            $(`td:eq(4)`, row).html(data['ping']).addClass('text-end');
+            $(`td:eq(5)`, row).html(data['startingheight']).addClass('text-end');
+            $(`td:eq(6)`, row).html("<span>" + data['country'] + "</span>" + flagBlock).addClass('countrycol');
           },
           fnDrawCallback: function(settings) {
 
@@ -303,11 +312,14 @@ block content
           table#connections-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
             thead
               tr
-                th.text-center IP:port
+                th.text-center IP:Port
                 // if network_page.connections_table.port_filter != '-1'
                   th.text-center='Port'
                 th.text-center Protocol
                 th.text-center.full #{settings.locale.net_version}
+                th.text-center Banscore
+                th.text-center Ping
+                th.text-center Started
                 th.text-center
             tbody.text-center
       #addnodes.container.tab-pane(style='margin-top:0;border-top:0;')

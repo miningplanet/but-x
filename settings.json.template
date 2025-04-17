@@ -10,19 +10,21 @@
 */
 {
   // The URL of the embedding site.
-  "home_url": "https://butkoin.com",
+  "home_url":                               "https://site.xyz",
+  "home_title":                             "Home Link",
 
   // locale: Change language definitions. Only English is supported for now
   "locale": "locale/en.json",
 
   // list of coins.
   "coins": [
-    {
-    "id": "BUTK",
-    "name": "Butkoin",
-    "symbol": "BUTK",
-    "max_supply": 21000000000
-    }
+    { "id": "EGOD",   "name": "Egodcoin",   "symbol": "EGOD",   "max_supply":     420000000 },
+    { "id": "BTRM",   "name": "Bitoreum",   "symbol": "BTRM",   "max_supply":   21000000000 },
+    { "id": "RTM",    "name": "Raptoreum",  "symbol": "RTM",    "max_supply":   21000000000 },
+    { "id": "PEPEW",  "name": "PEPEPOW",    "symbol": "PEPEW",  "max_supply":   89999999997 },
+    { "id": "VKAX",   "name": "Vkax",       "symbol": "VKAX",   "max_supply":   21000000000 },
+    { "id": "YERB",   "name": "Yerbas",     "symbol": "YERB",   "max_supply":     420000000 },
+    { "id": "BTC",    "name": "Bitcoin",    "symbol": "BTC",    "max_supply":      21000000 }
   ],
 
   // list of DBs, first is default
@@ -53,7 +55,8 @@
       "host": "localhost",
       "port": 15998,
       "username": "rrr59AKrh3hdfgfgf",
-      "password": "ttfhgfhghgjhjwew"
+      "genesis_hash": "7e2489e3e792e445b485550840504179897ae3f501ef81dc4a53a6716a323175",
+      "start_time": 1675905317
     },
     {
       "id": "testnet",
@@ -61,14 +64,16 @@
       "host": "localhost",
       "port": 34340,
       "username": "admin1",
-      "password": "123"
+      "password": "123",
+      "genesis_hash": "eff0bbe5c1bbe1ef8da54822a18f528d6dc58232990bdb86e0a77ab2814ed12c",
+      "start_time": 1652138420
     }
   ],
 
   // Configures node.js express web framework (read more: https://www.npmjs.com/package/express)
   "webserver": {
     // The base URL of the but-x site. Overwrite for other chains.
-    "url": "https://x.butkoin.com",
+    "url": "https://x.egodcoin.org",
     // Express webserver port.
     "port": 3001,
     // Optional TLS (Transport Layer Security) settings.
@@ -104,7 +109,6 @@
     "GBP": { "minfd": 8, "maxfd": 8, "name": "British Pound Sterling", "code": "GBP", "symbol": "&pound;" },
     "RUB": { "minfd": 6, "maxfd": 6, "name": "Russian Ruble", "code": "RUB", "symbol": "&#8381;" },
     "BRL": { "minfd": 7, "maxfd": 7, "name": "Brazilian Real", "code": "BRL", "symbol": "R&#36;" },
-    "BUTK": { "minfd": 2, "maxfd": 2, "name": "Butkoin", "code": "BUTK", "symsbol": "BUTK" },
     "USDT": { "minfd": 8, "maxfd": 8, "name": "Tether", "code": "USDT", "symbol": "USDT" },
     "BTC": { "minfd": 8, "maxfd": 8, "name": "Bitcoin", "code": "BTC", "symbol": "BTC" },
     "LTC": { "minfd": 7, "maxfd": 7, "name": "Litecoin", "code": "LTC", "symbol": "LTC" },
@@ -132,6 +136,8 @@
     "blocks":           { "ttl": 120,   "size": 100 },
     "addresses":        { "ttl": 120,   "size": 100 },
     "addresstxes":      { "ttl": 120,   "size": 100 },
+    "assets":           { "ttl": 120,   "size": 10 },
+    "asset":            { "ttl": 120,   "size": 100 },
     "txs":              { "ttl": 120,   "size": 5000 },
     "peers":            { "ttl": 120,   "size": 100 },
     "masternodes":      { "ttl": 120,   "size": 100 },
@@ -154,8 +160,8 @@
     // Valid options: Darkly (until new and lean solution is implemented.)
     "theme": "Darkly",
     // Displayed at the end of the HTML title tag and also in the page header if "shared_pages.page_header.home_link" is set to "title".
-    "page_title": "butkoin.com",
-    "page_description": "Secure digital currency and asset storage. Butkoin supports instant transactions, CPU, GPU, ASIC mining and PoSe Smartnodes.",
+    "page_title": "site.xyz",
+    "page_description": "Secure digital currency and asset storage. Egodcoin supports instant transactions, CPU, GPU, ASIC mining and PoSe Smartnodes.",
     "page_tags": "crypto, currency, coin, governance, secure, bitcoin, explorer, mining, Ghostrider, Yespower, Lyra2, Sha256d, Scrypt, defi markets",
     // Base directory is public
     "favicon32": "img/logo.svg",
@@ -179,7 +185,8 @@
     // Valid options are: POW, POS or Hybrid.
     "difficulty": "POS",
     // Show network hash rate.
-    // TODO: Check. If false, the /api/getnetworkhashps and /ext/getsummary endpoints will no longer return the hash rate, and the network hashrate chart will automatically be disabled.
+    // TODO: Check. If false, the /api/getnetworkhashps and /ext/getsummary endpoints will no longer 
+    // return the hash rate, and the network hashrate chart will automatically be disabled.
     "show_hashrate": true,
     "page_header": {
       // menu: Valid options:
@@ -269,8 +276,6 @@
           "sha256d_fill_color": "rgba(66,245,245, 0.2)",
           "scrypt_line_color": "rgba(66,123,245)",
           "scrypt_fill_color": "rgba(66,123,245, 0.2)",
-          "butkscrypt_line_color": "rgba(54,52,186)",
-          "butkscrypt_fill_color": "rgba(54,52,186, 0.2)",
           "line_color": "rgba(54, 162, 235, 1)",
           "fill_color": "rgba(54, 162, 235, 0.2)",
           "crosshair_color": "#000000",
@@ -295,8 +300,6 @@
           "sha256d_fill_color": "rgba(66,245,245, 0.2)",
           "scrypt_line_color": "rgba(66,123,245)",
           "scrypt_fill_color": "rgba(66,123,245, 0.2)",
-          "butkscrypt_line_color": "rgba(54,52,186)",
-          "butkscrypt_fill_color": "rgba(54,52,186, 0.2)",
           "pow_line_color": "rgba(255, 99, 132, 1)",
           "pow_fill_color": "rgba(255, 99, 132, 0.2)",
           "pos_line_color": "rgba(255, 161, 0, 1)",
@@ -328,7 +331,7 @@
         {
           "enabled": true,
           "tooltip_text": "Twitter",
-          "url": "https://twitter.com/ButKoin_",
+          "url": "https://twitter.com/Egodcoin",
           "icon": "twitter",
           "image_path": ""
         },
@@ -370,7 +373,7 @@
         {
           "enabled": false,
           "tooltip_text": "Website",
-          "url": "https://butkoin.com",
+          "url": "https://egodcoin.org",
           "icon": "home",
           "image_path": ""
         },
@@ -425,9 +428,9 @@
     "show_header_menu": true,
     "info": {
       "description": "",
-      "home_url": "https://butkoin.com",
-      "whitepaper_url": "https://butkoin.com/whitepaper.pdf",
-      "whitepaper_title": "Butkoin Whitepaper",
+      "home_url": "https://egodcoin.org",
+      "whitepaper_url": "https://egodcoin.org/whitepaper.pdf",
+      "whitepaper_title": "Egodcoin Whitepaper",
       "show_coinbase": true,
       "show_masternode_info": true,
       "show_markets": true,
@@ -442,228 +445,228 @@
   },
 
   "block_page": {
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.block_title, locale.block_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
     "genesis_block": "001787e5f9c3cd249f84f0142071f6098d9e3b7ec8591ff73543ddc4900c1dc2"
   },
 
   "transaction_page": {
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.tx_title, locale.tx_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
-    "genesis_tx": "c083fb7c3b6936c15dc2685a522ffa685247e8c665c818888b51b0771584d7b4",
+    "genesis_tx":                         "c083fb7c3b6936c15dc2685a522ffa685247e8c665c818888b51b0771584d7b4",
     // Show OP_RETURN values that may have been embeddeded in a TX
     // NOTE: Enabling this option will require a full reindex of the blockchain 
     // data before previously synced transactions can display the OP_RETURN value.
-    "show_op_return": false
+    "show_op_return":                     false
   },
 
   "address_page": {
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.a_title, locale.a_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
     // Show Total Sent and Total Received columns at the top of the address page.
-    "show_sent_received": false,
+    "show_sent_received":                 false,
     // Show private/hidden wallet addresses with hyperlinks to all Hidden Addresses instead 
     // of plain text and allows viewing of the /address/hidden_address page.
-    "enable_hidden_address_view": false,
+    "enable_hidden_address_view":         false,
     // Allow viewing the special 'unknown_address' wallet address which is populated anytime a wallet 
     // address cannot be deciphered. Adds hyperlinks to all Unknown Addresses instead of plain text 
     // and allows viewing of the /address/unknown_address page.
-    "enable_unknown_address_view": false,
+    "enable_unknown_address_view":        false,
     "history_table": {
       // Limited by max_items_per_query for /ext/getaddresstxs.
-      "page_length_options": [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
-      "items_per_page": 50
+      "page_length_options":              [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
+      "items_per_page":                   50
     }
   },
 
   "error_page": {
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.error_title, locale.error_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     }
   },
 
   /* Additional Pages (can be enabled/disabled via settings) */
 
   "masternodes_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.mn_title, locale.mn_description
-      "show_img": true,
-      "show_title": true,
-      "show_last_updated": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_last_updated":                true,
+      "show_description":                 true
     },
     "masternode_table": {
-      "page_length_options": [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
-      "items_per_page": 10
+      "page_length_options":              [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
+      "items_per_page":                   10
     }
   },
 
   "movement_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.move_title, locale.move_description
-      "show_img": true,
-      "show_title": true,
-      "show_last_updated": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_last_updated":                true,
+      "show_description":                 true
     },
     "movement_table": {
       // Limited based on the max_items_per_query for the /ext/getlasttxs api
-      "page_length_options": [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
-      "items_per_page": 10,
-      "reload_table_seconds": 45,
-      "min_amount": 5000,
+      "page_length_options":              [ 10, 25, 50, 75, 100, 250, 500, 1000 ],
+      "items_per_page":                   10,
+      "reload_table_seconds":             45,
+      "min_amount":                       5000,
       // Flag all TX smaller or equal to this value
-      "low_warning_flag": 50000,
+      "low_warning_flag":                 50000,
       // Flag all TX greater or equal to this value
-      "high_warning_flag": 100000
+      "high_warning_flag":                100000
     }
   },
 
   "network_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.net_title, locale.net_description
-      "show_img": true,
-      "show_title": true,
-      "show_last_updated": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_last_updated":                true,
+      "show_description":                 true
     },
     // port_filter: Only show peers with this port. If 0, all peers are listed. 
     // If -1, the port os not shown. All peers are listed and grouped to one.
     // hide_protocols: Do not list peers with these protocols. I.e. [ 70218, 70220 ]
     "connections_table": {
-      "page_length_options": [ 10, 25, 50, 75, 100 ],
-      "items_per_page": 10,
-      "port_filter": -1,
-      "hide_protocols": [ ]
+      "page_length_options":              [ 10, 25, 50, 75, 100 ],
+      "items_per_page":                   10,
+      "port_filter":                      -1,
+      "hide_protocols":                   [ ]
     },
     "addnodes_table": {
-      "page_length_options": [ 10, 25, 50, 75, 100 ],
-      "items_per_page": 10,
-      "port_filter": -1,
-      "hide_protocols": [ ]
+      "page_length_options":              [ 10, 25, 50, 75, 100 ],
+      "items_per_page":                   10,
+      "port_filter":                      -1,
+      "hide_protocols":                   [ ]
     },
     "onetry_table": {
-      "page_length_options": [ 10, 25, 50, 75, 100 ],
-      "items_per_page": 10,
-      "port_filter": -1,
-      "hide_protocols": [ ]
+      "page_length_options":              [ 10, 25, 50, 75, 100 ],
+      "items_per_page":                   10,
+      "port_filter":                      -1,
+      "hide_protocols":                   [ ]
     }
   },
 
   "richlist_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.rl_title, locale.rl_description
-      "show_img": true,
-      "show_title": true,
-      "show_last_updated": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_last_updated":                true,
+      "show_description":                 true
     },
     // Show top balance addresses.
-    "show_current_balance": true,
+    "show_current_balance":               true,
     // Show top received coins addresses.
-    "show_received_coins": true,
+    "show_received_coins":                true,
     // Show top highest total value TX.
-    "show_top_tx": true,
+    "show_top_tx":                        true,
     // Summary table with the breakdown of coins owned by the top 1-25, 26-50, 51-75, 76-100, 101+ wallets and all burned coins plus an associated pie chart.
     "wealth_distribution": {
-      "show_distribution_table": true,
-      "show_distribution_chart": true,
+      "show_distribution_table":          true,
+      "show_distribution_chart":          true,
       // Array of 6 colors (incl. burned coins, if enabled).
       "colors": [ "#e73cbd", "#00bc8c", "#3498db", "#e3ce3e", "#adb5bd", "#e74c3c" ]
     },
     // NOTE: Changes here might require sync or reindex-rich.
     "burned_coins": {
       // Exclude these addresses from tables and charts.
-      "addresses": [ "ButkBurnAddressXXXXXXXXXXXXXW7cDZQ" ],
+      "addresses":                        [ "EgodBurnAddressXXXXXXXXXXXXXW7cDZQ" ],
       // Set this value to false if your blockchain already has a mechanism for removing burned coins.
-      "include_burned_coins_in_distribution": false
+      "include_burned_coins_in_dist": false
     }
   },
 
   "markets_page": {
-    "enabled": false,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            false,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.mkt_title, locale.mkt_description
-      "show_img": true,
-      "show_title": true,
-      "show_last_updated": true,
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_last_updated":                true,
       // Show external link to the exchange trading page
-      "show_exchange_url": true,
-      "show_description": true
+      "show_exchange_url":                true,
+      "show_description":                 true
     },
     // Show market dropdown menu in the page header (if more than one market available),
     // or a menu item that navigates to the default market.
-    "show_market_dropdown_menu": true,
+    "show_market_dropdown_menu":          true,
     // Shows the market overview with a list of all markets and market data at th etop of the market page.
-    "show_market_select": true,
+    "show_market_select":                 true,
     // exchanges: see lib/markets
     "exchanges": {
       "exbitron": {
         "enabled": true,
-        "trading_pairs": [ "BUTK/USDT", "BUTK/LTC", "BUTK/DOGE", "BUTK/EXTO" ]
+        "trading_pairs": [ ]
       },
       "btrmex": {
         "enabled": true,
-        "trading_pairs": [ "BUTK/USDT" ]
+        "trading_pairs": [ ]
       },
       "bitxonex": {
         "enabled": true,
-        "trading_pairs": [ "BUTK/USDT", "BUTK/LTC" ]
+        "trading_pairs": [ ]
       },
       "altmarkets": {
         "enabled": false,
@@ -698,170 +701,176 @@
     // If blank, the first enabled exchange and trading pair will be used as the default exchange.
     // Determines the last market price shown in the panels.
     "default_exchange": {
-      "exchange_name": "btrmex",
-      "trading_pair": "BUTK/USDT"
+      "exchange_name":                    "btrmex",
+      "trading_pair":                     "EGOD/USDT"
     }
   },
 
   "api_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.api_title, locale.api_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
-    "show_logo": true,
+    "show_logo":                          true,
     "sample_data": {
-      "blockindex": 500,
-      "blockhash": "775d67da29dd6553268061f86368d06654944dd5d5c61db4c97e4c7960c11a74",
-      "txhash": "6cb3babd256de253f926f10bc8574dadf0a3e2fc8380107b81eb07c67d1e73ed",
-      "address": "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
-      "address": "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
+      "asset":                            "TROLLTIPS",
+      "blockindex":                       500,
+      "blockhash":                        "775d67da29dd6553268061f86368d06654944dd5d5c61db4c97e4c7960c11a74",
+      "txhash":                           "6cb3babd256de253f926f10bc8574dadf0a3e2fc8380107b81eb07c67d1e73ed",
+      "address":                          "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
+      "address":                          "XkffzeBW9S39X6zwEVpNrRsdSx5sfRK8or",
       // 'HelloWorld' to base64 (SGVsbG9Xb3JsZA==) to URL-encoded
-      "base64UrlEncodedMessage": "SGVsbG9Xb3JsZA%3D%3D",
+      "base64UrlEncodedMessage":          "SGVsbG9Xb3JsZA%3D%3D",
       // signature (H1B9Yt0gLf9V/W6L5GJ73O6Kb4RYL12zJ1YPrYS+tv0tIIsnREY92/+F2n9nBFxVzIqQL/L8blE8tnmWE2QAm8E=) to URL-encoded
-      "base64UrlEncodedSignature": "H1B9Yt0gLf9V%2FW6L5GJ73O6Kb4RYL12zJ1YPrYS%2Btv0tIIsnREY92%2F%2BF2n9nBFxVzIqQL%2FL8blE8tnmWE2QAm8E%3D"
+      "base64UrlEncodedSignature":        "H1B9Yt0gLf9V%2FW6L5GJ73O6Kb4RYL12zJ1YPrYS%2Btv0tIIsnREY92%2F%2BF2n9nBFxVzIqQL%2FL8blE8tnmWE2QAm8E%3D"
     },
     // Public available APIs.
     "public_apis": {
-      "hide_rpc_api_section": false,
-      "hide_ext_api_section": false,
-      "hide_net_api_section": false,
-      "hide_peers_api_section": false,
-      "hide_electrum_api_section": false,
+      "hide_rpc_api_section":             false,
+      "hide_ext_api_section":             false,
+      "hide_asset_api_section":           false,
+      "hide_net_api_section":             false,
+      "hide_peers_api_section":           false,
+      "hide_electrum_api_section":        false,
       // Data by RPC daemon. Might also have been stored in DB or is cached.
       // #{address}/api/#{name}/#{net}
       "rpc": {
-        "getdifficulty": { "enabled": true },
-        "getconnectioncount": { "enabled": true },
-        "getblockcount": { "enabled": true },
-        "getblockhash": { "enabled": true },
-        "getblock": { "enabled": true },
-        "getrawtransaction": { "enabled": true },
-        "getnetworkhashps": { "enabled": true },
-        "getvotelist": { "enabled": true },
-        "getmasternodecount": { "enabled": true },
-        "verifymessage": { "enabled": true },
-        "validateaddress": { "enabled": true },
-        "getgovernanceinfo": { "enabled": true }
+        "getdifficulty":                  { "enabled": true },
+        "getconnectioncount":             { "enabled": true },
+        "getblockcount":                  { "enabled": true },
+        "getblockhash":                   { "enabled": true },
+        "getblock":                       { "enabled": true },
+        "getrawtransaction":              { "enabled": true },
+        "getnetworkhashps":               { "enabled": true },
+        "getvotelist":                    { "enabled": true },
+        "getmasternodecount":             { "enabled": true },
+        "verifymessage":                  { "enabled": true },
+        "validateaddress":                { "enabled": true },
+        "getgovernanceinfo":              { "enabled": true }
       },
       // Extended API.
       // #{address}/ext/#{name}/#{net}
       "ext": {
-        "getblockchaininfo": { "enabled": true },
-        "getmoneysupply": { "enabled": true },
-        "getdistribution": { "enabled": true },
-        "getaddress": { "enabled": true },
-        "getaddresstxs": { "enabled": true, "max_items_per_query": 1000 },
-        "gettx": { "enabled": true },
-        "getbalance": { "enabled": true },
-        "getlasttxs": { "enabled": true, "max_items_per_query": 1000 },
-        "getcurrentprice": { "enabled": true },
-        "getnetworkpeers": { "enabled": true },
-        "getbasicstats": { "enabled": true },
-        "getticker": { "enabled": true },
-        "getmarkets": { "enabled": true },
-        "getsummary": { "enabled": true },
-        "getmasternodelist": { "enabled": true },
-        "getmasternoderewards": { "enabled": true },
-        "getmasternoderewardstotal": { "enabled": true }
+        "getblockchaininfo":              { "enabled": true },
+        "getmoneysupply":                 { "enabled": true },
+        "getdistribution":                { "enabled": true },
+        "getaddress":                     { "enabled": true },
+        "getaddresstxs":                  { "enabled": true, "max_items_per_query": 1000 },
+        "gettx":                          { "enabled": true },
+        "getbalance":                     { "enabled": true },
+        "getlasttxs":                     { "enabled": true, "max_items_per_query": 1000 },
+        "getcurrentprice":                { "enabled": true },
+        "getnetworkpeers":                { "enabled": true },
+        "getbasicstats":                  { "enabled": true },
+        "getticker":                      { "enabled": true },
+        "getmarkets":                     { "enabled": true },
+        "getsummary":                     { "enabled": true },
+        "getmasternodelist":              { "enabled": true },
+        "getmasternoderewards":           { "enabled": true },
+        "getmasternoderewardstotal":      { "enabled": true }
+      },
+      "db": {
+        "asset":                          { "enabled": true },
+        "assets":                         { "enabled": true }
       },
       // All Net API.
       "net": {
-        "getallnet": { "enabled": true }
+        "getallnet":                      { "enabled": true }
       },
       // X peers layer API.
       "peers": {
-        "allowed_ips": [ "::ffff:127.0.0.1", "127.0.0.1" ],
-        "getpeers": { "enabled": true },
-        "subscribe_upstream": { "enabled": true },
-        "subscribe_downstream": { "enabled": true },
-        "unsubscribe_upstream": { "enabled": true },
-        "unsubscribe_downstream": { "enabled": true }
+        "allowed_ips":                    [ "::ffff:127.0.0.1", "127.0.0.1" ],
+        "getpeers":                       { "enabled": true },
+        "subscribe_upstream":             { "enabled": true },
+        "subscribe_downstream":           { "enabled": true },
+        "unsubscribe_upstream":           { "enabled": true },
+        "unsubscribe_downstream":         { "enabled": true }
       }
     }
   },
 
   "registration_page": {
-    "enabled": true,
-    "show_panels": true,
-    "show_panels_position": "top",
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        true,
+    "show_panels_position":               "top",
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
-    "show_header_menu": true,
-    "enable_bad_word_filter": true,
-    "min_balance_for_registration": 100
+    "show_header_menu":                   true,
+    "enable_bad_word_filter":             true,
+    "min_balance_for_registration":       100
   },
 
   "login_page": {
-    "enabled": true,
-    "show_panels": true,
-    "show_panels_position": "top",
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        true,
+    "show_panels_position":               "top",
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
-    "show_header_menu": true,
-    "enable_bad_word_filter": true,
-    "min_balance_for_login": 100
+    "show_header_menu":                   true,
+    "enable_bad_word_filter":             true,
+    "min_balance_for_login":              100
   },
 
   "user_page": {
-    "enabled": true,
-    "show_panels": true,
-    "show_panels_position": "top",
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        true,
+    "show_panels_position":               "top",
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
-    "show_header_menu": true
+    "show_header_menu":                   true
   },
 
   "claim_address_page": {
-    "enabled": true,
-    "show_panels": false,
-    "show_panels_position": 'top',
-    "show_nethash_chart": false,
-    "show_difficulty_chart": false,
+    "enabled":                            true,
+    "show_panels":                        false,
+    "show_panels_position":               'top',
+    "show_nethash_chart":                 false,
+    "show_difficulty_chart":              false,
     "page_header": {
       // locale.claim_title, locale.claim_description
-      "show_img": true,
-      "show_title": true,
-      "show_description": true
+      "show_img":                         true,
+      "show_title":                       true,
+      "show_description":                 true
     },
     // Show or hide the "Claim Address" header menu item. Page will be still available.
-    "show_header_menu": true,
+    "show_header_menu":                   true,
     // "bad word" filter for claimed addresses. For more see here: https://www.npmjs.com/package/bad-words
-    "enable_bad_word_filter": true
+    "enable_bad_word_filter":             true
   },
 
   // sync: a collection of settings that pertain to the data synchronization process
   "sync": {
     // Single / multiple threads sync. Use 1 for serial sync. Recommended!
     // If not. Historical balance data for a wallet addresses might be stored without order.
-    "block_parallel_tasks": 1,
+    "block_parallel_tasks":               1,
     // Time to wait in ms before moving to the next block or TX during sync or reindex.
-    "update_timeout": 5,
+    "update_timeout":                     5,
     // Time to wait in ms before moving to the next block or TX during a check sync.
-    "check_timeout": 250,
+    "check_timeout":                      250,
     // Save coinstats every n blocks during index sync.
-    "save_stats_after_sync_blocks": 100,
+    "save_stats_after_sync_blocks":       100,
     // Show the sync msg at the top of all pages during index sync if there are more than this many blocks to process.
     "show_sync_msg_when_syncing_more_than_blocks": 1000
   },
@@ -882,30 +891,30 @@
   // Maps the API commands to RPC. Blank ("") means disabled.
   "api_cmds": {
     // Use RPC or API endpoints. Always true until replaced by new concept.
-    "use_rpc": true,
-    "getnetworkhashps": "getnetworkhashps",
-    "getmininginfo": "getmininginfo",
-    "getdifficulty": "getdifficulty",
-    "getconnectioncount": "getconnectioncount",
-    "getblockcount": "getblockcount",
-    "getblockhash": "getblockhash",
-    "getblock": "getblock",
-    "getrawtransaction": "getrawtransaction",
-    "getinfo": "getinfo",
-    "getblockchaininfo": "getblockchaininfo",
-    "getpeerinfo": "getpeerinfo",
-    "gettxoutsetinfo": "gettxoutsetinfo",
-    "getvotelist": "masternodelist votes",
-    "getmasternodecount": "getmasternodecount",
-    "getmasternodelist": "listmasternodes",
+    "use_rpc":                            true,
+    "getnetworkhashps":                   "getnetworkhashps",
+    "getmininginfo":                      "getmininginfo",
+    "getdifficulty":                      "getdifficulty",
+    "getconnectioncount":                 "getconnectioncount",
+    "getblockcount":                      "getblockcount",
+    "getblockhash":                       "getblockhash",
+    "getblock":                           "getblock",
+    "getrawtransaction":                  "getrawtransaction",
+    "getinfo":                            "getinfo",
+    "getblockchaininfo":                  "getblockchaininfo",
+    "getpeerinfo":                        "getpeerinfo",
+    "gettxoutsetinfo":                    "gettxoutsetinfo",
+    "getvotelist":                        "masternodelist votes",
+    "getmasternodecount":                 "getmasternodecount",
+    "getmasternodelist":                  "listmasternodes",
     // verifymessage: Verify a signed message. Must accept the following arguments:
     //                address: The wallet address to use for the signature
     //                signature: The signature provided by the signer in base 64 encoding
     //                message: The message that was signed
-    "verifymessage": "verifymessage",
+    "verifymessage":                      "verifymessage",
     // Needs a wallet address as parameter.
-    "validateaddress": "validateaddress",
-    "getgovernanceinfo": "getgovernanceinfo"
+    "validateaddress":                    "validateaddress",
+    "getgovernanceinfo":                  "getgovernanceinfo"
   },
 
   // Non-standard blockchain features (deprecated).
@@ -913,11 +922,11 @@
     "bitcoin": {
       // Enable / disable the use of bitcoin scripts.
       // NOTE: Enabling this feature requires a full reindex to fix any P2PK TX.
-      "enabled": false,
+      "enabled":                          false,
       // Maps the API commands to RPC. Blank ("") means disabled.
       "api_cmds": {
-        "getdescriptorinfo": "getdescriptorinfo",
-        "deriveaddresses": "deriveaddresses"
+        "getdescriptorinfo":              "getdescriptorinfo",
+        "deriveaddresses":                "deriveaddresses"
       }
     },
     "heavycoin": {

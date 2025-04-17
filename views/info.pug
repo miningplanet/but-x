@@ -24,10 +24,7 @@ block content
                 .sub-page-header.text-muted=settings.locale.info_description.replace('{1}', coin.name)
             else
               .sub-page-header.text-muted=settings.locale.info_description.replace('{1}', coin.name)
-      .cardSpacer.clearfix
     .card.card-default.border-0
-      .card-header
-        strong #{settings.locale.info_documentation}
       div#info-table_wrapper.card-body
         if info_page.show_logo == true
           img(src=settings.getWallet(net).logo_title, style='margin:0;height:128px;')
@@ -57,26 +54,40 @@ block content
                 td.text-end 
                   a(href=info.whitepaper_url) #{info.whitepaper_title}
             tr
+              td.text-start #{settings.locale.info_start_time}
+              td.text-end #{settings.formatUnixtime(stats.starttime, net, true)}
+            tr
               td.text-start #{settings.locale.info_block_height}
-              td.text-end 
-                a(href=info.whitepaper_url) #{settings.formatInt(stats.count)}
+              td.text-end #{settings.formatInt(stats.count)}
+            tr
+              td.text-start #{settings.locale.info_blocks_per_hour}
+              td.text-end #{settings.formatDecimal(stats.count / ((Math.floor(Date.now() / 1000) - stats.starttime) / 60 / 60), 2, 2)}
             if info.show_last_price == true
               tr
                 td.text-start #{settings.locale.info_last_price.replace('{1}', "USDT")}
-                td.text-end #{stats.last_price + ' / ' + stats.last_usd_price}
+                td.text-end #{settings.formatDecimal(stats.last_price, 8, 8) + ' / ' + settings.formatDecimal(stats.last_usd_price, 8, 8)}
             tr
               td.text-start #{settings.locale.info_max_supply}
               td.text-end #{settings.formatDecimal(coin.max_supply, 2, 2)}
+                small  [100.0%]
             tr
               td.text-start #{settings.locale.info_current_supply}
               td.text-end #{settings.formatDecimal(stats.supply, 2, 2)}
-            if info.show_coinbase == true && Array.isArray(latest_coinbase_tx) && latest_coinbase_tx[0] && latest_coinbase_tx[0].vin[0] /* Does not exist for pepew. */
+                small  [ #{settings.formatDecimal(stats.supply / coin.max_supply * 100, 1, 1)}%]
+            tr
+              td.text-start #{'Locked in Smartnodes'}
+              td.text-end #{settings.formatDecimal(stats.smartnodes_enabled * 42000, 2, 2)}
+                small [#{' ' + settings.formatDecimal(stats.smartnodes_enabled * 42000 / coin.max_supply * 100, 1, 1)}%]
+            if info.show_coinbase == true && Array.isArray(latest_coinbase_tx.vin) && latest_coinbase_tx.vin.length > 0 /* Does not exist for pepew. */
               tr 
                 td.text-start #{settings.locale.info_latest_coinbase}
-                td.text-end #{settings.formatCurrency(latest_coinbase_tx[0].vin[0].amount / 100000000, coin.symbol)}
+                td.text-end #{settings.formatDecimal(latest_coinbase_tx.vin[0].amount / 100000000, 2, 2)}
             tr
               td.text-start #{settings.locale.info_count_addresses}
-              td.text-end #{settings.formatInt(stats.addresses)}
+              td.text-end #{settings.formatInt(addresses)}
+            tr
+              td.text-start #{settings.locale.info_count_assets}
+              td.text-end #{settings.formatInt(assets)}
             tr
               td.text-start #{settings.locale.info_count_utxos}
               td.text-end #{settings.formatInt(stats.count_utxos)}
@@ -85,27 +96,27 @@ block content
               td.text-end #{settings.formatInt(txes)}
             if info.show_txstats == true && tx_types
               each tx_type, index in tx_types
-                tr.sub
-                  td.text-start 
-                    span #{index + ' · ' + tx_type.replace('TRANSACTION_', '')}
+                tr.sub(style='line-height: 1.0')
+                  td.text-start
+                    span(style='margin-left: 0') #{'·' + tx_type.replace('TRANSACTION_', '')}
                   td.text-end
                     if (count_tx_by_type)
                       each txtype in count_tx_by_type
                         if index == txtype._id
-                          span #{settings.formatInt(txtype.count)}
+                          span(style='margin-left: 0') #{settings.formatInt(txtype.count)}
             if info.show_masternode_info == true
               tr
                 td.text-start #{settings.locale.info_count_masternodes}
                 td.text-end #{stats.smartnodes_enabled + ' / ' + stats.smartnodes_total}
             if info.show_miningstats == true && algos.length == 1
               tr
-                td.text-start #{settings.locale.info_hash_ps}
+                td.text-start #{settings.locale.info_megahash_ps}
                 td.text-end #{settings.formatDecimal(stats['nethash'], 3, 3)}
               tr
                 td.text-start #{settings.locale.info_difficulty}
                 td.text-end #{settings.formatDecimal(stats['difficulty'], 6, 6)}
-          br
         if info.show_markets == true
+          br
           h4 #{settings.locale.info_title_markets}
           hr
           table#marketstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
@@ -139,7 +150,6 @@ block content
                     span #{sell._id.trade}
                   td.text-end
                     span #{settings.formatDecimal(sell.sum_val, 2, 2)}
-          br
         if info.show_masternode_info == true
           h4 #{settings.locale.info_title_masternodes}
           hr
@@ -151,16 +161,31 @@ block content
                 th.text-center #{settings.locale.info_masternodes_th_percent}
             tbody 
               if (count_masternodes_by_country)
+                - var mini = ''
+                - var cnt = 0
+                - var percent = 0
                 each mn in count_masternodes_by_country 
-                  tr
-                    td.text-start.fill
-                      span #{mn._id ? mn._id : 'Unknown'}
-                    td.text-end
-                      span #{mn.count}
-                    td.text-end
-                      span #{settings.formatDecimal(mn.percent, 2, 2)}
-          br
+                  if mn.percent > 1
+                    tr
+                      td.text-start.fill
+                        span #{mn._id ? mn._id : 'Unknown'}
+                      td.text-end
+                        span #{mn.count}
+                      td.text-end
+                        span #{settings.formatDecimal(mn.percent, 2, 2)}
+                  else
+                    - cnt = cnt + mn.count
+                    - percent = percent + mn.percent
+                    - mini = mini + mn._id + ' (' + mn.count + ') '
+                tr
+                  td.text-start.fill
+                    span #{'<1%'} #{mini}
+                  td.text-end
+                    span #{cnt}
+                  td.text-end
+                    span #{settings.formatDecimal(percent, 2, 2)}
         if info.show_miningstats == true && algos.length > 1
+          br
           h4 #{settings.locale.info_title_mining}
           hr
           table#miningstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right

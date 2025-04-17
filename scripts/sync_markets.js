@@ -1,4 +1,4 @@
-const debug = require('debug')('sync')
+const debug = require('debug')('market')
 const settings = require('../lib/settings')
 const db = require('../lib/database')
 const { MarketsDb, MarketOrderDb, MarketTradeDb, StatsDb } = require('../lib/database')
@@ -178,15 +178,34 @@ function update_markets_db(market, coin_symbol, pair_symbol, reverse, cb, net=se
           // Renew offers.
           MarketOrderDb[net].insertMany(obj.buys).then(() => {
             MarketOrderDb[net].deleteMany({ex: market, market: coin_symbol, trade: pair_symbol, date: { $ne: now }}).then(() => {
-              obj.trades.forEach((trade) => {
-                copyHistoryParam(trade, market, coin_symbol, pair_symbol, now)
-              })
-              // Renew trade history.
-              MarketTradeDb[net].insertMany(obj.trades).then(() => {
-                MarketTradeDb[net].deleteMany({market: coin_symbol, trade: pair_symbol, date: { $ne: now }}).then(() => {
+
+              // Update trade history.
+              MarketTradeDb[net].find({market:coin_symbol, trade: pair_symbol}).sort({timestamp:-1}).limit(1).then((latest) => {
+                var lastTime = new Date().getTime() - 1000 * 60 * 60 * 24 * 180
+                if (latest && Array.isArray(latest) && latest.length > 0) {
+                  lastTime = latest[0].timestamp
+                }
+
+                const newTrades = []
+                obj.trades.forEach((trade) => {
+                  if (trade.timestamp > lastTime) {
+                    copyHistoryParam(trade, market, coin_symbol, pair_symbol, now)
+                    newTrades.push(trade)
+                  }
+                })
+
+                if (newTrades.length == 0) {
+                  if (debug.enabled) 
+                    debug("No new trades since %d. Finished.", lastTime)
+                  return cb(null)
+                }
+
+                // Renew trade history.
+                if (debug.enabled) 
+                  debug("Insert %d new trades since %d.", newTrades.length, lastTime)
+                MarketTradeDb[net].insertMany(newTrades).then(() => {
                   const markets_page = settings.get(net, 'markets_page')
-                  // check if this is the default market and trading pair
-                  if (market == markets_page.default_exchange.exchange_name && markets_page.default_exchange.trading_pair.toUpperCase() == coin_symbol.toUpperCase() + '/' + pair_symbol.toUpperCase()) {
+                  if (isDefaultMarket(markets_page, market, coin_symbol, pair_symbol)) {
                     StatsDb[net].updateOne({coin: coin.name}, {
                       last_price: obj.stats.last
                     }).then(() => {
@@ -209,6 +228,11 @@ function update_markets_db(market, coin_symbol, pair_symbol, reverse, cb, net=se
   } else {
     return cb('market is not installed')
   }
+}
+
+function isDefaultMarket(markets_page, market, coin_symbol, pair_symbol) {
+  const r = market == markets_page.default_exchange.exchange_name && markets_page.default_exchange.trading_pair.toUpperCase() == coin_symbol.toUpperCase() + '/' + pair_symbol.toUpperCase()
+  return r;
 }
 
 function copyHistoryParam(data, market, coin_symbol, pair_symbol, now) {

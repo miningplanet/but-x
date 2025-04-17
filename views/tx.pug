@@ -317,8 +317,17 @@ block content
                                 =settings.locale.unknown_sender
                             else
                               =settings.locale.unknown_sender
-                        td.text-end #{ramountParts[0]}.
-                          span.decimal #{ramountParts[1]}
+                        if address.scriptPubKey && address.scriptPubKey.asset
+                          td.text-end
+                            if address.scriptPubKey.asset.name
+                              small 
+                                span #{address.scriptPubKey.asset.amount}
+                              small 
+                                span  #{address.scriptPubKey.asset.name}
+                        else 
+                          td.text-end #{ramountParts[0]}.
+                            span.decimal #{ramountParts[1]}
+                            span  #{coin.symbol}
                 else
                   tr.text-center
                     td.bottom-border-1 #{settings.locale.proof_of_stake}
@@ -344,9 +353,18 @@ block content
                               =address.addresses
                             else
                               =address.claim_name
-                          include ./includes/rl_labels.pug
-                        td.text-end #{ramountParts[0]}.
-                          span.decimal #{ramountParts[1]}
+                          include ./includes/rl_labels.pug    
+                        if address.name
+                          td.text-end
+                            if address.name
+                              small 
+                                span #{address.tamount}
+                              small 
+                                span  #{address.name}
+                        else
+                          td.text-end #{ramountParts[0]}.
+                            span.decimal #{ramountParts[1]}
+                            span  #{coin.symbol}
                       else if address.amount > 0
                         td.addresscol
                           if address.addresses == 'hidden_address'

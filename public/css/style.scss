@@ -720,7 +720,7 @@ p {
 h1 { font-size: 1.75rem; }
 h2 { font-size: 1.5rem; }
 h3 { font-size: 1.45rem; }
-h4 { font-size: 1.40rem; }
+h4 { font-size: calc(0.9rem + .3vw); margin-top: 0; }
 h5 { font-size: 1.35rem; }
 h6 { font-size: 1.25rem; }
 
@@ -834,7 +834,7 @@ footer div.navbar-nav label.nav-link {
 }
 
 div.navbar, div#navbar-collapse {
-  background: var(--bg0)
+  /* background: var(--bg0) */
 }
 
 .navbar {
@@ -1321,7 +1321,7 @@ img.logo-main {
     max-width: none;
     padding-left: 0;
     padding-right: 0;
-    margin-top: 6px
+    margin-top: 0px
   }
 }
 
@@ -1648,14 +1648,16 @@ div.navbar-expand-lg {
 }
 
 #page-title-container {
+  padding-top: 0.2rem;
   background: transparent !important;
 }
 
 #page-title {
-  font-size: calc(1.325rem + .9vw);
+  font-size: calc(1rem + .3vw);
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
+  margin-left: 0.5vw;
   text-shadow: var(--title-shadow);
 }
 
@@ -1850,7 +1852,11 @@ div#cockpit div.card-header, div#cockpit div.card-body {
 }
 
 div#cockpit div.card-body label strong {
-  font-size: 22px !important
+  font-size: 20px !important
+}
+
+label#spnMasternodeCountOnline strong {
+  font-size: 20px !important;
 }
 
 div.align-items-start {
@@ -1858,7 +1864,7 @@ div.align-items-start {
 }
 
 div.border-0 {
-  border: solid 2px var(--bg0) !important;
+  border: solid 1px var(--bg0) !important;
   border-radius: 0.5rem !important;
 }
 
@@ -1965,6 +1971,7 @@ table td.addresscol, table th.addresscol {
 
 table td.addresscol {
   text-align: center;
+  font-family: monospace, monospace !important;
 }
 
 table td.addresscol a {
@@ -2036,12 +2043,25 @@ table td.statuscol {
 }
 
 /* display: inline-block; */
+
+table td.txcol {
+  font-family: monospace, monospace !important;
+}
+
 table td.txcol a {
   width: 98%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left !important;
+}
+
+div#market_offers_wrapper {
+  margin-bottom: 12px;
+  --bs-gutter-x: 0px !important;
+}
+div#market_history_wrapper {
+  --bs-gutter-x: 0px !important;
 }
 
 /* Responsivnes */

@@ -42,24 +42,26 @@ util.init_db(net, function(status) {
     update_block_stats_from_db(algos, dbindex, function() {
       update_count_utxos(dbindex, function () {
         update_count_addresses(dbindex, function () {
-          update_tx_by_type(dbindex, function () {
-            const tx_type_index  = settings.get(net, 'tx_types').indexOf('TRANSACTION_COINBASE')
-            update_latest_coinbase_tx(tx_type_index, dbindex, function () {
-              update_masternodes_by_country_code(dbindex, function(mn) {
-                
-                db.get_markets_local(function(markets) {
-                  if (Array.isArray(markets) && markets.length > 0) {
-                    debug("Got markets size %d for net '%s'.", markets.length, net)
+          update_count_assets(dbindex, function () {
+            update_tx_by_type(dbindex, function () {
+              const tx_type_index  = settings.get(net, 'tx_types').indexOf('TRANSACTION_COINBASE')
+              update_latest_coinbase_tx(tx_type_index, dbindex, function () {
+                update_masternodes_by_country_code(dbindex, function(mn) {
+                  db.get_markets_local(function(markets) {
+                    if (Array.isArray(markets) && markets.length > 0) {
+                      if (debug.enabled) 
+                        debug("Got markets size %d for net '%s'.", markets.length, net)
 
-                    update_sell_order_aggregation(coin.symbol, dbindex, function () {
-                      update_buy_order_aggregation(coin.symbol, dbindex, function () {
-                        update_dbindex_and_exit(coin, dbindex)
+                      update_sell_order_aggregation(coin.symbol, dbindex, function () {
+                        update_buy_order_aggregation(coin.symbol, dbindex, function () {
+                          update_dbindex_and_exit(coin, dbindex)
+                        })
                       })
-                    })
-                  } else {
-                    update_dbindex_and_exit(coin, dbindex)
-                  }
-                }, net)
+                    } else {
+                      update_dbindex_and_exit(coin, dbindex)
+                    }
+                  }, net)
+                })
               })
             })
           })
@@ -93,7 +95,8 @@ function update_tx_by_type(dbindex, cb) {
       }
       dbindex.count_txes = txes
       dbindex.count_tx_by_type = txtypes
-      debug("Got tx count (by type) %d from db for net '%s'.", txes, net)
+      if (debug.enabled) 
+        debug("Got tx count (by type) %d from db for net '%s'.", txes, net)
     }
     cb(txtypes)
   }).catch((err) => {
@@ -106,7 +109,8 @@ function update_latest_coinbase_tx(tx_type, dbindex, cb) {
   db.TxDb[net].find({tx_type: tx_type}).sort({blockindex:-1}).limit(1).then((tx) => {
     if (Array.isArray(tx) && tx.length > 0) {
       dbindex.latest_coinbase_tx = tx[0]
-      debug("Got latest coinbase '%s' for net '%s' from db, type %d, height %d", tx[0].txid, net, tx[0].tx_type, tx[0].blockindex)
+      if (debug.enabled) 
+        debug("Got latest coinbase '%s' for net '%s' from db, type %d, height %d", tx[0].txid, net, tx[0].tx_type, tx[0].blockindex)
     }
     cb(tx)
   }).catch((err) => {
@@ -119,7 +123,8 @@ function update_sell_order_aggregation(coin_symbol, dbindex, cb) {
   get_order_aggregation(coin_symbol, 0, function (sells) {
     if (Array.isArray(sells)) {
       dbindex.sell_order_aggregation = sells
-      debug("Got market sell order aggregation size %d for net '%s'.", sells.length, net)
+      if (debug.enabled) 
+        debug("Got market sell order aggregation size %d for net '%s'.", sells.length, net)
     } else {
       dbindex.sell_order_aggregation = []
     }
@@ -131,7 +136,8 @@ function update_buy_order_aggregation(coin_symbol, dbindex, cb) {
   get_order_aggregation(coin_symbol, 1, function (buys) {
     if (Array.isArray(buys)) {
       dbindex.buy_order_aggregation = buys
-      debug("Got market buy order aggregation size %d for net '%s'.", buys.length, net)
+      if (debug.enabled) 
+        debug("Got market buy order aggregation size %d for net '%s'.", buys.length, net)
     } else {
       dbindex.buy_order_aggregation = []
     }
@@ -156,7 +162,8 @@ function update_block_stats_from_db(algos, dbindex, cb) {
   get_max_block_height(function(height) {
     if (!isNaN(height)) {
       dbindex.latest_block_height = height
-      debug("Got max. block height %d from db for net '%s'.", height, net)
+      if (debug.enabled) 
+        debug("Got max. block height %d from db for net '%s'.", height, net)
     }
 
     if (algos.length > 1) {
@@ -167,7 +174,8 @@ function update_block_stats_from_db(algos, dbindex, cb) {
       count_blocks(function(count) {
         if (!isNaN(count)) {
           dbindex.count_blocks = count
-          debug("Got block count %d from db for net '%s'.", count, net)
+          if (debug.enabled) 
+            debug("Got block count %d from db for net '%s'.", count, net)
         }
         cb()
       })
@@ -196,7 +204,8 @@ function count_blocks(cb) {
 function update_count_utxos(dbindex, cb) {
   db.AddressTxDb[net].countDocuments({amount:{"$gt":0}}).then(count => {
     dbindex.count_utxos = count
-    debug("Got utxos count %d for net '%s'.", count, net)
+    if (debug.enabled) 
+      debug("Got utxos count %d for net '%s'.", count, net)
     return cb(count)
   }).catch((err) => {
     console.error("Failed to count utxos for chain '%s': %s", net, err)
@@ -207,10 +216,23 @@ function update_count_utxos(dbindex, cb) {
 function update_count_addresses(dbindex, cb) {
   db.AddressDb[net].countDocuments({}).then(count => {
     dbindex.count_addresses = count
-    debug("Got addresses count %d for net '%s'.", count, net)
+    if (debug.enabled) 
+      debug("Got addresses count %d for net '%s'.", count, net)
     return cb(count)
   }).catch((err) => {
     console.error("Failed to count addresses for chain '%s': %s", net, err)
+    return cb(err)
+  })
+}
+
+function update_count_assets(dbindex, cb) {
+  db.AssetsDb[net].countDocuments({}).then(count => {
+    dbindex.count_assets = count
+    if (debug.enabled) 
+      debug("Got assets count %d for net '%s'.", count, net)
+    return cb(count)
+  }).catch((err) => {
+    console.error("Failed to count assets for chain '%s': %s", net, err)
     return cb(err)
   })
 }
@@ -230,7 +252,8 @@ function update_count_blocks_by_algorithm(dbindex, cb) {
 
       dbindex.count_blocks = blocks
       dbindex.count_blocks_by_algorithm = algos
-      debug("Got block count (by algos) %d from db for net '%s'.", dbindex.count_blocks, net)
+      if (debug.enabled) 
+        debug("Got block count (by algos) %d from db for net '%s'.", dbindex.count_blocks, net)
     }
     cb(algos)
   }).catch((err) => {
@@ -257,7 +280,8 @@ function update_masternodes_by_country_code(dbindex, cb) {
 
         dbindex.count_masternodes_enabled = count
         dbindex.count_masternodes_by_country = nodes
-        debug("Got masternodes by country code size %d for net '%s'.", nodes.length, net)
+        if (debug.enabled) 
+          debug("Got masternodes by country code size %d for net '%s'.", nodes.length, net)
       }
 
       cb(nodes)

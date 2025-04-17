@@ -28,18 +28,21 @@ networks.forEach( function(net, index) {
 })
 
 function route_get_block(req, res, blockhash) {
-  const net = req.params['net']
+  const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
+
   db.get_block_by_hash(blockhash, function (block) {
     const block_page = settings.get(net, 'block_page')
+
     if (block && block != 'There was an error. Check your console.') {
       db.get_stats(coin.name, function(stats) {
+
         if (blockhash == block_page.genesis_block) {
           const p = blockParam(req, stats, 'block', block_page, net, db, settings, block, 'GENESIS', coin.name + ' Genesis Block')
           res.render('block', p)
         } else {
           db.find_txs_by_blockhash(block.hash, function(txs) {
-            if (txs.length > 0) {
+            if (txs && txs.length > 0) {
               const p = blockParam(req, stats, 'block', block_page, net, db, settings, block, txs, coin.name + ' Block ' + block.height)
               res.render('block', p)
             } else
@@ -57,6 +60,43 @@ function route_get_block(req, res, blockhash) {
         }, net)
       } else
         route_get_index(req, res, 'Block not found: ' + blockhash)
+    }
+  }, net)
+}
+
+function route_get_asset(req, res, name) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
+  const asset_page = settings.get(net, 'asset_page')
+
+  name = name.replace('asset:', '')
+  name = name.replace('+', '/')
+  name = name.replace('*', '#')
+  if (debug.enabled)
+    debug("Search for asset: " + name)
+  
+  db.get_asset_by_name_local(name, function (asset) {
+    if (asset) {
+      asset.name = name
+      db.get_stats(coin.name, function(stats) {
+        if (stats) {
+          if (asset.tx_count > 0) {
+            db.get_latest_asset_tx_by_name_local(name, function (latesttx) {
+              asset.latesttx = latesttx
+              const p = assetParam(req, stats, 'asset', asset_page, net, db, settings, asset, coin.name + ' Asset ' + name)
+              res.render('asset', p)
+            }, net)
+          } else {
+            asset.latesttx = []
+              const p = assetParam(req, stats, 'asset', asset_page, net, db, settings, asset, coin.name + ' Asset ' + name)
+              res.render('asset', p)
+          }
+        } else {
+          route_get_index(req, res, 'Asset search unexpected error: ' + name)
+        }
+      }, net)
+    } else {
+      route_get_index(req, res, 'Asset not found: ' + name)
     }
   }, net)
 }
@@ -80,10 +120,19 @@ function route_get_tx(req, res, txid) {
   } else {
     db.get_tx(txid, function(tx) {
       if (tx) {
-        // TODO: yerbas tx type
+        // TODO: yerbas: Add assets to vin. Could be solved with the yerbas-cli.
+        if (net == 'yerbas') {
+          for (i = 0; i < tx.vin.length; i++) {
+            if (tx.vin[i]) {
+              console.log("TXVIN: %O", tx.vin)
+            }
+          }
+        }
+        // TODO: yerbas: tx type
         if (tx.tx_type == 8 || tx.tx_type == 9) {
           db.get_token({ "height": tx.blockindex, "txid": tx.txid }, function(tokens) {
-            debug("Got tokens %o with TX %s at index %d for chain '%s'.", tokens, tx.txid, tx.blockindex, net)
+            if (debug.enabled)
+              debug("Got tokens %o with TX %s at index %d for chain '%s'.", tokens, tx.txid, tx.blockindex, net)
             if (settings.get(net, 'claim_address_page').enabled == true) {
               db.populate_claim_address_names(tx, function(tx) {
                 const p = txParam(req, 'tx', transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
@@ -137,6 +186,21 @@ function route_get_index(req, res, error) {
   }
 }
 
+router.get('/assets/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const coin = settings.getCoin(net)
+  const assets_page = settings.get(net, 'assets_page')
+  db.get_stats(coin.name, function(stats) {
+    if (stats) {
+      const p = assetsParam(req, 'assets', assets_page, net, db, settings, 'assets')
+      p.assets_page = assets_page
+      res.render('assets', p)
+    } else {
+      route_get_index(req, res, 'Assets page unexpected error 1: ')
+    }
+  }, net)
+})
+
 router.get('/info/:net?', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
@@ -148,10 +212,9 @@ router.get('/info/:net?', function(req, res) {
         const shared_pages = settings.get(net, 'shared_pages')
         const info_page = settings.get(net, 'info_page')
         const algos = settings.get(net, 'algos')
-
         const count_tx_by_type = dbindex.count_tx_by_type
-
         const tx_types = settings.get(net, 'tx_types')
+        
         let i = 0
         if (Array.isArray(count_tx_by_type)) {
           while (i < count_tx_by_type.length) {
@@ -185,6 +248,8 @@ router.get('/info/:net?', function(req, res) {
           }
         }
         p.txes = txes
+        p.addresses = dbindex.count_addresses
+        p.assets = dbindex.count_assets
         p.latest_coinbase_tx = dbindex.latest_coinbase_tx
         p.markets = markets
         p.trading_pairs = trading_pairs
@@ -285,7 +350,6 @@ function isApiEndpointEnabled(api_page, api_cmds, key) {
 router.get('/apidocs/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  // TODO: Fix API page sample data.
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true) {  
     const markets_page = settings.get(net, 'markets_page')
@@ -503,7 +567,7 @@ router.get('/masternodes/:net?', function(req, res) {
 router.get('/reward/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
-  // TODO: Fix.
+  // TODO: Fix Heavy Coin reward page.
   const reward_page = settings.get(net, 'reward_page')
   if (settings.blockchain_specific.heavycoin.enabled == true && settings.blockchain_specific.heavycoin.reward_page.enabled == true) {
     db.get_stats(coin.name, function (stats) {
@@ -544,6 +608,11 @@ router.get('/tx/:txid/:net?', function(req, res) {
 
 router.get('/block/:hash/:net?', function(req, res) {
   route_get_block(req, res, req.params.hash)
+})
+
+router.get('/asset/:name/:net?', function(req, res) {
+  req.params.name.replace('+', '/')
+  route_get_asset(req, res, req.params.name)
 })
 
 router.get('/register/:net?', function(req, res) {
@@ -613,7 +682,6 @@ function route_to_user_page(req, res, address) {
   route_get_index(req, res, 'User login is disabled.')
 }
 
-
 router.get('/claim/:net?', function(req, res) {
   route_get_claim_form(req, res, '')
 })
@@ -631,7 +699,6 @@ router.post('/search/:net?', function(req, res) {
   const shared_pages = settings.get(net, 'shared_pages')
   if (shared_pages.page_header.search.enabled == true) {
     var query = req.body.search.trim()
-
     if (query.length == 64) {
       const transaction_page = settings.get(net, 'transaction_page')
       if (query == transaction_page.genesis_tx) {
@@ -662,18 +729,24 @@ router.post('/search/:net?', function(req, res) {
         }, net)
       }
     } else {
-      db.get_address(query, function(address) {
-        if (address)
-          res.redirect('/address/' + address.a_id + '/' + net)
-        else {
-          lib.get_blockhash(query, function(hash) {
-            if (hash && hash != 'There was an error. Check your console.')
-              res.redirect('/block/' + hash + '/' + net)
-            else
-              route_get_index(req, res, locale.ex_search_error + query)
-          }, net)
-        }
-      }, net)
+      if (query.startsWith('asset:')) {
+        route_get_asset(req, res, query)
+      } else {
+        console.log("Search address: '" + query + "' for net " + net + ".")
+        db.get_address(query, function(address) {
+          console.log("Search address: '" + address)
+          if (address)
+            res.redirect('/address/' + address.a_id + '/' + net)
+          else {
+            lib.get_blockhash(query, function(hash) {
+              if (hash && hash != 'There was an error. Check your console.')
+                res.redirect('/block/' + hash + '/' + net)
+              else
+                route_get_index(req, res, locale.ex_search_error + query)
+            }, net)
+          }
+        }, net)
+      }
     }
   } else {
     // Search is disabled so load the index page with an error msg
@@ -727,7 +800,8 @@ function param(pageKey, page, req, db, settings, prefix) {
 function blockParam(req, stats, pageKey, page, net, db, settings, block, txs, prefix) {
   const r = param(pageKey, page, req, db, settings, prefix)
   r.block = block
-  r.confirmations = stats.count - block.height + 1
+  if (stats)
+    r.confirmations = stats.count - block.height + 1
   r.txs = txs
   r.block_page = settings.get(net, 'block_page') 
   r.api_page = settings.get(net, 'api_page') 
@@ -743,6 +817,39 @@ function txParam(req, pageKey, page, net, db, settings, tx, height, prefix) {
   r.transaction_page = settings.get(net, 'transaction_page')
   r.address_page = settings.get(net, 'address_page')
   r.api_page = settings.get(net, 'api_page') 
+  return r
+}
+
+function assetsParam(req, pageKey, page, net, db, settings, prefix) {
+  const r = param(pageKey, page, req, db, settings, prefix)
+  const shared_pages = settings.get(net, 'shared_pages')
+  r.assets_page = settings.get(net, 'assets_page')
+
+  // r.tx = tx
+  // r.confirmations = shared_pages.confirmations
+  // r.blockcount = height
+  // r.transaction_page = settings.get(net, 'transaction_page')
+  // r.address_page = settings.get(net, 'address_page')
+  // r.api_page = settings.get(net, 'api_page') 
+
+  return r
+}
+
+function assetParam(req, stats, pageKey, page, net, db, settings, asset, prefix) {
+  const shared_pages = settings.get(net, 'shared_pages')
+  const r = param(pageKey, page, req, db, settings, prefix)
+  r.asset = asset
+
+  r.confirmations = shared_pages.confirmations
+  r.blockcount = stats.count
+
+  if (stats)
+    r.confirmations = stats.count - asset.blockindex + 1
+  // r.txs = txs
+  r.asset_page = settings.get(net, 'asset_page') 
+  const tx_types = settings.get(net, 'tx_types')
+  r.tx_types = tx_types
+  // r.api_page = settings.get(net, 'api_page') 
   return r
 }
 

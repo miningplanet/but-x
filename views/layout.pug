@@ -12,18 +12,21 @@ html(lang='en')
   - const richlist_page = settings.get(net, 'richlist_page')
   - const api_page = settings.get(net, 'api_page')
   - const claim_address_page = settings.get(net, 'claim_address_page')
+  - const assets_page = settings.get(net, 'assets_page')
+  - const asset_page = settings.get(net, 'asset_page')
   - const registration_page = settings.get(net, 'registration_page')
   - const login_page = settings.get(net, 'login_page')
   - const user_page = settings.get(net, 'user_page')
   - const error_page = settings.get(net, 'error_page')
   - const network_history = settings.get(net, 'network_history')
-  - const isButkoin = settings.isButkoin(net)
+  - const isMultiAlgo = settings.isMultiAlgo(net)
   - const isPepew = settings.isPepew(net)
   - const isVkax = settings.isVkax(net)
   - const search_enabled = shared_pages.page_header.search.enabled
   - const nethash_enabled = shared_pages.page_header.network_charts.nethash_chart.enabled
   - const difficulty_enabled = shared_pages.page_header.network_charts.difficulty_chart.enabled
   - const home_url = settings.get(net, 'home_url')
+  - const home_title = settings.get(net, 'home_title')
   - const logo_title = settings.getWallet(net).logo_title
   head
     meta(charset='UTF-8')
@@ -49,7 +52,7 @@ html(lang='en')
     link(rel='stylesheet', type='text/css', href='/css/datatables.min.css')
     link(rel='stylesheet', href='/css/OverlayScrollbars.min.css')
     link(rel='stylesheet', href='/css/style.min.css' + (styleHash == null ? '' : '?h=' + styleHash))
-    link(rel='stylesheet', href='/css/' + net + '.min.css' + (customHash == null ? '' : '?h=' + customHash))
+    link(rel='stylesheet', href='/css/' + shared_pages.theme + '.min.css' + (customHash == null ? '' : '?h=' + customHash))
     script(type='text/javascript', src='/js/jquery.min.js', integrity='sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==', crossorigin='anonymous', referrerpolicy='no-referrer')
     script(type='text/javascript', src='/js/bootstrap.bundle.min.js', integrity='sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==', crossorigin='anonymous')
     script(type='text/javascript', src='/js/custom.js' integrity='sha512-msgKdlSc7RJ0hIfFKrOzeHxxHAIZBvAdxK8U8vzEj20iMLns5SaZjxWECaMb4hHq2Ww9NvBr8s2kZjsVqMHcRg==')
@@ -268,7 +271,7 @@ html(lang='en')
                 hashrateString = Number(json.hashrate).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
 
               $("#supply").text(supplyString);
-              splitValue = Number(parseFloat(json.lastPrice).toFixed(8) * parseInt(parseFloat(json.supply).toFixed(0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+              splitValue = Number(parseFloat(json.lastPrice).toFixed(8) * parseInt(parseFloat(json.supply).toFixed(0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
               splitParts = splitValue.split('.');
               showTopPanelData('supplypanel', 'supplyPanelLoading');
 
@@ -328,7 +331,7 @@ html(lang='en')
                 if (nethashChart == null) {
                   const netHashSets = []
                   const algos = '#{shared_pages.page_header.network_charts.algos}'
-                  const isBut = '#{isButkoin}'
+                  const isMultiAlgo = '#{isMultiAlgo}'
                   const isPepew = '#{isPepew}'
                   const isVkax = '#{isVkax}'
                   if (algos.includes("ghostrider")) {
@@ -340,7 +343,7 @@ html(lang='en')
                       fill: 'start'
                     });
                   }
-                  if (isBut === 'true' && algos.includes("yespower")) {
+                  if (isMultiAlgo === 'true' && algos.includes("yespower")) {
                     netHashSets.push({
                       label: 'Yespower',
                       data: result.map(function(a) {return a.nethash_yespower / 1000;}),
@@ -349,7 +352,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("lyra2")) {
+                  if (isMultiAlgo === 'true' && algos.includes("lyra2")) {
                     netHashSets.push({
                       label: 'Lyra2',
                       data: result.map(function(a) {return a.nethash_lyra2;}),
@@ -358,7 +361,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("sha256d")) {
+                  if (isMultiAlgo === 'true' && algos.includes("sha256d")) {
                     netHashSets.push({
                       label: 'Sha256d',
                       data: result.map(function(a) {return a.nethash_sha256d / 1000;}),
@@ -367,21 +370,12 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("scrypt")) {
+                  if (isMultiAlgo === 'true' && algos.includes("scrypt")) {
                     netHashSets.push({
                       label: 'Scrypt',
                       data: result.map(function(a) {return a.nethash_scrypt;}),
                       backgroundColor: ['#{shared_pages.page_header.network_charts.nethash_chart.scrypt_fill_color}'],
                       borderColor: ['#{shared_pages.page_header.network_charts.nethash_chart.scrypt_line_color}'],
-                      fill: 'start'
-                    })
-                  }
-                  if (isBut === 'true' && algos.includes("butkscrypt")) {
-                    netHashSets.push({
-                      label: 'Butkscrypt',
-                      data: result.map(function(a) {return a.nethash_butkscrypt;}),
-                      backgroundColor: ['#{shared_pages.page_header.network_charts.nethash_chart.butkscrypt_fill_color}'],
-                      borderColor: ['#{shared_pages.page_header.network_charts.nethash_chart.butkscrypt_line_color}'],
                       fill: 'start'
                     })
                   }
@@ -477,9 +471,6 @@ html(lang='en')
                               } else if (context.dataset.label == 'Scrypt') {
                                 const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
                                 return n + ' KH/s'
-                              } else if (context.dataset.label == 'Butkscrypt') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
-                                return n + ' KH/s'
                               } else if (context.dataset.label == 'MemeHash') {
                                 const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
                                 return n + ' KH/s'
@@ -528,7 +519,7 @@ html(lang='en')
                 }
 
                 const algos = '#{shared_pages.page_header.network_charts.algos}'
-                const isBut = '#{isButkoin}'
+                const isMultiAlgo = '#{isMultiAlgo}'
                 if (showPOS) {
                   if (algos.includes("ghostrider")) {
                     diffDataSets.push({
@@ -539,7 +530,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("yespower")) {
+                  if (isMultiAlgo === 'true' && algos.includes("yespower")) {
                     diffDataSets.push({
                       label: 'Yespower',
                       data: result.map(function(a) {return a.difficulty_yespower;}),
@@ -548,7 +539,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("lyra2")) {
+                  if (isMultiAlgo === 'true' && algos.includes("lyra2")) {
                     diffDataSets.push({
                       label: 'Lyra2',
                       data: result.map(function(a) {return a.difficulty_lyra2;}),
@@ -557,7 +548,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("sha256d")) {
+                  if (isMultiAlgo === 'true' && algos.includes("sha256d")) {
                     diffDataSets.push({
                       label: 'Sha256d',
                       data: result.map(function(a) {return a.difficulty_sha256d}),
@@ -566,7 +557,7 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("scrypt")) {
+                  if (isMultiAlgo === 'true' && algos.includes("scrypt")) {
                     diffDataSets.push({
                       label: 'Scrypt',
                       data: result.map(function(a) {return a.difficulty_scrypt;}),
@@ -575,21 +566,12 @@ html(lang='en')
                       fill: 'start'
                     })
                   }
-                  if (isBut === 'true' && algos.includes("butkscrypt")) {
-                    diffDataSets.push({
-                      label: 'Butkscrypt',
-                      data: result.map(function(a) {return a.difficulty_butkscrypt}),
-                      backgroundColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_fill_color}'],
-                      borderColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_line_color}'],
-                      fill: 'start'
-                    })
-                  }
                   if (algos.includes("memehash")) {
                     diffDataSets.push({
                       label: 'MemeHash',
-                      data: result.map(function(a) {return a.difficulty_butkscrypt}),
-                      backgroundColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_fill_color}'],
-                      borderColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.butkscrypt_line_color}'],
+                      data: result.map(function(a) {return a.difficulty_memehash}),
+                      backgroundColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.memehash_fill_color}'],
+                      borderColor: ['#{shared_pages.page_header.network_charts.difficulty_chart.memehash_line_color}'],
                       fill: 'start'
                     })
                   }
@@ -1132,7 +1114,7 @@ html(lang='en')
                 button.navbar-light.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbar-collapse', aria-controls='navbar-collapse', aria-expanded='false', aria-label='Toggle navigation')
                   span#navbar-toggler-txt &#x2261;
             if shared_pages.page_header.home_link == 'title'
-              a.navbar-brand(href=home_url, style='order:-1;') #{shared_pages.page_title}
+              a.navbar-brand(href=home_url, style='order:-1;') #{home_title}
             else if shared_pages.page_header.home_link == 'coin'
               a.navbar-brand(href=home_url, style='order:-1;') #{coin.name}
             else if shared_pages.page_header.home_link == 'logo'
@@ -1140,10 +1122,11 @@ html(lang='en')
                 img.logo-main(src=(logo_title), style='margin:0;max-height:' + shared_pages.page_header.home_link_logo_height + 'px;')
             .collapse.navbar-collapse(id='navbar-collapse')
               ul.navbar-nav(style='width:100%;')
-                li#home.nav-item
-                  a.nav-link(href='/' + net)
-                    span.x
-                    span.margin-left-5 #{settings.locale.menu_explorer}
+                if index_page.enabled == true
+                  li#home.nav-item
+                    a.nav-link(href='/' + net)
+                      span.x
+                      span.margin-left-5 #{settings.locale.menu_explorer}
                 if markets_page.enabled == true
                   if markets_page.show_market_dropdown_menu == true && settings.market_count[net] > 1
                     li#markets.dropdown.nav-item
@@ -1177,6 +1160,11 @@ html(lang='en')
                     a.nav-link(href='/info/' + net)
                       span.info
                       span.margin-left-5 #{settings.locale.menu_info}
+                if assets_page.enabled == true
+                  li#info.nav-item
+                    a.nav-link(href='/assets/' + net)
+                      span.info
+                      span.margin-left-5 #{settings.locale.menu_assets}
                 if masternodes_page.enabled == true
                   li#masternodes.nav-item
                     a.nav-link(href='/masternodes/' + net)
@@ -1207,25 +1195,24 @@ html(lang='en')
                     a.nav-link(href='/claim/' + net)
                       span.claim
                       span.margin-left-5 #{settings.locale.menu_claim_address}
-                if registration_page.enabled == true
+                if registration_page.enabled == true && registration_page.linked == true
                   li#register.nav-item
                     a.nav-link(href='/register/' + net)
                       span.register
                       span.margin-left-5 #{settings.locale.menu_register}
-                if login_page.enabled == true
+                if login_page.enabled == true && login_page.linked == true
                   li#register.nav-item
                     a.nav-link(href='/login/' + net)
                       span.register
                       span.margin-left-5 #{settings.locale.menu_login}
-                if user_page.enabled == true
+                if user_page.enabled == true && user_page.linked == true
                   li#user.nav-item
                     a.nav-link(href='/user/' + net)
                       span.user
                       span.margin-left-5 #{settings.locale.menu_user}
                 if shared_pages.page_header.menu_show_user_ip == true 
-                  li.nav-item 
-                    span.nav-link
-                      small [Your IP #{remoteIp}]
+                  li#your-ip.nav-item 
+                    span#your_ip.nav-link [Your IP #{remoteIp}]
             if search_enabled == true && shared_pages.page_header.search.position.toString().toLowerCase() == 'inside-header'
               span#search-header-span(alt='Search', title='Search', data-bs-toggle='tooltip', data-bs-placement='left')
                 button#search-header-button(data-bs-toggle='collapse', data-bs-target='#search-navbar-collapse')
@@ -1432,7 +1419,7 @@ html(lang='en')
                         strong Network Hashrate
                       .card-body(style='padding:0.2rem;')
                         canvas#nethashChart(style='max-height:300px;')
-                      if isButkoin
+                      if isMultiAlgo
                         .card-footer(id='hashChartFooter')
                           button(onclick='hashonlycpu()') CPU
                           button(onclick='hashonlygpu()') GPU
@@ -1444,7 +1431,7 @@ html(lang='en')
                         strong Proof of work (PoW) Difficulty
                       .card-body(style='padding:0.2rem;')
                         canvas#difficultyChart(style='max-height:300px;')
-                      if isButkoin
+                      if isMultiAlgo
                         .card-footer(id="difficultyChartFooter")
                           button(onclick='diffonlycpu()') CPU
                           button(onclick='diffonlygpu()') GPU
@@ -1488,8 +1475,6 @@ html(lang='en')
                 img(class='vertical-align-middle', src=link.image_path)
               span #{link.text}
     footer
-      div 
-        span Your IP: #{remoteIp}
       div#social
         each social in shared_pages.page_footer.social_links
           if social.enabled
@@ -1500,9 +1485,9 @@ html(lang='en')
                 img(class='vertical-align-middle', src=social.image_path)
       div#copy
         p
-          small Butkoin is a decentralized secure cryptocurrency © But Project
-            br
-            | Donate to [BUTK]&nbsp;-&nbsp;XvrHWjw7zd4CQZkxbiZGt3dGE53vjrUGrs
+          small #{shared_pages.page_footer.copy_text}
+        div#version 
+          small #{settings.app_name} - #{settings.app_version}
 // .col-4.navbar-nav
         ui.nav.justify-content-end
           label#lblBlockcount.badge.nav-link.border-0.float-end

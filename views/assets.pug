@@ -1,0 +1,127 @@
+extends layout
+
+block content
+  include ./includes/common.pug
+  script.
+    const setting_maxCount = parseInt("#{assets_page.assets_table.max_items}")
+    const itemsPerPage = parseInt("#{assets_page.assets_table.items_per_page}")
+    const lengthMenuOptsAdd = !{JSON.stringify(assets_page.assets_table.page_length_options)}
+    $(document).ready(function() {
+      var rtable = $('#assets-table').dataTable({
+        autoWidth: true,
+        searching: true,
+        ordering: true,
+        order: [[ 0, 'asc' ]],
+        responsive: true,
+        lengthChange: true,
+        processing: true,
+        iDisplayLength: setting_maxCount < itemsPerPage ? setting_maxCount : itemsPerPage,
+        lengthMenu: lengthMenuOptsAdd,
+        scrollX: true,
+        ajax: {
+          url: '/api/assets/#{net}',
+          beforeSend: function(jqXHR, settings) {
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) // '/type'
+            return true
+          },
+          dataSrc: function(json) {
+            json = json.data
+            for (i = 0; i < json.length; i++) {
+              const height = Number(json[i].height).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true})
+              const amount = Number(json[i].amount).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true})
+              const units = Number(json[i].units).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true})
+              const balance = Number(json[i].balance).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true})
+              const txes = Number(json[i].tx_count).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true})
+              json[i].name = '<a href="/asset/' + json[i].name.replace('/', '+').replace('#', '*') + '/#{net}">' + json[i].name + '</a>'
+              json[i].height = height
+              json[i].amount = amount
+              json[i].units = units
+              json[i].balance = balance
+              json[i].tx_count = txes
+              json[i].ipfs_hash = '<span class="ipfs"><a target="_blank" href="https://ipfs.io/ipfs/' + json[i].ipfs_hash + '">' + json[i].ipfs_hash + '</a></span>'
+            }
+            return json
+          }
+        },
+        language: {
+          paginate: {
+            previous: '<',
+            next: '>'
+          }
+        },
+        columns: [
+          { name: 'name',     data: 'name',       className: "text-begin" },
+          { name: 'height',   data: 'height',     className: "text-end" },
+          { name: 'amount',   data: 'amount',     className: "text-end" },
+          { name: 'units',    data: 'units',      className: "text-center" },
+          { name: 'balance',  data: 'balance',    className: "text-end" },
+          { name: 'count_tx', data: 'tx_count',   className: "text-end" },
+          { name: 'ipfs',     data: 'ipfs_hash',  className: "text-center" }
+        ],
+        rowCallback: function(row, data, index) {
+        },
+        fnDrawCallback: function(settings) {
+          enableTooltips()
+        },
+        fnInitComplete: function(settings, json) {
+          setTimeout(function () {
+            // Hide/show columns.
+            // ctable.api().column('rank:name').visible(<true|false>, false)
+          }, 0)
+        }
+      })
+
+      var setting_reload_table_seconds = parseInt("#{assets_page.assets_table.reload_table_seconds}")
+      if (setting_reload_table_seconds > 0) {
+        setInterval( function () {
+          rtable.api().ajax.reload(null, false)
+        }, (setting_reload_table_seconds * 1000) )
+      }
+
+      if ('#{assets_page.page_header.show_last_updated}' == 'true') {
+        var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)}
+
+        if (lastUpdatedDate != 0) {
+          $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate))
+
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+            $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true))
+            enableTooltips()
+          }
+        } else
+          $('span#lastUpdatedDate').html(' N/A')
+      }
+    })
+  .col-xs-12.col-md-12
+    if settings.anyHeader(asset_page, net)
+      #page-header-container(style='align-items:' + (settings.allHeaders(asset_page, net) ? 'flex-start' : 'center'))
+        if asset_page.page_header.show_img == true
+          #header-img-container
+            img#header-img(src=page_title_logo)
+        #page-title-container
+          if asset_page.page_header.show_title == true
+            h3#page-title #{settings.locale.assets_title.replace('{1}', coin.name).replace('{2}')}
+          if asset_page.page_header.show_description == true
+            if asset_page.page_header.show_title != true
+              #page-title-container
+                .sub-page-header.text-muted=settings.locale.assets_description.replace('{1}', coin.name)
+            else
+              .sub-page-header.text-muted=settings.locale.assets_description.replace('{1}', coin.name)
+      .cardSpacer.clearfix
+    //- .card.card-default.border-0.cardSpacer
+    //-   .card-header
+    //-     strong Assets (#{assets && Array.isArray(assets) ? assets.length : '-'})
+    div#info-table_wrapper.card.card-default.border-0.cardSpacer
+      .card-header
+      //- h4 Assets (#{assets && Array.isArray(assets) ? assets.length : '-'})
+      table#assets-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
+        thead 
+          tr 
+            th.text-center Name
+            th.text-center Height
+            th.text-center Amount
+            th.text-center Units
+            th.text-center Balance
+            th.text-center Txes
+            th.text-center IPFS
+        tbody

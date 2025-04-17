@@ -15,6 +15,7 @@ const { Peers } = require('./lib/peers')
 const routes = require('./routes/index')
 const lib = require('./lib/x')
 const db = require('./lib/database')
+const util = require('./lib/functions/util')
 const datautil = require('./lib/datautil')
 const package_metadata = require('./package.json')
 const locale = require('./lib/locale')
@@ -32,20 +33,28 @@ const jwt = require('jsonwebtoken')
 const TTLCache = require('@isaacs/ttlcache')
 const cache = settings.cache
 
-// application cache
+const assetutil = require('./lib/functions/assetutil')
+
+// Application caches.
 const foreverCache        = new TTLCache({ max: 10,                       ttl: Infinity,                        updateAgeOnGet: false, noUpdateTTL: false })
 const tickerCache         = new TTLCache({ max: cache.ticker.size,        ttl: 1000 * cache.ticker.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 const xpeersCache         = new TTLCache({ max: cache.xpeers.size,        ttl: 1000 * cache.xpeers.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
+const assetsCache         = new TTLCache({ max: cache.assets.size,        ttl: 1000 * cache.assets.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
+const assetCache          = new TTLCache({ max: cache.asset.size,         ttl: 1000 * cache.asset.ttl,          updateAgeOnGet: false, noUpdateTTL: false })
 
-// pass wallet rpc connections info to nodeapi
+const METHOD_DISABLED = 'This method is disabled'
+const BLOCK_NOT_FOUND = 'Block not found'
+const BLOCK_HEIGHT_MUST_BE_A_NUMBER = 'Block height must be a number.'
+
+// Pass wallet rpc connections info to nodeapi.
 nodeapi.setWalletDetails(settings.wallets)
 
-// dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value
+// Dynamically build the nodeapi cmd access list by adding all non-blockchain-specific api cmds that have a value.
 networks.forEach( function(item, index) {
   const api_cmds = settings.get(item, 'api_cmds')
   Object.keys(api_cmds).forEach(function(key, index, map) {
     if (key != 'use_rpc' && api_cmds[key] != null && api_cmds[key] != '')
-      apiAccessList.push(item + "@" + key);
+      apiAccessList.push(item + "@" + key)
   })
 })
 
@@ -56,6 +65,7 @@ networks.forEach( function(net, index) {
   }
 })
 
+// Allow user sessions if login is enabled.
 if (loginEnabled == true) {
   app.use(session({
     secret: 'secret-key',
@@ -64,32 +74,33 @@ if (loginEnabled == true) {
   }))
 }
 
-// an upstream peer (client) connects to us (we are the server) - 1
+// An upstream peer (client) connects to us (we are the server) - 1.
 wsInstance.getWss().on('connection', (obj) => {
   const clientsSet = wsInstance.getWss().clients
   const clientsValues = clientsSet.values()
   for(let i=0; i < clientsSet.size; i++) {
-    debugPeers("*** " + (i + 1) + "/" + clientsSet.size + " ***")
-    const peer = clientsValues.next().value
-    debugPeers("Connected upstream peer %o.", peer._sender._socket._peername)
+    if (debugPeers.enabled) {
+      debugPeers("*** " + (i + 1) + "/" + clientsSet.size + " ***")
+      debugPeers("Connected upstream peer %o.", clientsValues.next().value._sender._socket._peername)
+    }
   }
 })
 
-// dynamically find and add additional blockchain_specific api cmds
+// Dynamically find and add additional blockchain_specific api cmds.
 Object.keys(settings.blockchain_specific).forEach(function(key, index, map) {
   // check if this feature is enabled and has api cmds
   if (settings.blockchain_specific[key].enabled == true && Object.keys(settings.blockchain_specific[key]).indexOf('api_cmds') > -1) {
     // add all blockchain specific api cmds that have a value
     Object.keys(settings.blockchain_specific[key]['api_cmds']).forEach(function(key2, index, map) {
       if (settings.blockchain_specific[key]['api_cmds'][key2] != null && settings.blockchain_specific[key]['api_cmds'][key2] != '')
-        apiAccessList.push(key2);
-    });
+        apiAccessList.push(key2)
+    })
   }
-});
-// whitelist the cmds in the nodeapi access list
-nodeapi.setAccess('only', apiAccessList);
+})
+// Whitelist the cmds in the nodeapi access list.
+nodeapi.setAccess('only', apiAccessList)
 
-// determine if cors should be enabled
+// Determine if cors should be enabled.
 if (settings.webserver.cors.enabled == true) {
   app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", settings.webserver.cors.corsorigin);
@@ -99,11 +110,11 @@ if (settings.webserver.cors.enabled == true) {
   });
 }
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// View engine setup.
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'pug')
 
-// security
+// Security.
 app.disable('x-powered-by')
 
 function setCustomCacheControl (res, path) {
@@ -113,17 +124,17 @@ function setCustomCacheControl (res, path) {
   }
 }
 
-// Always use Butkoin favicon.
-app.use(favicon(path.join('./public', settings.shared_pages.favicons.favicon32)));
+// Always use main coin favicon.
+app.use(favicon(path.join('./public', settings.shared_pages.favicons.favicon32)))
 app.use(serveStatic(path.join(__dirname, 'public'), {
   maxAge: '1d',
   setHeaders: setCustomCacheControl
 }))
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
 /* RPC APIs by DB / cache */
 
@@ -131,7 +142,6 @@ app.use('/api/getblockchaininfo/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getblockchaininfo.enabled, function (stats) {
-    const isButkoin = settings.isButkoin(net)
     const chain = settings.getWallet(net).chain
     const algos = settings.get(net, 'algos')
     const r = {}
@@ -186,7 +196,7 @@ app.use('/api/getmininginfo/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getmininginfo.enabled, function (stats) {
-    const isButkoin = settings.isButkoin(net)
+    const isMultiAlgo = settings.isMultiAlgo(net)
     const chain = settings.getWallet(net).chain
     const algos = settings.get(net, 'algos')
     const r = {}
@@ -197,7 +207,7 @@ app.use('/api/getmininginfo/:net?', function(req, res) {
     r.blocks = !isNaN(stats.last) ? stats.last : 'n/a'
     r.headers = !isNaN(stats.count) ? stats.count : 'n/a'
     
-    if (isButkoin) {
+    if (isMultiAlgo) {
       r.pow_algo_id = !isNaN(stats.pow_algo_id) ? stats.pow_algo_id : 'n/a'
       r.pow_algo = stats.pow_algo ? stats.pow_algo : 'n/a'
     }
@@ -261,15 +271,19 @@ app.use('/api/getblockhash/:height/:net?', function(req, res) {
   const height = req.params['height']
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.rpc.getblockhash.enabled == true) {
-    db.get_block_by_height(height, function(block) {
-      if (block) {
-        res.send(block.hash)
-      } else {
-        res.end("Block not found")
-      }
-    }, net)
+    if (isNaN(height)) {
+      res.end(BLOCK_HEIGHT_MUST_BE_A_NUMBER)
+    } else {
+      db.get_block_by_height(height, function(block) {
+        if (block) {
+          res.send(block.hash)
+        } else {
+          res.end(BLOCK_NOT_FOUND)
+        }
+      }, net)
+    }
   } else {
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
   }
 })
 
@@ -286,11 +300,11 @@ app.use('/api/getblock/:hash/:net?', function(req, res) {
       }
     }, net)
   } else {
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
   }
 })
 
-// TODO: API fix getrawtransaction
+// TODO: API: Fix getrawtransaction (comes from deamon -> nodeapi.js)
 
 // app.use('/api/getrawtransaction/:hash/:net?', function(req, res) {
 //   const net = settings.getNet(req.params['net'])
@@ -306,7 +320,7 @@ app.use('/api/getblock/:hash/:net?', function(req, res) {
 //       }
 //     }, net)
 //   } else {
-//     res.end('This method is disabled')
+//     res.end(METHOD_DISABLED)
 //   }
 // })
 
@@ -341,8 +355,8 @@ app.use('/api/getmasternodecount/:net?', function(req, res) {
   })
 })
 
-// TODO: API verifymessage
-// TODO: API validateaddress
+// TODO: Peers: Impl. verifymessage
+// TODO: Peers: Impl. validateaddress
 
 app.use('/api/getgovernanceinfo/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
@@ -365,6 +379,77 @@ app.use('/api/getgovernanceinfo/:net?', function(req, res) {
   })
 })
 
+/* Asset APIs by DB / cache */
+
+app.use('/api/asset/:name/:net?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const name = req.params['name'].replace('+', '/')
+  const api_page = settings.get(net, 'api_page')
+  const ckey = net + '---' + name
+  if (api_page.enabled == true && api_page.public_apis.db.asset.enabled == true) {
+    var r = assetCache.get(ckey)
+    if (r == undefined) {
+      db.get_asset_by_name_local(name, function (asset) {
+        if (asset) {
+          assetCache.set(ckey, asset)
+          if (debug.enabled) 
+            debug("Cached asset '%s' %o - mem: %o", net, asset, util.memoryUsage(process))
+          res.send(asset)
+        } else {
+          res.send("Asset with name '" + name + "' not found.")
+        }
+      }, net)
+    } else {
+      if (debug.enabled) 
+        debug("Get asset by cache '%s' %o ...", net, r)
+      res.send(r)
+    }
+  } else {
+    res.end(METHOD_DISABLED)    
+  }
+})
+
+app.use('/api/assets/:net/:start?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const start = req.params['start']
+  
+  // req.url.split contains a list of params after ':start?', i.e. length/mintxes/sortby...
+  var split = []
+  if (!isNaN(start)) {
+    split = req.url.replace('/','').split('/')
+  }
+  var length = 100000
+  if (split.length > 0 && !isNaN(split[0])) {
+    length = Number(split[0])
+  }
+
+  const api_page = settings.get(net, 'api_page')
+  if (api_page.enabled == true && api_page.public_apis.db.assets.enabled == true) {
+    const coin = settings.getCoin(net)
+    db.get_dbindex(coin.name, function (dbindex) {
+      db.get_assets_local(start, length, function (assets) {
+        const rows = []
+        if (assets) {
+          for (i = 0; i < assets.length; i++) {
+            const row = {}
+            row.name = assets[i].name
+            row.height = assets[i].height
+            row.amount = assets[i].amount
+            row.units = assets[i].units
+            row.balance = assets[i].balance
+            row.tx_count = assets[i].tx_count
+            row.ipfs_hash = assets[i].ipfs_hash
+            rows.push(row)
+          }
+        }
+        res.json({"data": rows, "recordsTotal": dbindex.count_assets, "recordsFiltered": dbindex.count_assets})
+      }, net)
+    }, net)
+  } else {
+    res.end(METHOD_DISABLED)
+  }
+})
+
 function stats(res, net, api_page, fenabled, cb) {
   if (api_page.enabled == true && fenabled == true) {
     const coin = settings.getCoin(net)
@@ -372,7 +457,7 @@ function stats(res, net, api_page, fenabled, cb) {
     if (r == undefined) {
       db.get_stats(coin.name, function (stats) {
         db.statsCache.set(net, stats)
-        debug("Cached stats '%s' %o - mem: %o", net, stats, process.memoryUsage())
+        debug("Cached stats '%s' %o - mem: %o", net, stats, util.memoryUsage(process))
         // res.setHeader('content-type', 'text/plain')
         res.send(cb(stats))
       }, net)
@@ -382,7 +467,7 @@ function stats(res, net, api_page, fenabled, cb) {
       res.send(cb(r))
     }
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 }
 
 // routes
@@ -435,7 +520,7 @@ app.post('/register/:net?', async (req, res) => {
           if (addressobj) {
             const min_balance = settings.get(net, 'registration_page').min_balance_for_registration
             const balance = addressobj.balance / 100000000
-            debug("Got balance %d (min %d) for address '%s' and net '%s' - mem: %o", balance, min_balance, address, net, process.memoryUsage())
+            debug("Got balance %d (min %d) for address '%s' and net '%s' - mem: %o", balance, min_balance, address, net, util.memoryUsage(process))
             
             if (balance == null || isNaN(balance) || (min_balance > 0 && balance < min_balance)) {
               res.json({ status: 'failed', error: true, message: 'Insufficient funds.' })
@@ -505,7 +590,7 @@ app.post('/login/:net?', async (req, res) => {
 
       debug("Logged in user '%s' for net '%s', session ID '%s'.", address, net, req.session.id)
 
-      // TODO: Fix redirect
+      // TODO: User: Fix login redirect
       // res.redirect('/user/' + net + '/' + address)
 
       res.status(200).json({ error: false, status: 'success', token: token, message: 'User ' + address + ' logged in.'})
@@ -565,6 +650,7 @@ app.use('/ext/getmoneysupply/:net?', function(req, res) {
   stats(res, net, api_page, api_page.public_apis.ext.getmoneysupply.enabled, function (stats) {
     return stats && stats.supply ? stats.supply.toString() : '0'
   })
+  return -1
 })
 
 app.use('/ext/getaddress/:hash/:net?', function(req, res) {
@@ -576,31 +662,31 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
       db.get_address_txs(req.params.hash, 0, api_page.public_apis.ext.getaddresstxs.max_items_per_query, function(obj) {
         if (address) {
           const txs = obj.data
-          var last_txs = [];
+          var last_txs = []
 
           for (i = 0; i < txs.length; i++) {
             if (typeof txs[i].txid !== "undefined") {
               var out = 0,
                   vin = 0,
                   tx_type = 'vout',
-                  row = {};
+                  row = {}
 
               txs[i].vout.forEach(function (r) {
                 if (r.addresses == req.params.hash)
-                  out += r.amount;
-              });
+                  out += r.amount
+              })
 
               txs[i].vin.forEach(function (s) {
                 if (s.addresses == req.params.hash)
-                  vin += s.amount;
-              });
+                  vin += s.amount
+              })
 
               if (vin > out)
-                tx_type = 'vin';
+                tx_type = 'vin'
 
-              row['addresses'] = txs[i].txid;
-              row['type'] = tx_type;
-              last_txs.push(row);
+              row['addresses'] = txs[i].txid
+              row['type'] = tx_type
+              last_txs.push(row)
             }
           }
 
@@ -611,24 +697,25 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
             balance: (address.balance / 100000000).toString().replace(/(^-+)/mg, ''),
             last_txs: last_txs,
             coin: coin,
-            net: net
-          };
+            net: net,
+            assets : address.assets
+          }
 
-          res.send(a_ext);
+          res.send(a_ext)
         } else
-          res.send({ error: 'address not found.', hash: req.params.hash, coin: coin, net: net});
-      }, net);
-    }, net);
+          res.send({ error: 'address not found.', hash: req.params.hash, coin: coin, net: net})
+      }, net)
+    }, net)
   } else
-    res.end('This method is disabled');
-});
+    res.end(METHOD_DISABLED)
+})
 
 app.use('/ext/gettx/:txid/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.gettx.enabled == true) {
-    var txid = req.params.txid;
+    var txid = req.params.txid
 
     db.get_tx(txid, function(tx) {
       const shared_pages = settings.get(net, 'shared_pages')
@@ -640,7 +727,7 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
         res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net})
     }, net)
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getbalance/:hash/:net?', function(req, res) {
@@ -651,14 +738,14 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
     const coin = settings.getCoin(net)
     db.get_address(hash, function(address) {
       if (address) {
-        debug("Got balance '%s' '%s' %o - mem: %o", net, hash, address.balance, process.memoryUsage())
+        debug("Got balance '%s' '%s' %o - mem: %o", net, hash, address.balance, util.memoryUsage(process))
         res.setHeader('content-type', 'text/plain')
         res.end((address.balance / 100000000).toString().replace(/(^-+)/mg, ''))
       } else
         res.send({ error: 'address not found.', hash: hash, coin: coin, net: net })
     }, net)
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getdistribution/:net?', function(req, res) {
@@ -669,13 +756,13 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
     db.get_richlist(coin.name, function(richlist) {
       db.get_stats(coin.name, function(stats) {
         datautil.get_distribution(settings, lib, richlist, stats, function(dist) {
-          debug("Got distribution '%s' %o - mem: %o", net, dist, process.memoryUsage());
+          debug("Got distribution '%s' %o - mem: %o", net, dist, util.memoryUsage(process))
           res.send(dist)
         }, net)
       }, net)
     }, net)
   } else {
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
   }
 })
 
@@ -683,7 +770,7 @@ app.use('/ext/getcurrentprice/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getcurrentprice.enabled == true) {
-    const defaultExchangeCurrencyPrefix = settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toLowerCase();
+    const defaultExchangeCurrencyPrefix = settings.get(net, 'markets_page').default_exchange.trading_pair.split('/')[1].toLowerCase()
     db.get_stats(coin.name, function (stats) {
       r = {}
       r.last_updated=new Date().toUTCString().replace('GMT', 'UTC')
@@ -707,7 +794,7 @@ app.use('/ext/getcurrentprice/:net?', function(req, res) {
       })
     }, net)
   } else {
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
   }
 })
 
@@ -717,7 +804,7 @@ function ratesPush(rates, currencies, item, price) {
     "symbol": currencies[item].symbol,
     "rate": price,
     "name": currencies[item].name,
-  });
+  })
 }
 
 app.use('/ext/getbasicstats/:net?', function(req, res) {
@@ -743,20 +830,20 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
           if (!isNaN(stats.last_usd_price)) 
             s.last_price_usd = stats.last_usd_price,
 
-          // eval('var p_ext = {  "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '":   }');
+          // eval('var p_ext = {  "last_price_' + markets_page.default_exchange.trading_pair.split('/')[1].toLowerCase() + '":   }')
           db.statsCache.set(net, s)
-          debug("Cached coin stats '%s' %o - mem: %o", net, s, process.memoryUsage());
-          res.send(s);
+          debug("Cached coin stats '%s' %o - mem: %o", net, s, util.memoryUsage(process))
+          res.send(s)
         } else 
-          res.end('This method is disabled')
-      }, net);
+          res.end(METHOD_DISABLED)
+      }, net)
     } else {
-      debug("Get coin stats by cache '%s' %o ...", net, r.block_count);
-      res.send(r);
+      debug("Get coin stats by cache '%s' %o ...", net, r.block_count)
+      res.send(r)
     }
   } else
-    res.end('This method is disabled');
-});
+    res.end(METHOD_DISABLED)
+})
 
 app.use('/ext/getticker/:mode/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
@@ -817,7 +904,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
                 r.pools = ["crimson-pool.com","cryptoverse.eu","kriptokyng.com","mecrypto.club","mining4people.com","mypool.sytes.net","suprnova.cc","zergpool.com","zpool.ca"]
                 r.algos = algos
                 tickerCache.set (net, r)
-                debug("Got ticker '%s' '%s' %o - mem: %o", r.coin, net, r, process.memoryUsage())
+                debug("Got ticker '%s' '%s' %o - mem: %o", r.coin, net, r, util.memoryUsage(process))
                 res.send(r)
                   
               })
@@ -829,10 +916,10 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
         res.send(r)
       }
     } else {
-      res.end('This method is available only with caching enabled')
+      res.end('This method is available only with caching enabled.')
     }
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
@@ -867,12 +954,12 @@ app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
       res.end('Invalid mode: use summary or full.');
     }
   } else {
-    res.end('This method is disabled');
+    res.end(METHOD_DISABLED);
   }
 });
 
 function isInternalRequest(req) {
-  // TODO: Find secure solution.
+  // TODO: Sec: Find secure asymmetric solution for internal request.
   return req.headers['x-requested-with'] != null 
     && req.headers['x-requested-with'].toLowerCase() == 'xmlhttprequest' 
     && req.headers.referer != null 
@@ -881,11 +968,12 @@ function isInternalRequest(req) {
 }
 
 app.use('/ext/getlasttxs/:net/:min', function(req, res) {
-  // TODO: Add cache.
+  // TODO: Cache: Latest tx.
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
     var min = req.params.min, start, length
+
     // split url suffix by forward slash and remove blank entries
     var type = req.params['type'] ? req.params['type'] : -1
     var split = req.url.split('/').filter(function(v) { return v; })
@@ -935,7 +1023,7 @@ app.use('/ext/getlasttxs/:net/:min', function(req, res) {
       res.json({"data": rows, "recordsTotal": count, "recordsFiltered": count})
     }, net)
   } else
-    res.end('This method is disabled');
+    res.end(METHOD_DISABLED);
 })
 
 app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
@@ -966,7 +1054,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
     debug("getaddresstx for chain '%s': min=%d, start=%d, length=%d", net, min, start, length)
 
     db.get_address_txs(req.params.address, start, length, function(obj) {
-      // TODO: Fix balance is null with upstream peer.
+      // TODO: Peers: Fix balance is null with upstream peer.
       const tx_types = settings.get(net, 'tx_types')
       const txs = obj.data
       var data = [];
@@ -993,6 +1081,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
           row.push(Number(out / 100000000))
           row.push(Number(vin / 100000000))
           row.push(Number(txs[i].balance / 100000000))
+          row.push(txs[i])
           data.push(row)
         }
       }
@@ -1000,7 +1089,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
       res.json({"data": data, "recordsTotal": obj.recordsTotal, "recordsFiltered": obj.recordsFiltered })
     }, net)
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getsummary/:net?', function(req, res) {
@@ -1047,11 +1136,11 @@ app.use('/ext/getsummary/:net?', function(req, res) {
           r['difficulty_' + algo.algo] = stats['difficulty_' + algo.algo]
       })
 
-      debug("Got summary '%s' %o - mem: %o", net, r, process.memoryUsage())
+      debug("Got summary '%s' %o - mem: %o", net, r, util.memoryUsage(process))
       res.send(r)
     }, net)
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getnetworkpeers/:net?', function(req, res) {
@@ -1063,7 +1152,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
       db.get_peers(function(peers) {
        
         if (peers.msg) {
-          debugPeers("Waiting for upstream peers.")
+          if (debugPeers.enabled) debugPeers("Waiting for upstream peers.")
           res.json(peers)
           return  
         }
@@ -1082,7 +1171,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
 
         // return peer data
         db.peersCache.set (net, peers)
-        debug("Cached peers '%s' %o - mem: %o", net, peers, process.memoryUsage())
+        debug("Cached peers '%s' %o - mem: %o", net, peers, util.memoryUsage(process))
         res.json(peers)
       }, net);
     } else {
@@ -1090,7 +1179,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
       res.send(r)
     }
   } else
-    res.end('This method is disabled');
+    res.end(METHOD_DISABLED);
 });
 
 // get the list of masternodes from local collection
@@ -1106,11 +1195,11 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
       //   delete masternodes[i]['_doc']['__v'];
       // }
       // db.masternodesCache.set(net, masternodes)
-      debug("Got masternodes '%s' %o - mem: %o", net, masternodes, process.memoryUsage())
+      debug("Got masternodes '%s' %o - mem: %o", net, masternodes, util.memoryUsage(process))
       res.send(masternodes)
     }, net)
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 // returns a list of masternode reward txs for a single masternode address from a specific block height
@@ -1138,7 +1227,7 @@ app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
         res.send({error: "failed to retrieve masternode rewards", hash: req.params.hash, since: req.params.since});
     }, net);
   } else
-    res.end('This method is disabled');
+    res.end(METHOD_DISABLED);
 });
 
 // returns the total masternode rewards received for a single masternode address from a specific block height
@@ -1150,19 +1239,19 @@ app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) 
     db.get_masternode_rewards_totals(req.params.hash, req.params.since, function(total_rewards) {
       if (total_rewards != null) {
         // return the total of masternode rewards
-        res.json(total_rewards);
+        res.json(total_rewards)
       } else
-        res.send({error: "failed to retrieve masternode rewards", hash: req.params.hash, since: req.params.since});
-    }, net);
+        res.send({error: "failed to retrieve masternode rewards", hash: req.params.hash, since: req.params.since})
+    }, net)
   } else
-    res.end('This method is disabled');
+    res.end(METHOD_DISABLED)
 });
 
 app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
   const net = settings.getNet(req.params['net'])
   db.get_network_chart_data(function(data) {
     if (data) {
-      debugChart("Got network chart '%s' %o - mem: %o", net, data, process.memoryUsage())
+      if (debugChart.enabled) debugChart("Got network chart '%s' %o - mem: %o", net, data, util.memoryUsage(process))
       res.send(data)
     } else {
       res.send()
@@ -1172,7 +1261,8 @@ app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
 
 const allnet_modes = ['markets']
 
-// net apis
+/* Net APIs by DB / cache */
+
 app.use('/net/getallnet/:mode?', function(req, res) {
   const net = settings.getDefaultNet()
   const mode = req.params['mode']
@@ -1181,21 +1271,21 @@ app.use('/net/getallnet/:mode?', function(req, res) {
   if (api_page.enabled == true && api_page.public_apis.net.getallnet.enabled == true) {
     if (mode) {
       if (!allnet_modes.includes(mode)) {
-        res.end('This mode is not supported');    
+        res.end('This mode is not supported')
       }
     } else {
-      const r = foreverCache.get('allnet');
+      const r = foreverCache.get('allnet')
       if (r == undefined) {
         const allnet = settings.getAllNet()
-        foreverCache.set(net, allnet);
-        res.send(allnet);
+        foreverCache.set(net, allnet)
+        res.send(allnet)
       } else {
-        res.send(r);
+        res.send(r)
       }
     }
   } else
-    res.end('This method is disabled');
-});
+    res.end(METHOD_DISABLED)
+})
 
 // peer connector API
 app.use('/peers/getpeers/:net?', function(req, res) {
@@ -1212,7 +1302,7 @@ app.use('/peers/getpeers/:net?', function(req, res) {
     if (r == undefined) {
       // db.get_xpeers(function(peers) {
       //   xpeersCache.set (net, peers)
-      //   debug("Cached xpeers '%s' %o - mem: %o", net, peers, process.memoryUsage())
+      //   debug("Cached xpeers '%s' %o - mem: %o", net, peers, util.memoryUsage(process))
       //   res.json(peers)
       // }, net)
       const clientsSet = wsInstance.getWss().clients
@@ -1230,7 +1320,7 @@ app.use('/peers/getpeers/:net?', function(req, res) {
       res.json(r)
     }
   } else
-    res.end('This method is disabled')
+    res.end(METHOD_DISABLED)
 })
 
 function isPeerUpstreamAllowed(net) {
@@ -1243,13 +1333,13 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
   const net = req.params['net']
   const ip = settings.getRemoteIp(req)
 
-  // TODO: Check peer IP allowed.
-  // an upstream peer (client) connects to us (we are the server) - 0
+  // TODO: Peers: Check peer IP allowed.
+  // An upstream peer (client) connects to us (we are the server) - 0
   if (isPeerUpstreamAllowed(net)) {
     console.log("Upstream peer '%s' for net '%s' requested.", ip, net)
 
     ws.on('message', function(msg) {
-      // TODO: Fix balance is null with upstream peer.
+      // TODO: Peers: Fix balance is null with upstream peer.
 
       const obj = JSON.parse(msg)
 
@@ -1260,7 +1350,7 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
         console.log("Received upstream handshake for net '%s', peer version %d, number of peers %d.", obj.net, obj.data, clientsSet.size)
         if (version != Peers.PEER_VERSION) {
           console.log("Upstream peer version for net '%s' mismatch: received %d != %d", net, version, Peers.PEER_VERSION)
-          // TODO: Disconnect peer.
+          // TODO: Peers: Disconnect peer.
           // https://stackoverflow.com/questions/19304157/getting-the-reason-why-websockets-closed-with-close-code-1006/19305172#19305172
           // ws.close(1006, 'Abnormal Closure')
         }
@@ -1268,7 +1358,8 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
         const clientsValues = clientsSet.values()
         for(let i=0; i < clientsSet.size; i++) {
           const peer = clientsValues.next().value
-          debugPeers("Available peers(%d): %o", i + 1, peer._sender._socket._peername)
+          if (debugPeers.enabled) 
+            debugPeers("Available peers(%d): %o", i + 1, peer._sender._socket._peername)
           if (i == clientsSet.size - 1) {
             db.push_upstream_peer_server(peer, net)
           }
@@ -1276,7 +1367,8 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
 
         ws.send(JSON.stringify({ 'type': 'handshake', 'message': 'Completed' }))
       } else {
-        debugPeers("Got upstream response: %o", obj)
+        if (debugPeers.enabled) 
+          debugPeers("Got upstream response: %o", obj)
         if (obj && obj.event && obj.event == Peers.UPSTREAM_GET_PEERS + net) {
           db.peersCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_BLOCK_BY_HASH + net)) {
@@ -1305,7 +1397,7 @@ app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
           db.networkChartCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET + net)) {
           db.marketsCache.set(obj.event, obj.data)
-        }  else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKETS + net)) {
+        } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKETS + net)) {
           db.marketsCache.set(obj.event, obj.data)
         } else if (obj && obj.event && obj.event.startsWith(Peers.UPSTREAM_GET_MARKET_SUMMARY + net)) {
           db.marketsCache.set(obj.event, obj.data)
@@ -1442,45 +1534,46 @@ networks.forEach( function(item, index) {
 });
 
 // locals
-app.set('explorer_version', package_metadata.version)
-app.set('locale', locale)
-app.set('anyHeader', settings.anyHeader)
-app.set('allHeaders', settings.allHeaders)
-app.set('get', settings.get)
-app.set('getWallet', settings.getWallet)
-app.set('getRemoteIp', settings.getRemoteIp)
-app.set('isButkoin', settings.isButkoin)
-app.set('isPepew', settings.isPepew)
-app.set('isVkax', settings.isVkax)
-app.set('isMagpie', settings.isMagpie)
-app.set('isYerbas', settings.isYerbas)
-app.set('getLogo', settings.getLogo)
-app.set('getTitleLogo', settings.getTitleLogo)
-app.set('formatDateTime', settings.formatDateTime)
-app.set('formatCurrency', settings.formatCurrency)
-app.set('formatDecimal', settings.formatDecimal)
-app.set('formatInt', settings.formatInt)
-app.set('panelOffset', settings.panelOffset)
-app.set('panel', settings.panel)
-app.set('panels', settings.panels)
-app.set('coins', settings.coins)
-app.set('wallets', settings.wallets)
-app.set('default_wallet', settings.wallets[0].id)
-app.set('currencies', settings.currencies)
-app.set('cache', settings.cache)
-app.set('labels', settings.labels)
-app.set('blockchain_specific', settings.blockchain_specific)
-app.set('market_data', market_data)
-app.set('market_count', market_count)
-app.set('hasUpstream', settings.hasUpstream)
-app.set('needsUpstream', settings.needsUpstream)
+app.set('app_name',                       package_metadata.name)
+app.set('app_version',                    package_metadata.version)
+app.set('locale',                         locale)
+app.set('anyHeader',                      settings.anyHeader)
+app.set('allHeaders',                     settings.allHeaders)
+app.set('get',                            settings.get)
+app.set('getWallet',                      settings.getWallet)
+app.set('getRemoteIp',                    settings.getRemoteIp)
+app.set('isMultiAlgo',                     settings.isMultiAlgo)
+app.set('isPepew',                        settings.isPepew)
+app.set('isVkax',                         settings.isVkax)
+app.set('isMagpie',                       settings.isMagpie)
+app.set('getLogo',                        settings.getLogo)
+app.set('getTitleLogo',                   settings.getTitleLogo)
+app.set('formatDateTime',                 settings.formatDateTime)
+app.set('formatCurrency',                 settings.formatCurrency)
+app.set('formatDecimal',                  settings.formatDecimal)
+app.set('formatInt',                      settings.formatInt)
+app.set('formatUnixtime',                 settings.formatUnixtime)
+app.set('panelOffset',                    settings.panelOffset)
+app.set('panel',                          settings.panel)
+app.set('panels',                         settings.panels)
+app.set('coins',                          settings.coins)
+app.set('wallets',                        settings.wallets)
+app.set('default_wallet',                 settings.wallets[0].id)
+app.set('currencies',                     settings.currencies)
+app.set('cache',                          settings.cache)
+app.set('labels',                         settings.labels)
+app.set('blockchain_specific',            settings.blockchain_specific)
+app.set('market_data',                    market_data)
+app.set('market_count',                   market_count)
+app.set('hasUpstream',                    settings.hasUpstream)
+app.set('needsUpstream',                  settings.needsUpstream)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+    var err = new Error('Not Found')
+    err.status = 404
+    next(err)
+})
 
 // development error handler
 // will print stacktrace
@@ -1541,8 +1634,8 @@ exec('git rev-parse HEAD', (err, stdout, stderr) => {
   // check if the commit id was returned
   if (stdout != null && stdout != '') {
     // set but-x revision code based on the git commit id
-    app.set('revision', stdout.substring(0, 7));
+    app.set('revision', stdout.substring(0, 7))
   }
-});
+})
 
-module.exports = app;
+module.exports = app

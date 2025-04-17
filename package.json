@@ -1,6 +1,6 @@
 {
   "name": "but-x",
-  "version": "1.102.0",
+  "version": "2.0.0-alpha",
   "private": true,
   "scripts": {
     "start": "node --stack-size=20000 ./bin/cluster",
@@ -21,29 +21,29 @@
   "dependencies": {
     "@isaacs/ttlcache": "^1.4.1",
     "async": "^3.2.6",
-    "bad-words": "^3.0.4",
+    "bad-words": "^4.0.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
-    "bufferutil": "^4.0.8",
+    "bufferutil": "^4.0.9",
     "cluster": "^0.7.7",
     "cookie-parser": "^1.4.7",
-    "debug": "^4.3.7",
+    "debug": "^4.4.0",
     "detect-port": "^1.6.1",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
     "express-ws": "^5.0.2",
     "jsonminify": "^0.4.2",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "mongodb": "^6.9.0",
-    "mongoose": "^8.7.1",
+    "mongodb": "^6.15.0",
+    "mongoose": "^8.12.2",
     "morgan": ">=1.10.0",
-    "postman-request": "^2.88.1-postman.40",
+    "postman-request": "^2.88.1-postman.42",
     "pug": "^3.0.3",
     "qr-image": "^3.2.0",
-    "sass": "^1.79.5",
+    "sass": "^1.86.0",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.16.2",
-    "ws": "^8.18.0"
+    "ws": "^8.18.1"
   }
 }

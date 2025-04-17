@@ -45,10 +45,12 @@ util.init_db(net, function(status) {
     }
     db.lib.get_blockchaininfo(net, function(info) {
       if (typeof info === 'undefined') {
-        debug("No stats from DB for net '%s', re-creating..", net)
+        if (debug.enabled)
+          debug("No stats from DB for net '%s', re-creating..", net)
         util.exit_remove_lock(2, lock, net)
       }
-      debug("Got stats from DB for net '%s': %O", net, info)
+      if (debug.enabled)
+        debug("Got stats from DB for net '%s': %O", net, info)
 
       if (!isNaN(info.blocks)) {
         stats.last = info.blocks
@@ -86,22 +88,26 @@ util.init_db(net, function(status) {
 
       db.lib.get_blockhash(info.blocks, function (hash) {
         if (typeof hash === 'undefined') {
-          debug("Block hash for height %d not found for net '%s'.", info.blocks, net)
+          if (debug.enabled)
+            debug("Block hash for height %d not found for net '%s'.", info.blocks, net)
           util.exit_remove_lock(2, lock, net)
         }
 
         db.lib.get_block(hash, function (block) {
           if (typeof block === 'undefined') {
-            debug("Block with hash 's%' not found for height %d for net '%s'.", hash, info.blocks, net)
+            if (debug.enabled)
+              debug("Block with hash 's%' not found for height %d for net '%s'.", hash, info.blocks, net)
             util.exit_remove_lock(2, lock, net)
           }
-          debug("Got block with hash '%s' for height %d for net '%s'", block.hash, block.height, net)
+          if (debug.enabled)
+            debug("Got block with hash '%s' for height %d for net '%s'", block.hash, block.height, net)
 
           lib.get_hashrate(function(ms) {
             if (typeof ms === 'undefined') {
               update_stats_and_exit(coin, stats)
             }
-            debug("Got mining info from DB for net '%s': %o", net, ms)
+            if (debug.enabled)
+              debug("Got mining info from DB for net '%s': %o", net, ms)
 
             r.hashps = !isNaN(ms.networkhashps) ? ms.networkhashps : -1
             algos.forEach((algo) => {
@@ -117,7 +123,8 @@ util.init_db(net, function(status) {
 
             db.lib.get_txoutsetinfo(net, function (txout) {
               if (txout) {
-                debug("Got txoutsetinfo with for height %d for net '%s': %o", block.height, net, txout)
+                if (debug.enabled)
+                  debug("Got txoutsetinfo with for height %d for net '%s': %o", block.height, net, txout)
 
                 if (!isNaN(txout.transactions)) {
                   stats.count_txes = txout.transactions
@@ -132,6 +139,8 @@ util.init_db(net, function(status) {
                   stats.size_on_disk = txout.disk_size
                 }
               }
+              stats.genesishash = wallet.genesis_hash;
+              stats.starttime = wallet.start_time;
               update_stats_and_exit(coin, stats)
             })
           }, net)

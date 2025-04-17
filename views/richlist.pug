@@ -14,7 +14,7 @@ block content
           ['101+', !{diste.percent}]
         ];
         var burned = '!{burned}';
-        if ('#{richlist_page.burned_coins.include_burned_coins_in_distribution}' == 'true' && burned != 'null' && burned != '' && burned != '0')
+        if ('#{richlist_page.burned_coins.include_burned_coins_in_dist}' == 'true' && burned != 'null' && burned != '' && burned != '0')
           data.push(['Burned Coins', parseFloat(((burned / 100000000) / !{stats.supply}) * 100)]);
         var piePlot = $.jqplot('pieChart', [data],
           {
@@ -193,11 +193,11 @@ block content
                         td.text-center
                           =count
                         td.text-center
-                          a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{tx.blockindex}
+                          a.breakWord(href='/block/' + tx.blockhash + '/' + net) #{settings.formatDecimal(tx.blockindex, 0, 0)}
                         td.text-center
                           span #{timestamp}
                         td.text-end
-                          span #{tx.size}
+                          span #{settings.formatDecimal(tx.size, 0, 0)}
                         td.text-end #{itemFixedParts[0]}.
                           span.decimal #{itemFixedParts[1]}
     if richlist_page.wealth_distribution.show_distribution_table == true || richlist_page.wealth_distribution.show_distribution_chart == true
@@ -285,7 +285,7 @@ block content
                     span.decimal.breakWord #{totalParts[1]}
                   td.text-end #{percentParts[0]}.
                     span.decimal #{percentParts[1]}
-                if richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0
+                if richlist_page.burned_coins.include_burned_coins_in_dist == true && burned != null && burned > 0
                   tr
                     td.fw-bold
                       div.float-start.wealth-dist-color-box(style=('background-color:' + richlist_page.wealth_distribution.colors[5] + ';'))
@@ -301,9 +301,9 @@ block content
                 tr.text-end
                   td.fw-bold
                     span #{settings.locale.total}
-                  - var total = Number(parseFloat(dista.total) + parseFloat(distb.total) + parseFloat(distc.total) + parseFloat(distd.total) + parseFloat(diste.total) + (richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? burned / 100000000 : 0)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+                  - var total = Number(parseFloat(dista.total) + parseFloat(distb.total) + parseFloat(distc.total) + parseFloat(distd.total) + parseFloat(diste.total) + (richlist_page.burned_coins.include_burned_coins_in_dist == true && burned != null && burned > 0 ? burned / 100000000 : 0)).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
                   - var totalParts = total.split(".");
-                  - var percent = (parseFloat(dista.percent) + parseFloat(distb.percent) + parseFloat(distc.percent) + parseFloat(distd.percent) + parseFloat(diste.percent) + parseFloat((richlist_page.burned_coins.include_burned_coins_in_distribution == true && burned != null && burned > 0 ? ((burned / 100000000) / stats.supply) * 100 : 0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':false});
+                  - var percent = (parseFloat(dista.percent) + parseFloat(distb.percent) + parseFloat(distc.percent) + parseFloat(distd.percent) + parseFloat(diste.percent) + parseFloat((richlist_page.burned_coins.include_burned_coins_in_dist == true && burned != null && burned > 0 ? ((burned / 100000000) / stats.supply) * 100 : 0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':false});
                   - var percentParts = percent.split(".");
                   td.text-end.fw-bold.breakWord #{totalParts[0]}.
                     span.decimal.breakWord #{totalParts[1]}

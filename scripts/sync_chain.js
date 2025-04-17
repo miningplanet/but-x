@@ -1,9 +1,11 @@
 const debug = require('debug')('sync')
+const d_assets = require('debug')('assets')
 const mongoose = require('mongoose')
 const settings = require('../lib/settings')
 const fs = require('fs')
 const async = require('async')
 const datautil = require('../lib/datautil')
+const assetutil = require('../lib/functions/assetutil')
 const db = require('../lib/database')
 const util = require('./syncutil')
 
@@ -126,15 +128,6 @@ function check_show_sync_message(blocks_to_sync, net) {
   return retVal
 }
 
-function update_heavy(coin, height, count, heavycoin_enabled, cb) {
-  if (heavycoin_enabled == true) {
-    db.update_heavy(coin, height, count, function() {
-      return cb(true)
-    })
-  } else
-    return cb(false)
-}
-
 function update_network_history(coin, height, network_history_enabled, cb, net) {
   if (network_history_enabled == true) {
     update_network_history_db(coin, height, function() {
@@ -150,7 +143,7 @@ function update_network_history_db(coin, height, cb, net) {
     if (!network_hist) {
       db.lib.get_hashrate(function(hashps) {
         db.lib.get_difficulty(net, function(difficulties) {
-          const isBut = settings.isButkoin(net)
+          const isMultiAlgo = settings.isMultiAlgo(net)
           const isPepew = settings.isPepew(net)
           const isVkax = settings.isVkax(net)
           const difficulty = difficulties.difficulty
@@ -172,8 +165,8 @@ function update_network_history_db(coin, height, cb, net) {
 
           // create a new network history record
           var dto = null
-          if (isBut) {
-            const hashrate = hashps.butkscrypt
+          if (isMultiAlgo) {
+            const hashrate = hashps.ghostrider
             dto = db.NetworkHistoryDb[net].create({
               blockindex: height,
               nethash: (hashrate == null || hashrate == '-' ? 0 : hashrate),
@@ -184,13 +177,11 @@ function update_network_history_db(coin, height, cb, net) {
               difficulty_lyra2: difficulties.difficulty_lyra2,
               difficulty_sha256d: difficulties.difficulty_sha256d,
               difficulty_scrypt: difficulties.difficulty_scrypt,
-              difficulty_butkscrypt: difficulties.difficulty_butkscrypt,
               nethash_ghostrider: hashps.ghostrider,
               nethash_yespower: hashps.yespower,
               nethash_lyra2: hashps.lyra2,
               nethash_sha256d: hashps.sha256d,
-              nethash_scrypt: hashps.scrypt,
-              nethash_butkscrypt: hashps.butkscrypt
+              nethash_scrypt: hashps.scrypt
             })
           } else if (isPepew) {
             dto = db.NetworkHistoryDb[net].create({
@@ -223,8 +214,8 @@ function update_network_history_db(coin, height, cb, net) {
 
           if (dto) {
             var rr = {}
-            if (isBut) {
-              const hashrate = hashps.butkscrypt
+            if (isMultiAlgo) {
+              const hashrate = hashps.ghostrider
               rr.last = height,
               rr.nethash = (hashrate == null || hashrate == '-' ? 0 : hashrate),
               rr.difficulty_pow = difficultyPOW,
@@ -234,13 +225,11 @@ function update_network_history_db(coin, height, cb, net) {
               rr.difficulty_lyra2 = difficulties.difficulty_lyra2,
               rr.difficulty_sha256d = difficulties.difficulty_sha256d,
               rr.difficulty_scrypt = difficulties.difficulty_scrypt,
-              rr.difficulty_butkscrypt = difficulties.difficulty_butkscrypt,
               rr.nethash_ghostrider = hashps.ghostrider,
               rr.nethash_yespower = hashps.yespower,
               rr.nethash_lyra2 = hashps.lyra2,
               rr.nethash_sha256d = hashps.sha256d,
-              rr.nethash_scrypt = hashps.scrypt,
-              rr.nethash_butkscrypt = hashps.butkscrypt
+              rr.nethash_scrypt = hashps.scrypt
             } else {
               rr.last = height,
               rr.nethash = hashps,
@@ -304,6 +293,7 @@ function update_stats_db(net, coin, cb) {
       console.log('Error: Unable to connect to the X API.')
       return cb(false)
     }
+    // TODO: Fix. Updates DB with DB.
     db.StatsDb[net].findOne({coin: coin}).then((stats) => {
       if (stats) {
         db.StatsDb[net].updateOne({coin: coin}, {
@@ -340,8 +330,8 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   var task_limit_txs = 1
 
   // fix for invalid block height (skip genesis block as it should not have valid txs)
-  if (typeof start === 'undefined' || start < 1)
-    start = 1
+  if (typeof start === 'undefined' || start < 0)
+    start = 0
 
   if (task_limit_blocks < 1)
     task_limit_blocks = 1
@@ -355,7 +345,7 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   async.eachLimit(blocks_to_scan, task_limit_blocks, function(block_height, next_block) {
     const sync_after = settings.sync.save_stats_after_sync_blocks
     if (!check_only && sync_after > -1 && block_height % sync_after === 0) {
-      debug("Scan block update stats: %d", block_height)
+      if (debug.enabled) debug("Scan block update stats: %d", block_height)
 
       db.lib.get_txoutsetinfo(net, function(info) {
         const dto = {}
@@ -363,13 +353,13 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
 
         if (info && !isNaN(info.transactions))
           dto.txes = info.transactions
-        if (info && !isNaN(info.transactions))
+        if (info && !isNaN(info.txouts))
           dto.utxos = info.txouts
         if (info && !isNaN(info.total_amount))
           dto.supply = info.total_amount
 
         db.StatsDb[net].updateOne({coin: coin}, dto).then(() => {
-          debug("Done update stats: %d", block_height)
+          if (debug.enabled) debug("Done update stats: %d", block_height)
         }).catch((err) => {
           console.error("Failed to update stats database: %s", err)
         })
@@ -378,98 +368,18 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
       console.log('Checking block %d...', block_height)
     }
 
-    console.log("Process block: %d", block_height)
+    console.log("-Process block: %d", block_height)
     db.lib.get_blockhash(block_height, function(blockhash) {
-      debug("Got block hash: %s", blockhash)
+      if (debug.enabled) debug("Got block hash: %s", blockhash)
       if (blockhash) {
         db.lib.get_block(blockhash, function(block) {
-          debug("Got block: %s", blockhash)
+          if (debug.enabled) debug("Got block: %s", blockhash)
           if (block) {
             db.get_block_by_height(block_height, function(blockc) {
               if (blockc) {
-                console.log('Block %d is in DB.', block_height)
-                async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-                  db.TxDb[net].findOne({txid: txid}).then((tx) => {
-                    debug("Got block tx: %s", txid)
-                    if (tx) {
-                      debug('TX %s is in DB.', txid)
-                      setTimeout( function() {
-                        tx = null
-                        stopSync ? next_tx({}) : next_tx() // stop or next
-                      }, timeout)
-                    } else {
-                      save_tx(net, txid, block_height, function(err, tx_has_vout) {
-                        debug("Saved block tx: %s", txid)
-                        if (err)
-                          console.log(err)
-                        else
-                          console.log('%s: %s', block_height, txid)
-
-                        if (tx_has_vout)
-                          txes++
-
-                        setTimeout( function() {
-                          tx = null
-                          stopSync ? next_tx({}) : next_tx() // stop or next
-                        }, timeout)
-                      })
-                    }
-                  }).catch((err) => {
-                    console.error("Failed to find tx database: %s", err)
-                    return cb(null)
-                  })
-                }, function() {
-                  setTimeout( function() {
-                    blockhash = null
-                    block = null
-                    stopSync ? next_block({}) : next_block() // stop or next
-                  }, timeout)
-                })
+                processBlockIsInDb(net, block, block_height, blockhash, task_limit_txs, timeout, next_block)
               } else {
-                create_block(block, function(blockr) {
-                  if (blockr) {
-                    async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
-                      db.TxDb[net].findOne({txid: txid}).then((tx) => {
-                        debug("Got block tx: %s", txid)
-                        if (tx) {
-                          debug('TX %s is in DB.', txid)
-                          setTimeout( function() {
-                            tx = null
-                            stopSync ? next_tx({}) : next_tx() // stop or next
-                          }, timeout)
-                        } else {
-                          save_tx(net, txid, block_height, function(err, tx_has_vout) {
-                            debug("Saved block tx: %s", txid)
-                            if (err)
-                              console.log(err)
-                            else
-                              console.log('%s: %s', block_height, txid)
-
-                            if (tx_has_vout)
-                              txes++
-
-                            setTimeout( function() {
-                              tx = null
-                              stopSync ? next_tx({}) : next_tx() // stop or next
-                            }, timeout)
-                          })
-                        }
-                      }).catch((err) => {
-                        console.error("Failed to find tx database: %s", err)
-                        return cb(null)
-                      })
-                    }, function() {
-                      setTimeout( function() {
-                        blockhash = null
-                        block = null
-                        stopSync ? next_block({}) : next_block() // stop or next
-                      }, timeout)
-                    })
-                  } else {
-                    console.error("Failed to insert block at height %d hash '%s'. Exit.", block.height, block.hash)
-                    util.exit_remove_lock(1, lock, net)
-                  }
-                }, net)
+                processNewBlock(net, block, block_height, blockhash, txes, task_limit_txs, timeout, next_block)
               }
             }, net)
           } else {
@@ -506,6 +416,94 @@ function update_tx_db(net, coin, start, end, txes, timeout, check_only, cb) {
   })
 }
 
+function processBlockIsInDb(net, block, block_height, blockhash, task_limit_txs, timeout, next_block) {
+  console.log('Block %d is in DB.', block_height)
+  async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
+    db.TxDb[net].findOne({txid: txid}).then((tx) => {
+      if (debug.enabled) debug("Got block tx: %s", txid)
+      if (tx) {
+        if (debug.enabled) debug('TX %s is in DB.', txid)
+        setTimeout( function() {
+          tx = null
+          stopSync ? next_tx({}) : next_tx() // stop or next
+        }, timeout)
+      } else {
+        save_tx(net, txid, block_height, function(err, tx_has_vout) {
+          if (debug.enabled) debug("Saved block tx: %s", txid)
+          if (err)
+            console.log(err)
+          else
+            console.log('%s: %s', block_height, txid)
+
+          // if (tx_has_vout)
+          //   txes++
+
+          setTimeout( function() {
+            tx = null
+            stopSync ? next_tx({}) : next_tx() // stop or next
+          }, timeout)
+        })
+      }
+    }).catch((err) => {
+      console.error("Failed to find tx database: %s", err)
+      return cb(null)
+    })
+  }, function() {
+    setTimeout( function() {
+      blockhash = null
+      block = null
+      stopSync ? next_block({}) : next_block() // stop or next
+    }, timeout)
+  })
+}
+
+function processNewBlock(net, block, block_height, blockhash, txes, task_limit_txs, timeout, next_block) {
+  create_block(block, function(blockr) {
+    if (blockr) {
+      async.eachLimit(block.tx, task_limit_txs, function(txid, next_tx) {
+        db.TxDb[net].findOne({txid: txid}).then((tx) => {
+          if (debug.enabled) debug("Got block tx: %s", txid)
+          if (tx) {
+            if (debug.enabled) debug('TX %s is in DB.', txid)
+            setTimeout( function() {
+              tx = null
+              stopSync ? next_tx({}) : next_tx() // stop or next
+            }, timeout)
+          } else {
+            save_tx(net, txid, block_height, function(err, tx_has_vout) {
+              if (debug.enabled) debug("Saved block tx: %s", txid)
+              if (err)
+                console.log(err)
+              else
+                console.log('%s: %s', block_height, txid)
+
+              if (tx_has_vout)
+                txes++
+
+              setTimeout( function() {
+                tx = null
+                stopSync ? next_tx({}) : next_tx() // stop or next
+              }, timeout)
+            })
+          }
+        }).catch((err) => {
+          console.error("Failed to find tx database: %s", err)
+          return cb(null)
+        })
+      }, function() {
+        setTimeout( function() {
+          blockhash = null
+          block = null
+          stopSync ? next_block({}) : next_block() // stop or next
+        }, timeout)
+      })
+    } else {
+      console.error("Failed to insert block at height %d hash '%s'. Exit.", block.height, block.hash)
+      util.exit_remove_lock(1, lock, net)
+    }
+  }, net)
+}
+
 function create_block(block, cb, net) {
   var cbtx = null
   const d = block.cbTx
@@ -538,35 +536,75 @@ function create_block(block, cb, net) {
     cbtx: cbtx
   })
   if (dto) {
-      console.log("Stored block for chain %s height %d", net, block.height)
+      console.log("+Stored block for chain %s height %d", net, block.height)
   }
   return cb(block)
 }
 
+const tx_types = settings.get(net, 'tx_types')
+
 function save_tx(net, txid, blockheight, cb) {
-  db.lib.get_rawtransaction(txid, function(tx) {
+  db.lib.get_rawtransaction(txid, async function(tx) {
     if (tx && tx != 'There was an error. Check your console.') {
-      db.lib.prepare_vin(net, tx, function(vin, tx_type_vin) {
-        db.lib.prepare_vout(net, tx.vout, txid, vin, false, function(vout, nvin, tx_type_vout) {
+
+      // Register asset.
+      if (tx_types.indexOf('TRANSACTION_ASSET_REGISTER') == tx.type) {
+        const newAsset = assetutil.getNewAsset(tx.vout)
+        console.log("NEW ASSET %o", newAsset)
+        const name = newAsset[1].scriptPubKey.asset.name
+        var index = await db.AssetsDb[net].findOne({name: name}).exec() 
+        if (index) 
+          console.log("Asset with name '%s' for chain '%s' is already in DB.", name, net)
+        else {
+          index = await db.AssetsDb[net].create({
+            height: blockheight,
+            txid, txid,
+            name: newAsset[1].scriptPubKey.asset.name,
+            address: newAsset[1].scriptPubKey.addresses[0],
+            owner: newAsset[0] ? newAsset[0].scriptPubKey.asset.name : newAsset[1].scriptPubKey.asset.name + '!',
+            owner_address: newAsset[0] ? newAsset[0].scriptPubKey.addresses[0] : newAsset[1].scriptPubKey.addresses[0],
+            expire_time: newAsset[1].scriptPubKey.asset.expire_time,
+            amount: newAsset[1].scriptPubKey.asset.amount,
+            units: newAsset[1].scriptPubKey.asset.units,
+            balance: newAsset[1].scriptPubKey.asset.amount,
+            ipfs_hash: newAsset[1].scriptPubKey.asset.ipfs_hash ? newAsset[1].scriptPubKey.asset.ipfs_hash : ''
+          })
+          console.log("Creates asset index with name '%s' for chain '%s'.", index.name, net)
+        }
+      }
+      
+      const txAssets = assetutil.getDistinctTransferAssets(tx.vout)
+      for (const txAsset of txAssets) {
+        if (d_assets.enabled) d_assets("Increase tx count for asset '%s'.", txAsset)
+        await db.AssetsDb[net].updateOne({name: txAsset}, {$inc: { tx_count: 1 }}).exec()
+      }
+
+      prepare_vin(net, txAssets, tx, function(vin, tx_type_vin) {
+        prepare_vout(net, tx.vout, txid, vin, function(vout, nvin, tx_type_vout) {
+          // tx.vin = vin
+          for (var i = 0; i < tx.vin.length; i += 1) {
+            if (vin[i].scriptPubKey) {
+              tx.vin[i].scriptPubKey = vin[i].scriptPubKey
+            }
+          }
+
           db.lib.syncLoop(vin.length, function (loop) {
             var i = loop.iteration()
 
-            // check if address is inside an array
+            // Copy address from array (should be only one).
             if (Array.isArray(nvin[i].addresses)) {
-              // extract the address
               nvin[i].addresses = nvin[i].addresses[0]
+              if (nvin[i].addresses.length > 1)
+                console.warn("Found vin with multiple addresses. Txid '%s', index %d: %o", txid, i, nvin[i].addresses)
             }
 
-            update_address(nvin[i].addresses, blockheight, txid, nvin[i].amount, 'vin', function() {
+            update_address(i, tx, nvin[i].addresses, nvin[i].amount, blockheight, 'vin', function() {
               loop.next()
             }, net)
           }, function() {
-            const tx_types = settings.get(net, 'tx_types')
-            const isButkoin = settings.isButkoin(net)
             const isBitoreum = settings.isBitoreum(net)
             const isRaptoreum = settings.isRaptoreum(net)
             const isVkax = settings.isVkax(net)
-            const isYerbas = settings.isYerbas(net)
 
             db.lib.syncLoop(vout.length, function (subloop) {
               var t = subloop.iteration()
@@ -578,7 +616,7 @@ function save_tx(net, txid, blockheight, cb) {
               }
 
               if (vout[t].addresses) {
-                update_address(vout[t].addresses, blockheight, txid, vout[t].amount, 'vout', function() {
+                update_address(t, tx, vout[t].addresses, vout[t].amount, blockheight, 'vout', function() {
                   subloop.next()
                 }, net)
               } else
@@ -599,7 +637,7 @@ function save_tx(net, txid, blockheight, cb) {
                   })
                 }
                 var extra = null
-                if (isButkoin || isBitoreum || isRaptoreum || isVkax) {
+                if (isBitoreum || isRaptoreum || isVkax) {
                   switch (tx.type) {
                     case tx_types.indexOf('TRANSACTION_NORMAL'): break // -> NORMAL
                     case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER'): extra = datautil.protxRegisterServiceTxToArray(tx); break
@@ -611,7 +649,7 @@ function save_tx(net, txid, blockheight, cb) {
                     case tx_types.indexOf('TRANSACTION_FUTURE'): extra = tx.extraPayload; break // FUTURE
                     default: console.warn('*** Unknown TX type %s.', tx.type)
                   }
-                } else if (isYerbas) {
+                } else {
                   switch (tx.type) {
                     case tx_types.indexOf('TRANSACTION_NORMAL'): break // -> NORMAL
                     case tx_types.indexOf('TRANSACTION_PROVIDER_REGISTER'): extra = datautil.protxRegisterServiceTxToArray(tx); break
@@ -665,54 +703,184 @@ function hex_to_ascii(hex) {
   return str;
 }
 
-function update_address(hash, blockheight, txid, amount, type, cb, net=settings.getDefaultNet()) {
-  var to_sent = false
-  var to_received = false
-  var addr_inc = {}
+async function update_address(index, tx, hash, amount, height, type, cb, net=settings.getDefaultNet()) {
+  if (debug.enabled) debug("Update address: %s %d, %s, %d, %d", type, index, hash, height, amount)
 
-  if (hash == 'coinbase')
-    addr_inc.sent = amount
-  else {
-    if (type == 'vin') {
-      addr_inc.sent = amount
-      addr_inc.balance = -amount
+  const utxo = type == 'vin' ? tx.vin[index] : tx.vout[index]
+  const hasAsset = assetutil.hasAsset(utxo) // && assetutil.hasAssetHexAsm(utxo)
+
+  var address = await db.AddressDb[net].find({a_id: hash}).exec()
+  
+  if (address && Array.isArray(address) && address.length > 0) {
+    address = address[0]
+    const assets = address.assets
+    
+    if (hash == 'coinbase') {
+      // Update coinbase address. since is the counter.
+      address.since = height
+      address.sent = address.sent + amount
     } else {
-      addr_inc.received = amount
-      addr_inc.balance = amount
+      if (type == 'vin') {
+        address.sent = address.sent + amount
+        address.balance = address.balance - amount
+        // *******************
+        if (hasAsset) {
+          const asset = utxo.scriptPubKey.asset
+          if (d_assets.enabled) d_assets("Found vin asset '%o'.", asset)
+          const ai = findAssetIndex(assets, asset.name)
+          const assetAmount = asset.amount
+          if (ai > -1 && assets[ai]) {
+            // console.warn("Found vin asset.")
+            const sent = assets[ai].sent
+            const balance = assets[ai].balance
+            assets[ai].sent = sent + assetAmount
+            assets[ai].balance = balance - assetAmount
+            if (d_assets.enabled) d_assets("Update vin asset '%s' for address '%s' sent/balance %d/%d to %d/%d.", hash, assets[ai].name, sent, balance, assets[ai].sent, assets[ai].balance)
+          } else {
+            if (!Array.isArray(assets)) 
+              assets = []
+            assets.push({ name: asset.name, sent: assetAmount, received: 0, balance: 0 })
+          }
+        }
+        // *******************
+      } else {
+        address.received = Number(address.received + amount)
+        address.balance = Number(address.balance + amount)
+        if (hasAsset) {
+          const asset = utxo.scriptPubKey.asset
+          if (d_assets.enabled) d_assets("Found vout asset '%o'.", asset)
+          const ai = findAssetIndex(assets, asset.name)
+          if (ai > -1) {
+            // Update address asset balance.
+            const received = assets[ai].received
+            const balance = assets[ai].balance
+            assets[ai].received = received + asset.amount
+            assets[ai].balance = balance + asset.amount
+            if (d_assets.enabled) d_assets("Update vout asset for address '%s' received/balance %d/%d to %d/%d.", hash, received, balance, assets[ai].received, assets[ai].balance)
+
+            // Update asset index balance / tx_count.
+            if (!asset.name.endsWith('!')) {
+              var assetIndex = await db.AssetsDb[net].findOne({ name: asset.name }).exec()
+              if (assetIndex) {
+                var mbalance = assetIndex.balance
+                if (assetIndex.address == address.a_id) {
+                  if (d_assets.enabled) d_assets("Asset '%s' receiver is owner. Amount %d. Owner %s.", asset.name, asset.amount, assetIndex.address)
+                  mbalance = mbalance + asset.amount
+                }
+                for (let i = 0; i < tx.vin.length; i++) {
+                  if (tx.vin[i].address == assetIndex.address && tx.vin[i].scriptPubKey && tx.vin[i].scriptPubKey.type == 'transfer_asset' && tx.vin[i].scriptPubKey.asset && tx.vin[i].scriptPubKey.asset.name == asset.name) {
+                    if (d_assets.enabled) d_assets("Asset '%s' send by owner.  %d.", asset.name, asset.amount)
+                    mbalance = mbalance - asset.amount
+                  }
+                }
+                // else {
+                //   d_assets("Asset '%s' send by owner.  %d.", asset.name, asset.amount)
+                //   mbalance = mbalance - asset.amount
+                // }
+                if (assetIndex.balance != mbalance) {
+                  await db.AssetsDb[net].updateOne({ name: asset.name }, { balance: mbalance}).exec()
+                }
+              }
+            }
+
+          } else {
+            if (!Array.isArray(assets)) 
+              assets = []
+            assets.push({ name: asset.name, sent: 0, received: asset.amount, balance: asset.amount })
+          }
+        }
+      }
     }
+
+    await db.AddressDb[net].updateOne({a_id: hash}, {
+      received: Number(address.received),
+      balance: Number(address.balance),
+      sent: Number(address.sent),
+      assets: address.assets
+    }).exec()
+  } else {
+    console.log("Create new address: %d, %j", amount, address)
+    address = {}
+    address.a_id = hash
+    if (hash == 'coinbase') {
+      // First coinbase.
+      address.since = 0
+      address.sent = amount
+      address.received = 0
+      address.balance = 0
+    } else {
+      // New address. First utxo will be stored below.
+      address.since = height
+      address.received = amount
+      address.balance = amount
+      address.sent = 0
+      if (hasAsset) {
+        // Add first asset to the address.
+        // TODO: Multiple assets
+        address.assets = [{name: utxo.scriptPubKey.asset.name, since: height, received: utxo.scriptPubKey.asset.amount, sent: 0, balance: utxo.scriptPubKey.asset.amount}]
+      }
+    }
+    await db.AddressDb[net].create(address)
   }
 
-  db.AddressDb[net].findOneAndUpdate({a_id: hash}, {
-    $inc: addr_inc
+  if (hash == 'coinbase')
+    return cb()
+
+  var dto = {}
+  var filter = {}
+  if (hasAsset) {
+    filter = {a_id: hash, txid: tx.txid, name: utxo.scriptPubKey.asset.name}
+    const ttype = assetutil.getAssetTypeIndex(utxo.scriptPubKey.type)
+    dto = {
+      a_id: hash,
+      blockindex: height,
+      txid: tx.txid,
+      name: utxo.scriptPubKey.asset.name,
+      tamount: utxo.scriptPubKey.asset.amount,
+      ttype: ttype,
+      asm: utxo.scriptPubKey.hex
+    }
+    if (ttype == 0 && utxo.scriptPubKey.asset.reissuable && utxo.scriptPubKey.asset.units) {
+      dto.treissue = utxo.scriptPubKey.asset.reissuable
+      dto.tunits = utxo.scriptPubKey.asset.units
+    }
+  } else {
+    filter = {a_id: hash, txid: tx.txid}
+    dto = {
+      a_id: hash,
+      blockindex: height,
+      txid: tx.txid
+    }
+  }
+  
+  db.AddressTxDb[net].findOneAndUpdate(filter, {
+    $inc: {
+      amount: type == 'vin' ? -amount : amount
+    },
+    $set: dto
   }, {
     new: true,
     upsert: true
-  }).then((address) => {
-    if (hash != 'coinbase') {
-      db.AddressTxDb[net].findOneAndUpdate({a_id: hash, txid: txid}, {
-        $inc: {
-          amount: addr_inc.balance
-        },
-        $set: {
-          a_id: hash,
-          blockindex: blockheight,
-          txid: txid
-        }
-      }, {
-        new: true,
-        upsert: true
-      }).then(() => {
-        return cb()
-      }).catch((err) => {
-        console.error("Failed to find address tx '%s' for chain '%s': %s", hash, net, err)
-        return cb(err)
-      })
-    } else
-      return cb()
+  }).then(() => {
+    return cb()
   }).catch((err) => {
-    console.error("Failed to find address '%s' for chain '%s': %s", hash, net, err)
+    console.error("Failed to find address tx '%s' for chain '%s': %s", hash, net, err)
     return cb(err)
   })
+}
+
+function findAssetIndex(assets, name) {
+  if (d_assets.enabled) d_assets('Find address asset index, %s: %o.', name, assets)
+  if (assets && Array.isArray(assets)) {
+    for (let i = 0; i < assets.length; i++) {
+      if (assets[i] && assets[i].name && assets[i].name == name) {
+        if (d_assets.enabled) d_assets("Found asset index %d for token '%s'.", i, name)
+        return i
+      }
+    }
+  }
+  if (d_assets.enabled) d_assets('Asset index with name %s not found.', name)
+  return -1
 }
 
 function remove_sync_message(net) {
@@ -728,50 +896,276 @@ function remove_sync_message(net) {
   }
 }
 
-function update_heavy(coin, height, count, cb, net) {
-  var newVotes = []
+// TODO: yerbas
 
-  db.lib.get_maxmoney(function (maxmoney) {
-    db.lib.get_maxvote(function (maxvote) {
-      db.lib.get_vote(function (vote) {
-        db.lib.get_phase(function (phase) {
-          db.lib.get_reward(function (reward) {
-            util.get_stats(coin.name, function (stats) {
-              db.lib.get_estnext(function (estnext) {
-                db.lib.get_nextin(function (nextin) {
-                  db.lib.syncLoop(count, function (loop) {
-                    var i = loop.iteration()
-                    db.lib.get_blockhash(height - i, function (hash) {
-                      db.lib.get_block(hash, function (block) {
-                        newVotes.push({ count: height - i, reward: block.reward, vote: (block && block.vote ? block.vote : 0) })
-                        loop.next()
-                      }, net)
-                    }, net)
-                  }, function() {
-                    HeavyDb[net].updateOne({coin: coin}, {
-                      lvote: (vote ? vote : 0),
-                      reward: (reward ? reward : 0),
-                      supply: (stats && stats.supply ? stats.supply : 0),
-                      cap: (maxmoney ? maxmoney : 0),
-                      estnext: (estnext ? estnext : 0),
-                      phase: (phase ? phase : 'N/A'),
-                      maxvote: (maxvote ? maxvote : 0),
-                      nextin: (nextin ? nextin : 'N/A'),
-                      votes: newVotes
-                    }, function() {
-                      // update reward_last_updated value
-                      util.update_last_updated_stats(coin.name, { reward_last_updated: Math.floor(new Date() / 1000) }, function (new_cb) {
-                        console.log('Heavycoin update complete')
-                        return cb()
-                      }, net)
-                    })
-                  })
-                }, net)
-              }, net)
-            }, net)
+function prepare_vin(net=settings.getDefaultNet(), txAssets, tx, cb) {
+  const arr_vin = []
+  // const txAssets = assetutil.getDistinctAssets(tx.vout)
+  var tx_type = null
+
+  db.lib.syncLoop(tx.vin.length, function (loop) {
+    const i = loop.iteration()
+
+    get_input_addresses(net, tx.vin[i], tx.vout, function(addresses, tx_type_vin) {
+      // check if the tx type is set
+      if (tx_type_vin != null) {
+        // set the tx type return value
+        tx_type = tx_type_vin
+      }
+
+      if (addresses && addresses.length) {
+        if (txAssets.size > 0) {
+          const vinTxId = tx.vin[i].txid
+          const vinVoutIndex = tx.vin[i].vout          
+          if (d_assets.enabled) d_assets("Lookup vin asset txid '%s', vout index %d.", vinTxId, vinVoutIndex)
+
+          const dto = {}
+          db.lib.get_rawtransaction(vinTxId, function(vinTx) {
+            // asset_transfer!
+            if (vinTx && assetutil.hasAsset(vinTx.vout[vinVoutIndex])) {
+              dto.scriptPubKey = {}
+              dto.scriptPubKey.asset = {}
+              dto.scriptPubKey.asset.name = vinTx.vout[vinVoutIndex].scriptPubKey.asset.name
+              dto.scriptPubKey.asset.amount = vinTx.vout[vinVoutIndex].scriptPubKey.asset.amount
+              dto.scriptPubKey.asset.type = vinTx.vout[vinVoutIndex].scriptPubKey.type
+              dto.scriptPubKey.type = vinTx.vout[vinVoutIndex].scriptPubKey.type
+              if (d_assets.enabled) d_assets("Add asset to vin %o.", vinTx.vout[vinVoutIndex].scriptPubKey.asset)
+            }
+            datautil.convert_to_satoshi(parseFloat(addresses[0].amount), function(amount_sat) {
+              dto.addresses = addresses[0].hash
+              dto.amount = amount_sat
+              arr_vin.push(dto)
+              loop.next()
+            })    
           }, net)
-        }, net)
-      }, net)
+        } else {
+          datautil.convert_to_satoshi(parseFloat(addresses[0].amount), function(amount_sat) {
+            arr_vin.push({
+              addresses: addresses[0].hash, 
+              amount: amount_sat
+            })
+            loop.next()
+          })
+       }
+      } else {
+        // could not decipher the address, save as unknown and move to next vin
+        console.warn('Failed to find vin address from tx ' + tx.txid)
+        datautil.is_unique(arr_vin, 'unknown_address', 'addresses', function(unique, index) {
+          // TODO: Prio 1. Fix it.
+          if (unique == true)
+            arr_vin.push({addresses: 'unknown_address', amount: 0})
+          else {
+            // TODO: Check error message.
+            console.error("Not unique: unknown_address is not unique 1.");
+          }
+          loop.next()
+        })
+      }
+    })
+  }, function() {
+    return cb(arr_vin, tx_type)
+  })
+}
+
+function prepare_vout(net=settings.getDefaultNet(), vout, txid, vin, cb) {
+  var arr_vout = []
+  var arr_vin = vin
+  var tx_type = null
+
+  db.lib.syncLoop(vout.length, function (loop) {
+    var i = loop.iteration();
+    // make sure vout has an address
+    if (vout[i].scriptPubKey.type != 'nonstandard' && vout[i].scriptPubKey.type != 'nulldata') {
+      var address_list = vout[i].scriptPubKey.addresses;
+      // check if there are one or more addresses in the vout
+      if (address_list == null || address_list.length == 0) {
+        // no addresses defined
+        // check if there is a single address defined
+        if (vout[i].scriptPubKey.address == null) {
+          // no single address defined
+          // check if bitcoin features are enabled
+          if (settings.blockchain_specific.bitcoin.enabled == true) {
+            // assume the asm value is a P2PK (Pay To Pubkey) public key that should be encoded as a P2PKH (Pay To Pubkey Hash) address
+            encodeP2PKaddress(vout[i].scriptPubKey.asm, function(p2pkh_address) {
+              // check if the address was encoded properly
+              if (p2pkh_address != null) {
+                // mark this tx as p2pk
+                tx_type = 'p2pk';
+                // process vout addresses
+                processVoutAddresses(vout[i], p2pkh_address, vout[i].value, arr_vout, function(vout_array) {
+                  // save updated array
+                  arr_vout = vout_array;
+                  // move to next vout
+                  loop.next();
+                });
+              } else {
+                // could not decipher the address, save as unknown and move to next vout
+                console.log('Failed to find vout address from tx ' + txid);
+                // process vout addresses
+                processVoutAddresses(vout[i], ['unknown_address'], vout[i].value, arr_vout, function(vout_array) {
+                  // save updated array
+                  arr_vout = vout_array;
+                  // move to next vout
+                  loop.next();
+                });
+              }
+            }, net);
+          } else {
+            // could not decipher the address, save as unknown and move to next vout
+            console.log('Failed to find vout address from tx ' + txid)
+            processVoutAddresses(vout[i], ['unknown_address'], vout[i].value, arr_vout, function(vout_array) {
+              arr_vout = vout_array
+              loop.next()
+            })
+          }
+        } else {
+          processVoutAddresses(vout[i], [vout[i].scriptPubKey.address], vout[i].value, arr_vout, function(vout_array) {
+            arr_vout = vout_array
+            loop.next()
+          })
+        }
+      } else {
+        processVoutAddresses(vout[i], address_list, vout[i].value, arr_vout, function(vout_array) {
+          arr_vout = vout_array
+          loop.next()
+        })
+      }
+    } else {
+      // no address, move to next vout
+      loop.next()
+    }
+  }, function() {
+    if (typeof vout[0] !== 'undefined' && vout[0].scriptPubKey.type == 'nonstandard') {
+      if (arr_vin.length > 0 && arr_vout.length > 0) {
+        if (arr_vin[0].addresses == arr_vout[0].addresses) {
+          //PoS
+          arr_vout[0].amount = arr_vout[0].amount - arr_vin[0].amount
+          arr_vin.shift();
+
+          return cb(arr_vout, arr_vin, tx_type)
+        } else
+          return cb(arr_vout, arr_vin, tx_type)
+      } else
+        return cb(arr_vout, arr_vin, tx_type)
+    } else
+      return cb(arr_vout, arr_vin, tx_type)
+  })
+}
+
+function processVoutAddresses(vout, address_list, vout_value, arr_vout, cb) {
+  if (address_list != null && address_list.length > 0) {
+    if (Array.isArray(address_list[0])) {
+      // extract the address
+      address_list[0] = address_list[0][0]
+    }
+
+    datautil.convert_to_satoshi(parseFloat(vout_value), function(amount_sat) {
+      if (assetutil.hasAsset(vout) && assetutil.hasAssetHexAsm(vout))
+        arr_vout.push({ 
+          addresses: address_list[0],
+          amount: amount_sat,
+          name: vout.scriptPubKey.asset.name,
+          tamount: vout.scriptPubKey.asset.amount,
+          ttype: assetutil.getAssetTypeIndex(vout.scriptPubKey.type),
+          asm: vout.scriptPubKey.hex })
+      else 
+        arr_vout.push({ addresses: address_list[0], amount: amount_sat})
+      return cb(arr_vout)
+    })
+  } else {
+    // No address, move to next vout.
+    return cb(arr_vout)
+  }
+}
+
+function get_input_addresses(net=settings.getDefaultNet(), input, vout, cb) {
+  var addresses = [];
+
+  if (input.coinbase) {
+    var amount = 0;
+
+    db.lib.syncLoop(vout.length, function (loop) {
+      var i = loop.iteration();
+
+      amount = amount + parseFloat(vout[i].value);
+      loop.next();
+    }, function() {
+      addresses.push({hash: 'coinbase', amount: amount});
+      return cb(addresses, null);
+    });
+  } else {
+    db.lib.get_rawtransaction(input.txid, function(tx) {
+      if (tx) {
+        var tx_type = null;
+
+        db.lib.syncLoop(tx.vout.length, function (loop) {
+          var i = loop.iteration();
+
+          if (tx.vout[i].n == input.vout) {
+            if (tx.vout[i].scriptPubKey.addresses || tx.vout[i].scriptPubKey.address) {
+              var new_address = tx.vout[i].scriptPubKey.address || tx.vout[i].scriptPubKey.addresses[0]
+
+              // check if address is inside an array
+              if (Array.isArray(new_address)) {
+                // extract the address
+                new_address = new_address[0]
+              }
+              addresses.push({hash: new_address, amount: tx.vout[i].value})
+              loop.break(true)
+              loop.next()
+            } else {
+              // no addresses defined
+              // check if bitcoin features are enabled
+              if (settings.blockchain_specific.bitcoin.enabled == true) {
+                // assume the asm value is a P2PK (Pay To Pubkey) public key that should be encoded as a P2PKH (Pay To Pubkey Hash) address
+                db.lib.encodeP2PKaddress(tx.vout[i].scriptPubKey.asm, function(p2pkh_address) {
+                  // check if the address was encoded properly
+                  if (p2pkh_address != null) {
+                    // mark this tx as p2pk
+                    tx_type = 'p2pk';
+
+                    // check if address is inside an array
+                    if (Array.isArray(p2pkh_address)) {
+                      // extract the address
+                      p2pkh_address = p2pkh_address[0];
+                    }
+
+                    // save the P2PKH address
+                    datautil.is_unique(addresses, p2pkh_address, 'hash', function(unique, index) {
+                      if (unique == true)
+                        addresses.push({hash: p2pkh_address, amount: tx.vout[i].value});
+                      else {
+                        // TODO: Check error message.
+                        console.error("Not unique: " + p2pkh_address + " not unique 2");
+                        addresses[index].amount = addresses[index].amount + tx.vout[i].value;
+                      }
+
+                      loop.break(true);
+                      loop.next();
+                    });
+                  } else {
+                    // could not decipher the address, save as unknown
+                    console.log('Failed to find vin address from tx ' + input.txid)
+                    addresses.push({hash: 'unknown_address', amount: tx.vout[i].value})
+                    loop.break(true)
+                    loop.next()
+                  }
+                }, net)
+              } else {
+                // could not decipher the address, save as unknown
+                console.log('Failed to find vin address from tx ' + input.txid)
+                addresses.push({hash: 'unknown_address', amount: tx.vout[i].value})
+                loop.break(true)
+                loop.next()
+              }
+            }
+          } else
+            loop.next()
+        }, function() {
+          return cb(addresses, tx_type)
+        })
+      } else
+        return cb()
     }, net)
-  }, net)
+  }
 }

@@ -3,40 +3,38 @@ extends layout
 block content
   include ./includes/common.pug
   script.
-    var hashAddress = "#{address.a_id}"
-    var setting_maxTxCount = parseInt("#{api_page.public_apis.ext.getaddresstxs.max_items_per_query}")
-    var setting_txPerPage = parseInt("#{address_page.history_table.items_per_page}")
-    var lengthMenuOptsAdd = !{JSON.stringify(address_page.history_table.page_length_options)}
-    var lengthMenuOpts = []
-    var addedLength = false
-    for (i = 0; i < lengthMenuOptsAdd.length; i++) {
-      if (setting_maxTxCount >= lengthMenuOptsAdd[i]) {
-        if (!addedLength) {
-          if (lengthMenuOptsAdd[i] > setting_txPerPage) {
-            lengthMenuOpts.push(setting_txPerPage)
-            addedLength = true
-          }
+    var assetItem = ''
+    function update_balance_view(item) {
+      const index = $("#asset_selector").prop('selectedIndex');
+      if (index > 0) {
+        if (assetItem.length > 0) {
+          update_asset(assetItem, 'none')
         }
-
-        lengthMenuOpts.push(lengthMenuOptsAdd[i])
-
-        if (!addedLength) {
-          if (lengthMenuOptsAdd[i] > setting_txPerPage)
-            lengthMenuOpts.push(setting_txPerPage)
-          if (lengthMenuOptsAdd[i] == setting_txPerPage || lengthMenuOptsAdd[i] > setting_txPerPage)
-            addedLength = true
+        assetItem = item
+        update_coin('none')
+        update_asset(item, 'table-row')
+      } else {
+        if (assetItem.length > 0) {
+          update_asset(assetItem, 'none')
+          assetItem = ''
         }
+        update_coin('table-row')
       }
     }
-    if (!addedLength && setting_txPerPage <= setting_maxTxCount && setting_txPerPage != lengthMenuOpts[lengthMenuOpts.length - 1])
-      lengthMenuOpts.push(setting_txPerPage)
-    if (!addedLength && setting_txPerPage > setting_maxTxCount && setting_maxTxCount != lengthMenuOpts[lengthMenuOpts.length - 1])
-      lengthMenuOpts.push(setting_maxTxCount)
-    if (setting_maxTxCount < setting_txPerPage) {
-      var displayLengthMax = setting_maxTxCount
-    } else {
-      var displayLengthMax = setting_txPerPage
+    function update_asset(item, state) {
+      document.getElementById('b_asset_' + item).style.display = state
+      document.getElementById('s_asset_' + item).style.display = state
+      document.getElementById('r_asset_' + item).style.display = state
     }
+    function update_coin(state) {
+      document.getElementById('b_coin').style.display = state
+      document.getElementById('s_coin').style.display = state
+      document.getElementById('r_coin').style.display = state
+    }
+    const hashAddress = "#{address.a_id}"
+    const setting_maxCount = parseInt("#{api_page.public_apis.ext.getaddresstxs.max_items_per_query}")
+    const setting_itemsPerPage = parseInt("#{address_page.history_table.items_per_page}")
+    const lengthMenuOptsAdd = !{JSON.stringify(address_page.history_table.page_length_options)}
     $(document).ready(function () {
       var rtable = $('#address-txs').dataTable({
         autoWidth: true,
@@ -46,8 +44,8 @@ block content
         lengthChange: true,
         processing: true,
         serverSide: true,
-        iDisplayLength: displayLengthMax,
-        lengthMenu: lengthMenuOpts,
+        iDisplayLength: setting_maxCount < setting_itemsPerPage ? setting_maxCount : setting_itemsPerPage,
+        lengthMenu: lengthMenuOptsAdd,
         scrollX: true,
         ajax: {
           url: '/ext/getaddresstxs/' + hashAddress + '/#{net}',
@@ -68,7 +66,7 @@ block content
           const txtype = data[2] = data[2].replace('TRANSACTION_', 'TX_')
           const out = data[3]
           const vin = data[4]
-          // TODO: Balance is undefined from upstream peer
+          // TODO: Peers: Balance is undefined from upstream peer.
           const balance = data[5] && !isNaN(data[5]) ? data[5].toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : '0.0'
           const balanceParts = balance.split('.')
           $("td:eq(0)", row).html('<a href="/tx/' + txhash + '/#{net}"><span class="entity" data-bs-toggle="tooltip" data-bs-placement="top" title="#{settings.locale.view_tx}">&#8627</span></a>').addClass('text-center d-table-cell d-md-none')
@@ -162,27 +160,48 @@ block content
             th
         tbody
           tr
-            td.text-center.addr-summary
+            td.text-center.addr-summary(colspan=2)
               div.text-center
                 img.qrcode(src='/qr/' + address.a_id)
-            td
-          tr
-            td #{settings.locale.rl_balance}
+            td(style='display: none')
+          if (address.assets && Array.isArray(address.assets) && address.assets.length > 0)
+            tr 
+              td.text-center(colspan=2)
+                div.text-center
+                  select#asset_selector(onchange="update_balance_view(event.target.value)")
+                    option(value=coin.symbol) #{coin.symbol}
+                    each asset in address.assets
+                      option(value=asset.name) #{asset.name}
+              td(style='display: none')
+          tr#b_coin
+            td#b_label #{settings.locale.rl_balance}
               span.small.fw-normal  (#{coin.symbol})
-            td.addr-summary #{balanceParts[0]}.
+            td#b_value.addr-summary #{balanceParts[0]}.
               span.decimal #{balanceParts[1]}
           if address_page.show_sent_received == true
-            tr
-              td #{settings.locale.total_sent}
+            tr#s_coin
+              td#s_label #{settings.locale.total_sent}
                 span.small.fw-normal  (#{coin.symbol})
-              td.addr-summary #{sentParts[0]}.
+              td#s_value.addr-summary #{sentParts[0]}.
                 span.decimal #{sentParts[1]}
           if address_page.show_sent_received == true
-            tr
-              td #{settings.locale.total_received}
+            tr#r_coin
+              td#r_label #{settings.locale.total_received}
                 span.small.fw-normal  (#{coin.symbol})
-              td.addr-summary #{receivedParts[0]}.
+              td#r_value.addr-summary #{receivedParts[0]}.
                 span.decimal #{receivedParts[1]}
+          if (address.assets && Array.isArray(address.assets) && address.assets.length > 0)
+            - var index1 = 0;
+            each asset in address.assets
+              tr(id="b_asset_" + asset.name, style='display: none')
+                td Balance (#{asset.name})
+                td #{settings.formatDecimal(asset.balance, 2, 2)}
+              tr(id='s_asset_' + asset.name, style='display: none') 
+                td Total Sent (#{asset.name})
+                td #{settings.formatDecimal(asset.sent, 2, 2)}
+              tr(id='r_asset_' + asset.name, style='display: none') 
+                td Total Received (#{asset.name})
+                td #{settings.formatDecimal(asset.received, 2, 2)}
     .card.card-default.border-0.cardSpacer
       .card-header
         strong #{settings.locale.ex_latest_transactions}

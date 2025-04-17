@@ -8,7 +8,7 @@ describe('market', function() {
     });
 
     it('should return market data', function(done) {
-      // TODO: Fix chain (coin.name)
+      // TODO: Markets: Fix chain (coin.name)
       poloniex.get_data({ coin: 'LTC', exchange: 'BTC' }, function(err, obj) {
         expect(err).toEqual(null);
         expect(obj.buys.length).toEqual(50);

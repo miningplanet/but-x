@@ -4,6 +4,14 @@ module.exports = new require('mongoose').Schema({
   port: { type: String, default: "" },
   protocol: { type: String, default: "" },
   version: { type: String, default: "" },
+  lastsend: { type: Number, default: -1, index: false },
+  lastreceived: { type: Number, default: -1, index: false },
+  bytessend: { type: Number, default: -1, index: false },
+  bytesreceived: { type: Number, default: -1, index: false },
+  conntime: { type: Number, default: -1, index: false },
+  ping: { type: Number, default: -1, index: false },
+  startingheight: { type: Number, default: -1, index: false },
+  banscore: { type: Number, default: -1, index: false },
   country: { type: String, default: "" },
   country_code: { type: String, default: "" }
 })

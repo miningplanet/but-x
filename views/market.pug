@@ -175,15 +175,24 @@ block content
                               img.align-top.market-logo(src='data:image/png;base64,' + mkt.logo, title=mkt.market_name + ' (' + mkt.pair_symbol + ')', alt=mkt.market_name + ' (' + mkt.pair_symbol + ')')
                         td.full.text-start
                           a(href='/markets/' + mkt.market + '/' + mkt.coin_symbol + '/' + mkt.pair_symbol + '/' + net) #{mkt.market}
-                        td.text-start #{mkt.reverse ? mkt.coin_symbol : mkt.pair_symbol}
-                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.bid) && mkt.summary.bid > 0 ? settings.formatCurrency(mkt.summary.bid, marketdata.exchange) : '-'} 
-                        td.full.text-end #{mkt.summary && !isNaN(mkt.summary.ask) && mkt.summary.ask > 0 ? settings.formatCurrency(mkt.summary.ask, marketdata.exchange) : '-'} 
-                        td.text-end #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
-                        td.full.text-end #{mkt.summary && mkt.summary.low && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
-                        td.full.text-end #{mkt.summary && mkt.summary.high && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
-                        td.text-end #{mkt.summary && mkt.summary.change && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : '-'}
-                        td.half.text-end #{tradeVolume}  
-                        td.text-end #{marketVolume} 
+                        td.text-start
+                          small #{mkt.reverse ? mkt.coin_symbol : mkt.pair_symbol}
+                        td.full.text-end 
+                          small #{mkt.summary && !isNaN(mkt.summary.bid) && mkt.summary.bid > 0 ? settings.formatCurrency(mkt.summary.bid, marketdata.exchange) : '-'} 
+                        td.full.text-end 
+                          small #{mkt.summary && !isNaN(mkt.summary.ask) && mkt.summary.ask > 0 ? settings.formatCurrency(mkt.summary.ask, marketdata.exchange) : '-'} 
+                        td.text-end 
+                          small #{mkt.summary && !isNaN(mkt.summary.last) && mkt.summary.last > 0? settings.formatCurrency(mkt.summary.last, marketdata.exchange) : '-'} 
+                        td.full.text-end 
+                          small #{mkt.summary && mkt.summary.low && !isNaN(mkt.summary.low) ? settings.formatCurrency(mkt.summary.low, marketdata.exchange) : '-'} 
+                        td.full.text-end 
+                          small #{mkt.summary && mkt.summary.high && !isNaN(mkt.summary.high) ? settings.formatCurrency(mkt.summary.high, marketdata.exchange) : '-'} 
+                        td.text-end 
+                          small #{mkt.summary && mkt.summary.change && !isNaN(mkt.summary.change) ? mkt.summary.change.toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}) : '-'}
+                        td.half.text-end 
+                          small #{tradeVolume}  
+                        td.text-end 
+                          small #{marketVolume} 
                   td 
                   td.full 
                   td 
@@ -194,7 +203,8 @@ block content
                   td.full.text-end 
                   td.text-end 
                   td.half.text-end 
-                  td.text-end #{Number(volumeCoin) > 0 ? settings.formatCurrency(volumeCoin, 'BTRM') : '-'}
+                  td.text-end 
+                    small #{Number(volumeCoin) > 0 ? settings.formatCurrency(volumeCoin, 'BTRM') : '-'}
             
     if marketdata.data != null && ((marketdata.data.buys != null && marketdata.data.buys.length > 0) || (marketdata.data.sells != null && marketdata.data.sells.length > 0) || (marketdata.data.history != null && marketdata.data.history.length > 0))
       block market_view
@@ -478,7 +488,7 @@ block content
               .card-header
                 if marketdata.market_logo != null && marketdata.market_logo != ''
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
-                strong #{settings.locale.mkt_trade_history}
+                strong #{settings.locale.mkt_trade_history.replace('{1}', marketdata.data.history.length)}
               table#history-table.table.table-hover.table-bordered.table-striped.table-paging(cellspacing='0')
                 thead
                   tr
