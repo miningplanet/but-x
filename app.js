@@ -424,26 +424,38 @@ app.use('/api/assets/:net/:start?', function(req, res) {
   }
 
   const api_page = settings.get(net, 'api_page')
+  const ckey = net + '-' + start + '-' + length
+  
   if (api_page.enabled == true && api_page.public_apis.db.assets.enabled == true) {
     const coin = settings.getCoin(net)
     db.get_dbindex(coin.name, function (dbindex) {
-      db.get_assets_local(start, length, function (assets) {
-        const rows = []
-        if (assets) {
-          for (i = 0; i < assets.length; i++) {
-            const row = {}
-            row.name = assets[i].name
-            row.height = assets[i].height
-            row.amount = assets[i].amount
-            row.units = assets[i].units
-            row.balance = assets[i].balance
-            row.tx_count = assets[i].tx_count
-            row.ipfs_hash = assets[i].ipfs_hash
-            rows.push(row)
+      var r = assetsCache.get(ckey)
+      if (r == undefined) {
+        db.get_assets_local(start, length, function (assets) {
+          const rows = []
+          if (assets) {
+            for (i = 0; i < assets.length; i++) {
+              const row = {}
+              row.name = assets[i].name
+              row.height = assets[i].height
+              row.amount = assets[i].amount
+              row.units = assets[i].units
+              row.balance = assets[i].balance
+              row.tx_count = assets[i].tx_count
+              row.ipfs_hash = assets[i].ipfs_hash
+              rows.push(row)
+            }
           }
-        }
-        res.json({"data": rows, "recordsTotal": dbindex.count_assets, "recordsFiltered": dbindex.count_assets})
-      }, net)
+          assetsCache.set(ckey, assets)
+          if (debug.enabled) 
+            debug("Cached assets '%s' %o - mem: %o", net, assets.length, util.memoryUsage(process))
+          res.json({"data": rows, "recordsTotal": dbindex.count_assets, "recordsFiltered": dbindex.count_assets})
+        }, net)
+      } else {
+        if (debug.enabled) 
+          debug("Get assets by cache '%s' %o ...", net, r.length)
+        res.json({"data": r, "recordsTotal": dbindex.count_assets, "recordsFiltered": dbindex.count_assets})
+      }
     }, net)
   } else {
     res.end(METHOD_DISABLED)
