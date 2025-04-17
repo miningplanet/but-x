@@ -6,6 +6,6 @@ Disallow: /tx/
 Disallow: /claim/
 Disallow: /movement/
 
-Sitemap: https://butkoin.com/sitemap.txt
-Sitemap: https://x.butkoin.com/sitemap.txt
+Sitemap: https://<domain>.com/sitemap.txt
+Sitemap: https://x.<domain>.com/sitemap.txt
 
