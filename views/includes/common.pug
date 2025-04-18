@@ -20,6 +20,9 @@ script.
       r = mdate.toUTCString()
     return r
   }
+  function formatDecimal(n, min, max, locale='en') {
+    return Number(n).toLocaleString(locale,{'minimumFractionDigits':min,'maximumFractionDigits':max,'useGrouping':true})
+  }
   function generateAlertHTML(alertClass, headerText, msgText) {
     return '<div class="alert alert-' + alertClass + '" role="alert">' +
       '<div' + (msgText == null || msgText == '' ? '' : ' class="cardSpacer"') + '>' +

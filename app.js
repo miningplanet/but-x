@@ -41,6 +41,7 @@ const tickerCache         = new TTLCache({ max: cache.ticker.size,        ttl: 1
 const xpeersCache         = new TTLCache({ max: cache.xpeers.size,        ttl: 1000 * cache.xpeers.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 const assetsCache         = new TTLCache({ max: cache.assets.size,        ttl: 1000 * cache.assets.ttl,         updateAgeOnGet: false, noUpdateTTL: false })
 const assetCache          = new TTLCache({ max: cache.asset.size,         ttl: 1000 * cache.asset.ttl,          updateAgeOnGet: false, noUpdateTTL: false })
+const assetTxCache        = new TTLCache({ max: cache.assetTx.size,       ttl: 1000 * cache.assetTx.ttl,        updateAgeOnGet: false, noUpdateTTL: false })
 
 const METHOD_DISABLED = 'This method is disabled'
 const BLOCK_NOT_FOUND = 'Block not found'
@@ -425,7 +426,7 @@ app.use('/api/assets/:net/:start?', function(req, res) {
 
   const api_page = settings.get(net, 'api_page')
   const ckey = net + '-' + start + '-' + length
-  
+
   if (api_page.enabled == true && api_page.public_apis.db.assets.enabled == true) {
     const coin = settings.getCoin(net)
     db.get_dbindex(coin.name, function (dbindex) {
@@ -457,6 +458,58 @@ app.use('/api/assets/:net/:start?', function(req, res) {
         res.json({"data": r, "recordsTotal": dbindex.count_assets, "recordsFiltered": dbindex.count_assets})
       }
     }, net)
+  } else {
+    res.end(METHOD_DISABLED)
+  }
+})
+
+app.use('/api/getassettxes/:name/:net/:start?', function(req, res) {
+  const net = settings.getNet(req.params['net'])
+  const name = req.params['name'].replace('+', '/')
+  const start = req.params['start']
+  const api_page = settings.get(net, 'api_page')
+
+  var split = []
+  if (!isNaN(start)) {
+    split = req.url.replace('/','').split('/')
+  }
+  var length = 100000
+  if (split.length > 0 && !isNaN(split[0])) {
+    length = Number(split[0])
+  }
+
+  const ckey = net + '-' + name + '-' + start + '-' + length
+
+  if (api_page.enabled == true && api_page.public_apis.db.getassettxes.enabled == true) {
+    var r = assetTxCache.get(ckey)
+    if (r == undefined) {
+      db.get_latest_asset_tx_by_name_local(name, start, length, function (data) {
+        if (data && Array.isArray(data)) {
+          const rows = []
+          for (i = 0; i < data.length; i++) {
+            const row = []
+            row.push(data[i])
+            rows.push(row)
+          }
+          var count = -1
+          if (split.length > 1) {
+            count = split[1]
+          }
+          const txes = {"data": rows, "recordsTotal": count > -1 ? count: rows.length, "recordsFiltered": count > -1 ? count: rows.length}
+          assetTxCache.set(ckey, txes)
+          if (debug.enabled) 
+            debug("Cached asset txes '%s' %o - mem: %o", net, rows.length, util.memoryUsage(process))
+          res.json(txes)
+        } else {
+          res.json({"data": [], "recordsTotal": 0, "recordsFiltered": 0})
+        }
+        return
+      }, net)
+    } else {
+      if (debug.enabled) 
+        debug("Get asset txes by cache '%s' %o ...", net, r.length)
+      res.json(r)
+    }
   } else {
     res.end(METHOD_DISABLED)
   }

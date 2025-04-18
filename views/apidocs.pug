@@ -476,13 +476,25 @@ block content
           if api_page.public_apis.db.assets.enabled == true
             li
               p
-                div.fw-bold assets [net]
+                div.fw-bold assets [net] [start] [length]
                 div
                   em Returns a list of all assets on the blockchain.
-                if !isMainnet
-                  a(href='/api/assets/' + net) #{address}/api/assets/#{net}
-                else
-                  a(href='/api/assets') #{address}/api/assets
+                a(href='/api/assets/' + net + '/0/10') #{address}/api/assets/#{net}/0/10
+                //- if !isMainnet
+                //-   a(href='/api/assets/' + net + '/0/10') #{address}/api/assets/#{net}/0/10
+                //- else
+                //-   a(href='/api/assets') #{address}/api/assets
+          if api_page.public_apis.db.getassettxes.enabled == true
+            li
+              p
+                div.fw-bold getassettxes [name] [net] [start] [length]
+                div
+                  em Returns a list of all transactions for an asset on the blockchain.
+                a(href='/api/getassettxes/' + api_page.sample_data.asset + '/' + net + '/0/10') #{address}/api/getassettxes/#{api_page.sample_data.asset}/#{net}/0/10
+                //- if !isMainnet
+                //-   a(href='/api/assets/' + net) #{address}/api/assets/#{net}
+                //- else
+                //-   a(href='/api/assets') #{address}/api/assets
           hr
         if !api_page.public_apis.hide_net_api_section
           h3 Net API

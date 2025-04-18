@@ -64,7 +64,7 @@ function route_get_block(req, res, blockhash) {
   }, net)
 }
 
-function route_get_asset(req, res, name) {
+function route_get_asset(req, res, name, start) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const asset_page = settings.get(net, 'asset_page')
@@ -72,6 +72,16 @@ function route_get_asset(req, res, name) {
   name = name.replace('asset:', '')
   name = name.replace('+', '/')
   name = name.replace('*', '#')
+
+  var split = []
+  if (!isNaN(start)) {
+    split = req.url.replace('/','').split('/')
+  }
+  var length = 100000
+  if (split.length > 0 && !isNaN(split[0])) {
+    length = Number(split[0])
+  }
+
   if (debug.enabled)
     debug("Search for asset: " + name)
   
@@ -81,7 +91,7 @@ function route_get_asset(req, res, name) {
       db.get_stats(coin.name, function(stats) {
         if (stats) {
           if (asset.tx_count > 0) {
-            db.get_latest_asset_tx_by_name_local(name, function (latesttx) {
+            db.get_latest_asset_tx_by_name_local(name, start, length, function (latesttx) {
               asset.latesttx = latesttx
               const p = assetParam(req, stats, 'asset', asset_page, net, db, settings, asset, coin.name + ' Asset ' + name)
               res.render('asset', p)
@@ -610,9 +620,9 @@ router.get('/block/:hash/:net?', function(req, res) {
   route_get_block(req, res, req.params.hash)
 })
 
-router.get('/asset/:name/:net?', function(req, res) {
+router.get('/asset/:name/:net/:start?', function(req, res) {
   req.params.name.replace('+', '/')
-  route_get_asset(req, res, req.params.name)
+  route_get_asset(req, res, req.params.name, req.params.name)
 })
 
 router.get('/register/:net?', function(req, res) {
@@ -730,6 +740,7 @@ router.post('/search/:net?', function(req, res) {
       }
     } else {
       if (query.startsWith('asset:')) {
+        // TODO Check asset search.
         route_get_asset(req, res, query)
       } else {
         console.log("Search address: '" + query + "' for net " + net + ".")

@@ -2,6 +2,102 @@ extends layout
 
 block content
   include ./includes/common.pug
+  script.
+    const setting_maxCount = parseInt("#{api_page.public_apis.db.getassettxes.max_items_per_query}")
+    const setting_itemsPerPage = parseInt("#{asset_page.assettxes_table.items_per_page}")
+    const lengthMenuOptsAdd = !{JSON.stringify(asset_page.assettxes_table.page_length_options)}
+    $(document).ready(function() {
+      var rtable = $('#assettxes-table').dataTable({
+        autoWidth: true,
+        searching: false,
+        ordering: false,
+        lengthChange: true,
+        processing: true,
+        serverSide: true,
+        iDisplayLength: setting_maxCount < setting_itemsPerPage ? setting_maxCount : setting_itemsPerPage,
+        lengthMenu: lengthMenuOptsAdd,
+        scrollX: true,
+        ajax: {
+          url: '/api/getassettxes/#{asset.name}/#{net}',
+          beforeSend: function(jqXHR, settings) {
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/#{asset.tx_count}' // /type'
+            return true
+          }
+        },
+        language: {
+          paginate: {
+            previous: '<',
+            next: '>'
+          }
+        },
+        rowCallback: function(row, data, index) {
+          var html = '<strong class="assettx-title">Transaction #{asset.name} (block ' + data[0].blockindex + ')</strong>'
+          html += '<br><small class="assettx-id">Time: ' + format_unixtime(data[0].timestamp) + '<br>ID: <a href="/tx/' + data[0].txid + '/#{net}" class="tx">' + data[0].txid + '</a></small>'
+          html += '<br><div class="assettx-vout"><b>TxOut</b>'
+
+          var vout_sum = 0
+          var vout_cnt = 0
+          for (v of data[0].vout) {
+            if (v.addresses && v.name && v.tamount && !isNaN(v.tamount)) {
+              vout_sum += v.tamount
+              vout_cnt += 1
+              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + v.addresses + '</a></span>'
+              html += '<span class="assettx-amount">' + formatDecimal(v.tamount, 2, 2) + '</span>'
+            }
+          }
+          if (vout_cnt > 1) {
+            html += '<br><span class="assettx-addr"><b>Sum:</b></span>'
+            html += '<span class="assettx-amount"><b>' + formatDecimal(vout_sum, 2, 2) + '</b></span>'
+          }
+          html += '</div>'
+
+          var vin_sum = 0
+          var vin_cnt = 0
+          html += '<br><div class="assettx-vin"><b>TxIn</b>'
+          for (v of data[0].vin) {
+            console.log("vin: " + JSON.stringify(v))
+            if (v.scriptPubKey && v.addresses && v.scriptPubKey.asset && v.scriptPubKey.asset.amount && !isNaN(v.scriptPubKey.asset.amount)) {
+              vin_sum += v.scriptPubKey.asset.amount
+              vin_cnt += 1
+              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + v.addresses + '</a></span>'
+              html += '<span class="assettx-amount">' + formatDecimal(v.scriptPubKey.asset.amount, 2, 2) + '</span>'
+            }
+          }
+
+          if (vin_cnt > 1) {
+            html += '<br><span class="assettx-addr"><b>Sum:</b></span>'
+            html += '<span class="assettx-amount"><b>' + formatDecimal(vin_sum, 2, 2) + '</b></span>'
+          }
+          html += '</div>'
+
+          $("td:eq(0)", row).html(html).addClass('text-begin')
+        },
+        fnDrawCallback: function(settings) {
+          enableTooltips()
+        }
+      })
+
+      var setting_reload_table_seconds = parseInt("#{movement_page.movement_table.reload_table_seconds}")
+      if (setting_reload_table_seconds > 0) {
+        setInterval( function () {
+          rtable.api().ajax.reload(null, false)
+        }, (setting_reload_table_seconds * 1000) )
+      }
+
+      if ('#{movement_page.page_header.show_last_updated}' == 'true') {
+        var lastUpdatedDate = #{(last_updated == null || last_updated == '0' ? 0 : last_updated)}
+
+        if (lastUpdatedDate != 0) {
+          $('span#lastUpdatedDate').html(' ' + format_unixtime(lastUpdatedDate))
+
+          if (#{shared_pages.date_time.enable_alt_timezone_tooltips} == true) {
+            $('span#lastUpdatedDate').attr('data-bs-toggle', 'tooltip').attr('data-bs-placement', 'auto').attr('title', format_unixtime(lastUpdatedDate, true))
+            enableTooltips()
+          }
+        } else
+          $('span#lastUpdatedDate').html(' N/A')
+      }
+    })
   .col-xs-12.col-md-12
     if settings.anyHeader(asset_page, net)
       #page-header-container(style='align-items:' + (settings.allHeaders(asset_page, net) ? 'flex-start' : 'center'))
@@ -28,10 +124,6 @@ block content
             th
             th
         tbody
-          //- - const difficulty = Number(block.difficulty).toLocaleString('en',{'minimumFractionDigits':4,'maximumFractionDigits':4,'useGrouping':true});
-          //- - const splitDifficulty = difficulty.split('.');
-          //- - const block_size = Number(block.size/1024).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-          //- - const splitBlockSize = block_size.split('.');
           - var confirms = (blockcount - asset.blockindex + 1);
           tr
             td.d-md-table-cell Name
@@ -55,8 +147,10 @@ block content
               td.d-md-table-cell Block height
               td.breakWord #{settings.formatDecimal(asset.height, 0, 0)}
           tr
-            td.d-md-table-cell Tx ID
-            td.breakWord #{asset.txid}
+            td.d-md-table-cell Tx-ID
+            td.breakWord 
+              small
+                a(href='/tx/' + asset.txid + '/' + net) #{asset.txid}
           if asset.tx_type != null
             tr
               td.d-md-table-cell #{settings.locale.tx_type}
@@ -118,37 +212,20 @@ block content
               td.d-md-table-cell IPFS Hash
               td.breakWord 
                 span.ipfs
-                  a(href="https://ipfs.io/ipfs/"+asset.ipfs_hash target="_blank") #{asset.ipfs_hash}
+                  small
+                    a(href="https://ipfs.io/ipfs/"+asset.ipfs_hash target="_blank") #{asset.ipfs_hash}
                 hr
                 br
                 img(style="width: 50% !important; border: dashed 1px gray; border-radius: 5%;" src="https://ipfs.io/ipfs/"+asset.ipfs_hash)
       h4 Asset Reissuance (s)
       hr
       p No asset reissuances found.
+      hr
       if (asset.latesttx && asset.latesttx.length > 0)
-        h4 Latest transactions
-        hr
-        table#asset-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
-          thead(style='visibility: collapse !important;')
+        h4 Latest transactions  
+        table#assettxes-table.table.table-bordered.table-striped.table-paging.table-hover.mobile-border-right
+          thead
             tr
-              th
-              th
+              th.text-center
           tbody
-          each tx in asset.latesttx
-            tr(style='height: 15px, line-height: 10px') 
-              td(colspan=2, style='background-image: linear-gradient(to right, #222, #000); height: 15px; border-bottom: 1px solid red') Transaction #{asset.name} #{settings.formatUnixtime(tx.timestamp, net, true)}: TxIn / TxOut
-            tr 
-              td
-                each v in tx.vin
-                  if (v.scriptPubKey && v.addresses && v.scriptPubKey.asset)
-                    a.breakWord(href='/address/' + v.addresses + '/' + net)
-                      span.address(style='display: inline-block; width: 74%; margin-left: 0px') #{v.addresses}
-                    span(style='text-align: right; display: inline-block; width: 26%; margin-left: auto; margin-right: 0px') #{settings.formatDecimal(v.scriptPubKey.asset.amount, 2, 2)}
-                    br
-              td
-                each v in tx.vout
-                  if (v.addresses && v.name && v.tamount)
-                    a.breakWord(href='/address/' + v.addresses + '/' + net)
-                      span.address(style='display: inline-block; width: 74%; margin-left: 0px') #{v.addresses}
-                    span(style='text-align: right; display: inline-block; width: 26%; margin-left: auto; margin-right: 0px') #{settings.formatDecimal(v.tamount, 2, 2)}
-                    br
+        hr
