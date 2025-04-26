@@ -43,7 +43,7 @@ block content
           if tx.tx_type != null
             tr
               td.d-md-table-cell #{settings.locale.tx_type}
-              td.breakWord #{tx.tx_type} #{tx_types[tx.tx_type]}
+              td.breakWord #{tx.tx_type} - #{tx_types[tx.tx_type].replace('TRANSACTION_', '')}
           if tx.version != null
             tr
               td.d-md-table-cell #{settings.locale.tx_version}
@@ -56,7 +56,7 @@ block content
             tr
               td.d-md-table-cell #{settings.locale.tx_size}
               td.breakWord #{tx.size}
-          if transaction_page.show_op_return == true
+          if transaction_page.show_op_return == true && tx.op_return
             tr
               td.d-md-table-cell='OP_RETURN'
               td.breakWord #{tx.op_return}
@@ -71,7 +71,7 @@ block content
           if !isNaN(tx.locktime)
             tr
               td.d-md-table-cell #{settings.locale.tx_locktime}
-              td.breakWord #{tx.locktime}
+              td.breakWord #{settings.formatDecimal(tx.locktime, 0, 0)}
           if tx.instantlock != null
             tr
               td.d-md-table-cell #{settings.locale.tx_instantlock}
@@ -84,11 +84,12 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_hash}
-              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
+              td.breakWord
+                a(href="/tx/" + tx.extra[1] + "/" + net) #{tx.extra[1]}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_collateral_index}
               td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
@@ -97,13 +98,16 @@ block content
               td.breakWord #{tx.extra ? tx.extra[3] : 'N/A'}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_owner_address}
-              td.breakWord #{tx.extra ? tx.extra[4] : 'N/A'}
+              td.breakWord 
+                a(href="/address/" + tx.extra[4] + "/" + net) #{tx.extra[4]}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_voting_address}
-              td.breakWord #{tx.extra ? tx.extra[5] : 'N/A'}
+              td.breakWord
+                a(href="/address/" + tx.extra[5] + "/" + net) #{tx.extra[5]}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_payout_address}
-              td.breakWord #{tx.extra ? tx.extra[6] : 'N/A'}
+              td.breakWord 
+                a(href="/address/" + tx.extra[6] + "/" + net) #{tx.extra[6]}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_operator_pk}
               td.breakWord #{tx.extra ? tx.extra[7] : 'N/A'}
@@ -117,11 +121,12 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_version} #{tx.extra ? tx.extra[0] : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_protx_hash}
-              td.breakWord #{tx.extra ? tx.extra[1] : 'N/A'}
+              td.breakWord
+                a(href="/tx/" + tx.extra[1] + "/" + net) #{tx.extra[1]}
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_reg_service}
               td.breakWord #{tx.extra ? tx.extra[2] : 'N/A'}
@@ -132,7 +137,7 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_reg_version} #{tx.extra ? tx.extra[0] : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_reg_protx_hash}
@@ -153,7 +158,7 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_protx_update_revoke_version} #{tx.extra ? tx.extra[0] : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_protx_update_revoke_protx_hash}
@@ -168,7 +173,7 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_qc_version} #{tx.extra ? tx.extra[0] : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             tr
               td.d-md-table-cell #{settings.locale.tx_qc_height}
@@ -195,7 +200,7 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_assert_register_version} #{tx.version ? tx.version : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             if tokens.length > 0
               each token in tokens
@@ -232,7 +237,7 @@ block content
       div#tx_type_wrapper.card.card-default.border-0.cardSpacer
         .card-header
           strong #{settings.locale.tx_assert_reissue_version} #{tx.version ? tx.version : 'N/A'}
-        table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+        table#tx-table.table.table-bordered.summary-table.mobile-border-right
           tbody
             if tokens.length > 0
               each token in tokens
