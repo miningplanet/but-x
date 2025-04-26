@@ -1032,63 +1032,44 @@ function isInternalRequest(req) {
     && req.headers.accept.indexOf('application/json') > -1
 }
 
-app.use('/ext/getlasttxs/:net/:min', function(req, res) {
+app.use('/ext/getlasttxs/:net/:param?', function(req, res) {
   // TODO: Cache: Latest tx.
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getlasttxs.enabled == true) || isInternalRequest(req)) {
-    var min = req.params.min, start, length
-
-    // split url suffix by forward slash and remove blank entries
-    var type = req.params['type'] ? req.params['type'] : -1
-    var split = req.url.split('/').filter(function(v) { return v; })
-    // determine how many parameters were passed
-    switch (split.length) {
-      case 2:
-        // capture start and length
-        start = split[0]
-        length = split[1]
-        break;
-      default:
-        if (split.length == 1) {
-          // capture start
-          start = split[0]
-        } else if (split.length >= 3) {
-          type = split[2]
-        } else if (split.length >= 2) {
-          // capture start and length
-          start = split[0]
-          length = split[1]
-        }
-        break
-    }
-
-    if (typeof length === 'undefined' || isNaN(length) || length < 1 || length > api_page.public_apis.ext.getlasttxs.max_items_per_query)
-      length = api_page.public_apis.ext.getlasttxs.max_items_per_query;
-    if (typeof start === 'undefined' || isNaN(start) || start < 0)
-      start = 0;
-    if (typeof min === 'undefined' || isNaN(min) || min < 0)
-      min  = 0;
-    else
-      min  = (min * 100000000);
+    
+    const param = req.url.replace('/', '').split('/')
+    const min = 0
+    const type = req.params['type'] ? req.params['type'] : -1
+    var internal = false
+    if (param.length > 0 && !isNaN(param[0]))
+      start = param[0]
+    if (param.length > 1 && !isNaN(param[1]))
+      length = param[1]
+    if (param.length > 2 && param[2] == 'internal')
+      internal = true
 
     db.get_last_txs(start, length, min, type, function(data, count) {
       const rows = []
       for (i = 0; i < data.length; i++) {
         const row = []
-        row.push(data[i].blockindex)
-        row.push(data[i].blockhash)
-        row.push(data[i].txid)
-        row.push(data[i].type)
-        row.push(data[i].recipients)
-        row.push(data[i].amount)
-        row.push(data[i].timestamp)
+        if (internal) {
+          row.push(data[i])
+        } else {
+          row.push(data[i].blockindex)
+          row.push(data[i].blockhash)
+          row.push(data[i].txid)
+          row.push(data[i].type)
+          row.push(data[i].recipients)
+          row.push(data[i].amount)
+          row.push(data[i].timestamp)
+        }
         rows.push(row)
       }
       res.json({"data": rows, "recordsTotal": count, "recordsFiltered": count})
     }, net)
   } else
-    res.end(METHOD_DISABLED);
+    res.end(METHOD_DISABLED)
 })
 
 app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
