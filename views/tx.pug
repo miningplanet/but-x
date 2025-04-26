@@ -36,7 +36,6 @@ block content
       - const tx_types = settings.get(net, 'tx_types')
       table#tx-table.table.table-bordered.summary-table.mobile-border-right
         tbody
-          - var confirms = (blockcount - tx.blockindex + 1);
           tr
             td.d-md-table-cell #{settings.locale.tx_block_hash}
             td.d-md-table-cell
@@ -63,12 +62,7 @@ block content
               td.breakWord #{tx.op_return}
           tr
             td.d-md-table-cell #{settings.locale.confirmations}
-            if confirms >= confirmations
-              td #{confirms}
-            else if confirms < (confirmations / 2)
-              td #{confirms}
-            else
-              td #{confirms}
+            td #{settings.formatDecimal(confirmations, 0, 0)}
           if !isNaN(tx.timestamp)
             tr
               td.d-md-table-cell #{settings.locale.timestamp}

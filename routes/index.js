@@ -138,34 +138,36 @@ function route_get_tx(req, res, txid) {
             }
           }
         }
-        // TODO: yerbas: tx type
-        if (tx.tx_type == 8 || tx.tx_type == 9) {
-          db.get_token({ "height": tx.blockindex, "txid": tx.txid }, function(tokens) {
-            if (debug.enabled)
-              debug("Got tokens %o with TX %s at index %d for chain '%s'.", tokens, tx.txid, tx.blockindex, net)
+        db.get_stats(coin.name, function(stats) {
+          // TODO: yerbas: tx type
+          if (tx.tx_type == 8 || tx.tx_type == 9) {
+            db.get_token({ "height": tx.blockindex, "txid": tx.txid }, function(tokens) {
+              if (debug.enabled)
+                debug("Got tokens %o with TX %s at index %d for chain '%s'.", tokens, tx.txid, tx.blockindex, net)
+              if (settings.get(net, 'claim_address_page').enabled == true) {
+                db.populate_claim_address_names(tx, function(tx) {
+                  const p = txParam(req, 'tx', stats, transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
+                  p.tokens = tokens
+                  res.render('tx', p)
+                }, net)
+              } else {
+                const p = txParam(req, 'tx', stats, transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
+                p.tokens = tokens
+                res.render('tx', p)
+              }
+            }, net)
+          } else {
             if (settings.get(net, 'claim_address_page').enabled == true) {
               db.populate_claim_address_names(tx, function(tx) {
-                const p = txParam(req, 'tx', transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
-                p.tokens = tokens
+                const p = txParam(req, 'tx', stats, transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
                 res.render('tx', p)
               }, net)
             } else {
-              const p = txParam(req, 'tx', transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
-              p.tokens = tokens
+              const p = txParam(req, 'tx', stats, transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
               res.render('tx', p)
             }
-          }, net)
-        } else {
-          if (settings.get(net, 'claim_address_page').enabled == true) {
-            db.populate_claim_address_names(tx, function(tx) {
-              const p = txParam(req, 'tx', transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
-              res.render('tx', p)
-            }, net)
-          } else {
-            const p = txParam(req, 'tx', transaction_page, net, db, settings, tx, (tx.blockindex ? tx.blockindex : 0), coin.name + ' Transaction ' + tx.txid)
-            res.render('tx', p)
           }
-        }
+        }, net)
       } else {
         res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net})
       }
@@ -819,12 +821,13 @@ function blockParam(req, stats, pageKey, page, net, db, settings, block, txs, pr
   return r
 }
 
-function txParam(req, pageKey, page, net, db, settings, tx, height, prefix) {
+function txParam(req, pageKey, stats, page, net, db, settings, tx, height, prefix) {
   const r = param(pageKey, page, req, db, settings, prefix)
   const shared_pages = settings.get(net, 'shared_pages')
   r.tx = tx
-  r.confirmations = shared_pages.confirmations
   r.blockcount = height
+  if (stats)
+    r.confirmations = stats.count - height
   r.transaction_page = settings.get(net, 'transaction_page')
   r.address_page = settings.get(net, 'address_page')
   r.api_page = settings.get(net, 'api_page') 
