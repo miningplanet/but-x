@@ -35,7 +35,7 @@ block content
         if info.show_chainstats == true
           h4 #{settings.locale.info_title_chain}
           hr
-          table#chainstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+          table#chainstats.table.table-bordered.summary-table.mobile-border-right
             tbody 
             tr
               td.text-start #{settings.locale.info_name}
@@ -86,13 +86,15 @@ block content
               td.text-start #{settings.locale.info_count_addresses}
               td.text-end #{settings.formatInt(addresses)}
             tr
-              td.text-start #{settings.locale.info_count_assets}
+              td.text-start 
+                a(href='/assets/' + net) #{settings.locale.info_count_assets}
               td.text-end #{settings.formatInt(assets)}
             tr
               td.text-start #{settings.locale.info_count_utxos}
               td.text-end #{settings.formatInt(stats.count_utxos)}
             tr
-              td.text-start #{settings.locale.info_count_transactions}
+              td.text-start 
+                a(href='/movement/' + net) #{settings.locale.info_count_transactions}
               td.text-end #{settings.formatInt(txes)}
             if info.show_txstats == true && tx_types
               each tx_type, index in tx_types
@@ -106,7 +108,8 @@ block content
                           span(style='margin-left: 0') #{settings.formatInt(txtype.count)}
             if info.show_masternode_info == true
               tr
-                td.text-start #{settings.locale.info_count_masternodes}
+                td.text-start 
+                  a(href='/masternodes/' + net) #{settings.locale.info_count_masternodes}
                 td.text-end #{stats.smartnodes_enabled + ' / ' + stats.smartnodes_total}
             if info.show_miningstats == true && algos.length == 1
               tr
@@ -119,7 +122,7 @@ block content
           br
           h4 #{settings.locale.info_title_markets}
           hr
-          table#marketstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+          table#marketstats.table.table-bordered.table-striped.summary-table.mobile-border-right
             tbody 
             tr
               td.text-start #{settings.locale.info_name}
@@ -153,7 +156,7 @@ block content
         if info.show_masternode_info == true
           h4 #{settings.locale.info_title_masternodes}
           hr
-          table#masternodestats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+          table#masternodestats.table.table-bordered.table-striped.summary-table.mobile-border-right
             thead
               tr
                 th.text-center.fill #{settings.locale.info_masternodes_th_country}
@@ -188,7 +191,7 @@ block content
           br
           h4 #{settings.locale.info_title_mining}
           hr
-          table#miningstats.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+          table#miningstats.table.table-bordered.table-striped.summary-table.mobile-border-right
             thead
               tr
                 th.text-center.fill #{settings.locale.info_mining_th_algorithm}

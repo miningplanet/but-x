@@ -112,7 +112,7 @@ block content
           if richlist_page.show_current_balance == true
             #balance(class='container tab-pane' + (richlist_page.show_current_balance == true ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
-                table.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(id="rich" style='margin-bottom:0;', cellspacing='0')
+                table.table.table-bordered.summary-table.right-border-0(id="rich" style='margin-bottom:0;', cellspacing='0')
                   thead
                     tr
                       th.text-center
@@ -145,7 +145,7 @@ block content
           if richlist_page.show_received_coins == true
             #received(class='container tab-pane' + (!richlist_page.show_current_balance ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
-                table#rreceive.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
+                table#rreceive.table.table-bordered.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
                     tr
                       th.text-center
@@ -172,7 +172,7 @@ block content
           if richlist_page.show_top_tx == true
             #toptx(class='container tab-pane' + (!richlist_page.show_top_tx ? ' active' : ''), style='margin-top:0;')
               .card.card-default.border-0
-                table#rtoptx.table.table-hover.table-bordered.table-striped.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
+                table#rtoptx.table.table-bordered.summary-table.right-border-0(style='margin-bottom:0;', cellspacing='0')
                   thead
                     tr
                       th.text-center
@@ -206,7 +206,7 @@ block content
           #summary-panel.card.card-default.border-0(style='margin-top:' + (richlist_page.show_current_balance == true || richlist_page.show_received_coins == true ? '34' : '0') + 'px;')
             .card-header
               strong #{settings.locale.rl_wealth}
-            table.table.table-hover.table-bordered.summary-table.right-border-0(style='margin-bottom:0;')
+            table.table.table-bordered.summary-table.right-border-0(style='margin-bottom:0;')
               thead
                 tr
                   th

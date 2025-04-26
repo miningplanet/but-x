@@ -1,6 +1,6 @@
 {
   "name": "but-x",
-  "version": "2.1.0-alpha",
+  "version": "2.1.2-alpha",
   "private": true,
   "scripts": {
     "start": "node --stack-size=20000 ./bin/cluster",

@@ -34,7 +34,7 @@ block content
           a.d-none.d-md-inline(href=`/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
       - const tx_types = settings.get(net, 'tx_types')
-      table#tx-table.table.table-bordered.table-striped.summary-table.mobile-border-right
+      table#tx-table.table.table-bordered.summary-table.mobile-border-right
         tbody
           - var confirms = (blockcount - tx.blockindex + 1);
           tr
@@ -280,7 +280,7 @@ block content
             .card-header
               strong #{settings.locale.tx_contributors}
               span.fa.fa-arrow-right.float-end.d-none.d-md-block
-            table#contributors.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            table#contributors.table.table-bordered.summary-table.mobile-border-right
               thead
                 tr
                   th #{settings.locale.tx_address}
@@ -294,8 +294,8 @@ block content
                       tr.text-center
                         td.text-center #{settings.locale.new_coins}
                     else
-                      - var ramount = Number(address.amount / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                      - var ramountParts = ramount.split('.');
+                      - var ramount = settings.formatDecimal(Number(address.amount / 100000000), 2, 2)
+                      - var ramountParts = ramount.split('.')
                       tr
                         td.addresscol
                           if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
@@ -335,7 +335,7 @@ block content
           .card.card-default.border-0
             .card-header
               strong #{settings.locale.tx_recipients}
-            table#recipients.table.table-bordered.table-striped.table-hover.summary-table.mobile-border-right
+            table#recipients.table.table-bordered.summary-table.mobile-border-right
               thead
                 tr
                   th #{settings.locale.tx_address}
@@ -343,8 +343,8 @@ block content
               tbody
                 each address in tx.vout
                   if tx.vout.length > 0
-                    - var ramount = Number(address.amount / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                    - var ramountParts = ramount.split('.');
+                    - var ramount = settings.formatDecimal(Number(address.amount / 100000000), 2, 2)
+                    - var ramountParts = ramount.split('.')
                     tr
                       if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
                         td.addresscol
@@ -396,8 +396,8 @@ block content
                             else
                               =settings.locale.unknown_recipient
                   else
-                    - var ramount = Number(address.amount / 100000000).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
-                    - var ramountParts = ramount.split('.');
+                    - var ramount = settings.formatDecimal(Number(address.amount / 100000000), 2, 2)
+                    - var ramountParts = ramount.split('.')
                     tr
                       td.addresscol
                         a.breakWord(href='/address/' + address.addresses+ '/' + net)

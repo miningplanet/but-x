@@ -394,7 +394,7 @@ block content
                 if marketdata.market_logo != null && marketdata.market_logo != ''
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
                 strong(style='color:var(--bs-body-color)') #{settings.locale.mkt_buy_orders}
-              table#buy-orders.table.table-striped.table-bordered.table-hover.order-table.bottom-border-0
+              table#buy-orders.table.table-bordered.order-table.bottom-border-0
                 thead
                   - var sumBuys = 0;
                   - var totalBuys = 0;
@@ -441,7 +441,7 @@ block content
                 if marketdata.market_logo != null && marketdata.market_logo != ''
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
                 strong(style='color:var(--bs-body-color)') #{settings.locale.mkt_sell_orders}
-              table#sell-orders.table.table-striped.table-bordered.table-hover.order-table.bottom-border-0
+              table#sell-orders.table.table-bordered.order-table.bottom-border-0
                 - var sumSells = 0;
                 - var totalSells = 0;
                 each sell in marketdata.data.sells
@@ -489,7 +489,7 @@ block content
                 if marketdata.market_logo != null && marketdata.market_logo != ''
                   img.align-top.market-logo(src='data:image/png;base64,' + marketdata.market_logo, title=marketdata.market_name + ' Logo', alt=marketdata.market_name + ' Logo')
                 strong #{settings.locale.mkt_trade_history.replace('{1}', marketdata.data.history.length)}
-              table#history-table.table.table-hover.table-bordered.table-striped.table-paging(cellspacing='0')
+              table#history-table.table.table-bordered.table-paging(cellspacing='0')
                 thead
                   tr
                     th.text-center #{settings.locale.mkt_price}
