@@ -124,9 +124,6 @@ html(lang='en')
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
       }
-      function fixFooterHeightAndPosition() {
-        var screenWidth = $(window).outerWidth();
-      }
       function fixSidebarHeight() {
         if ('#{shared_pages.page_footer.sticky_footer}' != 'true')
           $('div#side-nav-bar').css('margin-bottom', -($('div#body-container > div#side-nav-bar').length ? ($('div#footer-container').offset().top - $('div#footer-container').position().top + 1) : 0).toString() + 'px');
@@ -135,52 +132,11 @@ html(lang='en')
         else
           $('div#side-nav-bar').css('margin-bottom', '');
       }
-      function getSocialLinkHeight() {
-        var retVal = 70;
-        var screenWidth = $(window).outerWidth();
-
-        if (screenWidth <= 575) {
-          // Mobile
-          retVal = !{shared_pages.page_footer.social_link_percent_height_mobile};
-        } else if (screenWidth >= 576 && screenWidth <= 991) {
-          // Tablet
-          retVal = !{shared_pages.page_footer.social_link_percent_height_tablet};
-        } else {
-          // Desktop
-          retVal = !{shared_pages.page_footer.social_link_percent_height_desktop};
-        }
-
-        return retVal;
-      }
       function enableTooltips() {
         if ($().tooltip) {
           // Enable tooltips only if browser supports them
           // $('[data-bs-toggle="tooltip"]').tooltip();
         }
-      }
-      function rotateElement(elementSelector) {
-        var element = $(elementSelector);
-
-        if (element.length > 0) {
-          $({ deg: 0 }).animate({ deg: 360 }, {
-            duration: 2000,
-            step: function(deg) {
-              element.css({
-                transform: 'rotateY(' + deg + 'deg)'
-              });
-            },
-            done: function() {
-              setTimeout(function() {
-                rotateElement(elementSelector);
-              }, 1500);
-            }
-          });
-        }
-      }
-      function startRotateElement(elementSelector) {
-        setTimeout(function() {
-          rotateElement(elementSelector);
-        }, 100);
       }
       function getNetHashUnits() {
         var networkSuffix='';
@@ -264,14 +220,14 @@ html(lang='en')
               var splitValue, splitParts;
 
               if (!isNaN(json.difficulty))
-                diffString = Number(json.difficulty).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                diffString = formatDecimal(Number(json.difficulty), 2, 8)
               if (!isNaN(json.supply))
                 supplyString = parseInt(parseFloat(json.supply).toFixed(0)).toLocaleString('en');
               if (!isNaN(json.hashrate))
-                hashrateString = Number(json.hashrate).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+                hashrateString = formatDecimal(Number(json.hashrate), 2, 8)
 
               $("#supply").text(supplyString);
-              splitValue = Number(parseFloat(json.lastPrice).toFixed(8) * parseInt(parseFloat(json.supply).toFixed(0))).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true});
+              splitValue = formatDecimal(Number(parseFloat(json.lastPrice).toFixed(8) * parseInt(parseFloat(json.supply).toFixed(0))), 2, 2)
               splitParts = splitValue.split('.');
               showTopPanelData('supplypanel', 'supplyPanelLoading');
 
@@ -298,7 +254,7 @@ html(lang='en')
               }
               showTopPanelData('hashratepanel', 'hashratePanelLoading');
 
-              splitValue = Number(json.lastPrice).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':8,'useGrouping':true});
+              splitValue = formatDecimal(Number(json.lastPrice), 2, 8)
               splitParts = splitValue.split('.');
               $("#lastPrice").html(splitParts[0] + '.<span class="decimal">' + splitParts[1] + '</span>');
               showTopPanelData('pricepanel', 'pricePanelLoading');
@@ -457,25 +413,25 @@ html(lang='en')
                               }
 
                               if (context.dataset.label == 'Ghostrider') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' KH/s';
                               } else if (context.dataset.label == 'Yespower') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' MH/s';
                               } else if (context.dataset.label == 'Lyra2') {
-                                const n = Number((context.raw *1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw *1000 || 0)), 0, 0)
                                 return n + ' KH/s'
                               } if (context.dataset.label == 'Sha256d') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' MH/s'
                               } else if (context.dataset.label == 'Scrypt') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' KH/s'
                               } else if (context.dataset.label == 'MemeHash') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' KH/s'
                               } else if (context.dataset.label == 'Mike') {
-                                const n = Number((context.raw * 1000 || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':0,'useGrouping':true});
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
                                 return n + ' KH/s'
                               }
                             }
@@ -654,7 +610,7 @@ html(lang='en')
                                   max = decimalCount;
                               }
 
-                              return Number((context.raw || 0)).toLocaleString('en',{'minimumFractionDigits':0,'maximumFractionDigits':max,'useGrouping':true});
+                              return formatDecimal(Number((context.raw || 0)), 0, max)
                             }
                           }
                         },

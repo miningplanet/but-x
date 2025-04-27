@@ -742,7 +742,6 @@ router.post('/search/:net?', function(req, res) {
       }
     } else {
       if (query.startsWith('asset:')) {
-        // TODO Check asset search.
         route_get_asset(req, res, query)
       } else {
         console.log("Search address: '" + query + "' for net " + net + ".")
@@ -762,7 +761,6 @@ router.post('/search/:net?', function(req, res) {
       }
     }
   } else {
-    // Search is disabled so load the index page with an error msg
     route_get_index(req, res, 'Search is disabled')
   }
 })
@@ -853,7 +851,7 @@ function assetParam(req, stats, pageKey, page, net, db, settings, asset, prefix)
   const shared_pages = settings.get(net, 'shared_pages')
   const r = param(pageKey, page, req, db, settings, prefix)
   r.asset = asset
-
+  // TODO: Fix asset confirmations.
   r.confirmations = shared_pages.confirmations
   r.blockcount = stats.count
 
