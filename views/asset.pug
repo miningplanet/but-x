@@ -31,8 +31,18 @@ block content
           }
         },
         rowCallback: function(row, data, index) {
-          var html = '<strong class="assettx-title">Transaction #{asset.name} (block ' + data[0].blockindex + ')</strong>'
-          html += '<br><small class="assettx-id">Time: ' + format_unixtime(data[0].timestamp) + '<br>ID: <a href="/tx/' + data[0].txid + '/#{net}" class="tx">' + data[0].txid + '</a></small>'
+          const screenWidth = $(window).outerWidth()
+          const height = !isNaN(data[0].blockindex) ? formatDecimal(data[0].blockindex, 0, 0) : 'n/a'
+          const timestamp = !isNaN(data[0].timestamp) ? format_unixtime(data[0].timestamp) : 'n/a'
+
+          var html = '<strong class="assettx-title">Transaction #{asset.name} (height ' + height + ')</strong>'
+          html += '<br><small class="assettx-id">Time: ' + timestamp
+          var txIdLabel
+          if (screenWidth <= 991)
+            txIdLabel = formatShortId(data[0].txid, 6, 6)
+          else 
+            txIdLabel = data[0].txid
+          html += '<br>Tx-ID: <a href="/tx/' + data[0].txid + '/#{net}" class="tx">' + txIdLabel + '</a></small>'
           html += '<br><div class="assettx-vout"><b>TxOut</b>'
 
           var vout_sum = 0
@@ -41,12 +51,17 @@ block content
             if (v.addresses && v.name && v.tamount && !isNaN(v.tamount)) {
               vout_sum += v.tamount
               vout_cnt += 1
-              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + v.addresses + '</a></span>'
+              var addrLabel
+              if (screenWidth <= 991)
+                addrLabel = formatShortId(v.addresses, 6, 6)
+              else 
+                addrLabel = v.addresses
+              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + addrLabel + '</a></span>'  
               html += '<span class="assettx-amount">' + formatDecimal(v.tamount, 2, 2) + '</span>'
             }
           }
           if (vout_cnt > 1) {
-            html += '<br><span class="assettx-addr"><b>Sum:</b></span>'
+            html += '<br><span class="assettx-addr">&nbsp;</span>'
             html += '<span class="assettx-amount"><b>' + formatDecimal(vout_sum, 2, 2) + '</b></span>'
           }
           html += '</div>'
@@ -55,17 +70,21 @@ block content
           var vin_cnt = 0
           html += '<br><div class="assettx-vin"><b>TxIn</b>'
           for (v of data[0].vin) {
-            console.log("vin: " + JSON.stringify(v))
             if (v.scriptPubKey && v.addresses && v.scriptPubKey.asset && v.scriptPubKey.asset.amount && !isNaN(v.scriptPubKey.asset.amount)) {
               vin_sum += v.scriptPubKey.asset.amount
               vin_cnt += 1
-              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + v.addresses + '</a></span>'
+              var addrLabel
+              if (screenWidth <= 991)
+                addrLabel = formatShortId(v.addresses, 6, 6)
+              else 
+                addrLabel = v.addresses
+              html += '<br><span class="assettx-addr"><a href="/address/' + v.addresses + '/#{net}" class="address">' + addrLabel + '</a></span>'
               html += '<span class="assettx-amount">' + formatDecimal(v.scriptPubKey.asset.amount, 2, 2) + '</span>'
             }
           }
 
           if (vin_cnt > 1) {
-            html += '<br><span class="assettx-addr"><b>Sum:</b></span>'
+            html += '<br><span class="assettx-addr">&nbsp;</span>'
             html += '<span class="assettx-amount"><b>' + formatDecimal(vin_sum, 2, 2) + '</b></span>'
           }
           html += '</div>'
@@ -110,9 +129,9 @@ block content
           if asset_page.page_header.show_description == true
             if asset_page.page_header.show_title != true
               #page-title-container
-                .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', settings.formatDecimal(asset.height, 0, 0))
+                .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', asset.height ? settings.formatDecimal(asset.height, 0, 0) : 'n/a')
             else
-              .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', settings.formatDecimal(asset.height, 0, 0))
+              .sub-page-header.text-muted=settings.locale.asset_description.replace('{1}', coin.name).replace('{2}', asset.height ? settings.formatDecimal(asset.height, 0, 0) : 'n/a')
       .cardSpacer.clearfix
     div#info-table_wrapper.card.card-default.border-0.cardSpacer
       .card-header
@@ -124,7 +143,7 @@ block content
             th
             th
         tbody
-          - var confirms = (blockcount - asset.blockindex + 1);
+          - var confirms = (blockcount - asset.blockindex + 1)
           tr
             td.d-md-table-cell Name
             td.breakWord #{asset.name}
@@ -133,24 +152,14 @@ block content
               td.d-md-table-cell Address
               td.breakWord
                 a.breakWord(href='/address/' + asset.address + '/' + net) #{asset.address}
-          //- if asset.owner
-          //-   tr
-          //-     td.d-md-table-cell Owner
-          //-     td.breakWord #{asset.owner}
-          //- if asset.owner_address 
-          //-   tr 
-          //-     td.d-md-table-cell Owner Address
-          //-     td.breakWord
-          //-       a.breakWord(href='/address/' + asset.owner_address + '/' + net) #{asset.owner_address}
           if asset.height
             tr
               td.d-md-table-cell Block height
-              td.breakWord #{settings.formatDecimal(asset.height, 0, 0)}
+              td.breakWord #{asset.height ? settings.formatDecimal(asset.height, 0, 0) : 'n/a'}
           tr
             td.d-md-table-cell Tx-ID
             td.breakWord 
-              small
-                a(href='/tx/' + asset.txid + '/' + net) #{asset.txid}
+              a(href='/tx/' + asset.txid + '/' + net) #{asset.txid ? settings.formatShortId(asset.txid, 6, 6) : 'n/a'}
           if asset.tx_type != null
             tr
               td.d-md-table-cell #{settings.locale.tx_type}
@@ -169,11 +178,11 @@ block content
           if asset.amount && asset.units
             tr
               td.d-md-table-cell Amount
-              td.breakWord #{settings.formatDecimal(asset.amount, asset.units, asset.units)}
+              td.breakWord #{settings.formatDecimal(asset.amount, 0, asset.units)}
           if asset.balance && asset.units
             tr
               td.d-md-table-cell Balance
-              td.breakWord #{settings.formatDecimal(asset.balance, asset.units, asset.units)}
+              td.breakWord #{settings.formatDecimal(asset.balance, 0, asset.units)}
           if asset.units
             tr
               td.d-md-table-cell Units
@@ -226,6 +235,6 @@ block content
         table#assettxes-table.table.table-bordered.table-paging.mobile-border-right
           thead
             tr
-              th.text-center
+              th(style="display: none")
           tbody
         hr

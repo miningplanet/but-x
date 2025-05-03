@@ -24,7 +24,7 @@ script.
     return Number(n).toLocaleString(locale,{'minimumFractionDigits':min,'maximumFractionDigits':max,'useGrouping':true})
   }
   function formatShortId(id, start, end) {
-    return id ? id.substring(0, 6) + '...' + id.substring(id.length - 6, id.length) : 'n/a'
+    return id ? id.substring(0, start) + '...' + id.substring(id.length - end, id.length) : 'n/a'
   }
   function generateAlertHTML(alertClass, headerText, msgText) {
     return '<div class="alert alert-' + alertClass + '" role="alert">' +
