@@ -34,9 +34,9 @@ block content
           if block_page.page_header.show_description == true
             if block_page.page_header.show_title != true
               #page-title-container
-                .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', block.height)
+                .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', !isNaN(block.height) ? settings.formatDecimal(block.height, 0, 0) : block.height)
             else
-              .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', block.height)
+              .sub-page-header.text-muted=settings.locale.block_description.replace('{1}', coin.name).replace('{2}', !isNaN(block.height) ? settings.formatDecimal(block.height, 0, 0) : block.height)
       .cardSpacer.clearfix
     div#block_info_wrapper.card.card-default.border-0.cardSpacer
       .card-header
@@ -55,7 +55,7 @@ block content
           if api_page.public_apis.rpc.getblock.enabled == true
             a.d-none.d-md-block(href='/api/getblock?hash=' + block.hash, style='margin-left:auto;', data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_block_data)
               span.fa.fa-info-circle(style='color: var(--bs-body-color);')
-      table#block-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table(style='border-top:0;margin-top:0 !important;')
+      table#block-summary.table.table-bordered.summary-table.bottom-border-0.single-row-table.mobile-border-right(style='border-top:0;margin-top:0 !important;')
         thead(style='visibility: collapse !important;')
           tr
             th
@@ -67,71 +67,70 @@ block content
           - const splitBlockSize = block_size.split('.');
           if block.hash
             tr
-              td #{settings.locale.block_hash}
-              td=block.hash
+              td.d-md-table-cell #{settings.locale.block_hash}
+              td.breakWord #{block.hash}
           if block.pow_hash
             tr
-              td #{settings.locale.block_hash_pow}
-              td=block.pow_hash
+              td.d-md-table-cell #{settings.locale.block_hash_pow}
+              td #{block.pow_hash}
           if block.algo
             tr
-              td #{settings.locale.block_algo}
-              td=block.algo
+              td.d-md-table-cell #{settings.locale.block_algo}
+              td #{block.algo}
           tr
-            td #{settings.locale.block_difficulty}
+            td.d-md-table-cell #{settings.locale.block_difficulty}
             td #{splitDifficulty[0]}.
               span.decimal #{splitDifficulty[1]}
           tr
-            td #{settings.locale.block_confirmations}
+            td.d-md-table-cell #{settings.locale.block_confirmations}
             td=confirmations
           if settings.blockchain_specific.heavycoin.enabled == true
             tr
-              td Vote
+              td.d-md-table-cell Vote
               td=block.vote
           tr
-            td #{settings.locale.block_size} (kB)
+            td.d-md-table-cell #{settings.locale.block_size} (kB)
             td #{splitBlockSize[0]}.
               span.decimal #{splitBlockSize[1]}
           if block.bits
             tr
-              td #{settings.locale.block_bits}
+              td.d-md-table-cell #{settings.locale.block_bits}
               td=block.bits
           if block.nonce
             tr
-              td #{settings.locale.block_nonce}
+              td.d-md-table-cell #{settings.locale.block_nonce}
               td=block.nonce
           if block.time
             tr
-              td #{settings.locale.block_timestamp}
-              td
-                span#timestampCol=block.time
+              td.d-md-table-cell #{settings.locale.block_timestamp}
+              td.breakWord #{!isNaN(block.time) ? settings.formatUnixtime(block.time) : block.time}
           if block.version
             tr
-              td #{settings.locale.block_version}
-              td=block.version
+              td.d-md-table-cell #{settings.locale.block_version}
+              td.breakWord #{block.version}
           if block.version_hex
             tr
-              td #{settings.locale.block_version_hex}
-              td=block.version_hex
+              td.d-md-table-cell #{settings.locale.block_version_hex}
+              td.breakWord #{block.version_hex}
           if block.merkle_root
             tr
-              td #{settings.locale.block_merkle_root}
-              td=block.merkle_root
+              td.d-md-table-cell #{settings.locale.block_merkle_root}
+              td.breakWord #{settings.formatShortId(block.merkle_root, 6, 6)}
           if block.chainwork
             tr
-              td #{settings.locale.block_chainwork}
-              td=block.chainwork
+              td.d-md-table-cell #{settings.locale.block_chainwork}
+              td.breakWord #{block.chainwork ? block.chainwork.replace(/^0+/, '') : 'n/a'}
           if block.cbtx
             tr
-              td #{settings.locale.block_cbtx}
-              td=block.cbtx
+              td.d-md-table-cell #{settings.locale.block_cbtx}
+              td.breakWord #{block.cbtx}
     if block.hash == block_page.genesis_block
       .alert.alert-info(role='alert', style='text-align:center;')
         strong #{settings.locale.block_genesis}
     else
       div#block-txs-wrapper.card.card-default.border-0
         .card-header
-          strong Transactions
+          strong #{settings.locale.block_transactions}
         table#block-txs.table.table-bordered.summary-table.mobile-border-right
           thead
             tr
@@ -147,7 +146,7 @@ block content
                   a(href='/tx/' + txn.txid)
                     span.entity(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_tx) &#8627
                 td.text-start.txcol.d-md-table-cell
-                  a.breakWord(href='/tx/' + txn.txid + '/' + net) #{txn.txid}
+                  a.breakWord(href='/tx/' + txn.txid + '/' + net) #{txn.txid ? settings.formatShortId(txn.txid, 6, 6) : txn.txid}
                 td.text-begin #{settings.get(net, 'tx_types')[txn.tx_type].replace('TRANSACTION_', 'TX_')}
                 td.text-center #{txn.vout.length}
                 if txn.vout.length > 0

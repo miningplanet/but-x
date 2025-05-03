@@ -34,7 +34,7 @@ block content
           a.d-none.d-md-inline(href='/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1', style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
       - const tx_types = settings.get(net, 'tx_types')
-      table#tx-table.table.table-bordered.summary-table.mobile-border-right
+      table#tx-table.table.table-bordered.summary-table.bottom-border-0.single-row-table.mobile-border-right
         tbody
           tr
             td.d-md-table-cell #{settings.locale.tx_block_hash}

@@ -20,7 +20,7 @@ block content
         ajax: {
           url: '/ext/getlasttxs/#{net}/#{movement_page.movement_table.min_amount}',
           beforeSend: function(jqXHR, settings) {
-            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) // '/type'
+            settings.url = settings.url.substring(0, settings.url.indexOf('?')) + '/' + getParameterByName('start', settings.url) + '/' + getParameterByName('length', settings.url) + '/internal' // '/type'
             return true
           }
         },
@@ -31,22 +31,27 @@ block content
           }
         },
         rowCallback: function(row, data, index) {
-          var blockindex = data[0]
-          var blockhash = data[1]
-          var txhash = data[2]
-          const txtype = data[3] = data[3].replace('TRANSACTION_', 'TX_')
-          var outputs = data[4]
-          var amount = data[5]
-          var amountParts = Number(amount).toLocaleString('en',{'minimumFractionDigits':2,'maximumFractionDigits':2,'useGrouping':true}).split('.')
-          var amountStr = amountParts[0] + '.<span class="decimal">' + amountParts[1] + '</span>'
-          var timestamp = data[6]
-          var total = amountStr
-          $("td:eq(0)", row).html('<a href="/tx/' + txhash + '/#{net}"><span class="entity" data-bs-toggle="tooltip" data-bs-placement="top" title="#{settings.locale.view_tx}">&#8627</span></a>').addClass('text-center d-table-cell d-md-none')
-          $("td:eq(1)", row).html('<a href="/tx/' + txhash + '/#{net}">' + txhash + '</a>').addClass('txcol')
-          $("td:eq(2)", row).html('<span>' + txtype + '</span>').addClass('text-begin')
-          $("td:eq(3)", row).html('<span>' + outputs + '</span>').addClass("text-center")
-          $("td:eq(4)", row).html(total).addClass('text-end')
-          $("td:eq(5)", row).html(format_unixtime(timestamp)).addClass('text-center')
+          const height = !isNaN(data[0].blockindex) ? formatDecimal(data[0].blockindex, 0, 0) : 'n/a'
+          const timestamp = !isNaN(data[0].timestamp) ? format_unixtime(data[0].timestamp) : 'n/a'
+          const txType = data[0].type ? data[0].type.replace('TRANSACTION_', '') : 'n/a'
+          const sendRec = data[0].senders + '/' + data[0].recipients
+          const amount = !isNaN(data[0].amount) ? formatDecimal(data[0].amount, 2, 2) : 'n/a'
+          const txid = data[0].txid ? data[0].txid : 'n/a'
+          const txidString = formatShortId(data[0].txid, 6, 6)
+          const blockString = formatShortId(data[0].blockhash, 6, 6)
+
+          var html = '<div class="tx-line">'
+          html += '<strong class="tx-title"><a href="/tx/' + txid + '/#{net}">Transaction #{coin.symbol} (height ' + height + ')</a></strong>'
+          html += '<br><p><small>'
+          html += '<a href="/tx/' + txid + '/#{net}">Tx-ID:&nbsp;' + txidString + '</a>'
+          html += ' · <a href="/block/' + data[0].blockhash + '/#{net}">Block:&nbsp;' + blockString + '</a>'
+          html += ' · Time:&nbsp;' + timestamp
+          html += ' · Tx-Type:&nbsp;' + txType
+          html += ' · Send./Rec.:&nbsp' + sendRec
+          html += '</small></p>'
+          html += '<div class="tx-value"><b>' + amount + '</b></div>'
+          html += '</div>'
+          $("td:eq(0)", row).html(html).addClass('tdwrap')
         },
         fnDrawCallback: function(settings) {
           enableTooltips()
@@ -102,14 +107,9 @@ block content
       .cardSpacer.clearfix
     .card.card-default.border-0.cardSpacer
       .card-header
-        strong="Latest Movement"
+        strong #{settings.locale.move_latest}
       table#movement-table.table.table-bordered.table-paging.mobile-border-right
         thead
           tr
-            th.d-table-cell.d-md-none
-            th.text-center #{settings.locale.tx_hash}
-            th.text-center #{settings.locale.tx_type}
-            th.text-center #{settings.locale.tx_txout}
-            th.text-center #{coin.symbol}
-            th.text-center #{settings.locale.mkt_time_stamp}
+            th(style="display: none")
         tbody

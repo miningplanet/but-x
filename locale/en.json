@@ -127,6 +127,7 @@
   "block_merkle_root": "Merkle root",
   "block_chainwork": "Chainwork",
   "block_cbtx": "Coinbase transaction",
+  "block_transactions" : "Transaction",
   "view_raw_block_data": "View Raw Block Data",
   "view_tx": "View Transaction",
 
@@ -188,6 +189,7 @@
 
   // movement view
   "move_title": "{1} Coin Movements",
+  "move_latest": "Latest Movement",
   "move_description": "A listing of larger movements where {1} or more {2} coins were sent in a single transaction",
 
   // richlist
@@ -277,7 +279,7 @@
   "api_getblockcount": "Returns the current block index.",
   "api_getblockhash": "Returns the hash of the block at [index]; index 0 is the genesis block.",
   "api_getblock": "Returns information about the block with the given hash.",
-  "api_getrawtransaction": "Returns raw transaction representation for given transaction id. decrypt can be set to 0(false) or 1(true).",
+  "api_getrawtransaction": "Returns raw transaction representation for given transaction id. decrypt can be set to 0 (false) or 1 (true).",
   "api_getmaxmoney": "Returns the maximum possible money supply.",
   "api_getmaxvote": "Returns the maximum allowed vote for the current phase of voting.",
   "api_getvote": "Returns the current block reward vote setting.",
