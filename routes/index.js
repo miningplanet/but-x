@@ -198,7 +198,7 @@ function route_get_index(req, res, error) {
   }
 }
 
-router.get('/assets/:net?', function(req, res) {
+router.get('/assets{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const assets_page = settings.get(net, 'assets_page')
@@ -213,7 +213,7 @@ router.get('/assets/:net?', function(req, res) {
   }, net)
 })
 
-router.get('/info/:net?', function(req, res) {
+router.get('/info{/:net}', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   
@@ -359,7 +359,7 @@ function isApiEndpointEnabled(api_page, api_cmds, key) {
   return api_page.public_apis.rpc[key].enabled == true && api_cmds[key] != null && api_cmds[key] != ''
 }
 
-router.get('/apidocs/:net?', function(req, res) {
+router.get('/apidocs{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -380,7 +380,7 @@ router.get('/apidocs/:net?', function(req, res) {
   }
 })
 
-router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res) {
+router.get('/markets/:market/:coin_symbol/:pair_symbol{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const markets_page = settings.get(net, 'markets_page')
@@ -471,7 +471,7 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol/:net?', function(req, res
   }
 })
 
-router.get('/richlist/:net?', function(req, res) {
+router.get('/richlist{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const richlist_page = settings.get(net, 'richlist_page')
@@ -509,7 +509,7 @@ router.get('/richlist/:net?', function(req, res) {
 })
 
 // movements page
-router.get('/movement/:net?', function(req, res) {
+router.get('/movement{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const movement_page = settings.get(net, 'movement_page')
@@ -532,7 +532,7 @@ router.get('/movement/:net?', function(req, res) {
 })
 
 // network page
-router.get('/network/:net?', function(req, res) {
+router.get('/network{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const network_page = settings.get(net, 'network_page')
@@ -554,7 +554,7 @@ router.get('/network/:net?', function(req, res) {
 })
 
 // masternode list page
-router.get('/masternodes/:net?', function(req, res) {
+router.get('/masternodes{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const masternodes_page = settings.get(net, 'masternodes_page')
@@ -576,7 +576,7 @@ router.get('/masternodes/:net?', function(req, res) {
   }
 })
 
-router.get('/reward/:net?', function(req, res) {
+router.get('/reward{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   // TODO: Fix Heavy Coin reward page.
@@ -614,20 +614,20 @@ router.get('/reward/:net?', function(req, res) {
   }
 })
 
-router.get('/tx/:txid/:net?', function(req, res) {
+router.get('/tx/:txid{/:net}', function(req, res) {
   route_get_tx(req, res, req.params.txid)
 })
 
-router.get('/block/:hash/:net?', function(req, res) {
+router.get('/block/:hash{/:net}', function(req, res) {
   route_get_block(req, res, req.params.hash)
 })
 
-router.get('/asset/:name/:net/:start?', function(req, res) {
+router.get('/asset/:name/:net{/:start}', function(req, res) {
   req.params.name.replace('+', '/')
   route_get_asset(req, res, req.params.name, req.params.name)
 })
 
-router.get('/register/:net?', function(req, res) {
+router.get('/register{/:net}', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   const address_page = settings.get(net, 'address_page')
@@ -645,7 +645,7 @@ router.get('/register/:net?', function(req, res) {
   route_get_index(req, res, 'Registration is disabled.')
 })
 
-router.get('/login/:net?', function(req, res) {
+router.get('/login{/:net}', function(req, res) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   const login_page = settings.get(net, 'login_page')
@@ -694,19 +694,19 @@ function route_to_user_page(req, res, address) {
   route_get_index(req, res, 'User login is disabled.')
 }
 
-router.get('/claim/:net?', function(req, res) {
+router.get('/claim{/:net}', function(req, res) {
   route_get_claim_form(req, res, '')
 })
 
-router.get('/claim/:hash/:net?', function(req, res) {
+router.get('/claim/:hash{/:net}', function(req, res) {
   route_get_claim_form(req, res, req.params.hash)
 })
 
-router.get('/address/:hash/:net?', function(req, res) {
+router.get('/address/:hash{/:net}', function(req, res) {
   route_get_address(req, res, req.params.hash)
 })
 
-router.post('/search/:net?', function(req, res) {
+router.post('/search{/:net}', function(req, res) {
   const net = req.params['net']
   const shared_pages = settings.get(net, 'shared_pages')
   if (shared_pages.page_header.search.enabled == true) {
@@ -765,7 +765,7 @@ router.post('/search/:net?', function(req, res) {
   }
 })
 
-router.get('/qr/:string/:net?', function(req, res) {
+router.get('/qr/:string{/:net}', function(req, res) {
   if (req.params.string) {
     var address = qr.image(req.params.string, {
       type: 'png',
@@ -836,14 +836,6 @@ function assetsParam(req, pageKey, page, net, db, settings, prefix) {
   const r = param(pageKey, page, req, db, settings, prefix)
   const shared_pages = settings.get(net, 'shared_pages')
   r.assets_page = settings.get(net, 'assets_page')
-
-  // r.tx = tx
-  // r.confirmations = shared_pages.confirmations
-  // r.blockcount = height
-  // r.transaction_page = settings.get(net, 'transaction_page')
-  // r.address_page = settings.get(net, 'address_page')
-  // r.api_page = settings.get(net, 'api_page') 
-
   return r
 }
 
@@ -851,17 +843,11 @@ function assetParam(req, stats, pageKey, page, net, db, settings, asset, prefix)
   const shared_pages = settings.get(net, 'shared_pages')
   const r = param(pageKey, page, req, db, settings, prefix)
   r.asset = asset
-  // TODO: Fix asset confirmations.
-  r.confirmations = shared_pages.confirmations
   r.blockcount = stats.count
-
   if (stats)
     r.confirmations = stats.count - asset.blockindex + 1
-  // r.txs = txs
   r.asset_page = settings.get(net, 'asset_page') 
-  const tx_types = settings.get(net, 'tx_types')
-  r.tx_types = tx_types
-  // r.api_page = settings.get(net, 'api_page') 
+  r.tx_types = settings.get(net, 'tx_types')
   return r
 }
 

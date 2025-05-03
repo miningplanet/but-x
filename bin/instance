@@ -36,7 +36,7 @@ db.connection_factory(networks[0], true, settings.getDbConnectionString(networks
 })
 
 function detectPortAndLaunchServer(port) {
-  detect(port).then(function(result) {
+  detect(port).then(result => {
     console.log('Detected port %s.', result)
     if (port !== result -1) {
       console.log('Starting...')

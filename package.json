@@ -1,6 +1,6 @@
 {
   "name":                                 "but-x",
-  "version":                              "2.1.5-alpha",
+  "version":                              "3.0.0-alpha",
   "private":                              true,
   "scripts": {
     "start":                              "node --stack-size=20000 ./bin/cluster",
@@ -23,13 +23,13 @@
     "async":                              "^3.2.6",
     "bad-words":                          "^4.0.0",
     "bcrypt":                             "^5.1.1",
-    "body-parser":                        "^1.20.3",
+    "body-parser":                        "^2.2.0",
     "bufferutil":                         "^4.0.9",
     "cluster":                            "^0.7.7",
     "cookie-parser":                      "^1.4.7",
     "debug":                              "^4.4.0",
     "detect-port":                        "^1.6.1",
-    "express":                            "^4.21.2",
+    "express":                            "^5.1.0",
     "express-session":                    "^1.18.1",
     "express-ws":                         "^5.0.2",
     "jsonminify":                         "^0.4.2",

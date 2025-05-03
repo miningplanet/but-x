@@ -139,7 +139,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 /* RPC APIs by DB / cache */
 
-app.use('/api/getblockchaininfo/:net?', function(req, res) {
+app.use('/api/getblockchaininfo{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getblockchaininfo.enabled, function (stats) {
@@ -193,7 +193,7 @@ app.use('/api/getblockchaininfo/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getmininginfo/:net?', function(req, res) {
+app.use('/api/getmininginfo{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getmininginfo.enabled, function (stats) {
@@ -235,7 +235,7 @@ app.use('/api/getmininginfo/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getdifficulty/:net?', function(req, res) {
+app.use('/api/getdifficulty{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getdifficulty.enabled, function (stats) {
@@ -251,7 +251,7 @@ app.use('/api/getdifficulty/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getconnectioncount/:net?', function(req, res) {
+app.use('/api/getconnectioncount{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getconnectioncount.enabled, function (stats) {
@@ -259,7 +259,7 @@ app.use('/api/getconnectioncount/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getblockcount/:net?', function(req, res) {
+app.use('/api/getblockcount{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getblockcount.enabled, function (stats) {
@@ -267,7 +267,7 @@ app.use('/api/getblockcount/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getblockhash/:height/:net?', function(req, res) {
+app.use('/api/getblockhash/:height{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const height = req.params['height']
   const api_page = settings.get(net, 'api_page')
@@ -288,7 +288,7 @@ app.use('/api/getblockhash/:height/:net?', function(req, res) {
   }
 })
 
-app.use('/api/getblock/:hash/:net?', function(req, res) {
+app.use('/api/getblock/:hash{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const hash = req.params['hash']
   const api_page = settings.get(net, 'api_page')
@@ -307,7 +307,7 @@ app.use('/api/getblock/:hash/:net?', function(req, res) {
 
 // TODO: API: Fix getrawtransaction (comes from deamon -> nodeapi.js)
 
-// app.use('/api/getrawtransaction/:hash/:net?', function(req, res) {
+// app.use('/api/getrawtransaction/:hash{/:net}', function(req, res) {
 //   const net = settings.getNet(req.params['net'])
 //   const hash = req.params['hash']
 //   const api_page = settings.get(net, 'api_page')
@@ -325,7 +325,7 @@ app.use('/api/getblock/:hash/:net?', function(req, res) {
 //   }
 // })
 
-app.use('/api/getnetworkhashps/:net?', function(req, res) {
+app.use('/api/getnetworkhashps{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getnetworkhashps.enabled, function (stats) {
@@ -343,7 +343,7 @@ app.use('/api/getnetworkhashps/:net?', function(req, res) {
   })
 })
 
-app.use('/api/getmasternodecount/:net?', function(req, res) {
+app.use('/api/getmasternodecount{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getmasternodecount.enabled, function (stats) {
@@ -359,7 +359,7 @@ app.use('/api/getmasternodecount/:net?', function(req, res) {
 // TODO: Peers: Impl. verifymessage
 // TODO: Peers: Impl. validateaddress
 
-app.use('/api/getgovernanceinfo/:net?', function(req, res) {
+app.use('/api/getgovernanceinfo{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.rpc.getgovernanceinfo.enabled, function (stats) {
@@ -382,7 +382,7 @@ app.use('/api/getgovernanceinfo/:net?', function(req, res) {
 
 /* Asset APIs by DB / cache */
 
-app.use('/api/asset/:name/:net?', function(req, res) {
+app.use('/api/asset/:name{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const name = req.params['name'].replace('+', '/')
   const api_page = settings.get(net, 'api_page')
@@ -410,11 +410,11 @@ app.use('/api/asset/:name/:net?', function(req, res) {
   }
 })
 
-app.use('/api/assets/:net/:start?', function(req, res) {
+app.use('/api/assets/:net/{:start}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const start = req.params['start']
   
-  // req.url.split contains a list of params after ':start?', i.e. length/mintxes/sortby...
+  // req.url.split contains a list of params after '{:start}', i.e. length/mintxes/sortby...
   var split = []
   if (!isNaN(start)) {
     split = req.url.replace('/','').split('/')
@@ -463,7 +463,7 @@ app.use('/api/assets/:net/:start?', function(req, res) {
   }
 })
 
-app.use('/api/getassettxes/:name/:net/:start?', function(req, res) {
+app.use('/api/getassettxes/:name/:net/{:start}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const name = req.params['name'].replace('+', '/')
   const start = req.params['start']
@@ -537,10 +537,10 @@ function stats(res, net, api_page, fenabled, cb) {
 
 // routes
 app.use('/api', nodeapi.app);
-// app.use('/:net?', routes);
+// app.use('{/:net}', routes);
 app.use('/', routes);
 
-app.post('/register/:net?', async (req, res) => {
+app.post('/register{/:net}', async (req, res) => {
   const net = settings.getNet(req.params['net'])
   try {
     const { uuid, address, signature, pwd, repeatpwd } = req.body
@@ -621,7 +621,7 @@ app.post('/register/:net?', async (req, res) => {
   }
 })
 
-app.post('/login/:net?', async (req, res) => {
+app.post('/login{/:net}', async (req, res) => {
   const net = settings.getNet(req.params['net'])
   try {
     const { address, pwd } = req.body
@@ -669,7 +669,7 @@ app.post('/login/:net?', async (req, res) => {
 })
 
 // post method to claim an address using verifymessage functionality
-app.post('/claim/:net?', function(req, res) {
+app.post('/claim{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
 
   var message = null
@@ -709,7 +709,7 @@ app.post('/claim/:net?', function(req, res) {
 
 /* Extended APIs by DB / cache */
 
-app.use('/ext/getmoneysupply/:net?', function(req, res) {
+app.use('/ext/getmoneysupply{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   stats(res, net, api_page, api_page.public_apis.ext.getmoneysupply.enabled, function (stats) {
@@ -718,7 +718,7 @@ app.use('/ext/getmoneysupply/:net?', function(req, res) {
   return -1
 })
 
-app.use('/ext/getaddress/:hash/:net?', function(req, res) {
+app.use('/ext/getaddress/:hash{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -775,7 +775,7 @@ app.use('/ext/getaddress/:hash/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/gettx/:txid/:net?', function(req, res) {
+app.use('/ext/gettx/:txid{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -795,7 +795,7 @@ app.use('/ext/gettx/:txid/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getbalance/:hash/:net?', function(req, res) {
+app.use('/ext/getbalance/:hash{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbalance.enabled == true) {
@@ -813,7 +813,7 @@ app.use('/ext/getbalance/:hash/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getdistribution/:net?', function(req, res) {
+app.use('/ext/getdistribution{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getdistribution.enabled == true) {
@@ -831,7 +831,7 @@ app.use('/ext/getdistribution/:net?', function(req, res) {
   }
 })
 
-app.use('/ext/getcurrentprice/:net?', function(req, res) {
+app.use('/ext/getcurrentprice{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getcurrentprice.enabled == true) {
@@ -872,7 +872,7 @@ function ratesPush(rates, currencies, item, price) {
   })
 }
 
-app.use('/ext/getbasicstats/:net?', function(req, res) {
+app.use('/ext/getbasicstats{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getbasicstats.enabled == true) {
@@ -910,7 +910,7 @@ app.use('/ext/getbasicstats/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getticker/:mode/:net?', function(req, res) {
+app.use('/ext/getticker/:mode{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -987,7 +987,7 @@ app.use('/ext/getticker/:mode/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getmarkets/:mode/:net?', function(req, res) {
+app.use('/ext/getmarkets/:mode{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.ext.getmarkets.enabled == true) {
@@ -1032,7 +1032,7 @@ function isInternalRequest(req) {
     && req.headers.accept.indexOf('application/json') > -1
 }
 
-app.use('/ext/getlasttxs/:net/:param?', function(req, res) {
+app.use('/ext/getlasttxs/:net/{:param}', function(req, res) {
   // TODO: Cache: Latest tx.
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
@@ -1138,7 +1138,7 @@ app.use('/ext/getaddresstxs/:address/:net/:start/:length', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getsummary/:net?', function(req, res) {
+app.use('/ext/getsummary{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getsummary.enabled == true) || isInternalRequest(req)) {
@@ -1189,7 +1189,7 @@ app.use('/ext/getsummary/:net?', function(req, res) {
     res.end(METHOD_DISABLED)
 })
 
-app.use('/ext/getnetworkpeers/:net?', function(req, res) {
+app.use('/ext/getnetworkpeers{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if ((api_page.enabled == true && api_page.public_apis.ext.getnetworkpeers.enabled == true) || isInternalRequest(req)) {
@@ -1229,7 +1229,7 @@ app.use('/ext/getnetworkpeers/:net?', function(req, res) {
 });
 
 // get the list of masternodes from local collection
-app.use('/ext/getmasternodelist/:net?', function(req, res) {
+app.use('/ext/getmasternodelist{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -1249,7 +1249,7 @@ app.use('/ext/getmasternodelist/:net?', function(req, res) {
 })
 
 // returns a list of masternode reward txs for a single masternode address from a specific block height
-app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
+app.use('/ext/getmasternoderewards/:hash/:since{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   // check if the getmasternoderewards api is enabled
@@ -1277,7 +1277,7 @@ app.use('/ext/getmasternoderewards/:hash/:since/:net?', function(req, res) {
 });
 
 // returns the total masternode rewards received for a single masternode address from a specific block height
-app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) {
+app.use('/ext/getmasternoderewardstotal/:hash/:since{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -1293,7 +1293,7 @@ app.use('/ext/getmasternoderewardstotal/:hash/:since/:net?', function(req, res) 
     res.end(METHOD_DISABLED)
 });
 
-app.use('/ext/getnetworkchartdata/:net?', function(req, res) {
+app.use('/ext/getnetworkchartdata{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   db.get_network_chart_data(function(data) {
     if (data) {
@@ -1309,7 +1309,7 @@ const allnet_modes = ['markets']
 
 /* Net APIs by DB / cache */
 
-app.use('/net/getallnet/:mode?', function(req, res) {
+app.use('/net/getallnet/{:mode}', function(req, res) {
   const net = settings.getDefaultNet()
   const mode = req.params['mode']
   const api_page = settings.get(net, 'api_page')
@@ -1334,7 +1334,7 @@ app.use('/net/getallnet/:mode?', function(req, res) {
 })
 
 // peer connector API
-app.use('/peers/getpeers/:net?', function(req, res) {
+app.use('/peers/getpeers{/:net}', function(req, res) {
   const net = settings.getNet(req.params['net'])
   const api_page = settings.get(net, 'api_page')
   if (api_page.enabled == true && api_page.public_apis.peers.getpeers.enabled == true) {
@@ -1375,7 +1375,7 @@ function isPeerUpstreamAllowed(net) {
   return api_page.enabled == true && api_page.public_apis.peers.subscribe_upstream.enabled == true && db && db.peers.enabled == true && db.peers.mode == 'upstream'
 }
 
-app.ws('/peers/subscribe/upstream/:net?', function(ws, req) {
+app.ws('/peers/subscribe/upstream{/:net}', function(ws, req) {
   const net = req.params['net']
   const ip = settings.getRemoteIp(req)
 

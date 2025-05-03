@@ -31,7 +31,7 @@ block content
       .card-header
         strong=settings.locale.tx_hash + ': ' + tx.txid
         if api_page.public_apis.rpc.getrawtransaction.enabled == true
-          a.d-none.d-md-inline(href=`/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1`, style='color: var(--bs-body-color);')
+          a.d-none.d-md-inline(href='/api/getrawtransaction/#{net}?txid=${tx.txid}&decrypt=1', style='color: var(--bs-body-color);')
             span.fa.fa-info-circle.float-end(data-bs-toggle='tooltip', data-bs-placement='top', title=settings.locale.view_raw_tx_data)
       - const tx_types = settings.get(net, 'tx_types')
       table#tx-table.table.table-bordered.summary-table.mobile-border-right
