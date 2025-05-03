@@ -43,8 +43,8 @@ const assetsCache         = new TTLCache({ max: cache.assets.size,        ttl: 1
 const assetCache          = new TTLCache({ max: cache.asset.size,         ttl: 1000 * cache.asset.ttl,          updateAgeOnGet: false, noUpdateTTL: false })
 const assetTxCache        = new TTLCache({ max: cache.assetTx.size,       ttl: 1000 * cache.assetTx.ttl,        updateAgeOnGet: false, noUpdateTTL: false })
 
-const METHOD_DISABLED = 'This method is disabled'
-const BLOCK_NOT_FOUND = 'Block not found'
+const METHOD_DISABLED = 'This method is disabled.'
+const BLOCK_NOT_FOUND = 'Block not found.'
 const BLOCK_HEIGHT_MUST_BE_A_NUMBER = 'Block height must be a number.'
 
 // Pass wallet rpc connections info to nodeapi.
@@ -99,7 +99,7 @@ Object.keys(settings.blockchain_specific).forEach(function(key, index, map) {
   }
 })
 // Whitelist the cmds in the nodeapi access list.
-nodeapi.setAccess('only', apiAccessList)
+nodeapi.setAccess('read-only', apiAccessList) // only
 
 // Determine if cors should be enabled.
 if (settings.webserver.cors.enabled == true) {
@@ -297,7 +297,7 @@ app.use('/api/getblock/:hash{/:net}', function(req, res) {
       if (block) {
         res.send(block)
       } else {
-        res.end("Block not found")
+        res.end(BLOCK_NOT_FOUND)
       }
     }, net)
   } else {
