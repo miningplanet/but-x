@@ -186,7 +186,7 @@
     // Valid options are: POW, POS or Hybrid.
     "difficulty": "POS",
     // Show network hash rate.
-    // TODO: Check. If false, the /api/getnetworkhashps and /ext/getsummary endpoints will no longer 
+    // If false, the /api/getnetworkhashps and /ext/getsummary endpoints will no longer 
     // return the hash rate, and the network hashrate chart will automatically be disabled.
     "show_hashrate": true,
     "page_header": {
