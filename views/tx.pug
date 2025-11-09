@@ -43,7 +43,9 @@ block content
           if tx.tx_type != null
             tr
               td.d-md-table-cell #{settings.locale.tx_type}
-              td.breakWord #{tx.tx_type} - #{tx_types[tx.tx_type].replace('TRANSACTION_', '')}
+              td.breakWord 
+                #{tx.tx_type}  #{tx_types[tx.tx_type].replace('TRANSACTION_', '')}  
+                img(src="/img/" + net + "-tx-" + tx_types[tx.tx_type].replace('TRANSACTION_', '') + ".png", class="tx-icon")
           if tx.version != null
             tr
               td.d-md-table-cell #{settings.locale.tx_version}
@@ -55,7 +57,7 @@ block content
           if !isNaN(tx.size)
             tr
               td.d-md-table-cell #{settings.locale.tx_size}
-              td.breakWord #{tx.size}
+              td.breakWord #{tx.size ? settings.formatDecimal(tx.size / 1024, 2, 2) + ' KB' : 'n/a'}
           if transaction_page.show_op_return == true && tx.op_return
             tr
               td.d-md-table-cell='OP_RETURN'

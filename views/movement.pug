@@ -41,12 +41,12 @@ block content
           const blockString = formatShortId(data[0].blockhash, 6, 6)
 
           var html = '<div class="tx-line">'
+          html += '<img src="/img/#{net}-tx-' + txType + '.png" class="tx-icon" title="TX_' + txType + '"/>'
           html += '<strong class="tx-title"><a href="/tx/' + txid + '/#{net}">Transaction #{coin.symbol} (height ' + height + ')</a></strong>'
           html += '<br><p><small>'
           html += '<a href="/tx/' + txid + '/#{net}">Tx-ID:&nbsp;' + txidString + '</a>'
           html += ' · <a href="/block/' + data[0].blockhash + '/#{net}">Block:&nbsp;' + blockString + '</a>'
           html += ' · Time:&nbsp;' + timestamp
-          html += ' · Tx-Type:&nbsp;' + txType
           html += ' · Send./Rec.:&nbsp' + sendRec
           html += '</small></p>'
           html += '<div class="tx-value"><b>' + amount + '</b></div>'

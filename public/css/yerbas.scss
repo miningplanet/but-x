@@ -1,0 +1,263 @@
+/* Add custom css rules here */
+:root {
+    --bs-body-bg: #000;
+    --but: #00ee43;
+    --but2: #889988;                            /* a */
+    --bg0: #000;                                /* header, footer, borders */
+    --bg1: #08022a;                             /* Unused */
+    --bg2: #040116;                             /* Unused */
+    --fg: red;                                  /* Unused */
+    --fgt: #bcb;                                /* Unused */
+    --fgt2: #889988;                            /* h?, elements, form border, chart border */
+    --alert-success-bg: transaprent;
+    --alert-warning-bg: transaprent;
+    --alert-animation: none;
+    --alert-color: red;
+    --alert-danger: green;
+    --pos: #0b0;
+    --neg: #f32;
+    --title-shadow: 0.2rem 0.2rem 0.1rem #000;
+    --panel-border: none;
+    --width-col-entity: 20px;
+    --xs-width-col-country: 30px;
+    --xs-2-col-label-width: 45%;
+    --xs-2-col-label-width-min: 166px;
+
+    --bs-table-hover-color: #889988;
+    --bs-table-striped-color: #889988;
+    --bs-table-active-color: #889988;
+    --bs-table-hover-color: #889988;
+}
+
+body {
+    font-size: 14px;
+    font-family: "Lato", -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", Helvetica, Arial, sans-serif  !important;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "liga", "tnum", "case", "calt", "zero", "ss01", "locl";
+    /* color: var(--fgt) */
+}
+
+table.table > tbody {
+    color: #889988 !important;
+}
+
+/* TX Index */
+
+div.tx-line {
+    background: #233;
+    background-image: linear-gradient(to right, #211, #233);
+    border: solid 1px #333;
+    border-radius: 5px;
+    padding-left: 0.5%;
+    padding-right: 0.25%;
+}
+
+img.tx-icon {
+    margin-top: 0.1vh;
+    height: 32px;
+    float: right;
+    filter: hue-rotate(90deg);
+}
+
+strong.tx-title {
+    border-bottom: 1px solid; 
+    border-image: linear-gradient(to right, #2a9e58 0%, #111 100%) 1;
+}
+
+div.tx-line p {
+    line-height: 1.1;
+}
+
+div.tx-value {
+    display: block; 
+    width: 80px; 
+    position: relative; 
+    margin-top: -20px; 
+    margin-left: auto; 
+    margin-right: 6px; 
+    margin-bottom: 0px; 
+    text-align: right;
+}
+
+td.tdwrap {
+    white-space: normal !important;
+}
+
+thead {
+    color: #99aa99 !important;
+}
+.dataTables_wrapper label, .dataTables_info {
+    color: #889988 !important;
+}
+
+/* Assets. */
+
+strong.assettx-title {
+    background-image: linear-gradient(to right, #222, #000); height: 15px; 
+    border-bottom: 1px solid #555
+}
+
+a.address, a.tx {
+    font-family: monospace, monospace !important;
+}
+
+div.assettx-vout {
+    background: #222;
+    background-image: linear-gradient(to right, #233, #222);
+    border: solid 1px #333;
+    border-radius: 5px;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+    margin-bottom: 4px;
+}
+
+div.assettx-vin {
+    background: #233;
+    background-image: linear-gradient(to right, #222, #233);
+    border: solid 1px #333;
+    border-radius: 5px;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+}
+
+span.assettx-addr {
+    display: inline-block; 
+    width: 74%; 
+    margin-left: 0px
+}
+
+span.assettx-amount {
+    display: inline-block; 
+    text-align: right; 
+    width: 26%; 
+    margin-left: auto; 
+    margin-right: 0px
+}
+
+img#panel-img, img#header-img {
+    filter: drop-shadow(0px 0px 3px red);
+}
+
+div#main-header {
+    background-color: #4f7942 !important;
+    color: black !important;
+}
+
+.navbar, .navbar a, .navbar-nav, .nav-item, .nav-item span, #search-header-button span, #navbar-toggler-txt {
+    background-color: #4f7942 !important;
+    color: black !important;
+}
+
+div.navbar-expand-lg {
+    border-bottom: solid 2px #fff;
+}
+
+.container .nav-tabs .nav-item {
+    background-color: transparent !important;
+}
+
+label#spnMasternodeCountOnline strong {
+    font-size: 20px !important;
+}
+
+div#masternodepanel {
+    margin-top: -8px;
+}
+
+footer {
+    background-image: linear-gradient(#222, #000);
+    border-top: solid 2px #1f4912;
+}
+
+div#copy p small {
+    font-size: 15px !important;
+}
+
+div#recent-table_wrapper, div#info-table_wrapper, div#movement-table_wrapper, div#masternodes-table_wrapper, 
+div#connections, div#addnodes, div#balance, div#received, div#balance, div#toptx, div.card-address-summary, 
+div#address-txs_wrapper, div#block_info_wrapper, div#block-txs-wrapper, div#tx_info_wrapper, div#tx_type_wrapper, 
+div#tx_recipients_wrapper, div#exchange_overview, div#exchange-table-wrapper, div#market_history_wrapper, 
+div#market_offers_wrapper {
+    background: #111 !important;
+    border: 2px solid #222 !important;
+    border-radius: 10px !important;
+}
+
+div#info-table_wrapper {
+    padding: 0 1vw !important;
+}
+
+div#tx_recipients_wrapper {
+    --bs-gutter-x: 0 !important;
+}
+
+ul.nav-tabs, li.nav-item {
+    background: transparent !important;
+    
+}
+
+li.nav-item a.nav-link {
+    padding: .2rem 1rem;
+}
+
+#your_ip {
+    color: #400 !important;
+}
+
+label select {
+    padding: 1px !important;
+}
+
+#info-table_wrapper hr {
+    margin: 0;
+}
+
+td span.address, td span.ipfs {
+    font-family: monospace !important;
+}
+
+@keyframes blink-animation { to { visibility: hidden; } }
+@-webkit-keyframes blink-animation { to { visibility: hidden; } }
+
+/* Responsivnes */
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (max-width: 575px) {
+}
+@media only screen and (min-width: 605px) {
+}
+@media only screen and (min-width: 695px) {
+}
+@media only screen and (min-width: 576px) and (max-width: 991px) {
+}
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (max-width: 768px) {
+}
+/* Large devices (desktop, 992px and up) */
+@media only screen and (max-width: 991px) {
+    div#cockpit div.col-lg-2 {
+        width: auto !important;
+    }
+}
+/* Large devices (desktop, 992px and up) */
+@media only screen and (min-width: 992px) {
+    ul.navbar-nav {
+        margin-top: 4px !important;
+    }
+    #your_ip {
+        padding-top: 3px !important;
+    }
+    div#cockpit div.col-lg-2 {
+        width: 16.666667% !important;
+    }
+}
+
+div#cockpit div.col-lg-2 {
+    width: auto;
+}
+
+/* tx */ 
+table#tx-table img.tx-icon {
+    float: none;
+    height: 24px;
+}
