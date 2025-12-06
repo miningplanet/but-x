@@ -106,7 +106,8 @@ block content
                     if (count_tx_by_type)
                       each txtype in count_tx_by_type
                         if index == txtype._id
-                          span(style='margin-left: 0') #{settings.formatInt(txtype.count)}
+                          span(style='margin-left: 0') #{isNaN(txtype.count) ? 0 : settings.formatInt(txtype.count)}
+                          img(src="/img/" + net + "-tx-" + tx_type.replace('TRANSACTION_', '') + ".png", class="tx-icon")
             if info.show_masternode_info == true
               tr
                 td.text-start 
