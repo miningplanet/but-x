@@ -109,16 +109,16 @@ util.init_db(net, function(status) {
             if (debug.enabled)
               debug("Got mining info from DB for net '%s': %o", net, ms)
 
-            r.hashps = !isNaN(ms.networkhashps) ? ms.networkhashps : -1
+            stats.hashps = !isNaN(ms.networkhashps) ? ms.networkhashps : -1
             algos.forEach((algo) => {
               if (!isNaN(ms['nethash_' + algo.algo]))
-                r['nethash_' + algo.algo] = ms['nethash_' + algo.algo]
+                stats['nethash_' + algo.algo] = ms['nethash_' + algo.algo]
             })
 
-            r.difficulty = !isNaN(ms.difficulty) ? ms.difficulty : -1
+            stats.difficulty = !isNaN(ms.difficulty) ? ms.difficulty : -1
             algos.forEach((algo) => {
               if (!isNaN(ms['difficulty_' + algo.algo]))
-                r['difficulty_' + algo.algo] = ms['difficulty_' + algo.algo]
+                stats['difficulty_' + algo.algo] = ms['difficulty_' + algo.algo]
             })
 
             db.lib.get_txoutsetinfo(net, function (txout) {

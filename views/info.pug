@@ -213,10 +213,12 @@ block content
                   tr
                     - const obj = count_blocks_by_algorithm.find((e) => e._id === algo.algo)
                     - const blocks = obj ? obj.count : -1
+                    - const nethash_decimals = shared_pages.page_header.network_charts.nethash_chart.round_decimals
+                    - const diff_decimals = shared_pages.page_header.network_charts.difficulty_chart.round_decimals
                     td.text-start #{algo.label}
                     td.text-center #{algo.type.toUpperCase()}
-                    td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], 0, 0)}
-                    td.text-end #{settings.formatDecimal(stats['difficulty_' + algo.algo], 5, 5)}
+                    td.text-end #{settings.formatDecimal(stats['nethash_' + algo.algo], nethash_decimals, nethash_decimals)}
+                    td.text-end #{settings.formatDecimal(stats['difficulty_' + algo.algo], diff_decimals, diff_decimals)}
                     td.text-end #{settings.formatInt(blocks)}
                     td.text-end #{settings.formatDecimal(blocks / stats.count * 100, 2, 2)}
         //- if info.show_sporks == true

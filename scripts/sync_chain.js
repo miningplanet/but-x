@@ -177,11 +177,9 @@ function update_network_history_db(coin, height, cb, net) {
               difficulty_lyra2: difficulties.difficulty_lyra2,
               difficulty_sha256d: difficulties.difficulty_sha256d,
               difficulty_scrypt: difficulties.difficulty_scrypt,
-              nethash_ghostrider: hashps.ghostrider,
-              nethash_yespower: hashps.yespower,
-              nethash_lyra2: hashps.lyra2,
-              nethash_sha256d: hashps.sha256d,
-              nethash_scrypt: hashps.scrypt
+              nethash_ghostrider: hashps['nethash_ghostrider'],
+              nethash_sha256d: hashps['nethash_sha256d'],
+              nethash_scrypt: hashps['nethash_scrypt']
             })
           } else if (isPepew) {
             dto = db.NetworkHistoryDb[net].create({

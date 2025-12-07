@@ -407,25 +407,25 @@ html(lang='en')
                               }
 
                               if (context.dataset.label == 'Ghostrider') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' KH/s';
                               } else if (context.dataset.label == 'Yespower') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' MH/s';
                               } else if (context.dataset.label == 'Lyra2') {
-                                const n = formatDecimal(Number((context.raw *1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw *1000 || 0)), val, val)
                                 return n + ' KH/s'
                               } if (context.dataset.label == 'Sha256d') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' MH/s'
                               } else if (context.dataset.label == 'Scrypt') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' KH/s'
                               } else if (context.dataset.label == 'MemeHash') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' KH/s'
                               } else if (context.dataset.label == 'Mike') {
-                                const n = formatDecimal(Number((context.raw * 1000 || 0)), 0, 0)
+                                const n = formatDecimal(Number((context.raw * 1000 || 0)), val, val)
                                 return n + ' KH/s'
                               }
                             }
@@ -589,22 +589,11 @@ html(lang='en')
                           displayColors: true,
                           callbacks: {
                             title: function(context) {
-                              return 'Block ' + context[0].label + ' Difficulty';
+                              return 'Block ' + context[0].label + ' Difficulty'
                             },
                             label: function(context) {
-                              var val = #{shared_pages.page_header.network_charts.difficulty_chart.round_decimals};
-                              var max = 20;
-
-                              if (val != -1)
-                                max = val;
-                              else {
-                                let decimalCount = countDecimals(context.raw || 0);
-
-                                if (decimalCount < max)
-                                  max = decimalCount;
-                              }
-
-                              return formatDecimal(Number((context.raw || 0)), 0, max)
+                              const n = #{shared_pages.page_header.network_charts.difficulty_chart.round_decimals}
+                              return formatDecimal(context.raw, n, n)
                             }
                           }
                         },

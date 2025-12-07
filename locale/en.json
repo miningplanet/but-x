@@ -256,7 +256,7 @@
 
   "info_mining_th_algorithm": "Algorithm",
   "info_mining_th_type": "Type",
-  "info_mining_th_hash_ps": "Hash / s.",
+  "info_mining_th_hash_ps": "MH / s.",
   "info_mining_th_difficulty": "Difficulty",
   "info_mining_th_blocks": "Blocks",
   "info_mining_th_percent": "%",
