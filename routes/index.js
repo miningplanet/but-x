@@ -130,14 +130,7 @@ function route_get_tx(req, res, txid) {
   } else {
     db.get_tx(txid, function(tx) {
       if (tx) {
-        // TODO: yerbas: Add assets to vin. Could be solved with the yerbas-cli.
-        if (net == 'yerbas') {
-          for (i = 0; i < tx.vin.length; i++) {
-            if (tx.vin[i]) {
-              console.log("TXVIN: %O", tx.vin)
-            }
-          }
-        }
+
         db.get_stats(coin.name, function(stats) {
           // TODO: yerbas: tx type
           if (tx.tx_type == 8 || tx.tx_type == 9) {
