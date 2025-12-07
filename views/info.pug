@@ -104,10 +104,15 @@ block content
                     span(style='margin-left: 0') #{'·' + tx_type.replace('TRANSACTION_', '')}
                   td.text-end
                     if (count_tx_by_type)
+                      - var found = false
                       each txtype in count_tx_by_type
                         if index == txtype._id
                           span(style='margin-left: 0') #{isNaN(txtype.count) ? 0 : settings.formatInt(txtype.count)}
                           img(src="/img/" + net + "-tx-" + tx_type.replace('TRANSACTION_', '') + ".png", class="tx-icon")
+                          - found = true
+                      if !found
+                        span '0'
+                        img(src="/img/" + net + "-tx-" + tx_type.replace('TRANSACTION_', '') + ".png", class="tx-icon")
             if info.show_masternode_info == true
               tr
                 td.text-start 
