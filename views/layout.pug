@@ -80,40 +80,34 @@ html(lang='en')
       function undefinedOrFalse(i) {
         return typeof i === 'undefined' || i == null || i == false;
       }
-      function hashonlycpu() {
-        const newState = undefinedOrFalse( nethashChart.data.datasets[0].hidden) || undefinedOrFalse( nethashChart.data.datasets[1].hidden);
-        nethashChart.data.datasets[0].hidden = newState;
-        nethashChart.data.datasets[1].hidden = newState;
+      function togglehashcpu() {
+        const state = undefinedOrFalse(nethashChart.data.datasets[0].hidden);
+        nethashChart.data.datasets[0].hidden = state;
         nethashChart.update();
       }
-      function hashonlygpu() {
-        const newState = undefinedOrFalse( nethashChart.data.datasets[2].hidden);
-        nethashChart.data.datasets[2].hidden = newState;
+      function togglehashgpu() {
+        const state = undefinedOrFalse(nethashChart.data.datasets[2].hidden);
+        nethashChart.data.datasets[2].hidden = state;
         nethashChart.update();
       }
-      function hashonlyasic() {
-        const newState = undefinedOrFalse( nethashChart.data.datasets[3].hidden) || undefinedOrFalse( nethashChart.data.datasets[4].hidden) || undefinedOrFalse( nethashChart.data.datasets[5].hidden);
-        nethashChart.data.datasets[3].hidden = newState;
-        nethashChart.data.datasets[4].hidden = newState;
-        nethashChart.data.datasets[5].hidden = newState;
+      function togglehashasic() {
+        const state = undefinedOrFalse(nethashChart.data.datasets[1].hidden);
+        nethashChart.data.datasets[1].hidden = state;
         nethashChart.update();
       }
-      function diffonlycpu() {
-        const newState = undefinedOrFalse( difficultyChart.data.datasets[0].hidden) || undefinedOrFalse( difficultyChart.data.datasets[1].hidden);
-        difficultyChart.data.datasets[0].hidden = newState;
-        difficultyChart.data.datasets[1].hidden = newState;
+      function togglediffcpu() {
+        const state = undefinedOrFalse(difficultyChart.data.datasets[0].hidden);
+        difficultyChart.data.datasets[0].hidden = state;
         difficultyChart.update();
       }
-      function diffonlygpu() {
-        const newState = undefinedOrFalse( difficultyChart.data.datasets[2].hidden);
-        difficultyChart.data.datasets[2].hidden = newState;
+      function togglediffgpu() {
+        const state = undefinedOrFalse(difficultyChart.data.datasets[2].hidden);
+        difficultyChart.data.datasets[2].hidden = state;
         difficultyChart.update();
       }
-      function diffonlyasic() {
-        const newState = undefinedOrFalse( difficultyChart.data.datasets[3].hidden) || undefinedOrFalse( difficultyChart.data.datasets[4].hidden) || undefinedOrFalse( difficultyChart.data.datasets[5].hidden);
-        difficultyChart.data.datasets[3].hidden = newState;
-        difficultyChart.data.datasets[4].hidden = newState;
-        difficultyChart.data.datasets[5].hidden = newState;
+      function togglediffasic() {
+        const state = undefinedOrFalse(difficultyChart.data.datasets[1].hidden);
+        difficultyChart.data.datasets[1].hidden = state;
         difficultyChart.update();
       }
       function getParameterByName(name, url = window.location.href) {
@@ -1377,9 +1371,9 @@ html(lang='en')
                         canvas#nethashChart(style='max-height:300px;')
                       if isMultiAlgo
                         .card-footer(id='hashChartFooter')
-                          button(onclick='hashonlycpu()') CPU
-                          button(onclick='hashonlygpu()') GPU
-                          button(onclick='hashonlyasic()') ASIC
+                          button(onclick='togglehashcpu()') CPU
+                          button(onclick='togglehashgpu()') GPU
+                          button(onclick="togglehashasic()") ASIC
                 if showDifficultyChart == true && difficulty_enabled == true
                   div#difficultyChartParent(class=chartColumnClass, style='display:none;margin:10px 0;')
                     .card.card-default.border-0
@@ -1389,9 +1383,9 @@ html(lang='en')
                         canvas#difficultyChart(style='max-height:300px;')
                       if isMultiAlgo
                         .card-footer(id="difficultyChartFooter")
-                          button(onclick='diffonlycpu()') CPU
-                          button(onclick='diffonlygpu()') GPU
-                          button(onclick='diffonlyasic()') ASIC
+                          button(onclick='togglediffcpu()') CPU
+                          button(onclick='togglediffgpu()') GPU
+                          button(onclick='togglediffasic()') ASIC
           if shared_pages.page_header.network_charts.align == 'top'
             block content
           if showPanels == true && showPanelsPosition == 'bottom'
