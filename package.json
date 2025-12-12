@@ -1,6 +1,6 @@
 {
   "name": "but-x",
-  "version": "3.1.1-alpha",
+  "version": "3.1.2-alpha",
   "private": true,
   "scripts": {
     "start": "node --stack-size=20000 ./bin/cluster",
@@ -38,10 +38,10 @@
     "mongodb": "^6.21.0",
     "mongoose": "^8.20.2",
     "morgan": "^1.10.1",
-    "postman-request": "^2.88.1-postman.46",
+    "postman-request": "^2.88.1-postman.47",
     "pug": "^3.0.3",
     "qr-image": "^3.2.0",
-    "sass": "^1.94.2",
+    "sass": "^1.96.0",
     "serve-favicon": "^2.5.1",
     "serve-static": "^1.16.2",
     "ws": "^8.18.3"
