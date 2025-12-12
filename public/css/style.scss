@@ -2043,8 +2043,13 @@ div#market_offers_wrapper {
   margin-bottom: 12px;
   --bs-gutter-x: 0px !important;
 }
+
 div#market_history_wrapper {
   --bs-gutter-x: 0px !important;
+}
+
+ul.apilist {
+  padding-left: 0.75rem !important;
 }
 
 /* Responsivnes */

@@ -68,7 +68,7 @@ block content
 
           var vin_sum = 0
           var vin_cnt = 0
-          html += '<br><div class="assettx-vin"><b>TxIn</b>'
+          html += '<div class="assettx-vin"><b>TxIn</b>'
           for (v of data[0].vin) {
             if (v.scriptPubKey && v.addresses && v.scriptPubKey.asset && v.scriptPubKey.asset.amount && !isNaN(v.scriptPubKey.asset.amount)) {
               vin_sum += v.scriptPubKey.asset.amount

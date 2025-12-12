@@ -36,8 +36,6 @@ block content
               .sub-page-header.text-muted=settings.locale.api_description.replace('{1}', coin.name)
       .cardSpacer.clearfix
     .card.card-default.border-0
-      .card-header
-        strong #{settings.locale.api_documentation}
       .card-body
         if api_page.show_logo == true
           img(src=settings.getWallet(net).logo_title, style='margin:0;height:128px;')
@@ -45,8 +43,8 @@ block content
         if !api_page.public_apis.hide_rpc_api_section
           h3 #{settings.locale.api_calls}
           p
-            em Return data from coind
-          ul
+            em Return data from coind.
+          ul(class='apilist')
             if getblockchaininfo
               li
                 p
@@ -275,8 +273,8 @@ block content
         if !api_page.public_apis.hide_ext_api_section
           h3 Extended API
           p
-            em Return data from local indexes
-          ul
+            em Return data from local indexes.
+          ul(style='padding-left: 0.75rem;')
             if api_page.public_apis.ext.getmoneysupply.enabled == true
               li
                 p
@@ -463,44 +461,39 @@ block content
           hr
         if !api_page.public_apis.hide_asset_api_section
           h3 Asset API
-          if api_page.public_apis.db.asset.enabled == true
-            li
-              p
-                div.fw-bold asset [name] [net]
-                div
-                  em Returns all data about an asset.
-                if !isMainnet
-                  a(href='/api/asset/' + api_page.sample_data.asset + '/' + net) #{address}/api/asset/#{api_page.sample_data.asset}/#{net}
-                else
-                  a(href='/api/asset/' + api_page.sample_data.asset) #{address}/api/asset/#{api_page.sample_data.asset}
-          if api_page.public_apis.db.assets.enabled == true
-            li
-              p
-                div.fw-bold assets [net] [start] [length]
-                div
-                  em Returns a list of all assets on the blockchain.
-                a(href='/api/assets/' + net + '/0/10') #{address}/api/assets/#{net}/0/10
-                //- if !isMainnet
-                //-   a(href='/api/assets/' + net + '/0/10') #{address}/api/assets/#{net}/0/10
-                //- else
-                //-   a(href='/api/assets') #{address}/api/assets
-          if api_page.public_apis.db.getassettxes.enabled == true
-            li
-              p
-                div.fw-bold getassettxes [name] [net] [start] [length]
-                div
-                  em Returns a list of all transactions for an asset on the blockchain.
-                a(href='/api/getassettxes/' + api_page.sample_data.asset + '/' + net + '/0/10') #{address}/api/getassettxes/#{api_page.sample_data.asset}/#{net}/0/10
-                //- if !isMainnet
-                //-   a(href='/api/assets/' + net) #{address}/api/assets/#{net}
-                //- else
-                //-   a(href='/api/assets') #{address}/api/assets
+          p
+            em Return asset data.
+          ul(class='apilist')
+            if api_page.public_apis.db.asset.enabled == true
+              li
+                p
+                  div.fw-bold asset [name] [net]
+                  div
+                    em Returns all data about an asset.
+                  if !isMainnet
+                    a(href='/api/asset/' + api_page.sample_data.asset + '/' + net) #{address}/api/asset/#{api_page.sample_data.asset}/#{net}
+                  else
+                    a(href='/api/asset/' + api_page.sample_data.asset) #{address}/api/asset/#{api_page.sample_data.asset}
+            if api_page.public_apis.db.assets.enabled == true
+              li
+                p
+                  div.fw-bold assets [net] [start] [length]
+                  div
+                    em Returns a list of all assets on the blockchain.
+                  a(href='/api/assets/' + net + '/0/10') #{address}/api/assets/#{net}/0/10
+            if api_page.public_apis.db.getassettxes.enabled == true
+              li
+                p
+                  div.fw-bold getassettxes [name] [net] [start] [length]
+                  div
+                    em Returns a list of all transactions for an asset on the blockchain.
+                  a(href='/api/getassettxes/' + api_page.sample_data.asset + '/' + net + '/0/10') #{address}/api/getassettxes/#{api_page.sample_data.asset}/#{net}/0/10
           hr
         if !api_page.public_apis.hide_net_api_section
           h3 Net API
           p
             em Data accross all chains.
-          ul
+          ul(class='apilist')
             if api_page.public_apis.net.getallnet.enabled == true
               li
                 p
@@ -513,7 +506,7 @@ block content
           h3 Peers API (restricted)
           p
             em X P2P layer.
-          ul
+          ul(class='apilist')
             if api_page.public_apis.peers.getpeers.enabled == true
               li
                 p
@@ -558,7 +551,7 @@ block content
           h3 Linking (GET)
           p
             em Linking to X
-          ul
+          ul(class='apilist')
             li
               p
                 div.fw-bold transaction (/tx/txid)
