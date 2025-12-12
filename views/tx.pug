@@ -301,11 +301,17 @@ block content
                         td.addresscol
                           if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
                             a.breakWord(href='/address/' + address.addresses + '/' + net)
-                              if address.claim_name == null || address.claim_name == ''
-                                =address.addresses
+                              =address.addresses
+                              if address.claim_name && address.claim_name != ''
+                                br
+                                small(class="alabel")
+                                  ='[' + address.claim_name + ']'
                               else
-                                =address.claim_name
-                            include ./includes/rl_labels.pug
+                                - const label = settings.labels[address.addresses]
+                                if label && label.enabled
+                                  br
+                                  small(class="alabel")
+                                    ='[' + label.label + ']'
                           else if address.addresses == 'hidden_address'
                             if address_page.enable_hidden_address_view == true
                               a.breakWord(href='/address/hidden_address/' + net)
@@ -350,11 +356,17 @@ block content
                       if address.addresses != 'hidden_address' && address.addresses != 'unknown_address'
                         td.addresscol
                           a.breakWord(href='/address/' + address.addresses + '/' + net)
-                            if address.claim_name == null || address.claim_name == ''
-                              =address.addresses
+                            =address.addresses
+                            if address.claim_name && address.claim_name != ''
+                              br
+                              small(class="alabel")
+                                ='[' + address.claim_name + ']'
                             else
-                              =address.claim_name
-                          include ./includes/rl_labels.pug    
+                              - const label = settings.labels[address.addresses]
+                              if label && label.enabled
+                                br
+                                small(class="alabel")
+                                  ='[' + label.label + ']'
                         if address.name
                           td.text-end
                             if address.name
@@ -402,10 +414,16 @@ block content
                     tr
                       td.addresscol
                         a.breakWord(href='/address/' + address.addresses+ '/' + net)
-                          if address.claim_name == null || address.claim_name == ''
-                            =address.addresses
+                          =address.addresses
+                          if address.claim_name && address.claim_name != ''
+                            br
+                            small(class="alabel")
+                              ='[' + address.claim_name + ']'
                           else
-                            =address.claim_name
-                        include ./includes/rl_labels.pug
+                            - const label = settings.labels[address.addresses]
+                            if label && label.enabled
+                              br
+                              small(class="alabel")
+                                ='[' + label.label + ']'
                       td.text-end #{ramountParts[0]}.
                         span.decimal #{ramountParts[1]}

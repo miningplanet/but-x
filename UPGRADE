@@ -180,7 +180,6 @@ NOTE: As of v1.100.0-bae4d50, it is no longer necessary to manually restart the 
 -Added a new setting for displaying a 'Market Cap' top panel
 -Added 16x16 logo images to markets
 -Show spinning loading icons in top panels before data is loaded
--Better reusability of rl_labels.pug
 -Added new market settings for accessing multiple markets (Turn markets header menu into a dropdown with multiple market selection and/or enable a multi-market select box on all market pages)
 -Fixed and added better tooltips where applicable
 -Wallet api security is now dynamically controlled by the new api_cmds settings

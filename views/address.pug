@@ -146,7 +146,15 @@ block content
         else
           strong #{address.name}
         | &#8203;
-        include ./includes/rl_labels.pug
+        if (address && address.name)
+          br
+          small(class="alabel") #{'[' + address.name + ']'}
+        else
+          - const label = settings.labels[address.a_id]
+          if label && label.enabled
+            br
+            small(class="alabel") #{'[' + label.label + ']'}
+
         if (!settings.labels[address.a_id] || !settings.labels[address.a_id].enabled) && claim_address_page.enabled == true
           a#claim-address.fw-bold(href='/claim/' + address.a_id, style='font-size:smaller;padding-bottom:0;')
             if address.name == null || address.name == ''

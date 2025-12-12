@@ -133,11 +133,15 @@ block content
                         td.text-center
                           =count
                         td.addresscol
-                          if claim_address_page.enabled == false || address.name == null || address.name == ''
-                            a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
+                          a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
+                          if (address && address.name)
+                            br
+                            small(class="alabel") #{'[' + address.name + ']'}
                           else
-                            a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.name}
-                          include ./includes/rl_labels.pug
+                            - const label = settings.labels[address.a_id]
+                            if label && label.enabled
+                              br
+                              small(class="alabel") #{'[' + label.label + ']'}
                         td.text-end #{itemFixedParts[0]}.
                           span.decimal #{itemFixedParts[1]}
                         td.text-end #{percentParts[0]}.
@@ -162,11 +166,15 @@ block content
                         td.text-center
                           =count
                         td.addresscol
-                          if claim_address_page.enabled == false || address.name == null || address.name == ''
-                            a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
+                          a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.a_id}
+                          if (address && address.name)
+                            br
+                            small(class="alabel") #{'[' + address.name + ']'}
                           else
-                            a.breakWord(href='/address/' + address.a_id + '/' + net) #{address.name}
-                          include ./includes/rl_labels.pug
+                            - const label = settings.labels[address.a_id]
+                            if label && label.enabled
+                              br
+                              small(class="alabel") #{'[' + label.label + ']'}
                         td.text-end #{itemFixedParts[0]}.
                           span.decimal #{itemFixedParts[1]}
           if richlist_page.show_top_tx == true
