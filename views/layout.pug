@@ -1,5 +1,6 @@
 doctype html
 html(lang='en')
+  - net = settings.getNet(net)
   - const markets_page = settings.get(net, 'markets_page')
   - const index_page = settings.get(net, 'index_page')
   - const info_page = settings.get(net, 'info_page')

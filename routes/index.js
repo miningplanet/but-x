@@ -27,7 +27,13 @@ networks.forEach( function(net, index) {
   }
 })
 
-function route_get_block(req, res, blockhash) {
+const ERR_NETWORK_UNKNOWN       = new Error('Network unkown. Use ' + settings.getAllNet() + '.')
+const ERR_BLOCK_UNKNOWN         = new Error('Block unkown.')
+const ERR_TX_UNKNOWN            = new Error('Transaction unkown.')
+const ERR_ADDRESS_UNKNOWN       = new Error('Address unkown.')
+const ERR_ASSET_UNKNOWN         = new Error('Asset unkown.')
+
+function route_get_block(req, res, next, blockhash) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
 
@@ -55,16 +61,19 @@ function route_get_block(req, res, blockhash) {
         lib.get_blockhash(blockhash, function(hash) {
           if (hash && hash != 'There was an error. Check your console.')
             res.redirect('/block/' + hash + '/' + net)
-          else
-            route_get_index(req, res, 'Block not found: ' + blockhash)
+          else {
+            // route_get_index(req, res, 'Block not found: ' + blockhash)
+            next(ERR_BLOCK_UNKNOWN)
+            return
+          }
         }, net)
       } else
-        route_get_index(req, res, 'Block not found: ' + blockhash)
+          next(ERR_BLOCK_UNKNOWN) // route_get_index(req, res, 'Block not found: ' + blockhash)
     }
   }, net)
 }
 
-function route_get_asset(req, res, name, start) {
+function route_get_asset(req, res, next, name, start) {
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const asset_page = settings.get(net, 'asset_page')
@@ -106,7 +115,7 @@ function route_get_asset(req, res, name, start) {
         }
       }, net)
     } else {
-      route_get_index(req, res, 'Asset not found: ' + name)
+      next(ERR_ASSET_UNKNOWN)
     }
   }, net)
 }
@@ -120,17 +129,16 @@ function get_file_timestamp(file_name) {
 
 /* GET functions */
 
-function route_get_tx(req, res, txid) {
-  const net = req.params['net']
+function route_get_tx(req, res, next, txid) {
+  const net = req.params['net']  
   const coin = settings.getCoin(net)
   const transaction_page = settings.get(net, 'transaction_page')
   if (txid == transaction_page.genesis_tx) {
     const block_page = settings.get(net, 'block_page')
-    route_get_block(req, res, block_page.genesis_block)
+    route_get_block(req, res, next, block_page.genesis_block)
   } else {
     db.get_tx(txid, function(tx) {
       if (tx) {
-
         db.get_stats(coin.name, function(stats) {
           // TODO: yerbas: tx type
           if (tx.tx_type == 8 || tx.tx_type == 9) {
@@ -162,14 +170,14 @@ function route_get_tx(req, res, txid) {
           }
         }, net)
       } else {
-        res.send({ error: 'tx not found.', hash: txid, coin: coin, net: net})
+        next(ERR_TX_UNKNOWN)
       }
     }, net)
   }
 }
 
 function route_get_index(req, res, error) {
-  const net = req.params['net']
+  const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const index_page = settings.get(net, 'index_page')
   const api_page = settings.get(net, 'api_page')
@@ -191,7 +199,12 @@ function route_get_index(req, res, error) {
   }
 }
 
-router.get('/assets{/:net}', function(req, res) {
+router.get('/assets{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const assets_page = settings.get(net, 'assets_page')
@@ -206,8 +219,13 @@ router.get('/assets{/:net}', function(req, res) {
   }, net)
 })
 
-router.get('/info{/:net}', function(req, res) {
-  const net = req.params['net']
+router.get('/info{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   
   db.get_stats(coin.name, function (stats) {
@@ -272,7 +290,7 @@ router.get('/info{/:net}', function(req, res) {
   }, net)
 })
 
-function route_get_address(req, res, hash) {
+function route_get_address(req, res, next, hash) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   const address_page = settings.get(net, 'address_page')
@@ -291,13 +309,13 @@ function route_get_address(req, res, hash) {
         res.render('address', p)
       }
       else
-        route_get_index(req, res, hash + ' not found')
+        next(ERR_ADDRESS_UNKNOWN)
     }, net)
   } else
-    route_get_index(req, res, hash + ' not found')
+    next(ERR_ADDRESS_UNKNOWN)
 }
 
-function route_get_claim_form(req, res, hash) {
+function route_get_claim_form(req, res, next, hash) {
   const net = req.params['net']
   const coin = settings.getCoin(net)
   const address_page = settings.get(net, 'address_page')
@@ -328,13 +346,18 @@ function route_get_claim_form(req, res, hash) {
       }, net)
     }
   } else
-    route_get_address(req, res, hash)
+    route_get_address(req, res, next, hash)
 }
 
 /* GET home page(s). */
 
-router.get('/', function(req, res) {
-  req.params['net'] = settings.getDefaultNet()
+router.get('/', function(req, res, next) {
+  // TODO: Does not really work as expected.
+  // const net = settings.getNet(req.params['net'])
+  // if (req.params['net'] && net != req.params['net']) {
+  //   next(ERR_NETWORK_UNKNOWN)
+  //   return
+  // }
   route_get_index(req, res, null)
 })
 
@@ -352,7 +375,12 @@ function isApiEndpointEnabled(api_page, api_cmds, key) {
   return api_page.public_apis.rpc[key].enabled == true && api_cmds[key] != null && api_cmds[key] != ''
 }
 
-router.get('/apidocs{/:net}', function(req, res) {
+router.get('/apidocs{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const api_page = settings.get(net, 'api_page')
@@ -373,7 +401,12 @@ router.get('/apidocs{/:net}', function(req, res) {
   }
 })
 
-router.get('/markets/:market/:coin_symbol/:pair_symbol{/:net}', function(req, res) {
+router.get('/markets/:market/:coin_symbol/:pair_symbol{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const markets_page = settings.get(net, 'markets_page')
@@ -464,7 +497,12 @@ router.get('/markets/:market/:coin_symbol/:pair_symbol{/:net}', function(req, re
   }
 })
 
-router.get('/richlist{/:net}', function(req, res) {
+router.get('/richlist{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const richlist_page = settings.get(net, 'richlist_page')
@@ -502,7 +540,11 @@ router.get('/richlist{/:net}', function(req, res) {
 })
 
 // movements page
-router.get('/movement{/:net}', function(req, res) {
+router.get('/movement{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const movement_page = settings.get(net, 'movement_page')
@@ -525,7 +567,12 @@ router.get('/movement{/:net}', function(req, res) {
 })
 
 // network page
-router.get('/network{/:net}', function(req, res) {
+router.get('/network{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const network_page = settings.get(net, 'network_page')
@@ -547,7 +594,12 @@ router.get('/network{/:net}', function(req, res) {
 })
 
 // masternode list page
-router.get('/masternodes{/:net}', function(req, res) {
+router.get('/masternodes{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const masternodes_page = settings.get(net, 'masternodes_page')
@@ -569,7 +621,12 @@ router.get('/masternodes{/:net}', function(req, res) {
   }
 })
 
-router.get('/reward{/:net}', function(req, res) {
+router.get('/reward{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   // TODO: Fix Heavy Coin reward page.
@@ -607,17 +664,33 @@ router.get('/reward{/:net}', function(req, res) {
   }
 })
 
-router.get('/tx/:txid{/:net}', function(req, res) {
-  route_get_tx(req, res, req.params.txid)
+router.get('/tx/:txid{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  route_get_tx(req, res, next, req.params.txid)
 })
 
-router.get('/block/:hash{/:net}', function(req, res) {
-  route_get_block(req, res, req.params.hash)
+router.get('/block/:hash{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  route_get_block(req, res, next, req.params.hash)
 })
 
-router.get('/asset/:name/:net{/:start}', function(req, res) {
+router.get('/asset/:name/:net{/:start}', function(req, res, next) {
+  // TODO: Does not work with undefined net.
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
   req.params.name.replace('+', '/')
-  route_get_asset(req, res, req.params.name, req.params.name)
+  route_get_asset(req, res, next, req.params.name, req.params.name)
 })
 
 router.get('/register{/:net}', function(req, res) {
@@ -687,20 +760,40 @@ function route_to_user_page(req, res, address) {
   route_get_index(req, res, 'User login is disabled.')
 }
 
-router.get('/claim{/:net}', function(req, res) {
-  route_get_claim_form(req, res, '')
+router.get('/claim{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  route_get_claim_form(req, res, next, '')
 })
 
-router.get('/claim/:hash{/:net}', function(req, res) {
-  route_get_claim_form(req, res, req.params.hash)
+router.get('/claim/:hash{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  route_get_claim_form(req, res, next, req.params.hash)
 })
 
-router.get('/address/:hash{/:net}', function(req, res) {
-  route_get_address(req, res, req.params.hash)
+router.get('/address/:hash{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  route_get_address(req, res, next, req.params.hash)
 })
 
-router.post('/search{/:net}', function(req, res) {
-  const net = req.params['net']
+router.post('/search{/:net}', function(req, res, next) {
+  if (!settings.hasNet(req.params['net'])) {
+    next(ERR_NETWORK_UNKNOWN)
+    return
+  }
+
+  const net = settings.getNet(req.params['net'])
   const shared_pages = settings.get(net, 'shared_pages')
   if (shared_pages.page_header.search.enabled == true) {
     var query = req.body.search.trim()
@@ -735,7 +828,7 @@ router.post('/search{/:net}', function(req, res) {
       }
     } else {
       if (query.startsWith('asset:')) {
-        route_get_asset(req, res, query)
+        route_get_asset(req, res, next, query)
       } else {
         console.log("Search address: '" + query + "' for net " + net + ".")
         db.get_address(query, function(address) {
@@ -773,7 +866,7 @@ router.get('/qr/:string{/:net}', function(req, res) {
 })
 
 function param(pageKey, page, req, db, settings, prefix) {
-  const net = req.params['net']
+  const net = settings.getNet(req.params['net'])
   const coin = settings.getCoin(net)
   const shared_pages = settings.get(net, 'shared_pages')
   var ip = '-'
